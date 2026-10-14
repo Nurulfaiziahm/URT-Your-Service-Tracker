@@ -4,67 +4,110 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Detail Servis - URT Device Tracker</title>
+  <link rel="stylesheet" href="style-customer.css">
+  <style>
+    /* Penyesuaian khusus halaman tanpa sidebar */
+    body {
+        align-items: flex-start;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+    .full-width-wrapper {
+        width: 100%;
+        max-width: 800px; /* Lebar maksimal konten */
+    }
+    .btn-secondary {
+        background-color: var(--white);
+        color: var(--text-dark);
+        border: 1px solid #cbd5e1;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .btn-secondary:hover {
+        background-color: #f1f5f9;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+        justify-content: flex-end; /* Memposisikan tombol ke kanan */
+    }
+    /* Menghilangkan garis tebal pada tabel detail */
+    .detail-table td {
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .detail-table td:first-child {
+        width: 35%;
+        color: var(--text-muted);
+    }
+  </style>
 </head>
 <body>
 
-  <main>
-    <section id="service-details-popup">
-      <h1>Ringkasan Servis Selesai</h1>
-      <h2>#URT-2026-0004</h2>
+  <main class="full-width-wrapper">
+    <section id="service-details-popup" class="card">
       
-      <table>
-        <tbody>
-          <tr>
-            <td><strong>Nama Laptop</strong></td>
-            <td>Lenovo IdeaPad 3</td>
-          </tr>
-          <tr>
-            <td><strong>Jenis Laptop</strong></td>
-            <td>Notebook / Laptop Consumer</td>
-          </tr>
-          <tr>
-            <td><strong>RAM</strong></td>
-            <td>8GB DDR4</td>
-          </tr>
-          <tr>
-            <td><strong>Tanggal Servis Masuk</strong></td>
-            <td>18 Agu 2026</td>
-          </tr>
-          <tr>
-            <td><strong>Tanggal Servis Selesai</strong></td>
-            <td>20 Agu 2026</td>
-          </tr>
-          <tr>
-            <td><strong>Jenis Perbaikan</strong></td>
-            <td>Cleaning & Thermal Paste Replacement</td>
-          </tr>
-          <tr>
-            <td><strong>Deskripsi Pengerjaan</strong></td>
-            <td>Pembersihan menyeluruh pada kipas pendingin, pembersihan debu pada motherboard, dan penggantian thermal paste lama dengan yang baru pada prosesor. Suhu laptop kembali normal.</td>
-          </tr>
-          <tr>
-            <td><strong>Teknisi Penanggungjawab</strong></td>
-            <td>Budi Santoso</td>
-          </tr>
-          <tr>
-            <td><strong>Total Pembayaran</strong></td>
-            <td><strong>Rp150.000</strong></td>
-          </tr>
-        </tbody>
-      </table>
+      <div style="margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+          <h1 style="font-size: 24px; margin-bottom: 4px;">Ringkasan Servis Selesai</h1>
+          <h2 style="font-size: 16px; color: var(--primary-blue);">#URT-2026-0004</h2>
+      </div>
+      
+      <div class="table-wrapper">
+        <table class="detail-table">
+          <tbody>
+            <tr>
+              <td><strong>Nama Laptop</strong></td>
+              <td>Lenovo IdeaPad 3</td>
+            </tr>
+            <tr>
+              <td><strong>Jenis Laptop</strong></td>
+              <td>Notebook / Laptop Consumer</td>
+            </tr>
+            <tr>
+              <td><strong>RAM</strong></td>
+              <td>8GB DDR4</td>
+            </tr>
+            <tr>
+              <td><strong>Tanggal Servis Masuk</strong></td>
+              <td>18 Agu 2026</td>
+            </tr>
+            <tr>
+              <td><strong>Tanggal Servis Selesai</strong></td>
+              <td>20 Agu 2026</td>
+            </tr>
+            <tr>
+              <td><strong>Jenis Perbaikan</strong></td>
+              <td>Cleaning & Thermal Paste Replacement</td>
+            </tr>
+            <tr>
+              <td><strong>Deskripsi Pengerjaan</strong></td>
+              <td style="line-height: 1.6;">Pembersihan menyeluruh pada kipas pendingin, pembersihan debu pada motherboard, dan penggantian thermal paste lama dengan yang baru pada prosesor. Suhu laptop kembali normal.</td>
+            </tr>
+            <tr>
+              <td><strong>Teknisi Penanggungjawab</strong></td>
+              <td>Budi Santoso</td>
+            </tr>
+            <tr>
+              <td><strong>Total Pembayaran</strong></td>
+              <td style="font-size: 18px; color: var(--text-dark);"><strong>Rp150.000</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <br>
+      <div class="action-buttons">
+        <a href="riwayat-servis.html" class="btn-secondary">Tutup</a>
+        <button type="button" class="btn-primary" onclick="window.print()" style="background-color: var(--text-dark);">Unduh Invoice</button>
+      </div>
 
-      <p>
-        <!-- Button kosongan untuk unduh PDF -->
-        <button type="button">Unduh Invoice PDF</button>
-        <!-- Button untuk kembali ke halaman riwayat servis -->
-        <a href="riwayat-servis.html">Tutup</a>
-      </p>
-      <nav aria-label="Navigasi halaman">
-        <a href="beranda-pelanggan.html">Kembali ke Beranda</a> |
-        <a href="../index.html">Keluar</a>
-      </nav>
     </section>
   </main>
 
