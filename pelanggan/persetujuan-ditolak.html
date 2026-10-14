@@ -1,131 +1,199 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tolak Perbaikan - URT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tolak Perbaikan - URT</title>
+    <link rel="stylesheet" href="style-customer.css">
+    <style>
+        /* Tambahan style khusus untuk halaman Tolak Perbaikan */
+        .alert-danger {
+            background-color: #FEF2F2;
+            border-left: 4px solid #EF4444;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .alert-danger h2 {
+            color: #991B1B;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        .alert-danger p {
+            color: #B91C1C;
+            font-size: 14px;
+        }
+        .detail-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .detail-list div { margin-bottom: 8px; }
+        .detail-list dt {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .detail-list dd {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .info-section { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+        .step-list { margin-top: 16px; padding-left: 16px; }
+        .step-list li { margin-bottom: 16px; font-size: 14px; color: var(--text-dark); }
+        .step-list li strong { display: block; margin-bottom: 4px; font-size: 14px; }
+        .step-list li p { color: var(--text-muted); font-size: 12px; }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div>
-      <strong>URT</strong>
-      <p>Your Service Tracker</p>
-      <p>CUSTOMER PORTAL</p>
-    </div>
-
-    <nav aria-label="Navigasi pelanggan">
-      <ul>
-        <li><a href="beranda-pelanggan.html">Beranda</a></li>
-        <li><a href="riwayat-servis.html">Riwayat Servis</a></li>
-        <li><a href="profil-pelanggan.html">Profil</a></li>
-      </ul>
-    </nav>
-
-    <p>
-      <strong>PELANGGAN</strong> |
-      Sistem Online
-    </p>
-
-    <p>
-      <strong>Nino Rachimas</strong><br>
-      Pelanggan
-    </p>
-  </header>
-
-  <main>
-    <header>
-      <p>Portal Pelanggan</p>
-      <h1>Tolak Perbaikan</h1>
-      <p>Keputusan perbaikan untuk ASUS VivoBook 14 pada tiket #URT-2026-001.</p>
-      <p><a href="detail-servis.html">Kembali ke Detail Service</a></p>
-    </header>
-
-    <section aria-labelledby="status-penolakan">
-      <h2 id="status-penolakan">Penolakan perbaikan telah tercatat</h2>
-      <p>
-        Nino Rachimas menolak estimasi Rp250.000 pada 26 Agu 2026.
-        Teknisi telah diberi tahu dan pekerjaan perbaikan tidak dilanjutkan.
-      </p>
-    </section>
-
-    <section aria-labelledby="konfirmasi-keputusan">
-      <h2 id="konfirmasi-keputusan">Konfirmasi Keputusan</h2>
-      <p>#URT-2026-001 • ASUS VivoBook 14</p>
-      <p><strong>PERBAIKAN DITOLAK</strong></p>
-
-      <dl>
-        <dt>Pelanggan</dt>
-        <dd>Nino Rachimas</dd>
-
-        <dt>Tindakan Diajukan</dt>
-        <dd>Deep Cleaning &amp; Re-paste Arctic MX-4</dd>
-
-        <dt>Estimasi Ditolak</dt>
-        <dd>Rp250.000</dd>
-
-        <dt>Teknisi</dt>
-        <dd>Sofia Malvalena Adam</dd>
-
-        <dt>Waktu Keputusan</dt>
-        <dd>26 Agu 2026</dd>
-      </dl>
-
-      <section aria-labelledby="alasan-penolakan">
-        <h3 id="alasan-penolakan">Alasan Penolakan</h3>
-        <p>
-          Biaya belum sesuai anggaran. Saya memilih mengambil kembali perangkat
-          tanpa melanjutkan perbaikan.
-        </p>
-      </section>
-
-      <section aria-labelledby="preferensi-pengambilan">
-        <h3 id="preferensi-pengambilan">Preferensi Pengambilan</h3>
-        <p>Diambil langsung di hub servis</p>
-      </section>
-
-      <p>
-        Keputusan ini disimpan sebagai catatan tiket.
-        Persetujuan biaya sebelumnya tidak dibuat.
-      </p>
-    </section>
-
-    <aside>
-      <section aria-labelledby="pengembalian-perangkat">
-        <h2 id="pengembalian-perangkat">Pengembalian Perangkat</h2>
-
-        <ol>
-          <li>
-            <strong>Perbaikan dihentikan</strong>
-            <p>Tidak ada tindakan perbaikan lanjutan.</p>
-          </li>
-          <li>
-            <strong>Konfirmasi dari tim servis</strong>
-            <p>Tim akan menghubungi Anda untuk jadwal pengambilan.</p>
-          </li>
-          <li>
-            <strong>Bawa tanda terima</strong>
-            <p>Siapkan nomor tiket #URT-2026-001 saat mengambil perangkat.</p>
-          </li>
-        </ol>
-      </section>
-
-      <section aria-labelledby="informasi-perangkat">
-        <h2 id="informasi-perangkat">Informasi Perangkat</h2>
-        <p>
-          <strong>Perangkat belum diperbaiki.</strong>
-          Keluhan awal masih dapat terjadi. Hindari penggunaan berat sampai
-          perangkat diperiksa kembali.
-        </p>
-      </section>
-
-      <p><a href="beranda-pelanggan.html">Kembali ke Beranda</a></p>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">URT</div>
+            <div>
+                <p style="font-size: 14px; font-weight: 700;">Your Service Tracker</p>
+                <p style="font-size: 10px; color: #94A3B8;">CUSTOMER PORTAL</p>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="beranda-pelanggan.html" class="nav-item">Beranda</a>
+            <a href="riwayat-servis.html" class="nav-item">Riwayat Servis</a>
+            <a href="profil-pelanggan.html" class="nav-item">Profil</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="avatar">NR</div>
+            <div class="user-info">
+                <p>Nino Rachimas</p>
+                <span>Pelanggan</span>
+            </div>
+        </div>
     </aside>
-  </main>
 
-  <footer>
-    <p>URT — Your Service Tracker | Kelompok 2</p>
-  </footer>
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        <!-- HEADER -->
+        <header class="top-header">
+            <div>
+                <span class="badge-pelanggan">PELANGGAN</span>
+                <span style="font-size: 14px; color: var(--text-muted); margin-left: 8px;">Sistem Online</span>
+            </div>
+            <div class="header-right">
+                <div class="avatar" style="background: white; border: 1px solid var(--primary-blue); color: var(--primary-blue);">NR</div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <div class="page-header">
+                <div>
+                    <span class="page-title">PORTAL PELANGGAN</span>
+                    <h1>Tolak Perbaikan</h1>
+                    <p class="subtitle">Keputusan perbaikan untuk ASUS VivoBook 14 pada tiket #URT-2026-001.</p>
+                </div>
+                <a href="detail-servis.html" class="btn-primary" style="background-color: var(--text-muted);">Kembali ke Detail Service</a>
+            </div>
+
+            <!-- ALERT SECTION -->
+            <section class="alert-danger" aria-labelledby="status-penolakan">
+                <h2 id="status-penolakan">Penolakan perbaikan telah tercatat</h2>
+                <p>Nino Rachimas menolak estimasi Rp250.000 pada 26 Agu 2026. Teknisi telah diberi tahu dan pekerjaan perbaikan tidak dilanjutkan.</p>
+            </section>
+
+            <!-- MAIN GRID LAYOUT -->
+            <div class="main-grid">
+                
+                <!-- KOLOM KIRI: DETAIL KEPUTUSAN -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                        <div>
+                            <h2 id="konfirmasi-keputusan" style="font-size: 18px; margin-bottom: 4px;">Konfirmasi Keputusan</h2>
+                            <p style="font-size: 14px; color: var(--text-muted);">#URT-2026-001 • ASUS VivoBook 14</p>
+                        </div>
+                        <span class="badge-orange" style="background-color: #FEE2E2; color: #DC2626;">PERBAIKAN DITOLAK</span>
+                    </div>
+
+                    <dl class="detail-list">
+                        <div>
+                            <dt>Pelanggan</dt>
+                            <dd>Nino Rachimas</dd>
+                        </div>
+                        <div>
+                            <dt>Teknisi</dt>
+                            <dd>Sofia Malvalena Adam</dd>
+                        </div>
+                        <div>
+                            <dt>Tindakan Diajukan</dt>
+                            <dd>Deep Cleaning & Re-paste Arctic MX-4</dd>
+                        </div>
+                        <div>
+                            <dt>Estimasi Ditolak</dt>
+                            <dd>Rp250.000</dd>
+                        </div>
+                        <div>
+                            <dt>Waktu Keputusan</dt>
+                            <dd>26 Agu 2026</dd>
+                        </div>
+                    </dl>
+
+                    <section class="info-section" aria-labelledby="alasan-penolakan">
+                        <h3 id="alasan-penolakan" style="font-size: 14px; margin-bottom: 8px;">Alasan Penolakan</h3>
+                        <p style="font-size: 14px; color: var(--text-dark); background: #f8fafc; padding: 12px; border-radius: 8px;">
+                            "Biaya belum sesuai anggaran. Saya memilih mengambil kembali perangkat tanpa melanjutkan perbaikan."
+                        </p>
+                    </section>
+
+                    <section class="info-section" aria-labelledby="preferensi-pengambilan">
+                        <h3 id="preferensi-pengambilan" style="font-size: 14px; margin-bottom: 8px;">Preferensi Pengambilan</h3>
+                        <p style="font-size: 14px; color: var(--text-dark);">Diambil langsung di hub servis</p>
+                    </section>
+
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 24px; font-style: italic;">
+                        Keputusan ini disimpan sebagai catatan tiket. Persetujuan biaya sebelumnya tidak dibuat.
+                    </p>
+                </div>
+
+                <!-- KOLOM KANAN: ASIDE / PANDUAN PENGEMBALIAN -->
+                <aside class="card">
+                    <section aria-labelledby="pengembalian-perangkat">
+                        <h2 id="pengembalian-perangkat" style="font-size: 16px; margin-bottom: 12px;">Pengembalian Perangkat</h2>
+                        <ol class="step-list">
+                            <li>
+                                <strong>Perbaikan dihentikan</strong>
+                                <p>Tidak ada tindakan perbaikan lanjutan.</p>
+                            </li>
+                            <li>
+                                <strong>Konfirmasi dari tim servis</strong>
+                                <p>Tim akan menghubungi Anda untuk jadwal pengambilan.</p>
+                            </li>
+                            <li>
+                                <strong>Bawa tanda terima</strong>
+                                <p>Siapkan nomor tiket #URT-2026-001 saat mengambil perangkat.</p>
+                            </li>
+                        </ol>
+                    </section>
+
+                    <section class="info-section" aria-labelledby="informasi-perangkat">
+                        <h2 id="informasi-perangkat" style="font-size: 14px; color: #B45309; margin-bottom: 8px;">⚠️ Informasi Perangkat</h2>
+                        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                            <strong>Perangkat belum diperbaiki.</strong> Keluhan awal masih dapat terjadi. Hindari penggunaan berat sampai perangkat diperiksa kembali.
+                        </p>
+                    </section>
+                    
+                    <a href="beranda-pelanggan.html" class="btn-primary" style="width: 100%; margin-top: 24px;">Kembali ke Beranda</a>
+                </aside>
+
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <footer style="text-align: center; padding: 24px; font-size: 12px; color: var(--text-muted);">
+            <p>URT — Your Service Tracker | Kelompok 2</p>
+        </footer>
+    </main>
 
 </body>
 </html>

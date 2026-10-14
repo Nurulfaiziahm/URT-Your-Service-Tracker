@@ -1,121 +1,141 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Profil Pelanggan - URT Device Tracker</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profil Pelanggan - URT Device Tracker</title>
+    <link rel="stylesheet" href="style-customer.css">
 </head>
 <body>
 
-  <!-- SIDEBAR NAVIGATION -->
-  <header>
-    <nav>
-      <h3>Menu Pelanggan</h3>
-      <p><strong>Nino Rachimas</strong></p>
-      
-      <ul>
-        <li><a href="beranda-pelanggan.html">Beranda</a></li>
-        <li><a href="riwayat-servis.html">Riwayat Servis</a></li>
-        <li>Profil (Aktif)</li>
-        <li><a href="../index.html">Keluar</a></li>
-      </ul>
-    </nav>
-  </header>
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">URT</div>
+            <div>
+                <p style="font-size: 14px; font-weight: 700;">Your Service Tracker</p>
+                <p style="font-size: 10px; color: #94A3B8;">CUSTOMER PORTAL</p>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="beranda-pelanggan.html" class="nav-item">Beranda</a>
+            <a href="riwayat-servis.html" class="nav-item">Riwayat Servis</a>
+            <!-- Kelas active dipindah ke Profil -->
+            <a href="profil-pelanggan.html" class="nav-item active">Profil</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="avatar">NR</div>
+            <div class="user-info">
+                <p>Nino Rachimas</p>
+                <span>Pelanggan</span>
+            </div>
+        </div>
+    </aside>
 
-  <hr>
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        <!-- HEADER -->
+        <header class="top-header">
+            <div>
+                <span class="badge-pelanggan">PELANGGAN</span>
+                <span style="font-size: 14px; color: var(--text-muted); margin-left: 8px;">Sistem Online</span>
+            </div>
+            <div class="header-right">
+                <div class="avatar" style="background: white; border: 1px solid var(--primary-blue); color: var(--primary-blue);">NR</div>
+            </div>
+        </header>
 
-  <!-- KONTEN UTAMA PROFIL -->
-  <main>
-    <h1>Profil Pelanggan</h1>
-    <p>Kelola identitas dan kontak untuk pembaruan status servis perangkat Anda.</p>
+        <!-- KONTEN UTAMA PROFIL -->
+        <div class="content">
+            <div class="page-header">
+                <div>
+                    <span class="page-title">PENGATURAN AKUN</span>
+                    <h1>Profil Pelanggan</h1>
+                    <p class="subtitle">Kelola identitas dan kontak untuk pembaruan status servis perangkat Anda.</p>
+                </div>
+            </div>
 
-    <h2>Nino Rachimas</h2>
-    <p>Informasi profil dan preferensi komunikasi</p>
+            <div class="card" style="max-width: 800px;">
+                <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;">
+                    <h2 style="font-size: 20px; margin-bottom: 4px;">Nino Rachimas</h2>
+                    <p style="font-size: 14px; color: var(--text-muted);">Informasi profil dan preferensi komunikasi</p>
+                </div>
 
-    <form action="beranda-pelanggan.html" method="GET">
-      <!-- INFORMASI PRIBADI -->
-      <fieldset>
-        <legend>Informasi Pribadi</legend>
-        <p>
-          <label>Nama Lengkap:<br> 
-            <input type="text" name="nama" value="Nino Rachimas" required>
-          </label>
-        </p>
-        <p>
-          <label>Nama pelaberanda-pelanggan.html:<br> 
-            <input type="text" name="username" value="ninorachimas" required>
-          </label>
-        </p>
-        <p>
-          <label>Email Aktif:<br> 
-            <input type="email" name="email" value="nino@vinix7ut.com" required>
-          </label>
-        </p>
-        <p>
-          <label>Nomor WhatsApp/Telepon:<br> 
-            <input type="tel" name="telepon" value="081234567890" required>
-          </label>
-        </p>
-        <p>
-          <label>Alamat Lengkap:<br> 
-            <textarea name="alamat" rows="4" cols="50" required>Kota Semarang, Jawa Barat</textarea>
-          </label>
-        </p>
-      </fieldset>
+                <form action="customer/beranda-pelanggan.html" method="GET">
+                    
+                    <!-- INFORMASI PRIBADI -->
+                    <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--primary-blue);">Informasi Pribadi</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" name="nama" value="Nino Rachimas" required class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Pengguna</label>
+                            <input type="text" name="username" value="ninorachimas" required class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Aktif</label>
+                            <input type="email" name="email" value="nino@vinix7ut.com" required class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor WhatsApp/Telepon</label>
+                            <input type="tel" name="telepon" value="081234567890" required class="form-control">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Alamat Lengkap</label>
+                            <textarea name="alamat" rows="3" required class="form-control">Kota Semarang, Jawa Tengah</textarea>
+                        </div>
+                    </div>
 
-      <br>
+                    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 32px 0;">
 
-      <!-- PREFERENSI & KEAMANAN -->
-      <fieldset>
-        <legend>Preferensi & Keamanan</legend>
-        <p>
-          <label>
-            <input type="checkbox" name="notif_wa" checked> 
-            Notifikasi melalui WhatsApp: Estimasi biaya, status pengerjaan, dan pengambilan
-          </label>
-        </p>
-        <p>
-          <label>
-            <input type="checkbox" name="notif_email" checked> 
-            Salinan tanda terima melalui email: Tanda terima dan ringkasan servis digital.
-          </label>
-        </p>
-        
-        <hr>
-        
-        <p>
-          <label>Kata Sandi Baru:<br> 
-            <input type="password" name="password_baru">
-          </label>
-        </p>
-        <p><em>Opsional. Kosongkan jika tidak ingin mengganti kata sandi.</em></p>
-        
-        <p>
-          <label>Konfirmasi Kata Sandi Baru:<br> 
-            <input type="password" name="konfirmasi_password">
-          </label>
-        </p>
-      </fieldset>
+                    <!-- PREFERENSI & KEAMANAN -->
+                    <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--primary-blue);">Preferensi & Keamanan</h3>
+                    
+                    <div class="checkbox-group" style="margin-bottom: 24px;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="notif_wa" checked> 
+                            <span><b>Notifikasi melalui WhatsApp:</b> Estimasi biaya, status pengerjaan, dan pengambilan.</span>
+                        </label>
+                        <label class="checkbox-label" style="margin-top: 12px;">
+                            <input type="checkbox" name="notif_email" checked> 
+                            <span><b>Salinan tanda terima email:</b> Tanda terima dan ringkasan servis digital.</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Kata Sandi Baru</label>
+                            <input type="password" name="password_baru" class="form-control" placeholder="Biarkan kosong jika tidak diubah">
+                        </div>
+                        <div class="form-group">
+                            <label>Konfirmasi Kata Sandi</label>
+                            <input type="password" name="konfirmasi_password" class="form-control" placeholder="Ulangi kata sandi baru">
+                        </div>
+                    </div>
 
-      <br>
+                    <!-- INFORMASI PENTING & TOMBOL AKSI -->
+                    <div style="background-color: #F8FAFC; padding: 16px; border-radius: 8px; margin-top: 24px; border: 1px solid #e2e8f0;">
+                        <p style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Data kontak digunakan untuk servis</p>
+                        <p style="font-size: 12px; color: var(--text-muted);">Pastikan nomor dan email aktif agar Anda menerima permintaan persetujuan biaya dan pembaruan perbaikan.</p>
+                    </div>
 
-      <!-- INFORMASI PENTING & TOMBOL AKSI -->
-      <p><strong>Data kontak digunakan untuk servis</strong></p>
-      <p>Pastikan nomor dan email aktif agar Anda menerima permintaan persetujuan biaya dan pembaruan perbaikan.</p>
+                    <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end;">
+                        <a href="beranda-pelanggan.html" class="btn-secondary">Batal</a>
+                        <button type="submit" class="btn-primary" style="border: none;">Simpan Profil</button>
+                        <a href="../index.html" class="btn-secondary">Keluar</a>
+                    </div>
 
-      <p>
-        <a href="beranda-pelanggan.html">Batal</a>
-        <button type="submit">Simpan Profil</button>
-      </p>
+                </form>
+            </div>
+            
+            <footer style="margin-top: 40px; text-align: center; font-size: 12px; color: var(--text-muted);">
+                <p>URT — Your Device Tracker | Kelompok 2</p>
+            </footer>
+        </div>
+    </main>
 
-    </form>
-  </main>
-
-  <br><hr>
-  <footer>
-    <p>URT — Your Device Tracker | Kelompok 2</p>
-  </footer>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

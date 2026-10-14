@@ -1,94 +1,127 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Riwayat Servis - URT Device Tracker</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Servis - URT Device Tracker</title>
+    <link rel="stylesheet" href="style-customer.css">
 </head>
 <body>
 
-  <!-- SIDEBAR NAVIGATION -->
-  <header>
-    <nav>
-      <h3>Menu Pelanggan</h3>
-      <p><strong>Nino Rachimas</strong></p>
-      
-      <ul>
-        <li><a href="beranda-pelanggan.html">Beranda</a></li>
-        <li>Riwayat Servis (Aktif)</li>
-        <li><a href="profil-pelanggan.html">Profil</a></li>
-      </ul>
-    </nav>
-  </header>
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">URT</div>
+            <div>
+                <p style="font-size: 14px; font-weight: 700;">Your Service Tracker</p>
+                <p style="font-size: 10px; color: #94A3B8;">CUSTOMER PORTAL</p>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="beranda-pelanggan.html" class="nav-item">Beranda</a>
+            <a href="riwayat-servis.html" class="nav-item active">Riwayat Servis</a>
+            <a href="profil-pelanggan.html" class="nav-item">Profil</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="avatar">NR</div>
+            <div class="user-info">
+                <p>Nino Rachimas</p>
+                <span>Pelanggan</span>
+            </div>
+        </div>
+    </aside>
 
-  <hr>
+    <!-- KONTEN UTAMA -->
+    <main class="main-wrapper">
+        <!-- HEADER ATAS -->
+        <header class="top-header">
+            <div>
+                <span class="badge-pelanggan">PELANGGAN</span>
+                <span style="font-size: 14px; color: var(--text-muted); margin-left: 8px;">Sistem Online</span>
+            </div>
+            <div class="header-right">
+                <div class="avatar" style="background: white; border: 1px solid var(--primary-blue); color: var(--primary-blue);">NR</div>
+            </div>
+        </header>
 
-  <!-- KONTEN UTAMA RIWAYAT SERVIS -->
-  <main>
-    <h1>Riwayat Servis</h1>
-    <p>Daftar lengkap perbaikan perangkat Anda yang telah diselesaikan.</p>
-    
-    <table>
-      <tr>
-        <th>Total Servis Selesai</th>
-      </tr>
-      <tr>
-        <td><strong>3</strong></td>
-      </tr>
-    </table>
+        <!-- AREA KONTEN -->
+        <div class="content">
+            <div class="page-header">
+                <div>
+                    <span class="page-title">RIWAYAT SERVIS</span>
+                    <h1>Daftar Servis Selesai</h1>
+                    <p class="subtitle">Daftar lengkap perbaikan perangkat Anda yang telah diselesaikan.</p>
+                </div>
+            </div>
+            
+            <!-- STATISTIK SINGKAT -->
+            <!-- Menggunakan max-width agar card tidak melebar ke seluruh layar karena hanya ada 1 kotak -->
+            <div class="stats-grid" style="grid-template-columns: 1fr; max-width: 300px;">
+                <div class="stat-card">
+                    <div class="stat-title">Total Servis Selesai</div>
+                    <div class="stat-value border-green">3</div>
+                </div>
+            </div>
 
-    <br>
+            <!-- TABEL DAFTAR RIWAYAT -->
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nomor Tiket & Perangkat</th>
+                                <th>Jenis Servis</th>
+                                <th>Tanggal Masuk</th>
+                                <th>Total Biaya</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <b>#URT-2026-0004</b><br>
+                                    <span style="font-size: 12px; color: var(--text-muted);">Lenovo IdeaPad 3</span>
+                                </td>
+                                <td>Cleaning & Thermal Paste Replacement</td>
+                                <td>18 Agu 2026</td>
+                                <td>Rp 150.000</td>
+                                <td><span class="badge-green">Selesai</span></td>
+                                <td><a href="detail-servis.html" class="btn-primary" style="padding: 6px 12px; font-size: 12px;">Detail</a></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <b>#URT-2026-0032</b><br>
+                                    <span style="font-size: 12px; color: var(--text-muted);">MacBook Air M1</span>
+                                </td>
+                                <td>Install Ulang MacOS & Backup Data</td>
+                                <td>12 Sep 2026</td>
+                                <td>Rp 250.000</td>
+                                <td><span class="badge-green">Selesai</span></td>
+                                <td><a href="detail-servis.html" class="btn-primary" style="padding: 6px 12px; font-size: 12px;">Detail</a></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <b>#URT-2026-0050</b><br>
+                                    <span style="font-size: 12px; color: var(--text-muted);">Acer Nitro 5</span>
+                                </td>
+                                <td>Upgrade SSD NVMe 1TB</td>
+                                <td>1 Okt 2026</td>
+                                <td>Rp 1.200.000</td>
+                                <td><span class="badge-green">Selesai</span></td>
+                                <td><a href="detail-servis.html" class="btn-primary" style="padding: 6px 12px; font-size: 12px;">Detail</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-    <!-- TABEL DAFTAR RIWAYAT -->
-    <table>
-      <thead>
-        <tr>
-          <th>Nomor Tiket & Perangkat</th>
-          <th>Jenis Servis</th>
-          <th>Tanggal Masuk</th>
-          <th>Total Biaya</th>
-          <th>Status</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>#URT-2026-0004</strong><br>Lenovo IdeaPad 3</td>
-          <td>Cleaning & Thermal Paste Replacement</td>
-          <td>18 Agu 2026</td>
-          <td>Rp 150.000</td>
-          <td>Selesai</td>
-          <td><a href="detail-servis.html">Detail</a></td>
-        </tr>
-        <tr>
-          <td><strong>#URT-2026-0032</strong><br>MacBook Air M1</td>
-          <td>Install Ulang MacOS & Backup Data</td>
-          <td>12 Sep 2026</td>
-          <td>Rp 250.000</td>
-          <td>Selesai</td>
-          <td><a href="detail-servis.html">Detail</a></td>
-        </tr>
-        <tr>
-          <td><strong>#URT-2026-0050</strong><br>Acer Nitro 5</td>
-          <td>Upgrade SSD NVMe 1TB</td>
-          <td>1 Okt 2026</td>
-          <td>Rp 1.200.000</td>
-          <td>Selesai</td>
-          <td><a href="detail-servis.html">Detail</a></td>
-        </tr>
-      </tbody>
-    </table>
-  </main>
+            <footer style="margin-top: 32px; text-align: center; color: var(--text-muted); font-size: 12px;">
+                <p>URT — Your Device Tracker | Kelompok 2</p>
+            </footer>
+        </div>
+    </main>
 
-  <br><hr>
-  <footer>
-    <p>URT — Your Device Tracker | Kelompok 2</p>
-  </footer>
-
-  <script src="script.js"></script>
-  <footer>
-    <p><a href="beranda-pelanggan.html">Kembali ke Beranda</a> | <a href="../index.html">Keluar</a></p>
-    <p>URT — Your Device Tracker | Kelompok 2</p>
-  </footer>
+    <script src="script.js"></script>
 </body>
 </html>

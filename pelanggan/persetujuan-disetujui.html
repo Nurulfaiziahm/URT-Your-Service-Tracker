@@ -1,135 +1,212 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Persetujuan Biaya - URT</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Persetujuan Biaya - URT</title>
+    <!-- Menyambungkan ke CSS utama -->
+    <link rel="stylesheet" href="style-customer.css">
+    <style>
+        /* Tambahan styling khusus untuk halaman detail/persetujuan jika diperlukan */
+        .dl-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 12px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        .dl-grid dt {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .dl-grid dd {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .alert-success {
+            background-color: #D1FAE5;
+            border: 1px solid #34D399;
+            color: #065F46;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .timeline-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 16px;
+        }
+        .timeline-list li {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+        .timeline-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-blue);
+            border-radius: 50%;
+        }
+        .timeline-list li:last-child {
+            margin-bottom: 0;
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div>
-      <strong>URT</strong>
-      <p>Your Service Tracker</p>
-      <p>CUSTOMER PORTAL</p>
-    </div>
-
-    <nav aria-label="Navigasi pelanggan">
-      <ul>
-        <li><a href="beranda-pelanggan.html">Beranda</a></li>
-        <li><a href="riwayat-servis.html">Riwayat Servis</a></li>
-        <li><a href="profil-pelanggan.html">Profil</a></li>
-      </ul>
-    </nav>
-
-    <p>
-      <strong>PELANGGAN</strong> |
-      Sistem Online
-    </p>
-
-    <p>
-      <strong>Nino Rachimas</strong><br>
-      Pelanggan
-    </p>
-  </header>
-
-  <main>
-    <header>
-      <p>Portal Pelanggan</p>
-      <h1>Persetujuan Biaya</h1>
-      <p>Konfirmasi biaya perbaikan ASUS VivoBook 14 pada tiket #URT-2026-001.</p>
-      <p><a href="detail-servis.html">Kembali ke Detail Service</a></p>
-    </header>
-
-    <section aria-labelledby="status-persetujuan">
-      <h2 id="status-persetujuan">Perbaikan telah Anda setujui</h2>
-      <p>
-        Persetujuan Nino Rachimas tercatat pada 26 Agu 2026.
-        Teknisi telah menerima konfirmasi persetujuan dan dapat melanjutkan pekerjaan.
-      </p>
-    </section>
-
-    <section aria-labelledby="rincian-disetujui">
-      <h2 id="rincian-disetujui">Rincian yang Disetujui</h2>
-      <p>#URT-2026-001 • ASUS VivoBook 14</p>
-      <p><strong>BIAYA DISETUJUI</strong></p>
-
-      <dl>
-        <dt>Pelanggan</dt>
-        <dd>Nino Rachimas</dd>
-
-        <dt>Temuan Diagnosis</dt>
-        <dd>Thermal Paste Kering &amp; Debu Kipas</dd>
-
-        <dt>Tindakan</dt>
-        <dd>Deep Cleaning &amp; Re-paste Arctic MX-4</dd>
-
-        <dt>Sparepart</dt>
-        <dd>Thermal paste</dd>
-
-        <dt>Estimasi Pengerjaan</dt>
-        <dd>1–2 Hari Kerja</dd>
-
-        <dt>Estimasi Selesai</dt>
-        <dd>3 Sep 2026</dd>
-
-        <dt>Teknisi</dt>
-        <dd>Sofia Malvalena Adam</dd>
-      </dl>
-
-      <hr>
-
-      <p>
-        <strong>Total Biaya Servis</strong><br>
-        <strong>Rp250.000</strong>
-      </p>
-
-      <p>
-        <strong>✓ Saya menyetujui tindakan dan estimasi biaya di atas</strong><br>
-        Persetujuan tersimpan • 26 Agu 2026
-      </p>
-
-      <p>
-        <button type="button" onclick="window.print()">Unduh Bukti Persetujuan</button>
-      </p>
-    </section>
-
-    <aside>
-      <section aria-labelledby="langkah-selanjutnya">
-        <h2 id="langkah-selanjutnya">Langkah Selanjutnya</h2>
-
-        <ol>
-          <li>
-            <strong>Persetujuan diterima</strong>
-            <p>Konfirmasi sudah dikirim kepada teknisi.</p>
-          </li>
-          <li>
-            <strong>Proses perbaikan</strong>
-            <p>Teknisi melanjutkan pembersihan dan penggantian pasta termal.</p>
-          </li>
-          <li>
-            <strong>QC &amp; Penyerahan</strong>
-            <p>Perangkat diuji sebelum siap diambil.</p>
-          </li>
-        </ol>
-      </section>
-
-      <section aria-labelledby="informasi-biaya">
-        <h2 id="informasi-biaya">Informasi Biaya</h2>
-        <p>
-          <strong>Tidak ada biaya tambahan tanpa konfirmasi.</strong>
-          Jika ditemukan pekerjaan tambahan, teknisi akan mengajukan estimasi baru
-          sebelum melanjutkan.
-        </p>
-      </section>
-
-      <p><a href="beranda-pelanggan.html">Kembali ke Beranda</a></p>
+    <!-- SIDEBAR (Sama dengan beranda) -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">URT</div>
+            <div>
+                <p style="font-size: 14px; font-weight: 700;">Your Service Tracker</p>
+                <p style="font-size: 10px; color: #94A3B8;">CUSTOMER PORTAL</p>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="beranda-pelanggan.html" class="nav-item">Beranda</a>
+            <a href="riwayat-servis.html" class="nav-item">Riwayat Servis</a>
+            <a href="profil-pelanggan.html" class="nav-item">Profil</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="avatar">NR</div>
+            <div class="user-info">
+                <p>Nino Rachimas</p>
+                <span>Pelanggan</span>
+            </div>
+        </div>
     </aside>
-  </main>
 
-  <footer>
-    <p>URT — Your Service Tracker | Kelompok 2</p>
-  </footer>
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        <!-- HEADER -->
+        <header class="top-header">
+            <div>
+                <span class="badge-pelanggan">PELANGGAN</span>
+                <span style="font-size: 14px; color: var(--text-muted); margin-left: 8px;">Sistem Online</span>
+            </div>
+            <div class="header-right">
+                <div class="avatar" style="background: white; border: 1px solid var(--primary-blue); color: var(--primary-blue);">NR</div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- PAGE HEADER -->
+            <div class="page-header">
+                <div>
+                    <span class="page-title">PORTAL PELANGGAN</span>
+                    <h1>Persetujuan Biaya</h1>
+                    <p class="subtitle">Konfirmasi biaya perbaikan ASUS VivoBook 14 pada tiket #URT-2026-001.</p>
+                </div>
+                <a href="detail-servis.html" class="btn-primary" style="background: white; color: var(--primary-blue); border: 1px solid var(--primary-blue);">Kembali ke Detail Service</a>
+            </div>
+
+            <!-- ALERT STATUS -->
+            <div class="alert-success" aria-labelledby="status-persetujuan">
+                <div>
+                    <h3 id="status-persetujuan" style="margin-bottom: 4px; font-size: 16px;">✓ Perbaikan telah Anda setujui</h3>
+                    <p style="font-size: 14px;">Persetujuan Nino Rachimas tercatat pada 26 Agu 2026. Teknisi telah menerima konfirmasi persetujuan dan dapat melanjutkan pekerjaan.</p>
+                </div>
+            </div>
+
+            <!-- GRID KONTEN UTAMA (2 Kolom) -->
+            <div class="main-grid">
+                
+                <!-- KOLOM KIRI (Rincian Disetujui) -->
+                <section class="card" aria-labelledby="rincian-disetujui">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px;">
+                        <h2 id="rincian-disetujui" style="font-size: 18px;">Rincian yang Disetujui</h2>
+                        <span class="badge-green">BIAYA DISETUJUI</span>
+                    </div>
+                    
+                    <p style="font-size: 14px; color: var(--primary-blue); font-weight: 600;">#URT-2026-001 • ASUS VivoBook 14</p>
+
+                    <dl class="dl-grid">
+                        <dt>Pelanggan</dt>
+                        <dd>Nino Rachimas</dd>
+
+                        <dt>Temuan Diagnosis</dt>
+                        <dd>Thermal Paste Kering &amp; Debu Kipas</dd>
+
+                        <dt>Tindakan</dt>
+                        <dd>Deep Cleaning &amp; Re-paste Arctic MX-4</dd>
+
+                        <dt>Sparepart</dt>
+                        <dd>Thermal paste</dd>
+
+                        <dt>Estimasi Pengerjaan</dt>
+                        <dd>1–2 Hari Kerja</dd>
+
+                        <dt>Estimasi Selesai</dt>
+                        <dd>3 Sep 2026</dd>
+
+                        <dt>Teknisi</dt>
+                        <dd>Sofia Malvalena Adam</dd>
+                    </dl>
+
+                    <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 24px 0;">
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="font-size: 14px; color: var(--text-muted);">Total Biaya Servis</p>
+                            <p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">Rp250.000</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="font-size: 12px; color: var(--success-green); font-weight: 600;">✓ Saya menyetujui tindakan & estimasi</p>
+                            <p style="font-size: 12px; color: var(--text-muted);">Tersimpan • 26 Agu 2026</p>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-primary" onclick="window.print()" style="width: 100%; margin-top: 24px; background-color: var(--text-dark);">Unduh Bukti Persetujuan</button>
+                </section>
+
+                <!-- KOLOM KANAN (Aside - Info & Langkah) -->
+                <aside>
+                    <!-- Card Langkah -->
+                    <section class="card" aria-labelledby="langkah-selanjutnya" style="margin-bottom: 24px;">
+                        <h2 id="langkah-selanjutnya" style="font-size: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">Langkah Selanjutnya</h2>
+                        <ul class="timeline-list">
+                            <li>
+                                <strong style="font-size: 14px;">Persetujuan diterima</strong>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Konfirmasi sudah dikirim kepada teknisi.</p>
+                            </li>
+                            <li>
+                                <strong style="font-size: 14px;">Proses perbaikan</strong>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Teknisi melanjutkan pembersihan dan penggantian pasta termal.</p>
+                            </li>
+                            <li>
+                                <strong style="font-size: 14px;">QC &amp; Penyerahan</strong>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Perangkat diuji sebelum siap diambil.</p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Card Info -->
+                    <section class="card" aria-labelledby="informasi-biaya">
+                        <h2 id="informasi-biaya" style="font-size: 16px; margin-bottom: 12px; color: var(--warning-orange);">Informasi Biaya</h2>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                            <strong>Tidak ada biaya tambahan tanpa konfirmasi.</strong>
+                            Jika ditemukan pekerjaan tambahan, teknisi akan mengajukan estimasi baru sebelum melanjutkan.
+                        </p>
+                    </section>
+                </aside>
+
+            </div>
+            
+            <footer style="margin-top: 40px; text-align: center; font-size: 12px; color: #94A3B8;">
+                <p>URT — Your Service Tracker | Kelompok 2</p>
+            </footer>
+
+        </div>
+    </main>
 
 </body>
 </html>

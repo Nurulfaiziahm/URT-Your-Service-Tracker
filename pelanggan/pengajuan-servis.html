@@ -1,99 +1,167 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pengajuan Servis - URT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengajuan Servis - URT</title>
+    <link rel="stylesheet" href="style-customer.css">
+    
+    <!-- Gaya khusus untuk halaman form tanpa sidebar -->
+    <style>
+        body {
+            /* Memusatkan konten di tengah layar */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 600px; /* Lebar maksimal form */
+            padding: 40px;
+        }
+
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 24px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px #DBEAFE;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .btn-outline {
+            background-color: white;
+            color: var(--text-dark);
+            border: 1px solid #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+
+        .btn-outline:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* Modifikasi btn-primary agar sejajar panjangnya */
+        .btn-primary {
+            flex: 1;
+            border: none;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- SIDEBAR NAVIGATION -->
-  <header>
-    <nav>
-      <h3>Menu Pelanggan</h3>
-      <p><strong>Nino Rachimas</strong></p>
-      
-      <ul>
-        <li><a href="beranda-pelanggan.html">Beranda</a></li>
-        <li><a href="riwayat-servis.html">Riwayat Servis</a></li>
-        <li><a href="profil-pelanggan.html">Profil</a></li>
-        <li>Ajukan Servis Terbaru (Aktif)</li>
-        <li><a href="../index.html">Keluar</a></li>
-      </ul>
-    </nav>
-  </header>
+    <!-- Kontainer utama form menggunakan gaya "card" -->
+    <main class="card form-container">
+        <section id="service-order-popup">
+            
+            <span class="page-title">PENGAJUAN SERVIS</span>
+            <h1 style="font-size: 24px; margin-top: 8px;">Isi Form Servis</h1>
+            <p class="subtitle" style="margin-bottom: 24px;">Lengkapi data agar teknisi dapat memeriksa perangkatmu.</p>
 
-  <hr>
-  <main>
-    <section id="service-order-popup">
-      <p>Pengajuan Servis</p>
-      <h1>Isi Form servis</h1>
-      <p>Lengkapi data agar teknisi dapat memeriksa perangkatmu.</p>
+            <form action="riwayat-servis.html" method="GET">
+                
+                <!-- DATA PEMILIK -->
+                <div class="form-section-title">Data Pemilik</div>
+                
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" class="form-control" name="nama" value="Sofia Malvalena Adam" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control" name="email" value="sofia.m@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Nomor HP</label>
+                    <input type="tel" class="form-control" name="nohp" value="081234567890" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea class="form-control" name="alamat" rows="3" required>Depok, Jawa Barat</textarea>
+                </div>
 
-      <!-- Form diarahkan ke riwayat-servis.html setelah di-submit -->
-      <form action="riwayat-servis.html" method="GET">
-        
-        <fieldset>
-          <legend>Data Pemilik</legend>
-          <p>
-            <label>Nama Lengkap:<br>
-              <input type="text" name="nama" value="Sofia Malvalena Adam" required>
-            </label>
-          </p>
-          <p>
-            <label>Email:<br>
-              <input type="email" name="email" value="sofia.m@example.com" required>
-            </label>
-          </p>
-          <p>
-            <label>Nomor HP:<br>
-              <input type="tel" name="nohp" value="081234567890" required>
-            </label>
-          </p>
-          <p>
-            <label>Alamat:<br>
-              <textarea name="alamat" rows="3" cols="50" required>Depok, Jawa Barat</textarea>
-            </label>
-          </p>
-        </fieldset>
+                <!-- DATA PERANGKAT -->
+                <div class="form-section-title">Data Perangkat</div>
+                
+                <div class="form-group">
+                    <label>Jenis Perangkat</label>
+                    <select class="form-control" name="jenis_perangkat" required>
+                        <option value="">-- Pilih Jenis --</option>
+                        <option value="laptop">Laptop / Notebook</option>
+                        <option value="pc">PC / Komputer Desktop</option>
+                        <option value="macbook">MacBook</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Merek/Model</label>
+                    <input type="text" class="form-control" name="model" placeholder="Contoh: ASUS ROG Zephyrus G14" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Keluhan/Kerusakan</label>
+                    <textarea class="form-control" name="keluhan" rows="4" placeholder="Jelaskan secara detail masalah pada perangkat Anda..." required></textarea>
+                </div>
 
-        <br>
+                <!-- TOMBOL AKSI -->
+                <div class="button-group">
+                    <a href="beranda-pelanggan.html" class="btn-outline">Batal</a>
+                    <a href="persetujuan-servis.html" class="btn-primary">Ajukan Servis</a>
+                </div>
 
-        <fieldset>
-          <legend>Data Perangkat</legend>
-          <p>
-            <label>Jenis Perangkat:<br>
-              <select name="jenis_perangkat" required>
-                <option value="">-- Pilih Jenis --</option>
-                <option value="laptop">Laptop / Notebook</option>
-                <option value="pc">PC / Komputer Desktop</option>
-                <option value="macbook">MacBook</option>
-              </select>
-            </label>
-          </p>
-          <p>
-            <label>Merek/Model:<br>
-              <input type="text" name="model" placeholder="Contoh: ASUS ROG Zephyrus G14" required>
-            </label>
-          </p>
-          <p>
-            <label>Keluhan/Kerusakan:<br>
-              <textarea name="keluhan" rows="5" cols="50" placeholder="Jelaskan secara detail masalah pada perangkat Anda..." required></textarea>
-            </label>
-          </p>
-        </fieldset>
+            </form>
+        </section>
+    </main>
 
-        <br>
-
-        <p>
-          <a href="beranda-pelanggan.html">Batal</a>
-          <button type="submit">Ajukan Servis</button>
-        </p>
-
-      </form>
-    </section>
-  </main>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
