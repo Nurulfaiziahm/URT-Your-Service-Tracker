@@ -1,148 +1,142 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Beranda Pelanggan - URT Device Tracker</title>
-  </head>
-  <body>
-    <!-- SIDEBAR NAVIGATION -->
-    <header>
-      <nav>
-        <h3>Menu Pelanggan</h3>
-        <!-- Foto & Nama Profil Pelanggan -->
-        <p><strong>Nino Rachimas</strong></p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal - URT</title>
+    <link rel="stylesheet" href="style-customer.css">
+</head>
+<body>
 
-        <ul>
-          <li><a href="beranda-pelanggan.html">Beranda</a> (Aktif)</li>
-          <li><a href="riwayat-servis.html">Riwayat Servis</a></li>
-          <li><a href="profil-pelanggan.html">Profil</a></li>
-          <li><a href="pengajuan-servis.html">Ajukan Servis Terbaru</a></li>
-          <li><a href="../index.html">Keluar</a></li>
-        </ul>
-      </nav>
-    </header>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">URT</div>
+            <div>
+                <p style="font-size: 14px; font-weight: 700;">Your Service Tracker</p>
+                <p style="font-size: 10px; color: #94A3B8;">CUSTOMER PORTAL</p>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="beranda-pelanggan.html" class="nav-item active">Beranda</a>
+            <a href="riwayat-servis.html" class="nav-item">Riwayat Servis</a>
+            <a href="profil-pelanggan.html" class="nav-item">Profil</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="avatar">NR</div>
+            <div class="user-info">
+                <p>Nino Rachimas</p>
+                <span>Pelanggan</span>
+            </div>
+        </div>
+    </aside>
 
-    <hr>
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        <!-- HEADER -->
+        <header class="top-header">
+            <div>
+                <span class="badge-pelanggan">PELANGGAN</span>
+                <span style="font-size: 14px; color: var(--text-muted); margin-left: 8px;">Sistem Online</span>
+            </div>
+            <div class="header-right">
+                <div class="avatar" style="background: white; border: 1px solid var(--primary-blue); color: var(--primary-blue);">NR</div>
+            </div>
+        </header>
 
-    <!-- KONTEN UTAMA BERANDA PELANGGAN -->
-    <main>
-      <h1>Halo, Nino Rachimas!</h1>
-      <p>Ajukan servis, cek tiket, dan pantau proses perbaikan laptopmu.</p>
+        <!-- CONTENT -->
+        <div class="content">
+            <div class="page-header">
+                <div>
+                    <span class="page-title">PORTAL PELANGGAN</span>
+                    <h1>Halo, Nino Rachimas</h1>
+                    <p class="subtitle">Ajukan servis, cek tiket, dan pantau proses perbaikan laptopmu.</p>
+                </div>
+                <a href="pengajuan-servis.html" class="btn-primary">+ Ajukan Servis</a>
+            </div>
 
-      <!-- TABEL RINGKASAN SERVIS -->
-      <table>
-        <thead>
-          <tr>
-            <th>Servis Aktif</th>
-            <th>Servis Selesai</th>
-            <th>Total Riwayat Servis</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>4</td>
-            <td>3</td>
-          </tr>
-        </tbody>
-      </table>
+            <!-- STATS -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Servis Aktif</div>
+                    <div class="stat-value border-blue">1</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Servis Selesai</div>
+                    <div class="stat-value border-green">4</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Riwayat Servis</div>
+                    <div class="stat-value border-orange">3</div>
+                </div>
+            </div>
 
-      <br>
-      <hr>
-      <br>
+            <!-- TICKET & TIMELINE (GRID) -->
+            <div class="main-grid">
+                <!-- TIKET AKTIF -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <span style="font-size: 12px; color: var(--text-muted);">TIKET AKTIF</span>
+                            <h2>#URT-2026-001</h2>
+                        </div>
+                        <span class="badge-orange">Persetujuan Biaya</span>
+                    </div>
+                    <!-- Info Laptop dan Progress Bar dapat ditambahkan di sini dengan struktur div biasa -->
+                    <br>
+                    <a href="detail-servis.html" class="btn-primary" style="width: 100%;">Lihat Detail Service</a>
+                </div>
 
-      <!-- BAGIAN TIKET AKTIF -->
-      <p>Tiket Aktif:</p>
-      <h2>#URT-2026-001</h2>
-      <ul>
-        <li><strong>Merk Laptop:</strong> ASUS ROG Zephyrus G14</li>
-        <li>
-          <strong>Tahapan Servis:</strong> Menunggu Konfirmasi Biaya
-          (Pemeriksaan Selesai)
-        </li>
-        <li><strong>Estimasi Selesai:</strong> 8 Oktober 2026</li>
-        <li><strong>Teknisi:</strong> Sofia Malvalena Adam</li>
-        <li><strong>Biaya Servis:</strong> Rp 850.000 (Estimasi)</li>
-      </ul>
-      <a href="persetujuan-servis.html">Lihat detail servis</a>
+                <!-- TIMELINE -->
+                <div class="card">
+                    <h3>Perjalanan Servis</h3>
+                    <p style="font-size: 14px; margin-top: 10px; color: var(--text-muted);">Teknisi Sofia Malvalena Adam sedang mengajukan biaya perbaikan untuk persetujuan.</p>
+                </div>
+            </div>
 
-      <br><br>
+            <!-- TABEL RIWAYAT -->
+            <div class="card">
+                <h3>Servis Sebelumnya</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nomor Tiket</th>
+                                <th>Perangkat</th>
+                                <th>Jenis Servis</th>
+                                <th>Tanggal Masuk</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><b>#URT-2026-0004</b></td>
+                                <td>Lenovo IdeaPad</td>
+                                <td>Cleaning & Thermal Paste</td>
+                                <td>18 Agu 2026</td>
+                                <td><span class="badge-green">Selesai</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>#URT-2024-012</b></td>
+                                <td>MacBook Air M1</td>
+                                <td>Install Ulang MacOS & Backup Data</td>
+                                <td>12 Februari 2024</td>
+                                <td><span class="badge-green">Selesai</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>#URT-2023-045</b></td>
+                                <td>Acer Nitro 5</td>
+                                <td>Upgrade RAM 8GB ke 16GB</td>
+                                <td>05 November 2023</td>
+                                <td><span class="badge-green">Selesai</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-      <!-- BAGIAN PERJALANAN SERVIS -->
-      <h3>Perjalanan Servis</h3>
-      <ul>
-        <li>
-          <strong>24 Agustus 2026:</strong> Perangkat diterima.
-          <em
-            >(Laptop diserahkan ke resepsionis, keluhan: mati total setelah
-            pemakaian wajar).</em
-          >
-        </li>
-        <li>
-          <strong>25 Agustus 2026:</strong> Proses pemeriksaan diagnosis.
-          <em
-            >(Teknisi sedang mengecek jalur power pada motherboard dan komponen
-            IC).</em
-          >
-        </li>
-        <li>
-          <strong>Hari Ini:</strong> Konfirmasi estimasi biaya.
-          <em
-            >(Ditemukan masalah pada IC Power, menunggu persetujuan perbaikan
-            dari pelanggan).</em
-          >
-        </li>
-      </ul>
-
-      <br>
-      <hr>
-      <br>
-
-      <!-- TABEL SERVIS SEBELUMNYA -->
-      <h3>Servis Sebelumnya</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Nomor Tiket</th>
-            <th>Perangkat</th>
-            <th>Jenis Servis</th>
-            <th>Tanggal Masuk</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>#URT-2025-089</td>
-            <td>Lenovo ThinkPad T480</td>
-            <td>Pembersihan Kipas & Ganti Thermal Paste</td>
-            <td>10 Mei 2025</td>
-            <td>Selesai</td>
-          </tr>
-          <tr>
-            <td>#URT-2024-012</td>
-            <td>MacBook Air M1</td>
-            <td>Install Ulang MacOS & Backup Data</td>
-            <td>12 Februari 2024</td>
-            <td>Selesai</td>
-          </tr>
-          <tr>
-            <td>#URT-2023-045</td>
-            <td>Acer Nitro 5</td>
-            <td>Upgrade RAM 8GB ke 16GB</td>
-            <td>05 November 2023</td>
-            <td>Selesai</td>
-          </tr>
-        </tbody>
-      </table>
+        </div>
     </main>
 
-    <br>
-    <hr>
-    <footer>
-      <p>URT — Your Device Tracker | Kelompok 2</p>
-    </footer>
-
-    <script src="script.js"></script>
-  </body>
+</body>
 </html>
