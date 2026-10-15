@@ -1,79 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Detail Riwayat Servis - URT Device Tracker</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Riwayat Servis - URT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../font.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style-customer.css">
 </head>
-  <body>
-    <header>
-      <h1>Detail Riwayat Servis</h1>
-      <hr />
-      <nav>
-        <a href="beranda-pelanggan.html">Kembali ke Beranda Pelanggan</a>
-      </nav>
-    </header>
+<body>
+  <aside class="sidebar">
+    <a class="sidebar-header brand-link" href="beranda-pelanggan.html">
+      <span class="logo-box">URT</span>
+      <span class="brand-copy"><strong>Your Service Tracker</strong><small>CUSTOMER PORTAL</small></span>
+    </a>
+    <nav class="nav-menu" aria-label="Navigasi pelanggan"><a href="beranda-pelanggan.html" class="nav-item">Beranda</a><a href="riwayat-servis.html" class="nav-item active" aria-current="page">Riwayat Servis</a><a href="profil-pelanggan.html" class="nav-item">Profil</a></nav>
+    <div class="sidebar-footer"><div class="avatar">NR</div><div class="user-info"><p>Nino Rachimas</p><span>Pelanggan</span></div></div>
+  </aside>
+  <div class="main-wrapper">
+    <header class="top-header"><div><span class="badge-pelanggan">PELANGGAN</span><span class="online-label">Sistem Online</span></div><div class="header-right"><span class="avatar avatar-outline">NR</span></div></header>
+    <main class="content">
+      
+<div class="page-header"><div><span class="page-title">RIWAYAT SERVIS</span><h1>Detail Riwayat Servis</h1><p class="subtitle">Informasi lengkap mengenai riwayat perbaikan perangkat Anda.</p></div><a class="btn-secondary" href="riwayat-servis.html">← Kembali ke Riwayat</a></div>
+<div class="card"><div class="section-heading"><div><span class="eyebrow">DETAIL TIKET</span><h2>#URT-2026-001</h2><p class="subtitle">ASUS ROG Zephyrus G14</p></div><span class="status-pill warning">Menunggu Persetujuan</span></div><div class="info-list"><div><span>Nama Pelanggan</span><strong>Nino Rachimas</strong></div><div><span>Perangkat</span><strong>ASUS ROG Zephyrus G14</strong></div><div><span>Serial Number</span><strong>ASUS-G14-998877</strong></div><div><span>Keluhan Awal</span><strong>Mati total, tidak bisa di-charge, lampu indikator mati.</strong></div></div><div class="subsection"><h3>Tindakan Teknisi</h3><p>Pembongkaran unit dan pengecekan arus listrik pada motherboard. Penggantian IC Power diperlukan. Estimasi pengerjaan memakan waktu 2–3 hari kerja setelah sparepart tersedia.</p></div></div>
+<section class="card action-card"><span class="eyebrow">PERSETUJUAN TINDAKAN</span><h2>Konfirmasi biaya perbaikan</h2><p>Apakah Anda menyetujui biaya perbaikan sebesar <strong>Rp850.000</strong>?</p><div class="button-row"><a class="btn-primary" href="persetujuan-disetujui.html">✓ Setujui Perbaikan</a><a class="btn-danger" href="persetujuan-ditolak.html">Tolak Perbaikan</a></div></section>
 
-    <main>
-      <section>
-        <h2>Detail Tiket: #URT-2026-001</h2>
-        <p>
-          Berikut adalah informasi lebih lengkap mengenai riwayat perbaikan
-          laptop Anda.
-        </p>
-
-        <table>
-          <tr>
-            <td><strong>Nama Pelanggan</strong></td>
-            <td>Nino Rachimas</td>
-          </tr>
-          <tr>
-            <td><strong>Device</strong></td>
-            <td>ASUS ROG Zephyrus G14</td>
-          </tr>
-          <tr>
-            <td><strong>Serial Number</strong></td>
-            <td>ASUS-G14-998877</td>
-          </tr>
-          <tr>
-            <td><strong>Keluhan Awal</strong></td>
-            <td>Mati total, tidak bisa di-charge, lampu indikator mati.</td>
-          </tr>
-        </table>
-
-        <h3>Tindakan Teknisi</h3>
-        <p>
-          Pembongkaran unit dan pengecekan arus listrik pada motherboard.
-          Penggantian IC Power diperlukan. Estimasi pengerjaan memakan waktu 2-3
-          hari kerja setelah *sparepart* tersedia.
-        </p>
-      </section>
-      <section aria-labelledby="persetujuan-tindakan">
-        <h3 id="persetujuan-tindakan">Persetujuan Tindakan</h3>
-
-        <p>Apakah Anda menyetujui biaya perbaikan sebesar Rp850.000?</p>
-
-        <p>
-          <a href="persetujuan-disetujui.html">Setujui Perbaikan</a>
-          <a href="persetujuan-ditolak.html">Tolak Perbaikan</a>
-        </p>
-      </section>
     </main>
-
-    <br />
-    <hr />
-    <footer>
-      <p>
-        <a href="beranda-pelanggan.html">Kembali ke Beranda</a> |
-        <a href="../index.html">Keluar</a>
-      </p>
-      <p>URT — Your Device Tracker | Kelompok 2</p>
-    </footer>
-
-    <script src="script.js"></script>
-  </body>
+    <footer class="site-footer">URT — Your Service Tracker <span>Kelompok 2</span></footer>
+  </div>
+</body>
 </html>

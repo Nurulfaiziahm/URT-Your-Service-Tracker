@@ -1,136 +1,34 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tolak Perbaikan - URT</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penolakan Perbaikan - URT</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../font.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style-customer.css">
 </head>
 <body>
+  <aside class="sidebar">
+    <a class="sidebar-header brand-link" href="beranda-pelanggan.html">
+      <span class="logo-box">URT</span>
+      <span class="brand-copy"><strong>Your Service Tracker</strong><small>CUSTOMER PORTAL</small></span>
+    </a>
+    <nav class="nav-menu" aria-label="Navigasi pelanggan"><a href="beranda-pelanggan.html" class="nav-item">Beranda</a><a href="riwayat-servis.html" class="nav-item">Riwayat Servis</a><a href="profil-pelanggan.html" class="nav-item">Profil</a></nav>
+    <div class="sidebar-footer"><div class="avatar">NR</div><div class="user-info"><p>Nino Rachimas</p><span>Pelanggan</span></div></div>
+  </aside>
+  <div class="main-wrapper">
+    <header class="top-header"><div><span class="badge-pelanggan">PELANGGAN</span><span class="online-label">Sistem Online</span></div><div class="header-right"><span class="avatar avatar-outline">NR</span></div></header>
+    <main class="content">
+      
+<div class="page-header"><div><span class="page-title">PORTAL PELANGGAN</span><h1>Penolakan Perbaikan</h1><p class="subtitle">Keputusan perbaikan untuk ASUS VivoBook 14 pada tiket #URT-2026-001.</p></div><a class="btn-secondary" href="detail-servis.html">Kembali ke Detail Servis</a></div>
+<div class="status-banner status-danger"><span class="status-icon">!</span><div><h2>Penolakan perbaikan telah tercatat</h2><p>Nino Rachimas menolak estimasi Rp250.000 pada 26 Agu 2026. Teknisi telah diberi tahu dan pekerjaan perbaikan tidak dilanjutkan.</p></div></div>
+<div class="detail-layout"><section class="card"><div class="section-heading"><div><span class="eyebrow">KONFIRMASI KEPUTUSAN</span><h2>#URT-2026-001</h2><p class="subtitle">ASUS VivoBook 14</p></div><span class="status-pill danger">Perbaikan ditolak</span></div><div class="info-list"><div><span>Pelanggan</span><strong>Nino Rachimas</strong></div><div><span>Tindakan Diajukan</span><strong>Deep Cleaning &amp; Re-paste Arctic MX-4</strong></div><div><span>Estimasi Ditolak</span><strong>Rp250.000</strong></div><div><span>Teknisi</span><strong>Sofia Malvalena Adam</strong></div><div><span>Waktu Keputusan</span><strong>26 Agu 2026</strong></div></div><div class="subsection"><h3>Alasan Penolakan</h3><p>Biaya belum sesuai anggaran. Saya memilih mengambil kembali perangkat tanpa melanjutkan perbaikan.</p></div><div class="subsection"><h3>Preferensi Pengambilan</h3><p>Diambil langsung di hub servis</p></div><p class="muted-paragraph">Keputusan ini disimpan sebagai catatan tiket. Persetujuan biaya sebelumnya tidak dibuat.</p></section>
+<aside class="side-stack"><section class="card"><h2>Pengembalian Perangkat</h2><ol class="step-list"><li><strong>Perbaikan dihentikan</strong><p>Tidak ada tindakan perbaikan lanjutan.</p></li><li><strong>Konfirmasi dari tim servis</strong><p>Tim akan menghubungi Anda untuk jadwal pengambilan.</p></li><li><strong>Bawa tanda terima</strong><p>Siapkan nomor tiket #URT-2026-001 saat mengambil perangkat.</p></li></ol></section><section class="card soft-card"><h3>Informasi Perangkat</h3><p><strong>Perangkat belum diperbaiki.</strong> Keluhan awal masih dapat terjadi. Hindari penggunaan berat sampai perangkat diperiksa kembali.</p></section><a class="text-link" href="beranda-pelanggan.html">← Kembali ke Beranda</a></aside></div>
 
-  <header>
-    <div>
-      <a href="beranda-pelanggan.html">
-        <img src="../image/logo-urt.svg" alt="URT Your Service Tracker" height="36">
-      </a>
-      <p>CUSTOMER PORTAL</p>
-    </div>
-
-    <nav aria-label="Navigasi pelanggan">
-      <ul>
-        <li><a href="beranda-pelanggan.html">Beranda</a></li>
-        <li><a href="riwayat-servis.html">Riwayat Servis</a></li>
-        <li><a href="profil-pelanggan.html">Profil</a></li>
-      </ul>
-    </nav>
-
-    <p>
-      <strong>PELANGGAN</strong> |
-      Sistem Online
-    </p>
-
-    <p>
-      <strong>Nino Rachimas</strong><br>
-      Pelanggan
-    </p>
-  </header>
-
-  <main>
-    <header>
-      <p>Portal Pelanggan</p>
-      <h1>Tolak Perbaikan</h1>
-      <p>Keputusan perbaikan untuk ASUS VivoBook 14 pada tiket #URT-2026-001.</p>
-      <p><a href="detail-servis.html">Kembali ke Detail Service</a></p>
-    </header>
-
-    <section aria-labelledby="status-penolakan">
-      <h2 id="status-penolakan">Penolakan perbaikan telah tercatat</h2>
-      <p>
-        Nino Rachimas menolak estimasi Rp250.000 pada 26 Agu 2026.
-        Teknisi telah diberi tahu dan pekerjaan perbaikan tidak dilanjutkan.
-      </p>
-    </section>
-
-    <section aria-labelledby="konfirmasi-keputusan">
-      <h2 id="konfirmasi-keputusan">Konfirmasi Keputusan</h2>
-      <p>#URT-2026-001 • ASUS VivoBook 14</p>
-      <p><strong>PERBAIKAN DITOLAK</strong></p>
-
-      <dl>
-        <dt>Pelanggan</dt>
-        <dd>Nino Rachimas</dd>
-
-        <dt>Tindakan Diajukan</dt>
-        <dd>Deep Cleaning &amp; Re-paste Arctic MX-4</dd>
-
-        <dt>Estimasi Ditolak</dt>
-        <dd>Rp250.000</dd>
-
-        <dt>Teknisi</dt>
-        <dd>Sofia Malvalena Adam</dd>
-
-        <dt>Waktu Keputusan</dt>
-        <dd>26 Agu 2026</dd>
-      </dl>
-
-      <section aria-labelledby="alasan-penolakan">
-        <h3 id="alasan-penolakan">Alasan Penolakan</h3>
-        <p>
-          Biaya belum sesuai anggaran. Saya memilih mengambil kembali perangkat
-          tanpa melanjutkan perbaikan.
-        </p>
-      </section>
-
-      <section aria-labelledby="preferensi-pengambilan">
-        <h3 id="preferensi-pengambilan">Preferensi Pengambilan</h3>
-        <p>Diambil langsung di hub servis</p>
-      </section>
-
-      <p>
-        Keputusan ini disimpan sebagai catatan tiket.
-        Persetujuan biaya sebelumnya tidak dibuat.
-      </p>
-    </section>
-
-    <aside>
-      <section aria-labelledby="pengembalian-perangkat">
-        <h2 id="pengembalian-perangkat">Pengembalian Perangkat</h2>
-
-        <ol>
-          <li>
-            <strong>Perbaikan dihentikan</strong>
-            <p>Tidak ada tindakan perbaikan lanjutan.</p>
-          </li>
-          <li>
-            <strong>Konfirmasi dari tim servis</strong>
-            <p>Tim akan menghubungi Anda untuk jadwal pengambilan.</p>
-          </li>
-          <li>
-            <strong>Bawa tanda terima</strong>
-            <p>Siapkan nomor tiket #URT-2026-001 saat mengambil perangkat.</p>
-          </li>
-        </ol>
-      </section>
-
-      <section aria-labelledby="informasi-perangkat">
-        <h2 id="informasi-perangkat">Informasi Perangkat</h2>
-        <p>
-          <strong>Perangkat belum diperbaiki.</strong>
-          Keluhan awal masih dapat terjadi. Hindari penggunaan berat sampai
-          perangkat diperiksa kembali.
-        </p>
-      </section>
-
-      <p><a href="beranda-pelanggan.html">Kembali ke Beranda</a></p>
-    </aside>
-  </main>
-
-  <footer>
-    <p>URT — Your Service Tracker | Kelompok 2</p>
-  </footer>
-
+    </main>
+    <footer class="site-footer">URT — Your Service Tracker <span>Kelompok 2</span></footer>
+  </div>
 </body>
 </html>
