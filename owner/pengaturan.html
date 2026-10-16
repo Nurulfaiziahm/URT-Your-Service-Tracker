@@ -1,203 +1,150 @@
 <!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengaturan — Portal Pemilik — Your Service Tracker</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../font.css">
-  </head>
-  <body>
-    <header>
-      <p>
-        PEMILIK USAHA &bull; &#9679; Sistem Online &nbsp;&nbsp;&nbsp; &#128276;
-        &nbsp; AR
-      </p>
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pengaturan Portal Pemilik ServisKita">
+  <title>Pengaturan — Portal Pemilik — Your Service Tracker</title>
+  <link rel="stylesheet" href="css/owner.css">
+  <script src="js/owner.js" defer></script>
+</head>
+<body>
 
-    <hr>
+  <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">URT</span>
+      <div class="brand-copy">
+        <strong>Your Service Tracker</strong>
+        <span>PORTAL PEMILIK</span>
+      </div>
+    </div>
 
-    <nav>
-      <ul>
-        <li><a href="beranda-owner.html">Beranda</a></li>
-        <li><a href="tiket-servis.html">Tiket Servis</a></li>
-        <li><a href="teknisi.html">Teknisi</a></li>
-        <li><a href="pelanggan.html">Pelanggan</a></li>
-        <li><a href="layanan.html">Layanan</a></li>
-        <li><a href="laporan.html">Laporan</a></li>
-        <li><a href="langganan.html">Langganan</a></li>
-        <li>
-          <strong><a href="pengaturan.html">Pengaturan</a></strong>
-        </li>
-        <li><a href="profil-owner.html">Profil</a></li>
-        <li><a href="../index.html">Keluar</a></li>
-      </ul>
-      <hr>
-      <p>Andi Ramadhan<br>Pemilik &bull; ServisKita</p>
+    <nav class="sidebar-nav" aria-label="Navigasi utama pemilik">
+      <a class="nav-item" href="beranda-owner.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+          <span>Beranda</span>
+        </a><a class="nav-item" href="tiket-servis.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z"></path><path d="M12 7v12" stroke-dasharray="2 2"></path></svg>
+          <span>Tiket Servis</span>
+        </a><a class="nav-item" href="teknisi.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 3.2a4 4 0 0 1 0 7.6M22 21v-2a4 4 0 0 0-3-3.87"></path></svg>
+          <span>Teknisi</span>
+        </a><a class="nav-item" href="pelanggan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"></rect><path d="M9 5V3h6v2"></path><circle cx="12" cy="11" r="2.5"></circle><path d="M8.5 17c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"></path></svg>
+          <span>Pelanggan</span>
+        </a><a class="nav-item" href="layanan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"></path></svg>
+          <span>Layanan</span>
+        </a><a class="nav-item" href="laporan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20v-6M10 20V9M15 20V4M20 20v-10"></path></svg>
+          <span>Laporan</span>
+        </a><a class="nav-item" href="langganan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18"></path></svg>
+          <span>Langganan</span>
+        </a><a class="nav-item is-active" href="pengaturan.html" aria-current="page">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H10.4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-3.2h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h3.2v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.35.34.55.8.6 1.3v.1h1v3.2h-1v.1c-.05.5-.25.96-.6 1.3Z"></path></svg>
+          <span>Pengaturan</span>
+        </a><a class="nav-item" href="profil-owner.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"></path></svg>
+          <span>Profil</span>
+        </a>
     </nav>
 
-    <hr>
+    <a class="owner-mini-profile" href="profil-owner.html" aria-label="Buka profil Andi Ramadhan">
+      <span class="avatar avatar-solid" aria-hidden="true">AR</span>
+      <span class="owner-mini-profile__copy">
+        <strong>Andi Ramadhan</strong>
+        <small>Pemilik • ServisKita</small>
+      </span>
+    </a>
+  </aside>
+  <div class="app-shell">
 
-    <main>
-      <p>PORTAL PEMILIK</p>
-      <h1>Pengaturan</h1>
-      <p>
-        Kelola informasi usaha, akun pemilik, dan preferensi operasional
-        ServisKita.
-      </p>
+    <header class="topbar">
+      <div class="system-status">
+        <span class="owner-chip">PEMILIK USAHA</span>
+        <span class="online-dot" aria-hidden="true"></span>
+        <span>Sistem Online</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-button" id="notificationButton" type="button" aria-label="Buka notifikasi">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+            <path d="M10 21h4"></path>
+          </svg>
+        </button>
+        <a class="avatar avatar-outline" href="profil-owner.html" aria-label="Buka profil pemilik">AR</a>
+      </div>
+    </header>
 
-      <form action="pengaturan.html" method="get">
-        <fieldset>
-          <legend>Informasi Usaha</legend>
-          <p><em>Ditampilkan pada portal pelanggan dan tanda terima</em></p>
+    <main class="owner-main">
+      <section class="page-heading" aria-labelledby="pageTitle">
+        <span class="eyebrow">PORTAL PEMILIK</span>
+        <h1 id="pageTitle">Pengaturan</h1>
+        <p>Kelola informasi usaha, akun pemilik, dan preferensi operasional ServisKita.</p>
+      </section>
 
-          <p>
-            <label for="nama_usaha">Nama Usaha</label><br>
-            <input
-              type="text"
-              id="nama_usaha"
-              name="nama_usaha"
-              value="ServisKita">
-          </p>
+      <form id="settingsForm" class="settings-layout">
+        <section class="form-card settings-business" aria-labelledby="businessInfoTitle">
+          <header class="form-card__heading">
+            <h2 id="businessInfoTitle">Informasi Usaha</h2>
+            <p>Ditampilkan pada portal pelanggan dan tanda terima</p>
+          </header>
 
-          <p>
-            <label for="email_usaha">Email Usaha</label><br>
-            <input
-              type="email"
-              id="email_usaha"
-              name="email_usaha"
-              value="admin@serviskita.id">
-          </p>
+          <label class="form-field"><span>Nama Usaha</span><input name="businessName" value="ServisKita"></label>
+          <label class="form-field"><span>Email Usaha</span><input type="email" name="businessEmail" value="admin@serviskita.id"></label>
+          <label class="form-field"><span>Nomor WhatsApp Usaha</span><input name="businessWhatsApp" value="0812 3456 7890"></label>
+          <label class="form-field"><span>Alamat Usaha</span><textarea name="businessAddress" rows="3">Jl. Raya Kebon Jeruk No. 18, Jakarta Barat, DKI Jakarta 11530</textarea></label>
+          <label class="form-field"><span>Jam Operasional</span><input name="businessHours" value="Senin–Sabtu, 09.00–18.00 WIB"></label>
+          <label class="form-field"><span>Tautan Portal Pelanggan</span><input name="portalUrl" value="urt.id/serviskita"></label>
+        </section>
 
-          <p>
-            <label for="wa_usaha">Nomor WhatsApp Usaha</label><br>
-            <input
-              type="tel"
-              id="wa_usaha"
-              name="wa_usaha"
-              value="0812 3456 7890">
-          </p>
+        <div class="settings-side">
+          <section class="form-card" aria-labelledby="ownerAccountTitle">
+            <header class="form-card__heading"><h2 id="ownerAccountTitle">Akun Pemilik</h2></header>
+            <label class="form-field"><span>Nama Lengkap</span><input name="ownerName" value="Andi Ramadhan"></label>
+            <label class="form-field"><span>Email Akun</span><input type="email" name="ownerEmail" value="andi@serviskita.id"></label>
+            <label class="form-field"><span>Peran</span><input value="Pemilik Usaha" disabled></label>
+          </section>
 
-          <p>
-            <label for="alamat_usaha">Alamat Usaha</label><br>
-            <textarea id="alamat_usaha" name="alamat_usaha" rows="3" cols="50">
-Jl. Raya Kebon Jeruk No. 18, Jakarta Barat, DKI Jakarta 11530</textarea
-            >
-          </p>
+          <section class="form-card preferences-card" aria-labelledby="preferencesTitle">
+            <header class="form-card__heading"><h2 id="preferencesTitle">Preferensi Sistem</h2><p>Pemberitahuan dan pengaturan tampilan</p></header>
 
-          <p>
-            <label for="jam_operasional">Jam Operasional</label><br>
-            <input
-              type="text"
-              id="jam_operasional"
-              name="jam_operasional"
-              value="Senin–Sabtu, 09.00–18.00 WIB">
-          </p>
-
-          <p>
-            <label for="tautan_portal">Tautan Portal Pelanggan</label><br>
-            <input
-              type="text"
-              id="tautan_portal"
-              name="tautan_portal"
-              value="urt.id/serviskita">
-          </p>
-        </fieldset>
-
-        <fieldset>
-          <legend>Akun Pemilik</legend>
-
-          <p>
-            <label for="nama_pemilik">Nama Lengkap</label><br>
-            <input
-              type="text"
-              id="nama_pemilik"
-              name="nama_pemilik"
-              value="Andi Ramadhan"
-              readonly>
-          </p>
-
-          <p>
-            <label for="email_akun">Email Akun</label><br>
-            <input
-              type="email"
-              id="email_akun"
-              name="email_akun"
-              value="andi@serviskita.id"
-              readonly>
-          </p>
-
-          <p>
-            <label for="peran">Peran</label><br>
-            <input
-              type="text"
-              id="peran"
-              name="peran"
-              value="Pemilik Usaha"
-              readonly>
-          </p>
-        </fieldset>
-
-        <fieldset>
-          <legend>Preferensi Sistem</legend>
-          <p><em>Pemberitahuan dan pengaturan tampilan</em></p>
-
-          <p>
-            <label>
-              <input type="checkbox" name="notif_wa" value="ya" checked>
-              <strong>Notifikasi WhatsApp pelanggan</strong> — Kirim pembaruan
-              saat status tiket berubah.
+            <label class="preference-row">
+              <input type="checkbox" name="waNotification" checked>
+              <span><strong>Notifikasi WhatsApp pelanggan</strong><small>Kirim pembaruan saat status tiket berubah.</small></span>
             </label>
-          </p>
-
-          <p>
-            <label>
-              <input type="checkbox" name="notif_email" value="ya" checked>
-              <strong>Notifikasi email estimasi &amp; invoice</strong> — Salinan
-              estimasi dan tagihan digital.
+            <label class="preference-row">
+              <input type="checkbox" name="emailNotification" checked>
+              <span><strong>Notifikasi email estimasi &amp; invoice</strong><small>Salinan estimasi dan tagihan digital.</small></span>
             </label>
-          </p>
-
-          <p>
-            <label>
-              <input
-                type="checkbox"
-                name="wajib_persetujuan"
-                value="ya"
-                checked>
-              <strong>Persetujuan biaya sebelum perbaikan</strong> — Wajib untuk
-              seluruh tiket servis.
+            <label class="preference-row">
+              <input type="checkbox" name="costApproval" checked>
+              <span><strong>Persetujuan biaya sebelum perbaikan</strong><small>Wajib untuk seluruh tiket servis.</small></span>
             </label>
-          </p>
 
-          <p>
-            <label for="bahasa">Bahasa / Zona Waktu</label><br>
-            <input
-              type="text"
-              id="bahasa"
-              name="bahasa"
-              value="Bahasa Indonesia • Asia/Jakarta (WIB)"
-              readonly>
-          </p>
-        </fieldset>
-
-        <p>
-          &#10003;
-          <em
-            >Pengaturan tersimpan — Informasi usaha dan preferensi operasional
-            berhasil diperbarui. Perubahan berlaku untuk seluruh akun
-            ServisKita.</em
-          >
-        </p>
-
-        <p>
-          <button type="reset">Reset Perubahan</button>
-          &nbsp;
-          <button type="submit">Simpan Pengaturan</button>
-        </p>
+            <label class="form-field"><span>Bahasa / Zona Waktu</span>
+              <select name="timezone">
+                <option value="id-asia-jakarta">Bahasa Indonesia • Asia/Jakarta (WIB)</option>
+                <option value="en-asia-jakarta">English • Asia/Jakarta (WIB)</option>
+              </select>
+            </label>
+          </section>
+        </div>
       </form>
+
+      <section class="success-banner" id="settingsSuccess">
+        <span aria-hidden="true">✓</span>
+        <div><strong>Pengaturan tersimpan</strong><p>Informasi usaha dan preferensi operasional berhasil diperbarui. Perubahan berlaku untuk seluruh akun ServisKita.</p></div>
+      </section>
+
+      <div class="page-actions">
+        <button class="secondary-button action-wide" id="resetSettings" type="button">Reset Perubahan</button>
+        <button class="muted-action-button action-wide" id="saveSettings" type="button">Simpan Pengaturan</button>
+      </div>
     </main>
-  </body>
+
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
 </html>

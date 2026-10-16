@@ -1,169 +1,213 @@
 <!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiket Servis — Portal Pemilik — Your Service Tracker</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../font.css">
-  </head>
-  <body>
-    <header>
-      <p>
-        PEMILIK USAHA &bull; &#9679; Sistem Online &nbsp;&nbsp;&nbsp; &#128276;
-        &nbsp; AR
-      </p>
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Daftar tiket servis Portal Pemilik Your Service Tracker">
+  <title>Tiket Servis — Portal Pemilik — Your Service Tracker</title>
+  <link rel="stylesheet" href="css/owner.css">
+  <script src="js/owner.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">URT</span>
+      <div class="brand-copy">
+        <strong>Your Service Tracker</strong>
+        <span>PORTAL PEMILIK</span>
+      </div>
+    </div>
 
-    <hr>
+    <nav class="sidebar-nav" aria-label="Navigasi utama pemilik">
+      <a class="nav-item" href="beranda-owner.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+        <span>Beranda</span>
+      </a>
 
-    <nav>
-      <ul>
-        <li><a href="beranda-owner.html">Beranda</a></li>
-        <li>
-          <strong><a href="tiket-servis.html">Tiket Servis</a></strong>
-        </li>
-        <li><a href="teknisi.html">Teknisi</a></li>
-        <li><a href="pelanggan.html">Pelanggan</a></li>
-        <li><a href="layanan.html">Layanan</a></li>
-        <li><a href="laporan.html">Laporan</a></li>
-        <li><a href="langganan.html">Langganan</a></li>
-        <li><a href="pengaturan.html">Pengaturan</a></li>
-        <li><a href="profil-owner.html">Profil</a></li>
-        <li><a href="../index.html">Keluar</a></li>
-      </ul>
-      <hr>
-      <p>Andi Ramadhan<br>Pemilik &bull; ServisKita</p>
+      <a class="nav-item is-active" href="tiket-servis.html" aria-current="page">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z"></path><path d="M12 7v12" stroke-dasharray="2 2"></path></svg>
+        <span>Tiket Servis</span>
+      </a>
+
+      <a class="nav-item" href="teknisi.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 3.2a4 4 0 0 1 0 7.6M22 21v-2a4 4 0 0 0-3-3.87"></path></svg>
+        <span>Teknisi</span>
+      </a>
+
+      <a class="nav-item" href="pelanggan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"></rect><path d="M9 5V3h6v2"></path><circle cx="12" cy="11" r="2.5"></circle><path d="M8.5 17c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"></path></svg>
+        <span>Pelanggan</span>
+      </a>
+
+      <a class="nav-item" href="layanan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"></path></svg>
+        <span>Layanan</span>
+      </a>
+
+      <a class="nav-item" href="laporan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20v-6M10 20V9M15 20V4M20 20v-10"></path></svg>
+        <span>Laporan</span>
+      </a>
+
+      <a class="nav-item" href="langganan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18"></path></svg>
+        <span>Langganan</span>
+      </a>
+
+      <a class="nav-item" href="pengaturan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H10.4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-3.2h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h3.2v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.35.34.55.8.6 1.3v.1h1v3.2h-1v.1c-.05.5-.25.96-.6 1.3Z"></path></svg>
+        <span>Pengaturan</span>
+      </a>
+
+      <a class="nav-item" href="profil-owner.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"></path></svg>
+        <span>Profil</span>
+      </a>
     </nav>
 
-    <hr>
+    <a class="owner-mini-profile" href="profil-owner.html" aria-label="Buka profil Andi Ramadhan">
+      <span class="avatar avatar-solid" aria-hidden="true">AR</span>
+      <span class="owner-mini-profile__copy">
+        <strong>Andi Ramadhan</strong>
+        <small>Pemilik • ServisKita</small>
+      </span>
+    </a>
+  </aside>
 
-    <main>
-      <p>PORTAL PEMILIK</p>
-      <h1>Tiket Servis</h1>
-      <p>
-        Pantau tiket servis dan penugasan teknisi di seluruh usaha ServisKita.
-      </p>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="system-status">
+        <span class="owner-chip">PEMILIK USAHA</span>
+        <span class="online-dot" aria-hidden="true"></span>
+        <span>Sistem Online</span>
+      </div>
 
-      <section>
-        <h2>Ringkasan Tiket</h2>
+      <div class="topbar-actions">
+        <button class="icon-button" id="notificationButton" type="button" aria-label="Buka notifikasi">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
+        </button>
+        <a class="avatar avatar-outline" href="profil-owner.html" aria-label="Buka profil pemilik">AR</a>
+      </div>
+    </header>
 
-        <table>
-          <tr>
-            <th>Tiket Aktif</th>
-            <th>Diagnosis</th>
-            <th>Dalam Perbaikan</th>
-            <th>SLA Terpenuhi</th>
-          </tr>
-          <tr>
-            <td><strong>28</strong><br><small>+8 minggu ini</small></td>
-            <td>
-              <strong>8</strong><br><small
-                >Menunggu pemeriksaan teknisi</small
-              >
-            </td>
-            <td>
-              <strong>10</strong><br><small
-                >Pekerjaan sedang berlangsung</small
-              >
-            </td>
-            <td>
-              <strong>87%</strong><br><small>Selesai tepat waktu</small>
-            </td>
-          </tr>
-        </table>
+    <main class="owner-main">
+      <section class="page-heading page-heading--tickets" aria-labelledby="pageTitle">
+        <span class="eyebrow">PORTAL PEMILIK</span>
+        <h1 id="pageTitle">Tiket Servis</h1>
+        <p>Pantau tiket servis dan penugasan teknisi di seluruh usaha ServisKita.</p>
       </section>
 
-      <hr>
+      <section class="stats-grid ticket-stats" aria-label="Ringkasan tiket servis">
+        <article class="stat-card stat-card--compact">
+          <div class="stat-card__head"><span>Tiket Aktif</span></div>
+          <div class="stat-value"><span class="stat-accent stat-accent--blue"></span>28</div>
+          <p>+8 minggu ini</p>
+        </article>
 
-      <section>
-        <h2>Seluruh Tiket Servis</h2>
-        <p>Tiket terbaru &bull; Data sesuai aktivitas dashboard pemilik</p>
+        <article class="stat-card stat-card--compact">
+          <div class="stat-card__head"><span>Diagnosis</span></div>
+          <div class="stat-value"><span class="stat-accent stat-accent--blue"></span>8</div>
+          <p>Menunggu pemeriksaan teknisi</p>
+        </article>
 
-        <form method="get" action="tiket-servis.html">
-          <label for="cari_tiket">Cari:</label>
-          <input
-            type="search"
-            id="cari_tiket"
-            name="q"
-            placeholder="Cari nomor tiket, nama pelanggan, atau perangkat">
-          &nbsp;
-          <label for="bulan">Bulan:</label>
-          <select id="bulan" name="bulan">
-            <option>Agustus 2026</option>
-            <option>Juli 2026</option>
-            <option>Juni 2026</option>
-          </select>
-          &nbsp;
-          <button type="submit">Filter</button>
-        </form>
+        <article class="stat-card stat-card--compact">
+          <div class="stat-card__head"><span>Dalam Perbaikan</span></div>
+          <div class="stat-value"><span class="stat-accent stat-accent--blue"></span>10</div>
+          <p>Pekerjaan sedang berlangsung</p>
+        </article>
 
-        <br>
+        <article class="stat-card stat-card--compact">
+          <div class="stat-card__head"><span>SLA Terpenuhi</span></div>
+          <div class="stat-value"><span class="stat-accent stat-accent--blue"></span>87%</div>
+          <p>Selesai tepat waktu</p>
+        </article>
+      </section>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Nomor Tiket</th>
-              <th>Perangkat</th>
-              <th>Pelanggan</th>
-              <th>Teknisi</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>#URT-2026-0142</td>
-              <td>MacBook Air M2</td>
-              <td>Nadia Putri</td>
-              <td>Sofia M. Adam</td>
-              <td>[DIAGNOSIS]</td>
-              <td><a href="detail-tiket.html">Detail</a></td>
-            </tr>
-            <tr>
-              <td>#URT-2026-0141</td>
-              <td>ASUS VivoBook 14</td>
-              <td>Rizky Fauzan</td>
-              <td>Ardi Pratama</td>
-              <td>[PERBAIKAN]</td>
-              <td><a href="detail-tiket.html">Detail</a></td>
-            </tr>
-            <tr>
-              <td>#URT-2026-0140</td>
-              <td>Lenovo IdeaPad</td>
-              <td>Dewi Lestari</td>
-              <td>Sofia M. Adam</td>
-              <td>[SELESAI]</td>
-              <td><a href="detail-tiket.html">Detail</a></td>
-            </tr>
-            <tr>
-              <td>#URT-2026-001</td>
-              <td>ASUS VivoBook 14</td>
-              <td>Nino Rachimas</td>
-              <td>Sofia M. Adam</td>
-              <td>[PERSETUJUAN]</td>
-              <td><a href="detail-tiket.html">Detail</a></td>
-            </tr>
-            <tr>
-              <td>#URT-2026-004</td>
-              <td>Lenovo IdeaPad 3</td>
-              <td>Aulia Rahman</td>
-              <td>Sofia M. Adam</td>
-              <td>[SELESAI]</td>
-              <td><a href="detail-tiket.html">Detail</a></td>
-            </tr>
-          </tbody>
-        </table>
+      <section class="tickets-panel" aria-labelledby="allTicketsTitle">
+        <header class="tickets-panel__heading">
+          <h2 id="allTicketsTitle">Seluruh Tiket Servis</h2>
+          <p>Tiket terbaru • Data sesuai aktivitas dashboard pemilik</p>
+        </header>
 
-        <p>
-          <small
-            >Menampilkan 5 tiket terbaru &bull; 28 tiket aktif di
-            ServisKita</small
-          >
-        </p>
+        <div class="ticket-toolbar">
+          <label class="search-field" for="ticketSearch">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+            <input id="ticketSearch" type="search" placeholder="Cari nomor tiket, nama pelanggan, atau perangkat" autocomplete="off">
+          </label>
+
+          <div class="ticket-toolbar__actions">
+            <label class="month-control" for="monthFilter">
+              <span class="sr-only">Pilih periode tiket</span>
+              <select id="monthFilter" aria-label="Pilih periode tiket">
+                <option value="2026-08" selected>Agustus 2026</option>
+                <option value="2026-07">Juli 2026</option>
+                <option value="2026-09">September 2026</option>
+                <option value="all">Semua Periode</option>
+              </select>
+            </label>
+
+            <div class="filter-wrap">
+              <button class="filter-button" id="filterToggle" type="button" aria-expanded="false" aria-controls="ticketFilterPanel">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M7 12h10M10 17h4"></path></svg>
+                <span>Filter</span>
+              </button>
+
+              <div class="filter-panel" id="ticketFilterPanel" hidden>
+                <fieldset>
+                  <legend>Status tiket</legend>
+                  <label><input type="checkbox" name="ticketStatus" value="diagnosis"> Diagnosis</label>
+                  <label><input type="checkbox" name="ticketStatus" value="perbaikan"> Perbaikan</label>
+                  <label><input type="checkbox" name="ticketStatus" value="persetujuan"> Persetujuan</label>
+                  <label><input type="checkbox" name="ticketStatus" value="selesai"> Selesai</label>
+                </fieldset>
+                <div class="filter-panel__actions">
+                  <button class="secondary-button" id="resetTicketFilter" type="button">Reset</button>
+                  <button class="primary-button" id="applyTicketFilter" type="button">Terapkan</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticket-list-table table-wrap">
+          <table id="ticketTable">
+            <caption class="sr-only">Daftar tiket servis ServisKita</caption>
+            <thead>
+              <tr>
+                <th scope="col">Nomor Tiket</th>
+                <th scope="col">Perangkat</th>
+                <th scope="col">Pelanggan</th>
+                <th scope="col">Teknisi</th>
+                <th scope="col">Status</th>
+                <th scope="col">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-ticket-row data-search="#urt-2026-0142 macbook air m2 nadia putri sofia m. adam diagnosis" data-status="diagnosis" data-month="2026-08">
+                <td><strong>#URT-2026-0142</strong></td><td>MacBook Air M2</td><td>Nadia Putri</td><td>Sofia M. Adam</td><td><span class="status status--warning">DIAGNOSIS</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-0142">Detail</a></td>
+              </tr>
+              <tr data-ticket-row data-search="#urt-2026-0141 asus vivobook 14 rizky fauzan ardi pratama perbaikan" data-status="perbaikan" data-month="2026-08">
+                <td><strong>#URT-2026-0141</strong></td><td>ASUS VivoBook 14</td><td>Rizky Fauzan</td><td>Ardi Pratama</td><td><span class="status status--progress">PERBAIKAN</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-0141">Detail</a></td>
+              </tr>
+              <tr data-ticket-row data-search="#urt-2026-0140 lenovo ideapad dewi lestari sofia m. adam selesai" data-status="selesai" data-month="2026-08">
+                <td><strong>#URT-2026-0140</strong></td><td>Lenovo IdeaPad</td><td>Dewi Lestari</td><td>Sofia M. Adam</td><td><span class="status status--success">SELESAI</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-0140">Detail</a></td>
+              </tr>
+              <tr data-ticket-row data-search="#urt-2026-001 asus vivobook 14 nino rachimas sofia m. adam persetujuan" data-status="persetujuan" data-month="2026-08">
+                <td><strong>#URT-2026-001</strong></td><td>ASUS VivoBook 14</td><td>Nino Rachimas</td><td>Sofia M. Adam</td><td><span class="status status--warning">PERSETUJUAN</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-001">Detail</a></td>
+              </tr>
+              <tr data-ticket-row data-search="#urt-2026-004 lenovo ideapad 3 aulia rahman sofia m. adam selesai" data-status="selesai" data-month="2026-08">
+                <td><strong>#URT-2026-004</strong></td><td>Lenovo IdeaPad 3</td><td>Aulia Rahman</td><td>Sofia M. Adam</td><td><span class="status status--success">SELESAI</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-004">Detail</a></td>
+              </tr>
+              <tr id="ticketEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada tiket yang sesuai dengan pencarian atau filter.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="ticket-table-summary" id="ticketTableSummary">Menampilkan 5 tiket terbaru • 28 tiket aktif di ServisKita</p>
       </section>
     </main>
-  </body>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
 </html>
