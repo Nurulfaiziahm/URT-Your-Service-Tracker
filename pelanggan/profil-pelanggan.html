@@ -11,10 +11,12 @@
 </head>
 <body>
   <aside class="sidebar">
-    <a class="sidebar-header brand-link" href="beranda-pelanggan.html">
-      <span class="logo-box">URT</span>
-      <span class="brand-copy"><strong>Your Service Tracker</strong><small>CUSTOMER PORTAL</small></span>
-    </a>
+        <div class="sidebar-header">
+        <img src="../teknisi/image/logo-urt.svg" alt="URT Your Service Tracker" height="42">
+            <div>
+                <p style="font-size: 10px; font-weight: 800; color: #aebbd3;">portal pelanggan</p>
+            </div>
+        </div>
     <nav class="nav-menu" aria-label="Navigasi pelanggan"><a href="beranda-pelanggan.html" class="nav-item">Beranda</a><a href="riwayat-servis.html" class="nav-item">Riwayat Servis</a><a href="profil-pelanggan.html" class="nav-item active" aria-current="page">Profil</a></nav>
     <div class="sidebar-footer"><div class="avatar">NR</div><div class="user-info"><p>Nino Rachimas</p><span>Pelanggan</span></div></div>
   </aside>
@@ -26,7 +28,12 @@
 <div class="profile-intro card"><div class="avatar profile-avatar">NR</div><div><h2>Nino Rachimas</h2><p class="subtitle">Informasi profil dan preferensi komunikasi</p></div></div>
 <form class="profile-form" action="beranda-pelanggan.html" method="GET"><section class="card form-card"><div class="section-heading"><div><h2>Informasi Pribadi</h2><p class="subtitle">Pastikan informasi kontak selalu terbaru.</p></div></div><div class="form-grid"><div class="form-group"><label for="nama">Nama Lengkap</label><input class="form-control" id="nama" type="text" name="nama" value="Nino Rachimas" required></div><div class="form-group"><label for="username">Nama Pengguna</label><input class="form-control" id="username" type="text" name="username" value="ninorachimas" required></div><div class="form-group"><label for="email">Email Aktif</label><input class="form-control" id="email" type="email" name="email" value="nino@vinix7ut.com" required></div><div class="form-group"><label for="telepon">Nomor WhatsApp/Telepon</label><input class="form-control" id="telepon" type="tel" name="telepon" value="081234567890" required></div><div class="form-group form-group-full"><label for="alamat">Alamat Lengkap</label><textarea class="form-control" id="alamat" name="alamat" rows="3" required>Kota Semarang, Jawa Barat</textarea></div></div></section>
 <section class="card form-card"><div class="section-heading"><div><h2>Preferensi &amp; Keamanan</h2><p class="subtitle">Atur pemberitahuan dan keamanan akun Anda.</p></div></div><div class="preferences"><label class="checkbox-label"><input type="checkbox" name="notif_wa" checked><span><strong>Notifikasi melalui WhatsApp</strong><small>Estimasi biaya, status pengerjaan, dan pengambilan.</small></span></label><label class="checkbox-label"><input type="checkbox" name="notif_email" checked><span><strong>Salinan tanda terima melalui email</strong><small>Tanda terima dan ringkasan servis digital.</small></span></label></div><div class="form-grid password-grid"><div class="form-group"><label for="password_baru">Kata Sandi Baru</label><input class="form-control" id="password_baru" type="password" name="password_baru" autocomplete="new-password"><small class="field-help">Opsional. Kosongkan jika tidak ingin mengganti kata sandi.</small></div><div class="form-group"><label for="konfirmasi_password">Konfirmasi Kata Sandi Baru</label><input class="form-control" id="konfirmasi_password" type="password" name="konfirmasi_password" autocomplete="new-password"></div></div></section>
-<div class="notice-card"><strong>Data kontak digunakan untuk servis</strong><p>Pastikan nomor dan email aktif agar Anda menerima permintaan persetujuan biaya dan pembaruan perbaikan.</p></div><div class="form-actions"><a class="btn-secondary" href="beranda-pelanggan.html">Batal</a><button class="btn-primary" type="submit">Simpan Profil</button></div></form>
+<div class="notice-card"><strong>Data kontak digunakan untuk servis</strong><p>Pastikan nomor dan email aktif agar Anda menerima permintaan persetujuan biaya dan pembaruan perbaikan.</p></div><div class="form-actions">
+  <a class="btn-secondary" href="beranda-pelanggan.html">Batal</a>
+  <button class="btn-primary" type="submit">Simpan Profil</button>
+  <a class="btn-secondary" href="../index.html" onclick="return confirm('Anda yakin mau keluar dari portal pelanggan?')">Keluar</a>
+</div>
+</form>
 
     </main>
     <footer class="site-footer">URT — Your Service Tracker <span>Kelompok 2</span></footer>
