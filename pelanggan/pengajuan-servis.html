@@ -12,23 +12,37 @@
 </head>
 <body>
   <aside class="sidebar">
-    <a class="sidebar-header brand-link" href="beranda-pelanggan.html" aria-label="URT, kembali ke beranda">
-      <span class="logo-box">URT</span>
-      <span class="brand-copy"><strong>Your Service Tracker</strong><small>CUSTOMER PORTAL</small></span>
-    </a>
+    <div class="sidebar-header">
+      <img src="../teknisi/image/logo-urt.svg" alt="URT Your Service Tracker" height="42">
+      <div>
+        <p style="font-size: 10px; font-weight: 800; color: #aebbd3;">portal pelanggan</p>
+      </div>
+    </div>
     <nav class="nav-menu" aria-label="Navigasi pelanggan">
       <a href="beranda-pelanggan.html" class="nav-item">Beranda</a>
       <a href="riwayat-servis.html" class="nav-item">Riwayat Servis</a>
       <a href="profil-pelanggan.html" class="nav-item">Profil</a>
       <a href="pengajuan-servis.html" class="nav-item active" aria-current="page">Ajukan Servis</a>
     </nav>
-    <div class="sidebar-footer"><div class="avatar">NR</div><div class="user-info"><p>Nino Rachimas</p><span>Pelanggan</span></div></div>
+
+    <div class="sidebar-footer">
+      <div class="avatar">NR</div>
+      <div class="user-info">
+        <p>Nino Rachimas</p>
+        <span>Pelanggan</span>
+      </div>
+    </div>
   </aside>
 
   <div class="main-wrapper">
     <header class="top-header">
-      <div><span class="badge-pelanggan">PELANGGAN</span><span class="online-label">Sistem Online</span></div>
-      <div class="header-right"><span class="avatar avatar-outline" aria-label="Nino Rachimas">NR</span></div>
+      <div>
+        <span class="badge-pelanggan">PELANGGAN</span>
+        <span class="online-label">Sistem Online</span>
+      </div>
+      <div class="header-right">
+        <span class="avatar avatar-outline" aria-label="Nino Rachimas">NR</span>
+      </div>
     </header>
 
     <main class="content">
@@ -42,40 +56,99 @@
 
       <div class="status-banner" style="background:#EFF6FF;border-color:#BFDBFE">
         <span class="status-icon" style="background:#DBEAFE;color:#1D4ED8" aria-hidden="true">i</span>
-        <div><h2>Sebelum mengajukan servis</h2><p>Pastikan nomor telepon dan alamat sudah benar. Jelaskan keluhan perangkat sedetail mungkin agar proses pemeriksaan lebih lancar.</p></div>
+        <div>
+          <h2>Sebelum mengajukan servis</h2>
+          <p>Pastikan nomor telepon dan alamat sudah benar. Jelaskan keluhan perangkat sedetail mungkin agar proses pemeriksaan lebih lancar.</p>
+        </div>
       </div>
 
-      <form class="profile-form service-form" action="riwayat-servis.html" method="GET">
+      <form class="profile-form service-form" id="form-servis">
         <section class="card form-card">
           <div class="section-heading">
-            <div><h2>Data Pemilik</h2><p class="subtitle">Informasi kontak yang dapat dihubungi selama proses servis.</p></div>
+            <div>
+              <h2>Data Pemilik</h2>
+              <p class="subtitle">Informasi kontak yang dapat dihubungi selama proses servis.</p>
+            </div>
             <span class="status-pill" style="background:#DBEAFE;color:#1D4ED8">Bagian 1 dari 2</span>
           </div>
+
           <div class="form-grid">
-            <div class="form-group"><label for="nama">Nama Lengkap <span aria-hidden="true">*</span></label><input class="form-control" id="nama" type="text" name="nama" value="Nino Rachimas" autocomplete="name" required></div>
-            <div class="form-group"><label for="email">Email Aktif <span aria-hidden="true">*</span></label><input class="form-control" id="email" type="email" name="email" value="nino@vinix7ut.com" autocomplete="email" required></div>
-            <div class="form-group"><label for="nohp">Nomor HP / WhatsApp <span aria-hidden="true">*</span></label><input class="form-control" id="nohp" type="tel" name="nohp" value="081234567890" autocomplete="tel" required><small class="field-help">Gunakan nomor yang aktif untuk menerima pembaruan servis.</small></div>
-            <div class="form-group"><label for="alamat">Alamat Lengkap <span aria-hidden="true">*</span></label><textarea class="form-control" id="alamat" name="alamat" rows="3" autocomplete="street-address" required placeholder="Masukkan alamat lengkap">Kota Semarang, Jawa Tengah</textarea></div>
+            <div class="form-group">
+              <label for="nama">Nama Lengkap <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="nama" type="text" name="nama" value="Nino Rachimas" autocomplete="name" required>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Aktif <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="email" type="email" name="email" value="nino@vinix7ut.com" autocomplete="email" required>
+            </div>
+
+            <div class="form-group">
+              <label for="nohp">Nomor HP / WhatsApp <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="nohp" type="tel" name="nohp" value="081234567890" autocomplete="tel" required>
+              <small class="field-help">Gunakan nomor yang aktif untuk menerima pembaruan servis.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="alamat">Alamat Lengkap <span aria-hidden="true">*</span></label>
+              <textarea class="form-control" id="alamat" name="alamat" rows="3" autocomplete="street-address" required placeholder="Masukkan alamat lengkap">Kota Semarang, Jawa Tengah</textarea>
+            </div>
           </div>
         </section>
 
         <section class="card form-card">
           <div class="section-heading">
-            <div><h2>Data Perangkat</h2><p class="subtitle">Ceritakan perangkat yang ingin diservis dan masalah yang dialami.</p></div>
+            <div>
+              <h2>Data Perangkat</h2>
+              <p class="subtitle">Ceritakan perangkat yang ingin diservis dan masalah yang dialami.</p>
+            </div>
             <span class="status-pill" style="background:#DBEAFE;color:#1D4ED8">Bagian 2 dari 2</span>
           </div>
+
           <div class="form-grid">
-            <div class="form-group"><label for="jenis_perangkat">Jenis Perangkat <span aria-hidden="true">*</span></label><select class="form-control" id="jenis_perangkat" name="jenis_perangkat" required><option value="">Pilih jenis perangkat</option><option value="laptop">Laptop / Notebook</option><option value="pc">PC / Komputer Desktop</option><option value="macbook">MacBook</option></select></div>
-            <div class="form-group"><label for="model">Merek / Model <span aria-hidden="true">*</span></label><input class="form-control" id="model" type="text" name="model" placeholder="Contoh: ASUS VivoBook 14" required></div>
-            <div class="form-group form-group-full"><label for="keluhan">Keluhan / Kerusakan <span aria-hidden="true">*</span></label><textarea class="form-control" id="keluhan" name="keluhan" rows="5" placeholder="Contoh: perangkat cepat panas, kipas berbunyi keras, atau tidak dapat menyala..." required></textarea><small class="field-help">Sebutkan gejala, kapan masalah mulai terjadi, dan hal yang sudah dicoba jika ada.</small></div>
+            <div class="form-group">
+              <label for="jenis_perangkat">Jenis Perangkat <span aria-hidden="true">*</span></label>
+              <select class="form-control" id="jenis_perangkat" name="jenis_perangkat" required>
+                <option value="">Pilih jenis perangkat</option>
+                <option value="laptop">Laptop / Notebook</option>
+                <option value="pc">PC / Komputer Desktop</option>
+                <option value="macbook">MacBook</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="model">Merek / Model <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="model" type="text" name="model" placeholder="Contoh: ASUS VivoBook 14" required>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="keluhan">Keluhan / Kerusakan <span aria-hidden="true">*</span></label>
+              <textarea class="form-control" id="keluhan" name="keluhan" rows="5" placeholder="Contoh: perangkat cepat panas, kipas berbunyi keras, atau tidak dapat menyala..." required></textarea>
+              <small class="field-help">Sebutkan gejala, kapan masalah mulai terjadi, dan hal yang sudah dicoba jika ada.</small>
+            </div>
           </div>
         </section>
 
-        <div class="notice-card"><strong>Periksa kembali data sebelum mengirim</strong><p>Pengajuan akan diteruskan ke halaman riwayat servis. Teknisi akan memeriksa perangkat dan memberikan informasi lanjutan sesuai proses servis.</p></div>
-        <div class="form-actions"><a class="btn-secondary" href="beranda-pelanggan.html">Batal</a><button class="btn-primary" type="submit">Ajukan Servis</button></div>
+        <div class="notice-card">
+          <strong>Periksa kembali data sebelum mengirim</strong>
+          <p>Pengajuan akan diteruskan ke halaman riwayat servis. Teknisi akan memeriksa perangkat dan memberikan informasi lanjutan sesuai proses servis.</p>
+        </div>
+
+        <div class="form-actions">
+          <a class="btn-secondary" href="beranda-pelanggan.html">Batal</a>
+          <button class="btn-primary" type="submit">Ajukan Servis</button>
+        </div>
       </form>
     </main>
+
     <footer class="site-footer">URT — Your Service Tracker <span>Kelompok 2</span></footer>
   </div>
+
+  <script>
+    document.getElementById("form-servis").addEventListener("submit", function(event) {
+      event.preventDefault();
+      window.location.href = "persetujuan-servis.html";
+    });
+  </script>
 </body>
 </html>

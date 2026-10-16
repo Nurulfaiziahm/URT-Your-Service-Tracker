@@ -40,31 +40,29 @@ body {
 
 /* === SIDEBAR === */
 .sidebar {
-    width: 260px;
+    width: 300px;
     background-color: var(--bg-sidebar);
     color: var(--white);
     display: flex;
     flex-direction: column;
     position: fixed;
-    height: 100vh;
+    height: 180vh;
     left: 0;
     top: 0;
 }
 
 .sidebar-header {
     padding: 24px;
-    display: flex;
+    /* display: flex; */
     align-items: center;
     gap: 12px;
 }
 
-.logo-box {
-    background-color: var(--primary-blue);
-    color: white;
-    font-weight: 700;
-    padding: 8px;
-    border-radius: 8px;
-    font-size: 14px;
+.sidebar-header p {
+  margin: 0;
+  padding: 16px 0px 0px 0px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
 }
 
 .nav-menu {
@@ -376,7 +374,7 @@ td {
 .btn-secondary:hover {
     background-color: #F1F5F9;
 }
-/* === Shared customer portal layout for all pages === */
+/* === Shared portal pelanggan layout for all pages === */
 :root { --bg-body: #F1F5F9; --text-dark: #0F172A; --text-muted: #64748B; }
 html { min-height: 100%; }
 body { background: #F1F5F9; font-family: 'Inter', sans-serif; line-height: 1.55; }
