@@ -1,25 +1,67 @@
 <!doctype html>
 <html lang="id">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Estimasi Biaya & Mutu - URT</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style-teknisi.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../teknisi/css/style-teknisi.css" />
   </head>
   <body>
     <header>
       <a href="beranda-teknisi.html">
-        <img src="image/logo-urt.svg" alt="URT Your Service Tracker" height="36">
+        <img
+          src="../image/logo-urt.svg"
+          alt="URT Your Service Tracker"
+          height="36"
+        />
       </a>
       <p>PORTAL TEKNISI</p>
       <nav aria-label="Navigasi utama">
         <ul>
-          <li><a href="beranda-teknisi.html">Beranda</a></li>
-          <li><a href="riwayat.html">Riwayat Tiket</a></li>
-          <li><a href="profil.html">Profil</a></li>
+          <li>
+            <a href="beranda-teknisi.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              <span>Beranda</span>
+            </a>
+          </li>
+          <li>
+            <a href="antrean.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z" />
+                <path d="M12 7v12" stroke-dasharray="2 2" />
+              </svg>
+              <span>Antrean Servis</span>
+            </a>
+          </li>
+          <li>
+            <a href="riwayat.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span>Riwayat Tiket</span>
+            </a>
+          </li>
+          <li>
+            <a href="profil.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="3.5" />
+                <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2" />
+              </svg>
+              <span>Profil</span>
+            </a>
+          </li>
         </ul>
       </nav>
     </header>
@@ -54,7 +96,7 @@
             <fieldset>
               <legend>Diagnosa &amp; Estimasi</legend>
               <p>
-                <label for="diagnosa">Kerusakan / Diagnosa</label><br>
+                <label for="diagnosa">Kerusakan / Diagnosa</label><br />
                 <textarea
                   id="diagnosa"
                   name="diagnosa"
@@ -67,24 +109,26 @@ Debu menumpuk pada kipas dan pendingin. Pasta termal menurun kualitasnya.</texta
               </p>
               <p>
                 <label for="suku-cadang">Suku Cadang yang Dibutuhkan</label
-                ><br>
+                ><br />
                 <input
                   type="text"
                   id="suku-cadang"
                   name="suku-cadang"
-                  value="Pasta termal">
+                  value="Pasta termal"
+                />
               </p>
               <p>
-                <label for="qc">Pemeriksaan Mutu Selesai</label><br>
-                <input type="date" id="qc" name="qc" value="2026-09-02">
+                <label for="qc">Pemeriksaan Mutu Selesai</label><br />
+                <input type="date" id="qc" name="qc" value="2026-09-02" />
               </p>
               <p>
-                <label for="estimasi">Estimasi Servis Selesai</label><br>
+                <label for="estimasi">Estimasi Servis Selesai</label><br />
                 <input
                   type="date"
                   id="estimasi"
                   name="estimasi"
-                  value="2026-09-03">
+                  value="2026-09-03"
+                />
               </p>
               <button type="submit">Simpan Estimasi</button>
             </fieldset>

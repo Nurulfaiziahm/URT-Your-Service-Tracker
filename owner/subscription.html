@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Service Tracker - Pilih Paket Langganan</title>
+    <link rel="stylesheet" href="../owner/css/owner-auth.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-badge">
+        <a href="index.html" class="site-header__brand" aria-label="URT Beranda">
+          <img
+            src="../image/logo-urt.svg"
+            alt="URT Logo"
+            class="brand-logo-img--light"
+          />
+        </a>
+        <div class="brand-text-wrap">
+          <div class="brand-name">Your Service Tracker</div>
+          <div class="brand-sub">UNTUK PEMILIK USAHA</div>
+        </div>
+      </div>
+
+      <div class="stepper">
+        <div class="step-item">
+          <span class="step-num">1</span>
+          <span>Data Usaha</span>
+        </div>
+        <div class="stepper-line completed"></div>
+        <div class="step-item active">
+          <span class="step-num">2</span>
+          <span>Pilih Paket</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="step-item">
+          <span class="step-num">3</span>
+          <span>Pembayaran</span>
+        </div>
+      </div>
+
+      <div class="header-trust-badge">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+        <span>Pembayaran aman</span>
+      </div>
+    </header>
+
+    <!-- Pricing Cards Content -->
+    <main class="main-wrapper">
+      <div class="center-header">
+        <div class="card-step-label">LANGKAH 2 DARI 3</div>
+        <h1 class="card-heading">
+          Pilih langganan untuk <span id="subBusinessName">ServisKita</span>
+        </h1>
+        <p class="card-subheading">
+          Satu langganan untuk seluruh operasional usaha. Teknisi dan pelanggan
+          dapat menggunakan URT tanpa membayar langganan.
+        </p>
+      </div>
+
+      <section class="pricing-grid">
+        <!-- Monthly Card -->
+        <article class="pricing-card">
+          <h3 class="plan-title">Bulanan</h3>
+          <p class="plan-subtitle">Ditagih setiap bulan</p>
+
+          <div class="price-box">
+            <span class="price-main">Rp99.000</span>
+            <span class="price-period">/ bulan</span>
+          </div>
+          <div class="plan-note">Fleksibel, perpanjang setiap bulan</div>
+
+          <div class="divider"></div>
+
+          <ul class="pricing-features">
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Tiket servis tanpa batas</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Kelola teknisi &amp; pelanggan</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Customer Portal dengan tautan unik</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Laporan operasional usaha</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Notifikasi WhatsApp</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Dukungan prioritas</span>
+            </li>
+          </ul>
+
+          <button type="button" id="btnSelectMonthly" class="btn-outline">
+            Pilih Paket Bulanan
+          </button>
+        </article>
+
+        <!-- Yearly Card -->
+        <article class="pricing-card featured">
+          <span class="badge-recommend">REKOMENDASI</span>
+          <h3 class="plan-title">Tahunan</h3>
+          <p class="plan-subtitle">Ditagih sekali setahun</p>
+
+          <div class="price-box">
+            <span class="price-main">Rp999.000</span>
+            <span class="price-period">/ tahun</span>
+          </div>
+          <div class="plan-note">
+            <span class="save-badge">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="m16 12-4-4-4 4" />
+                <path d="M12 16V8" />
+              </svg>
+              Hemat Setara Rp83.250 per bulan
+            </span>
+          </div>
+
+          <div class="divider"></div>
+
+          <ul class="pricing-features">
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Tiket servis tanpa batas</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Kelola teknisi &amp; pelanggan</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Customer Portal dengan tautan unik</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Laporan operasional usaha</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Notifikasi WhatsApp</span>
+            </li>
+            <li>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Dukungan prioritas</span>
+            </li>
+          </ul>
+
+          <button type="button" id="btnSelectYearly" class="btn-primary">
+            Pilih Paket Tahunan &rarr;
+          </button>
+        </article>
+      </section>
+
+      <div class="footer-trust-notes">
+        Batalkan kapan saja <span>&bull;</span> Data usaha tetap aman
+        <span>&bull;</span> Harga sudah termasuk pajak
+      </div>
+    </main>
+
+    <script src="../owner/js/owner-auth.js"></script>
+  </body>
+</html>

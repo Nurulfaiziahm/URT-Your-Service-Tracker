@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Service Tracker - Selesaikan Pembayaran</title>
+    <link rel="stylesheet" href="../owner/css/owner-auth.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- QRCode.js lightweight CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  </head>
+  <body id="paymentContainer">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-badge">
+        <a
+          href="index.html"
+          class="site-header__brand"
+          aria-label="URT Beranda"
+        >
+          <img
+            src="../image/logo-urt.svg"
+            alt="URT Logo"
+            class="brand-logo-img--light"
+          />
+        </a>
+        <div class="brand-text-wrap">
+          <div class="brand-name">Your Service Tracker</div>
+          <div class="brand-sub">UNTUK PEMILIK USAHA</div>
+        </div>
+      </div>
+
+      <div class="stepper">
+        <div class="step-item">
+          <span class="step-num">1</span>
+          <span>Data Usaha</span>
+        </div>
+        <div class="stepper-line completed"></div>
+        <div class="step-item">
+          <span class="step-num">2</span>
+          <span>Pilih Paket</span>
+        </div>
+        <div class="stepper-line completed"></div>
+        <div class="step-item active">
+          <span class="step-num">3</span>
+          <span>Pembayaran</span>
+        </div>
+      </div>
+
+      <div class="header-trust-badge encrypted">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        <span>Transaksi terenkripsi</span>
+      </div>
+    </header>
+
+    <!-- Payment Layout -->
+    <main class="payment-wrapper">
+      <div class="payment-header-group">
+        <div class="card-step-label">LANGKAH 3 DARI 3</div>
+        <h1 class="card-heading">Selesaikan pembayaran</h1>
+        <p class="card-subheading">
+          Aktifkan akun Pemilik Usaha ServisKita dan mulai kelola operasional
+          hari ini.
+        </p>
+      </div>
+
+      <div class="payment-grid">
+        <!-- Left Column: Payment Methods -->
+        <section class="payment-card">
+          <h2 class="payment-card-title">Pilih metode pembayaran</h2>
+          <p class="payment-card-desc">
+            Pembayaran diproses otomatis dan aman.
+          </p>
+
+          <div class="payment-options">
+            <div class="payment-option-item selected" data-method="qris">
+              <div class="option-left">
+                <div class="option-icon-box">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect width="5" height="5" x="3" y="3" rx="1" />
+                    <rect width="5" height="5" x="16" y="3" rx="1" />
+                    <rect width="5" height="5" x="3" y="16" rx="1" />
+                    <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+                    <path d="M21 21v.01" />
+                    <path d="M12 7v3a2 2 0 0 1-2 2H7" />
+                    <path d="M3 12h.01" />
+                    <path d="M12 3h.01" />
+                    <path d="M12 16v.01" />
+                    <path d="M16 12h1" />
+                    <path d="M21 12v.01" />
+                    <path d="M12 21v-1" />
+                  </svg>
+                </div>
+                <div class="option-meta">
+                  <div class="option-name">QRIS</div>
+                  <div class="option-sub">
+                    Scan dengan aplikasi bank atau e-wallet
+                  </div>
+                </div>
+              </div>
+              <div class="radio-circle"></div>
+            </div>
+
+            <div class="payment-option-item" data-method="va">
+              <div class="option-left">
+                <div class="option-icon-box">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="3" x2="21" y1="22" y2="22" />
+                    <line x1="6" x2="6" y1="18" y2="11" />
+                    <line x1="10" x2="10" y1="18" y2="11" />
+                    <line x1="14" x2="14" y1="18" y2="11" />
+                    <line x1="18" x2="18" y1="18" y2="11" />
+                    <polygon points="12 2 20 7 4 7" />
+                  </svg>
+                </div>
+                <div class="option-meta">
+                  <div class="option-name">Virtual Account</div>
+                  <div class="option-sub">
+                    BCA, BNI, BRI, Mandiri, dan Permata
+                  </div>
+                </div>
+              </div>
+              <div class="radio-circle"></div>
+            </div>
+
+            <div class="payment-option-item" data-method="ewallet">
+              <div class="option-left">
+                <div class="option-icon-box">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"
+                    />
+                    <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+                  </svg>
+                </div>
+                <div class="option-meta">
+                  <div class="option-name">E-Wallet</div>
+                  <div class="option-sub">GoPay, OVO, DANA, dan ShopeePay</div>
+                </div>
+              </div>
+              <div class="radio-circle"></div>
+            </div>
+          </div>
+
+          <div class="payment-privacy-notice">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+            <span
+              >Data pembayaran tidak disimpan oleh URT. Konfirmasi dikirim ke
+              email dan WhatsApp Pemilik Usaha.</span
+            >
+          </div>
+        </section>
+
+        <!-- Right Column: Order Summary -->
+        <aside class="payment-card">
+          <div class="summary-plan-badge-row" id="discountBadgeWrap"></div>
+
+          <h2 class="payment-card-title">Ringkasan pesanan</h2>
+
+          <div class="summary-selected-box">
+            <div class="summary-box-top">
+              <div>
+                <div class="summary-box-title" id="summaryPlanTitle">
+                  Paket Bulanan
+                </div>
+                <div class="summary-box-owner" id="summaryBusinessOwner">
+                  ServisKita • Pemilik Usaha
+                </div>
+              </div>
+              <a href="subscription.html" class="link-change-plan">Ubah</a>
+            </div>
+            <div class="summary-box-duration">
+              <span>Masa aktif</span>
+              <strong id="summaryDuration">30 Hari</strong>
+            </div>
+          </div>
+
+          <div class="summary-rows">
+            <div class="summary-row">
+              <span>Harga paket</span>
+              <span id="summaryPrice">Rp99.000</span>
+            </div>
+            <div class="summary-row">
+              <span>Biaya layanan</span>
+              <span>Rp0</span>
+            </div>
+            <div class="summary-row">
+              <span>Pajak</span>
+              <span>Termasuk</span>
+            </div>
+            <div class="summary-row total">
+              <div class="total-label-wrap">
+                <span class="total-title">Total pembayaran</span>
+                <span class="total-sub">Bayar satu kali</span>
+              </div>
+              <span class="total-amount" id="summaryTotal">Rp99.000</span>
+            </div>
+          </div>
+
+          <button type="button" id="btnExecutePayment" class="btn-primary">
+            <span id="payBtnText">Bayar dengan QRIS</span> &rarr;
+          </button>
+
+          <p class="terms-caption">
+            Dengan membayar, Anda menyetujui ketentuan langganan URT.
+          </p>
+        </aside>
+      </div>
+    </main>
+
+    <!-- Dynamic QR Code Modal Dialog -->
+    <div class="modal-overlay" id="qrModalOverlay">
+      <div class="qr-modal">
+        <button class="qr-close-btn" id="qrModalClose" aria-label="Tutup">
+          &times;
+        </button>
+        <h3 class="payment-card-title">Scan QRIS untuk Membayar</h3>
+        <p class="payment-card-desc">
+          Buka BCA, GoPay, OVO, atau m-Banking Anda
+        </p>
+
+        <div class="qr-code-wrapper" id="qrcode"></div>
+
+        <p
+          style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px"
+        >
+          Scan kode di atas dengan smartphone Anda atau klik tombol simulasi di
+          bawah untuk melanjutkan pengujian prototype.
+        </p>
+
+        <a
+          id="qrSimulatedRedirect"
+          href="../owner/beranda-owner.html"
+          class="btn-primary"
+          >Simulasikan Pembayaran Sukses &rarr;</a
+        >
+      </div>
+    </div>
+
+    <script src="../owner/js/qr-payment.js"></script>
+  </body>
+</html>

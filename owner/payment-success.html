@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Service Tracker - Pesanan Berhasil</title>
+    <link rel="stylesheet" href="../owner/css/owner-auth.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body id="paymentSuccessContainer" class="success-page">
+    <main class="success-card">
+      <div class="success-icon-wrap">
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </div>
+
+      <h1 class="success-title">Pesanan berhasil</h1>
+      <p class="success-desc">Pembayaran Anda telah berhasil diproses.</p>
+
+      <div class="success-details-list">
+        <div class="success-detail-item">
+          <span class="success-detail-label">Nomor Pesanan</span>
+          <span class="success-detail-val" id="orderNumber"
+            >ORD-20261017-0001</span
+          >
+        </div>
+        <div class="success-detail-item">
+          <span class="success-detail-label">Paket</span>
+          <span class="success-detail-val" id="orderPlan">Paket Bulanan</span>
+        </div>
+        <div class="success-detail-item">
+          <span class="success-detail-label">Total</span>
+          <span class="success-detail-val" id="orderTotal">Rp99.000</span>
+        </div>
+        <div class="success-detail-item">
+          <span class="success-detail-label">Status</span>
+          <span class="success-detail-val success-badge"
+            >Pembayaran berhasil</span
+          >
+        </div>
+      </div>
+
+      <a href="../owner/login.html" class="btn-primary">Kembali ke URT</a>
+    </main>
+
+    <script src="../owner/js/qr-payment.js"></script>
+  </body>
+</html>

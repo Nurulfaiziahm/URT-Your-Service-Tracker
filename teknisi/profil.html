@@ -1,25 +1,67 @@
 <!doctype html>
 <html lang="id">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profil Teknisi - URT</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style-teknisi.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../teknisi/css/style-teknisi.css" />
   </head>
   <body>
     <header>
       <a href="beranda-teknisi.html">
-        <img src="image/logo-urt.svg" alt="URT Your Service Tracker" height="36">
+        <img
+          src="../image/logo-urt.svg"
+          alt="URT Your Service Tracker"
+          height="36"
+        />
       </a>
       <p>PORTAL TEKNISI</p>
       <nav aria-label="Navigasi utama">
         <ul>
-          <li><a href="beranda-teknisi.html">Beranda</a></li>
-          <li><a href="riwayat.html">Riwayat Tiket</a></li>
-          <li><a href="profil.html" aria-current="page">Profil</a></li>
+          <li>
+            <a href="beranda-teknisi.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              <span>Beranda</span>
+            </a>
+          </li>
+          <li>
+            <a href="antrean.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z" />
+                <path d="M12 7v12" stroke-dasharray="2 2" />
+              </svg>
+              <span>Antrean Servis</span>
+            </a>
+          </li>
+          <li>
+            <a href="riwayat.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span>Riwayat Tiket</span>
+            </a>
+          </li>
+          <li>
+            <a href="profil.html" aria-current="page">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="3.5" />
+                <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2" />
+              </svg>
+              <span>Profil</span>
+            </a>
+          </li>
         </ul>
       </nav>
     </header>
@@ -43,46 +85,50 @@
               <legend>Informasi Pribadi</legend>
 
               <p>
-                <label for="nama">Nama Lengkap</label><br>
+                <label for="nama">Nama Lengkap</label><br />
                 <input
                   type="text"
                   id="nama"
                   name="nama"
                   value="Sofia Malvalena Adam"
-                  required>
+                  required
+                />
               </p>
 
               <p>
-                <label for="username">Nama Pengguna</label><br>
+                <label for="username">Nama Pengguna</label><br />
                 <input
                   type="text"
                   id="username"
                   name="username"
                   value="sofia.adam"
-                  required>
+                  required
+                />
               </p>
 
               <p>
-                <label for="email">Surel</label><br>
+                <label for="email">Surel</label><br />
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value="sofia.adam@yourservicetracker.id"
-                  required>
+                  required
+                />
               </p>
 
               <p>
-                <label for="telepon">Nomor HP</label><br>
+                <label for="telepon">Nomor HP</label><br />
                 <input
                   type="tel"
                   id="telepon"
                   name="telepon"
-                  value="0812 3456 7890">
+                  value="0812 3456 7890"
+                />
               </p>
 
               <p>
-                <label for="alamat">Alamat</label><br>
+                <label for="alamat">Alamat</label><br />
                 <textarea id="alamat" name="alamat" rows="4" cols="60">
 Jl. Raya Kebon Jeruk No. 18, Jakarta Barat, DKI Jakarta 11530</textarea
                 >
@@ -93,37 +139,40 @@ Jl. Raya Kebon Jeruk No. 18, Jakarta Barat, DKI Jakarta 11530</textarea
               <legend>Detail Kerja &amp; Keamanan</legend>
 
               <p>
-                <label for="jabatan">Jabatan</label><br>
+                <label for="jabatan">Jabatan</label><br />
                 <input
                   type="text"
                   id="jabatan"
                   name="jabatan"
                   value="Teknisi Servis Laptop"
-                  readonly>
+                  readonly
+                />
               </p>
 
               <p>
-                <label for="departemen">Departemen</label><br>
+                <label for="departemen">Departemen</label><br />
                 <input
                   type="text"
                   id="departemen"
                   name="departemen"
                   value="Operasional Servis"
-                  readonly>
+                  readonly
+                />
               </p>
 
               <p>
-                <label for="status">Status Akses</label><br>
+                <label for="status">Status Akses</label><br />
                 <input
                   type="text"
                   id="status"
                   name="status"
                   value="Aktif"
-                  readonly>
+                  readonly
+                />
               </p>
 
               <p>
-                Terakhir masuk: 24 Agu 2026, 09:12 WIB.<br>
+                Terakhir masuk: 24 Agu 2026, 09:12 WIB.<br />
                 Pembaruan kata sandi terakhir: 12 Agu 2026.
               </p>
             </fieldset>

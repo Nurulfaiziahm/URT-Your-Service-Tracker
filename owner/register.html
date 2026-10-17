@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Service Tracker - Registrasi Pemilik Usaha</title>
+    <link rel="stylesheet" href="../owner/css/owner-auth.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="register-layout">
+      <!-- Dark Navy Sidebar -->
+      <aside class="register-sidebar">
+        <div>
+          <div class="brand-badge">
+            <a
+              href="index.html"
+              class="site-header__brand"
+              aria-label="URT Beranda"
+            >
+              <img
+                src="../image/logo-urt.svg"
+                alt="URT Logo"
+                class="brand-logo-img"
+              />
+            </a>
+            <div class="brand-text-wrap">
+              <div class="brand-name">Your Service Tracker</div>
+              <div class="brand-sub">UNTUK PEMILIK USAHA</div>
+            </div>
+          </div>
+
+          <div class="sidebar-badge">PEMILIK USAHA</div>
+          <h1 class="sidebar-title">
+            Bangun operasi servis<br />yang lebih rapi.
+          </h1>
+          <p class="sidebar-desc">
+            Daftarkan usaha Anda untuk mulai mengelola usaha servis, teknisi,
+            pelanggan, dan layanan dalam satu sistem.
+          </p>
+
+          <div class="feature-list">
+            <div class="feature-item">
+              <div class="feature-icon-box">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M2 9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V9Z"
+                  />
+                  <path d="m2 9 10 7 10-7" />
+                </svg>
+              </div>
+              <div>
+                <h4>Kelola servis dari satu tempat</h4>
+                <p>
+                  Pantau tiket, estimasi, dan progres pekerjaan secara
+                  real-time.
+                </p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon-box">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <div>
+                <h4>Hubungkan seluruh tim</h4>
+                <p>
+                  Atur teknisi dan pelanggan tanpa biaya langganan tambahan.
+                </p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon-box">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" x2="18" y1="20" y2="10" />
+                  <line x1="12" x2="12" y1="20" y2="4" />
+                  <line x1="6" x2="6" y1="20" y2="14" />
+                </svg>
+              </div>
+              <div>
+                <h4>Keputusan berbasis data</h4>
+                <p>Lihat performa layanan dan kesehatan operasional usaha.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-bottom-info">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+          <span
+            >Hanya Pemilik Usaha yang membayar langganan URT. Teknisi dan
+            pelanggan tidak dikenakan biaya.</span
+          >
+        </div>
+      </aside>
+
+      <!-- Main Registration Section -->
+      <main class="register-main">
+        <header class="register-topbar">
+          <div class="stepper">
+            <div class="step-item active">
+              <span class="step-num">1</span>
+              <span>Data Usaha</span>
+            </div>
+            <div class="stepper-line"></div>
+            <div class="step-item">
+              <span class="step-num">2</span>
+              <span>Pilih Paket</span>
+            </div>
+            <div class="stepper-line"></div>
+            <div class="step-item">
+              <span class="step-num">3</span>
+              <span>Pembayaran</span>
+            </div>
+          </div>
+
+          <div class="login-link-wrap">
+            Sudah punya akun? <a href="login.html">Masuk</a>
+          </div>
+        </header>
+
+        <div class="register-content">
+          <section class="register-card">
+            <div class="card-step-label">LANGKAH 1 DARI 3</div>
+            <h2 class="card-heading">Daftarkan usaha Anda</h2>
+            <p class="card-subheading">
+              Buat akun khusus Pemilik Usaha. Setelah ini Anda akan memilih
+              paket langganan yang paling sesuai.
+            </p>
+
+            <form id="ownerRegistrationForm" novalidate>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="businessName"
+                    >Nama Usaha</label
+                  >
+                  <div class="input-container">
+                    <span class="input-icon-left">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                        />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                      </svg>
+                    </span>
+                    <input
+                      type="text"
+                      id="businessName"
+                      class="form-control"
+                      placeholder="Contoh: ServisKita"
+                      required
+                    />
+                  </div>
+                  <div class="field-error" id="businessNameError"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="ownerName">Nama Pemilik</label>
+                  <div class="input-container">
+                    <span class="input-icon-left">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </span>
+                    <input
+                      type="text"
+                      id="ownerName"
+                      class="form-control"
+                      placeholder="Nama lengkap Anda"
+                      required
+                    />
+                  </div>
+                  <div class="field-error" id="ownerNameError"></div>
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="whatsapp"
+                    >Nomor WhatsApp</label
+                  >
+                  <div class="input-container">
+                    <span class="input-icon-left">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                        />
+                      </svg>
+                    </span>
+                    <input
+                      type="tel"
+                      id="whatsapp"
+                      class="form-control"
+                      placeholder="08xx xxxx xxxx"
+                      required
+                    />
+                  </div>
+                  <div class="field-error" id="whatsappError"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="email">Email</label>
+                  <div class="input-container">
+                    <span class="input-icon-left">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <rect width="20" height="16" x="2" y="4" rx="2" />
+                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                      </svg>
+                    </span>
+                    <input
+                      type="email"
+                      id="email"
+                      class="form-control"
+                      placeholder="nama@usaha.com"
+                      required
+                    />
+                  </div>
+                  <div class="field-error" id="emailError"></div>
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="password">Kata Sandi</label>
+                  <div class="input-container">
+                    <span class="input-icon-left">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <rect
+                          width="18"
+                          height="11"
+                          x="3"
+                          y="11"
+                          rx="2"
+                          ry="2"
+                        />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                    </span>
+                    <input
+                      type="password"
+                      id="password"
+                      class="form-control"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="toggle-password"
+                      data-target="password"
+                      aria-label="Lihat kata sandi"
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="field-error" id="passwordError"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="confirmPassword"
+                    >Konfirmasi Kata Sandi</label
+                  >
+                  <div class="input-container">
+                    <span class="input-icon-left">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <rect
+                          width="18"
+                          height="11"
+                          x="3"
+                          y="11"
+                          rx="2"
+                          ry="2"
+                        />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                    </span>
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      class="form-control"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="toggle-password"
+                      data-target="confirmPassword"
+                      aria-label="Lihat konfirmasi kata sandi"
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="field-error" id="confirmPasswordError"></div>
+                </div>
+              </div>
+
+              <div class="checkbox-group">
+                <input type="checkbox" id="termsCheckbox" required />
+                <label for="termsCheckbox"
+                  >Saya menyetujui
+                  <a href="../terms.html">Syarat Penggunaan</a>
+                  dan
+                  <a href="../privacy.html">Kebijakan Privasi</a>
+                  URT.</label
+                >
+              </div>
+              <div
+                class="field-error"
+                id="termsCheckboxError"
+                style="margin-top: -16px; margin-bottom: 16px"
+              ></div>
+
+              <button type="submit" class="btn-primary">
+                Lanjut Pilih Langganan &rarr;
+              </button>
+            </form>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="../owner/js/owner-auth.js"></script>
+  </body>
+</html>

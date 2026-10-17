@@ -1,42 +1,257 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profil Pelanggan - URT</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style-customer.css">
-</head>
-<body>
-  <aside class="sidebar">
-        <div class="sidebar-header">
-        <img src="../teknisi/image/logo-urt.svg" alt="URT Your Service Tracker" height="42">
-            <div>
-                <p style="font-size: 10px; font-weight: 800; color: #aebbd3;">portal pelanggan</p>
-            </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil Pelanggan - URT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style-customer.css" />
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a
+          href="beranda-pelanggan.html"
+          style="display: inline-block; line-height: 0"
+        >
+          <img
+            src="../image/logo-urt.svg"
+            alt="URT Your Service Tracker"
+            height="38"
+          />
+        </a>
+        <div>
+          <p style="font-size: 10px; font-weight: 800; color: #aebbd3">
+            portal pelanggan
+          </p>
         </div>
-    <nav class="nav-menu" aria-label="Navigasi pelanggan"><a href="beranda-pelanggan.html" class="nav-item">Beranda</a><a href="riwayat-servis.html" class="nav-item">Riwayat Servis</a><a href="profil-pelanggan.html" class="nav-item active" aria-current="page">Profil</a></nav>
-    <div class="sidebar-footer"><div class="avatar">NR</div><div class="user-info"><p>Nino Rachimas</p><span>Pelanggan</span></div></div>
-  </aside>
-  <div class="main-wrapper">
-    <header class="top-header"><div><span class="badge-pelanggan">PELANGGAN</span><span class="online-label">Sistem Online</span></div><div class="header-right"><span class="avatar avatar-outline">NR</span></div></header>
-    <main class="content">
-      
-<div class="page-header"><div><span class="page-title">PENGATURAN AKUN</span><h1>Profil Pelanggan</h1><p class="subtitle">Kelola identitas dan kontak untuk pembaruan status servis perangkat Anda.</p></div></div>
-<div class="profile-intro card"><div class="avatar profile-avatar">NR</div><div><h2>Nino Rachimas</h2><p class="subtitle">Informasi profil dan preferensi komunikasi</p></div></div>
-<form class="profile-form" action="beranda-pelanggan.html" method="GET"><section class="card form-card"><div class="section-heading"><div><h2>Informasi Pribadi</h2><p class="subtitle">Pastikan informasi kontak selalu terbaru.</p></div></div><div class="form-grid"><div class="form-group"><label for="nama">Nama Lengkap</label><input class="form-control" id="nama" type="text" name="nama" value="Nino Rachimas" required></div><div class="form-group"><label for="username">Nama Pengguna</label><input class="form-control" id="username" type="text" name="username" value="ninorachimas" required></div><div class="form-group"><label for="email">Email Aktif</label><input class="form-control" id="email" type="email" name="email" value="nino@vinix7ut.com" required></div><div class="form-group"><label for="telepon">Nomor WhatsApp/Telepon</label><input class="form-control" id="telepon" type="tel" name="telepon" value="081234567890" required></div><div class="form-group form-group-full"><label for="alamat">Alamat Lengkap</label><textarea class="form-control" id="alamat" name="alamat" rows="3" required>Kota Semarang, Jawa Barat</textarea></div></div></section>
-<section class="card form-card"><div class="section-heading"><div><h2>Preferensi &amp; Keamanan</h2><p class="subtitle">Atur pemberitahuan dan keamanan akun Anda.</p></div></div><div class="preferences"><label class="checkbox-label"><input type="checkbox" name="notif_wa" checked><span><strong>Notifikasi melalui WhatsApp</strong><small>Estimasi biaya, status pengerjaan, dan pengambilan.</small></span></label><label class="checkbox-label"><input type="checkbox" name="notif_email" checked><span><strong>Salinan tanda terima melalui email</strong><small>Tanda terima dan ringkasan servis digital.</small></span></label></div><div class="form-grid password-grid"><div class="form-group"><label for="password_baru">Kata Sandi Baru</label><input class="form-control" id="password_baru" type="password" name="password_baru" autocomplete="new-password"><small class="field-help">Opsional. Kosongkan jika tidak ingin mengganti kata sandi.</small></div><div class="form-group"><label for="konfirmasi_password">Konfirmasi Kata Sandi Baru</label><input class="form-control" id="konfirmasi_password" type="password" name="konfirmasi_password" autocomplete="new-password"></div></div></section>
-<div class="notice-card"><strong>Data kontak digunakan untuk servis</strong><p>Pastikan nomor dan email aktif agar Anda menerima permintaan persetujuan biaya dan pembaruan perbaikan.</p></div><div class="form-actions">
-  <a class="btn-secondary" href="beranda-pelanggan.html">Batal</a>
-  <button class="btn-primary" type="submit">Simpan Profil</button>
-  <a class="btn-secondary" href="../index.html" onclick="return confirm('Anda yakin mau keluar dari portal pelanggan?')">Keluar</a>
-</div>
-</form>
+      </div>
+      <nav class="nav-menu">
+        <a href="beranda-pelanggan.html" class="nav-item">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Beranda</span>
+        </a>
+        <a href="riwayat-servis.html" class="nav-item">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span>Riwayat Servis</span>
+        </a>
+        <a href="profil-pelanggan.html" class="nav-item active">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <span>Profil</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="avatar">NR</div>
+        <div class="user-info">
+          <p>Nino Rachimas</p>
+          <span>Pelanggan</span>
+        </div>
+      </div>
+    </aside>
 
-    </main>
-    <footer class="site-footer">URT — Your Service Tracker <span>Kelompok 2</span></footer>
-  </div>
-</body>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div>
+          <span class="badge-pelanggan">PELANGGAN</span
+          ><span class="online-label">Sistem Online</span>
+        </div>
+        <div class="header-right">
+          <span class="avatar avatar-outline">NR</span>
+        </div>
+      </header>
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <span class="page-title">PENGATURAN AKUN</span>
+            <h1>Profil Pelanggan</h1>
+            <p class="subtitle">
+              Kelola identitas dan kontak untuk pembaruan status servis
+              perangkat Anda.
+            </p>
+          </div>
+        </div>
+        <div class="profile-intro card">
+          <div class="avatar profile-avatar">NR</div>
+          <div>
+            <h2>Nino Rachimas</h2>
+            <p class="subtitle">Informasi profil dan preferensi komunikasi</p>
+          </div>
+        </div>
+        <form class="profile-form" action="beranda-pelanggan.html" method="GET">
+          <section class="card form-card">
+            <div class="section-heading">
+              <div>
+                <h2>Informasi Pribadi</h2>
+                <p class="subtitle">
+                  Pastikan informasi kontak selalu terbaru.
+                </p>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="nama">Nama Lengkap</label
+                ><input
+                  class="form-control"
+                  id="nama"
+                  type="text"
+                  name="nama"
+                  value="Nino Rachimas"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="username">Nama Pengguna</label
+                ><input
+                  class="form-control"
+                  id="username"
+                  type="text"
+                  name="username"
+                  value="ninorachimas"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="email">Email Aktif</label
+                ><input
+                  class="form-control"
+                  id="email"
+                  type="email"
+                  name="email"
+                  value="nino@vinix7ut.com"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="telepon">Nomor WhatsApp/Telepon</label
+                ><input
+                  class="form-control"
+                  id="telepon"
+                  type="tel"
+                  name="telepon"
+                  value="081234567890"
+                  required
+                />
+              </div>
+              <div class="form-group form-group-full">
+                <label for="alamat">Alamat Lengkap</label
+                ><textarea
+                  class="form-control"
+                  id="alamat"
+                  name="alamat"
+                  rows="3"
+                  required
+                >
+Kota Semarang, Jawa Barat</textarea
+                >
+              </div>
+            </div>
+          </section>
+          <section class="card form-card">
+            <div class="section-heading">
+              <div>
+                <h2>Preferensi &amp; Keamanan</h2>
+                <p class="subtitle">
+                  Atur pemberitahuan dan keamanan akun Anda.
+                </p>
+              </div>
+            </div>
+            <div class="preferences">
+              <label class="checkbox-label"
+                ><input type="checkbox" name="notif_wa" checked /><span
+                  ><strong>Notifikasi melalui WhatsApp</strong
+                  ><small
+                    >Estimasi biaya, status pengerjaan, dan pengambilan.</small
+                  ></span
+                ></label
+              ><label class="checkbox-label"
+                ><input type="checkbox" name="notif_email" checked /><span
+                  ><strong>Salinan tanda terima melalui email</strong
+                  ><small
+                    >Tanda terima dan ringkasan servis digital.</small
+                  ></span
+                ></label
+              >
+            </div>
+            <div class="form-grid password-grid">
+              <div class="form-group">
+                <label for="password_baru">Kata Sandi Baru</label
+                ><input
+                  class="form-control"
+                  id="password_baru"
+                  type="password"
+                  name="password_baru"
+                  autocomplete="new-password"
+                /><small class="field-help"
+                  >Opsional. Kosongkan jika tidak ingin mengganti kata
+                  sandi.</small
+                >
+              </div>
+              <div class="form-group">
+                <label for="konfirmasi_password"
+                  >Konfirmasi Kata Sandi Baru</label
+                ><input
+                  class="form-control"
+                  id="konfirmasi_password"
+                  type="password"
+                  name="konfirmasi_password"
+                  autocomplete="new-password"
+                />
+              </div>
+            </div>
+          </section>
+          <div class="notice-card">
+            <strong>Data kontak digunakan untuk servis</strong>
+            <p>
+              Pastikan nomor dan email aktif agar Anda menerima permintaan
+              persetujuan biaya dan pembaruan perbaikan.
+            </p>
+          </div>
+          <div class="form-actions">
+            <a class="btn-secondary" href="beranda-pelanggan.html">Batal</a>
+            <button class="btn-primary" type="submit">Simpan Profil</button>
+            <a
+              class="btn-secondary"
+              href="../index.html"
+              onclick="
+                return confirm('Anda yakin mau keluar dari portal pelanggan?');
+              "
+              >Keluar</a
+            >
+          </div>
+        </form>
+      </main>
+      <footer class="site-footer">
+        URT — Your Service Tracker <span>Kelompok 2</span>
+      </footer>
+    </div>
+    <script>
+      const navItems = document.querySelectorAll(".nav-menu .nav-item");
+
+      navItems.forEach((item) => {
+        item.addEventListener("click", function () {
+          // Remove active class from all items
+          navItems.forEach((nav) => nav.classList.remove("active"));
+          // Set active state on the clicked item
+          this.classList.add("active");
+        });
+      });
+    </script>
+  </body>
 </html>

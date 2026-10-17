@@ -1,35 +1,157 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detail Riwayat Servis - URT</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style-customer.css">
-</head>
-<body>
-  <aside class="sidebar">
-        <div class="sidebar-header">
-        <img src="../teknisi/image/logo-urt.svg" alt="URT Your Service Tracker" height="42">
-            <div>
-                <p style="font-size: 10px; font-weight: 800; color: #aebbd3;">portal pelanggan</p>
-            </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detail Riwayat Servis - URT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style-customer.css" />
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a
+          href="beranda-pelanggan.html"
+          style="display: inline-block; line-height: 0"
+        >
+          <img
+            src="../image/logo-urt.svg"
+            alt="URT Your Service Tracker"
+            height="38"
+          />
+        </a>
+        <div>
+          <p style="font-size: 10px; font-weight: 800; color: #aebbd3">
+            portal pelanggan
+          </p>
         </div>
-    <nav class="nav-menu" aria-label="Navigasi pelanggan"><a href="beranda-pelanggan.html" class="nav-item">Beranda</a><a href="riwayat-servis.html" class="nav-item active" aria-current="page">Riwayat Servis</a><a href="profil-pelanggan.html" class="nav-item">Profil</a></nav>
-    <div class="sidebar-footer"><div class="avatar">NR</div><div class="user-info"><p>Nino Rachimas</p><span>Pelanggan</span></div></div>
-  </aside>
-  <div class="main-wrapper">
-    <header class="top-header"><div><span class="badge-pelanggan">PELANGGAN</span><span class="online-label">Sistem Online</span></div><div class="header-right"><span class="avatar avatar-outline">NR</span></div></header>
-    <main class="content">
-      
-<div class="page-header"><div><span class="page-title">RIWAYAT SERVIS</span><h1>Detail Riwayat Servis</h1><p class="subtitle">Informasi lengkap mengenai riwayat perbaikan perangkat Anda.</p></div><a class="btn-secondary" href="riwayat-servis.html">← Kembali ke Riwayat</a></div>
-<div class="card"><div class="section-heading"><div><span class="eyebrow">DETAIL TIKET</span><h2>#URT-2026-001</h2><p class="subtitle">ASUS ROG Zephyrus G14</p></div><span class="status-pill warning">Menunggu Persetujuan</span></div><div class="info-list"><div><span>Nama Pelanggan</span><strong>Nino Rachimas</strong></div><div><span>Perangkat</span><strong>ASUS ROG Zephyrus G14</strong></div><div><span>Serial Number</span><strong>ASUS-G14-998877</strong></div><div><span>Keluhan Awal</span><strong>Mati total, tidak bisa di-charge, lampu indikator mati.</strong></div></div><div class="subsection"><h3>Tindakan Teknisi</h3><p>Pembongkaran unit dan pengecekan arus listrik pada motherboard. Penggantian IC Power diperlukan. Estimasi pengerjaan memakan waktu 2–3 hari kerja setelah sparepart tersedia.</p></div></div>
-<section class="card action-card"><span class="eyebrow">PERSETUJUAN TINDAKAN</span><h2>Konfirmasi biaya perbaikan</h2><p>Apakah Anda menyetujui biaya perbaikan sebesar <strong>Rp850.000</strong>?</p><div class="button-row"><a class="btn-primary" href="persetujuan-disetujui.html">✓ Setujui Perbaikan</a><a class="btn-danger" href="persetujuan-ditolak.html">Tolak Perbaikan</a></div></section>
+      </div>
+      <nav class="nav-menu">
+        <a href="beranda-pelanggan.html" class="nav-item active">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Beranda</span>
+        </a>
+        <a href="riwayat-servis.html" class="nav-item">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span>Riwayat Servis</span>
+        </a>
+        <a href="profil-pelanggan.html" class="nav-item">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <span>Profil</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="avatar">NR</div>
+        <div class="user-info">
+          <p>Nino Rachimas</p>
+          <span>Pelanggan</span>
+        </div>
+      </div>
+    </aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div>
+          <span class="badge-pelanggan">PELANGGAN</span
+          ><span class="online-label">Sistem Online</span>
+        </div>
+        <div class="header-right">
+          <span class="avatar avatar-outline">NR</span>
+        </div>
+      </header>
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <span class="page-title">RIWAYAT SERVIS</span>
+            <h1>Detail Riwayat Servis</h1>
+            <p class="subtitle">
+              Informasi lengkap mengenai riwayat perbaikan perangkat Anda.
+            </p>
+          </div>
+          <a class="btn-secondary" href="riwayat-servis.html"
+            >← Kembali ke Riwayat</a
+          >
+        </div>
+        <div class="card">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">DETAIL TIKET</span>
+              <h2>#URT-2026-001</h2>
+              <p class="subtitle">ASUS ROG Zephyrus G14</p>
+            </div>
+            <span class="status-pill warning">Menunggu Persetujuan</span>
+          </div>
+          <div class="info-list">
+            <div><span>Nama Pelanggan</span><strong>Nino Rachimas</strong></div>
+            <div>
+              <span>Perangkat</span><strong>ASUS ROG Zephyrus G14</strong>
+            </div>
+            <div>
+              <span>Serial Number</span><strong>ASUS-G14-998877</strong>
+            </div>
+            <div>
+              <span>Keluhan Awal</span
+              ><strong
+                >Mati total, tidak bisa di-charge, lampu indikator mati.</strong
+              >
+            </div>
+          </div>
+          <div class="subsection">
+            <h3>Tindakan Teknisi</h3>
+            <p>
+              Pembongkaran unit dan pengecekan arus listrik pada motherboard.
+              Penggantian IC Power diperlukan. Estimasi pengerjaan memakan waktu
+              2–3 hari kerja setelah sparepart tersedia.
+            </p>
+          </div>
+        </div>
+        <section class="card action-card">
+          <span class="eyebrow">PERSETUJUAN TINDAKAN</span>
+          <h2>Konfirmasi biaya perbaikan</h2>
+          <p>
+            Apakah Anda menyetujui biaya perbaikan sebesar
+            <strong>Rp850.000</strong>?
+          </p>
+          <div class="button-row">
+            <a class="btn-primary" href="persetujuan-disetujui.html"
+              >✓ Setujui Perbaikan</a
+            ><a class="btn-danger" href="persetujuan-ditolak.html"
+              >Tolak Perbaikan</a
+            >
+          </div>
+        </section>
+      </main>
+      <footer class="site-footer">
+        URT — Your Service Tracker <span>Kelompok 2</span>
+      </footer>
+    </div>
+    <script>
+      const navItems = document.querySelectorAll(".nav-menu .nav-item");
 
-    </main>
-    <footer class="site-footer">URT — Your Service Tracker <span>Kelompok 2</span></footer>
-  </div>
-</body>
+      navItems.forEach((item) => {
+        item.addEventListener("click", function () {
+          // Remove active class from all items
+          navItems.forEach((nav) => nav.classList.remove("active"));
+          // Set active state on the clicked item
+          this.classList.add("active");
+        });
+      });
+    </script>
+  </body>
 </html>
