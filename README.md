@@ -1,2736 +1,555 @@
 # URT — Your Service Tracker
 
-URT (Your Service Tracker) adalah platform digital yang dirancang untuk membantu tempat servis mengelola proses servis secara lebih terstruktur, transparan, dan profesional.
+<p align="center">
+  <img src="image/logo-urt.svg" alt="URT — Your Service Tracker Logo" width="220" />
+</p>
 
-URT menghubungkan **pelanggan, teknisi, dan admin tempat servis** dalam satu sistem. Pelanggan dapat mengajukan dan melacak servis, sementara tempat servis dapat mengelola tiket servis, diagnosis, estimasi biaya, status pengerjaan, teknisi, hingga riwayat servis.
+<p align="center">
+  <strong>A service tracking and management platform designed to help Tempat Servis manage service tickets, repair progress, customer communication, and service information in a more organized way.</strong>
+</p>
 
-## Fitur Utama
+<p align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" alt="HTML5" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white" alt="CSS3" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
+  <img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub" />
+  <img src="https://img.shields.io/badge/Project-Academic%20Prototype-blue?style=flat-square" alt="Status" />
+</p>
 
-- Pelacakan status servis secara real-time
-- Pengajuan servis oleh pelanggan
-- Manajemen tiket servis
-- Diagnosis dan estimasi biaya
-- Manajemen antrean servis
-- Pengelolaan teknisi
-- Riwayat servis pelanggan
-- Invoice dan transaksi
-- Manajemen inventori dan spare part
-- Portal terpisah untuk owner, teknisi, dan pelanggan
+---
 
-## Tujuan
+## Table of Contents
 
-URT dibuat untuk mengurangi ketergantungan tempat servis terhadap pencatatan manual dan komunikasi melalui WhatsApp yang sering menyebabkan informasi servis tersebar, sulit dilacak, dan membuat pelanggan harus berulang kali menanyakan perkembangan servis.
+- [About the Project](#about-the-project)
+- [Problem Background](#problem-background)
+- [Project Goals](#project-goals)
+- [Key Features](#key-features)
+  - [Owner (Pemilik Usaha)](#owner-pemilik-usaha)
+  - [Teknisi (Technician)](#teknisi-technician)
+  - [Pelanggan (Customer)](#pelanggan-customer)
+- [Application Workflow](#application-workflow)
+- [Application Preview](#application-preview)
+  - [Landing Page](#landing-page)
+  - [Owner Portal](#owner-portal)
+  - [Teknisi Portal](#teknisi-portal)
+  - [Pelanggan Portal](#pelanggan-portal)
+  - [Ticket Detail](#ticket-detail)
+  - [Service Tracking](#service-tracking)
+  - [Service History](#service-history)
+  - [Mobile Responsive View](#mobile-responsive-view)
+- [Technology Stack](#technology-stack)
+- [Project Structure](#project-structure)
+- [How to Run](#how-to-run)
+- [Figma Design — Modul 5](#figma-design--modul-5)
+- [Team Contributions](#team-contributions)
+  - [Contribution Details](#contribution-details)
+  - [Contribution Note](#contribution-note)
+- [AI-Assisted Development](#ai-assisted-development)
+- [Prompt Log & Manual Improvements](#prompt-log--manual-improvements)
+- [Git Workflow](#git-workflow)
+- [Project Status](#project-status)
+- [Team](#team)
 
-Dengan URT, seluruh proses servis dapat dikelola dalam satu platform sehingga operasional menjadi lebih rapi dan pelanggan mendapatkan informasi yang lebih jelas.
+---
 
-## Target Pengguna
+## About the Project
 
-- Tempat servis laptop
-- Tempat servis HP
-- Tempat servis komputer
-- Tempat servis elektronik
-- Teknisi
-- Admin tempat servis
-- Pelanggan
+**URT — Your Service Tracker** adalah platform pelacakan dan manajemen operasional servis yang dirancang khusus untuk kebutuhan **Tempat Servis** (seperti tempat servis laptop, smartphone, komputer, dan perangkat elektronik lainnya).
 
-## Project Scope
+Sistem ini mengintegrasikan tiga pemangku kepentingan utama—**Owner**, **Teknisi**, dan **Pelanggan**—ke dalam satu ekosistem digital yang terkoordinasi. Dengan URT, pelanggan dapat memantau proses perbaikan perangkat secara transparan dan mandiri, sementara teknisi dan pemilik usaha dapat mengelola antrean pengerjaan, diagnosis kerusakan, persetujuan biaya, hingga pelaporan transaksi secara terpusat.
 
-Project ini dikembangkan sebagai bagian dari proses pembelajaran dan implementasi **UI/UX, Design Thinking, serta Semantic HTML5**. Pengembangan berfokus pada perancangan alur pengguna, struktur informasi, dan implementasi prototype menjadi halaman HTML5 yang semantik dan mengikuti standar W3C.
+---
+
+## Problem Background
+
+Banyak usaha Tempat Servis skala kecil dan menengah masih mengandalkan alur kerja manual:
+- **Pencatatan Fisik & Tercecer:** Nota kertas dan buku manual rawan hilang, rusak, atau terselip.
+- **Komunikasi Terfragmentasi:** Percakapan pembaruan status dan biaya via chat WhatsApp sering kali tenggelam, membingungkan pelanggan, dan memicu salah paham.
+- **Konfirmasi Biaya yang Terhambat:** Pelanggan lambat memberikan kepastian perbaikan karena tidak adanya rincian diagnosis dan estimasi biaya yang terdokumentasi rapi.
+- **Visibilitas Operasional Rendah:** Pemilik usaha kesulitan memantau beban kerja teknisi harian, status setiap unit yang sedang dikerjakan, serta performa pendapatan secara *real-time*.
+
+URT hadir untuk mentransformasikan alur kerja tradisional tersebut menjadi alur operasional digital yang terstruktur, rapi, dan profesional.
+
+---
+
+## Project Goals
+
+1. **Memudahkan Pelacakan Servis Mandiri:** Memberikan pelanggan akses langsung untuk mengetahui tahapan perbaikan perangkat mereka kapan saja tanpa perlu berulang kali menghubungi pihak Tempat Servis.
+2. **Membantu Teknisi Mengelola Tiket:** Menyediakan ruang kerja digital terstruktur bagi teknisi untuk mencatat temuan diagnosis, kebutuhan suku cadang, dan estimasi waktu kerja.
+3. **Merapikan Informasi Diagnosis & Estimasi Biaya:** Menghadirkan rincian biaya yang transparan serta alur persetujuan (*approval*) biaya sebelum tindakan perbaikan dimulai.
+4. **Meningkatkan Komunikasi Tempat Servis & Pelanggan:** Menyediakan pembaruan status yang konsisten dan pesan notifikasi terstruktur antara teknisi dan pemilik perangkat.
+5. **Membantu Pemilik Usaha Memantau Operasional:** Memberikan visibilitas terpadu kepada Owner terkait tiket aktif, performa teknisi, database pelanggan, dan laporan berkala.
+6. **Mengurangi Ketergantungan Alur Manual:** Mengurangi miskomunikasi dan hilangnya data akibat pencatatan terfragmentasi di berbagai media chat atau catatan fisik.
+
+---
+
+## Key Features
+
+Fitur-fitur URT diorganisasikan berdasarkan tiga peran utama:
+
+### Owner (Pemilik Usaha)
+Pusat kendali operasional Tempat Servis untuk memantau performa bisnis dan pengelolaan tim:
+- **Dashboard Operasional:** Ringkasan metrik utama mencakup tiket aktif, total pelanggan, jumlah teknisi aktif bertugas, dan status paket langganan.
+- **Manajemen Tiket Servis:** Daftar tiket servis komprehensif dilengkapi filter status (*Menunggu Diagnosis*, *Persetujuan*, *Pengerjaan*, *Selesai*), pencarian ID tiket, dan aksi cetak struk servis.
+- **Manajemen Teknisi:** Pengelolaan data staf teknisi, penugasan tiket, pemantauan beban kerja harian, keahlian/spesialisasi perangkat, serta penambahan dan pengeditan profil teknisi.
+- **Manajemen Pelanggan:** Database kontak pelanggan terpadu (nama, nomor WhatsApp, email, alamat), rekam jejak riwayat servis perangkat, formulir tambah pelanggan baru, serta antarmuka import data pelanggan.
+- **Katalog Layanan & Tarif:** Pengaturan daftar jenis layanan servis (jasa perbaikan dan suku cadang), tarif dasar, dan estimasi durasi pengerjaan.
+- **Laporan Operasional:** Visualisasi data pendapatan, tingkat penyelesaian servis tepat waktu (*SLA fulfillment*), dan tren volume servis bulanan.
+- **Manajemen Langganan URT:** Informasi paket langganan aktif Tempat Servis, opsi perpanjangan paket, petunjuk pembayaran QRIS/Virtual Account, dan riwayat faktur (*invoice*).
+- **Pengaturan Usaha & Profil:** Konfigurasi identitas Tempat Servis, alamat cabang, jam operasional, dan pengaturan akun pemilik usaha.
+
+### Teknisi (Technician)
+Lingkungan kerja praktis untuk menangani unit perangkat masuk dari diagnosis hingga pengujian:
+- **Dashboard Teknisi:** Ringkasan harian tiket penugasan pribadi, status tiket menunggu proses, unit selesai, dan kartu informasi tiket terpilih.
+- **Antrean Servis:** Pemantauan antrean perbaikan unit berdasarkan prioritas dan tingkat urgensi penanganan.
+- **Formulir Diagnosis & Estimasi:** Pencatatan detail temuan kerusakan fisik/komponen, penentuan kebutuhan spare part pengganti, input estimasi total biaya servis, dan target tanggal selesai.
+- **Draf Komunikasi Pelanggan:** Fitur perumusan pesan pemberitahuan otomatis hasil diagnosis yang siap dikirimkan kepada pelanggan untuk persetujuan biaya.
+- **Pelacakan Perjalanan Tiket (Timeline):** Riwayat pencatatan log tahapan pengerjaan mulai dari penerimaan unit, diagnosa selesai, persetujuan biaya, hingga perbaikan berjalan.
+- **Penyelesaian Servis & QC (Quality Control):** Pencatatan tahapan pengujian fungsionalitas unit sebelum perangkat dinyatakan siap diambil pelanggan.
+- **Riwayat Tiket Selesai:** Arsip pekerjaan servis yang telah sukses dituntaskan oleh teknisi.
+- **Profil Teknisi:** Pengaturan data profil pribadi, bidang spesialisasi perangkat, dan kontak teknisi.
+
+### Pelanggan (Customer)
+Portal transparan yang memberikan kendali dan visibilitas penuh kepada pelanggan atas perangkatnya:
+- **Pelacakan Status Mandiri (Public Tracking):** Akses cepat pelacakan servis menggunakan nomor tiket (contoh: `#URT-2026-001`) tanpa perlu login, menampilkan *stepper* tahapan servis interaktif.
+- **Dashboard Pelanggan:** Menampilkan status unit yang sedang diservis, ringkasan servis selesai, dan riwayat perbaikan sebelumnya.
+- **Pengajuan Servis Mandiri:** Formulir pengajuan perbaikan online mencakup kategori perangkat (laptop, smartphone, komputer, elektronik), merek/model, rincian keluhan, dan metode penyerahan unit.
+- **Detail Servis & Transparansi Biaya:** Informasi menyeluruh mengenai spesifikasi unit, teknisi yang bertugas, diagnosis kerusakan, serta rincian biaya jasa dan suku cadang.
+- **Persetujuan Servis Digital (Approval Flow):** Pelanggan dapat meninjau estimasi biaya perbaikan dan memberikan konfirmasi persetujuan (*Setujui*) atau penolakan (*Tolak*) secara mandiri melalui tombol aksi digital.
+- **Riwayat Servis & Garansi:** Arsip digital seluruh servis yang pernah dilakukan, rincian biaya yang telah dibayarkan, serta masa garansi perbaikan.
+- **Profil Pelanggan:** Pengelolaan data diri, nomor WhatsApp untuk notifikasi pembaruan, dan alamat pengiriman/penjemputan unit.
+
+---
+
+## Application Workflow
+
+Alur kerja URT menghubungkan pelanggan, teknisi, dan pemilik usaha secara berurutan dan terstruktur:
+
+```
++-------------------------------------------------------------------+
+|                        1. PENGAJUAN / PENERIMAAN                  |
+|    Pelanggan mengajukan servis atau membawa perangkat ke outlet   |
+|               Tempat Servis meregistrasi Tiket Servis             |
++-------------------------------------------------------------------+
+                                  │
+                                  ▼
++-------------------------------------------------------------------+
+|                     2. DIAGNOSIS & ESTIMASI TEKNISI               |
+|      Teknisi memeriksa perangkat, mencatat temuan kerusakan,      |
+|           menentukan suku cadang, dan menyusun estimasi biaya     |
++-------------------------------------------------------------------+
+                                  │
+                                  ▼
++-------------------------------------------------------------------+
+|                     3. PERSETUJUAN BIAYA PELANGGAN                |
+|      Pelanggan menerima rincian estimasi secara digital via       |
+|    Portal / Halaman Pelacakan, lalu memberi keputusan (Approve)   |
++-------------------------------------------------------------------+
+                                  │
+                                  ▼
++-------------------------------------------------------------------+
+|                     4. PROSES PERBAIKAN & TESTING                 |
+|       Teknisi melakukan penggantian spare part dan perbaikan      |
+|           Dilanjutkan dengan pengujian Quality Control (QC)       |
++-------------------------------------------------------------------+
+                                  │
+                                  ▼
++-------------------------------------------------------------------+
+|                   5. SERVIS SELESAI & SERAH TERIMA                |
+|      Status tiket diperbarui menjadi "Siap Diambil", pelanggan    |
+|        menerima unit, dan transaksi tercatat pada arsip Owner     |
++-------------------------------------------------------------------+
+```
+
+---
+
+## Application Preview
+
+Berikut adalah pratinjau antarmuka halaman asli aplikasi **URT — Your Service Tracker** yang ditangkap langsung dari sistem prototipe yang berjalan:
+
+### Landing Page
+Halaman beranda utama yang menyajikan identitas produk, demonstrasi alur kerja servis terstruktur, komparasi tiga peran pengguna, katalog fitur unggulan, dan pelacakan tiket mandiri.
+
+<p align="center">
+  <img src="assets/screenshots/landing-page.png" alt="Landing Page URT" width="95%" />
+</p>
+
+---
+
+### Owner Portal
+Pusat kendali utama bagi pemilik Tempat Servis untuk memantau performa pendapatan, total tiket aktif, distribusi beban kerja teknisi, database pelanggan, dan status langganan.
+
+<p align="center">
+  <img src="assets/screenshots/owner-dashboard.png" alt="Dashboard Pemilik Tempat Servis" width="95%" />
+</p>
+
+---
+
+### Teknisi Portal
+Ruang kerja teknisi yang menampilkan antrean tiket penugasan hari ini, kartu interaktif tiket aktif, tahapan perjalanan servis, serta akses cepat ke formulir diagnosis.
+
+<p align="center">
+  <img src="assets/screenshots/teknisi-dashboard.png" alt="Dashboard Teknisi URT" width="95%" />
+</p>
+
+---
+
+### Pelanggan Portal
+Antarmuka pelanggan untuk melihat perkembangan perbaikan perangkat aktif, indikator tahapan servis terstruktur (*segmented progress bar*), serta akses pengajuan servis baru.
+
+<p align="center">
+  <img src="assets/screenshots/pelanggan-dashboard.png" alt="Dashboard Pelanggan URT" width="95%" />
+</p>
+
+---
+
+### Ticket Detail
+Halaman rincian tiket servis komprehensif pada portal manajemen yang merangkum data spesifikasi perangkat, keluhan awal, temuan diagnosis teknisi, rincian biaya jasa & suku cadang, serta opsi cetak struk servis.
+
+<p align="center">
+  <img src="assets/screenshots/ticket-detail.png" alt="Detail Tiket Servis URT" width="95%" />
+</p>
+
+---
+
+### Service Tracking
+Halaman pelacakan publik yang dapat diakses oleh pelanggan kapan saja untuk mengecek status perbaikan menggunakan kode tiket, lengkap dengan tahapan stepper dan tombol persetujuan biaya.
+
+<p align="center">
+  <img src="assets/screenshots/service-tracking.png" alt="Pelacakan Servis Publik URT" width="95%" />
+</p>
+
+---
+
+### Service History
+Halaman arsip pada portal pelanggan yang mencatat seluruh perbaikan perangkat yang telah tuntas beserta rekam jejak biaya, tanggal pengambilan unit, dan garansi.
+
+<p align="center">
+  <img src="assets/screenshots/service-history.png" alt="Riwayat Servis Pelanggan" width="95%" />
+</p>
+
+---
+
+### Mobile Responsive View
+Tampilan antarmuka yang dioptimalkan secara responsif untuk perangkat telepon pintar (resolusi 390 × 844) dengan tombol menu hamburger dan kartu konten adaptif.
+
+<p align="center">
+  <img src="assets/screenshots/mobile-view.png" alt="Tampilan Responsif Mobile URT" width="45%" />
+</p>
+
+---
+
+## Technology Stack
+
+Proyek ini dibangun secara murni (*vanilla*) tanpa menggunakan *framework* atau pustaka eksternal pihak ketiga yang berlebihan, memastikan performa yang ringan, semantik, dan mudah dipahami:
+
+| Kategori | Teknologi | Deskripsi Implementasi |
+|---|---|---|
+| **Structure** | **HTML5** | Implementasi markup semantik (`<header>`, `<nav>`, `<main>`, `<aside>`, `<section>`, `<article>`, `<dl>`, dll.) dengan kepatuhan standar W3C dan prinsip aksesibilitas. |
+| **Styling** | **CSS3** | Vanilla CSS memanfaatkan *CSS Custom Properties* (Design Tokens untuk palet warna, tipografi, radius), CSS Flexbox, CSS Grid, serta *Media Queries* responsif. |
+| **Interactivity** | **JavaScript (ES6+)** | Manipulasi DOM murni (*vanilla JS*) untuk navigasi hamburger seluler, filter data, simulasi data tiket servis, dan alur alih peran pengguna. |
+| **Typography** | **Google Fonts (Inter)** | Penerapan keluarga huruf *Inter* secara konsisten pada seluruh portal sesuai standar desain antarmuka modern. |
+| **Assets** | **Scalable Vector Graphics (SVG)** | Logo resmi URT dan set ikon antarmuka berbasis vektor yang tajam pada berbagai kerapatan piksel layar. |
+| **Version Control** | **Git & GitHub** | Manajemen kode sumber kolaboratif menggunakan *branching workflow* dan *pull requests*. |
+
+---
 
 ## Project Structure
 
-URT memiliki beberapa portal utama:
+Struktur direktori repositori mencerminkan pemisahan modul yang jelas antara modul landing page dan masing-masing portal peran:
 
-- **Owner Portal** — mengelola operasional tempat servis
-- **Technician Portal** — mengelola pekerjaan dan status servis
-- **Customer Portal** — mengajukan serta melacak servis
-
-> **URT — Operasional rapi. Servis lebih profesional.**
-
-## Figma Prototype
-
-Prototype desain antarmuka dan interaksi URT (Kelompok 2 - PELURU UT):
-- [Figma Prototype URT](https://www.figma.com/design/SuxeFXuYaTvilZ7u932dcX/URT-prototyp-Kelompok-2-PELURU-UT?node-id=112-520&t=NVxgtYISml4CnrHo-0)
-
-## Log Prompt
-
-*Written by Nurul Faiziah M*
-
-URT Landing Page — Full HTML, CSS & JavaScript Implementation Prompt By Nurul Faiziah M
-
-1. Role
-
-Act as a senior UI/UX designer and frontend developer.
-
-Redesign and implement the existing URT — Your Service Tracker landing page using the provided:
-
-URT PRD
-
-Existing URT HTML
-
-Existing project structure/assets
-
-Ada visual reference as design inspiration
-
-The Ada reference is only a visual inspiration. Do not copy its branding, layout literally, colors, text, illustrations, or visual identity.
-
-The final result must feel like a unique, professional URT SaaS product website.
-
-2. IMPORTANT OUTPUT REQUIREMENT
-
-Generate the complete landing page using separated files:
-
-/index.html
-
-/css/style.css
-
-/js/script.js
-
-Do NOT put CSS inside <style> tags in index.html.
-
-Do NOT put JavaScript inside <script> blocks containing application logic.
-
-Use:
-
-<link rel="stylesheet" href="css/style.css">
-
-<script src="js/script.js" defer></script>
-
-The HTML must contain semantic structure and content.
-
-The CSS must contain all visual styling, layout, responsive behavior, animations, states, and UI styling.
-
-The JavaScript must contain all interactive behavior.
-
-Keep the three responsibilities clearly separated.
-
-3. Source of Truth
-
-Use the provided URT PRD as the source of truth for:
-
-Product purpose
-
-Personas
-
-User roles
-
-Service workflow
-
-Features
-
-Terminology
-
-Information architecture
-
-Business model
-
-User journey
-
-Product functionality
-
-Design system
-
-UX requirements
-
-Do not invent a completely different product.
-
-Use the existing HTML as the structural starting point where appropriate, but improve its structure when necessary.
-
-Do not simply add CSS on top of a poor structure.
-
-Refactor the HTML when needed to produce a professional final landing page.
-
-4. Product
-
-URT — Your Service Tracker
-
-Tagline:
-
-Operasional rapi. Servis lebih profesional.
-
-URT is a digital platform for Tempat Servis to manage:
-
-Customers
-
-Service requests
-
-Service tickets
-
-Technicians
-
-Diagnosis
-
-Cost estimates
-
-Customer approvals
-
-Service progress
-
-Transactions
-
-Service history
-
-Operational management
-
-The core concept is:
-
-One service process connecting the Owner, Technician, and Customer.
-
-5. Main Design Objective
-
-The landing page must not feel like a generic SaaS landing page.
-
-The most important objective is to show how URT is actually used by its three personas.
-
-The visitor should understand:
-
-Owner
-
-How an owner manages the entire service operation.
-
-Technician
-
-How a technician receives and processes service tickets.
-
-Customer
-
-How a customer submits a service request and tracks the repair.
-
-The landing page should visually demonstrate these workflows using realistic product UI mockups.
-
-6. Design Inspiration — Ada
-
-Use Ada as inspiration for:
-
-Editorial typography
-
-Large confident headlines
-
-Generous whitespace
-
-Strong visual hierarchy
-
-Minimal layouts
-
-Thin borders
-
-Flat cards
-
-Product UI as visual storytelling
-
-Large screenshots/product mockups
-
-Carefully controlled accent colors
-
-Sophisticated SaaS presentation
-
-Minimal decorative elements
-
-Strong section rhythm
-
-However:
-
-Do not copy Ada.
-
-URT must have its own:
-
-Brand identity
-
-Color system
-
-Typography treatment
-
-Content
-
-Layout composition
-
-Product UI
-
-Persona storytelling
-
-Visual hierarchy
-
-The final website should be recognizable as URT, not as an Ada clone.
-
-7. URT Color System
-
-Use the existing URT Design System.
-
-Primary
-
-Navy 950 #0F172A
-
-Navy 800 #1E293B
-
-Slate 600 #475569
-
-Slate 400 #94A3B8
-
-Slate 200 #E2E8F0
-
-Canvas #F8FAFC
-
-Card #FFFFFF
-
-Primary Action
-
-Blue 600 #2563EB
-
-Blue 700 #1D4ED8
-
-Semantic Colors
-
-Green 600 #16A34A
-
-Orange 600 #EA580C
-
-Red 600 #DC2626
-
-Purple 600 #7C3AED
-
-Do not use Ada's color palette.
-
-Do not introduce unnecessary gradients.
-
-Use semantic colors primarily for:
-
-Service status
-
-Success
-
-Warning
-
-Errors
-
-Approval states
-
-Progress indicators
-
-8. Typography
-
-Use a modern professional sans-serif typography system.
-
-Preferred:
-
-Inter
-
-Use typography intentionally.
-
-Recommended weights:
-
-400 — body
-
-500 — supporting text
-
-600 — labels and UI
-
-700 — major headings
-
-Do not make every heading extremely bold.
-
-Use large typography for major editorial sections.
-
-9. Overall Visual Language
-
-The visual language should communicate:
-
-Professional
-
-Modern
-
-Operational
-
-Reliable
-
-Structured
-
-Data-driven
-
-Efficient
-
-Human-centered
-
-Avoid:
-
-Excessive gradients
-
-Glassmorphism
-
-Excessive shadows
-
-Cartoon illustrations
-
-Generic stock photography
-
-Excessive rounded cards
-
-Excessive pills
-
-Decorative UI with no purpose
-
-Overly colorful sections
-
-Generic SaaS template appearance
-
-Prefer:
-
-White space
-
-Borders
-
-Typography
-
-Product UI
-
-Structured layouts
-
-Subtle interaction
-
-Strong visual hierarchy
-
-10. Landing Page Structure
-
-Use this narrative:
-
-Hero
-
-↓
-
-Problem
-
-↓
-
-One workflow
-
-↓
-
-Owner
-
-↓
-
-Technician
-
-↓
-
-Customer
-
-↓
-
-Connected workflow
-
-↓
-
-Features
-
-↓
-
-Service journey
-
-↓
-
-Before vs After
-
-↓
-
-Pricing
-
-↓
-
-Final CTA
-
-↓
-
-Footer
-
-The page should progressively explain the product.
-
-11. Navigation
-
-Create a clean navigation bar.
-
-Suggested structure:
-
-URT
-
-Beranda
-
-Lacak Servis
-
-Layanan
-
-Tentang Kami
-
-Harga
-
-Masuk
-
-Daftar Tempat Servis
-
-Use appropriate semantic elements:
-
-<header>
-
-<nav>
-
-The navigation should be responsive.
-
-On mobile, implement a functional mobile navigation menu using JavaScript.
-
-12. HERO SECTION
-
-The hero must immediately communicate the product.
-
-Suggested messaging:
-
-Eyebrow
-
-PLATFORM UNTUK TEMPAT SERVIS
-
-Headline
-
-Kelola Tempat Servis Lebih Mudah dengan URT
-
-Supporting text
-
-Explain that URT connects:
-
-pelanggan
-
-teknisi
-
-owner
-
-service process
-
-into one structured workflow.
-
-CTA
-
-Primary:
-
-Daftar Tempat Servis
-
-Secondary:
-
-Lihat Cara Kerja
-
-13. HERO PRODUCT VISUAL
-
-Do NOT use generic stock photography.
-
-Create a realistic product UI presentation.
-
-The hero should visually show a simplified URT dashboard.
-
-Example:
-
-┌───────────────────────────────────────┐
-
-│ URT │
-
-│ │
-
-│ Dashboard │
-
-│ │
-
-│ Service Overview │
-
-│ │
-
-│ 24 Active Services │
-
-│ 8 Waiting Diagnosis │
-
-│ 12 In Progress │
-
-│ 4 Ready │
-
-│ │
-
-│ Recent Service Tickets │
-
-│ │
-
-│ #URT-1024 MacBook Pro Progress │
-
-│ #URT-1025 iPhone 14 Diagnosis │
-
-│ #URT-1026 ASUS Vivo Completed │
-
-└───────────────────────────────────────┘
-
-This should look like a real product interface, not a random decorative dashboard.
-
-14. PROBLEM SECTION
-
-Introduce the problems faced by traditional service centers.
-
-Examples:
-
-Servis masih dikelola lewat chat dan catatan?
-
-Status servis sulit dilacak.
-
-Informasi pelanggan tersebar.
-
-Teknisi tidak memiliki antrean yang jelas.
-
-Estimasi sering disampaikan berulang kali.
-
-Owner sulit melihat kondisi operasional.
-
-Then transition to:
-
-URT menyatukan seluruh proses servis dalam satu alur.
-
-15. CORE STORY
-
-Create a major editorial section:
-
-Satu servis. Tiga peran. Satu alur kerja.
-
-Show:
-
-Owner
-
-↓
-
-Technician
-
-↓
-
-Customer
-
-But don't make this just three feature cards.
-
-Each persona needs a detailed visual story.
-
-16. PERSONA SHOWCASE — CORE SECTION
-
-This is one of the most important sections of the website.
-
-Create three major sections:
-
-01 Owner
-
-02 Technician
-
-03 Customer
-
-Each section must include:
-
-Persona label
-
-Persona headline
-
-Detailed explanation
-
-Responsibilities
-
-Main actions
-
-Product UI mockup
-
-Service workflow
-
-Relevant features
-
-CTA or navigation link where appropriate
-
-Do not summarize each persona in only 2–3 bullet points.
-
-The visitor should understand how that person actually uses URT.
-
-17. OWNER PERSONA
-
-Headline concept:
-
-Owner melihat seluruh operasional dalam satu tempat.
-
-Explain that the owner can manage:
-
-Service operations
-
-Customers
-
-Technicians
-
-Services
-
-Transactions
-
-Reports
-
-Business settings
-
-Subscription
-
-Create a realistic owner dashboard.
-
-Example UI:
-
-OWNER DASHBOARD
-
-Overview
-
-Active Services 24
-
-Waiting Approval 6
-
-In Progress 12
-
-Completed Today 8
-
-Service Queue
-
-#1024 MacBook Pro
-
-Diagnosis
-
-#1025 iPhone 14
-
-Waiting Approval
-
-#1026 ASUS VivoBook
-
-In Progress
-
-Technician Performance
-
-Andi 8 Services
-
-Budi 6 Services
-
-Rizky 5 Services
-
-The UI should look like a genuine SaaS operations dashboard.
-
-18. TECHNICIAN PERSONA
-
-Headline concept:
-
-Teknisi tahu apa yang harus dikerjakan berikutnya.
-
-Show the technician workflow.
-
-Example:
-
-SERVICE QUEUE
-
-#URT-1024
-
-Customer
-
-Ahmad
-
-Device
-
-MacBook Pro 2020
-
-Complaint
-
-Laptop tidak menyala.
-
-Diagnosis
-
-IC Power bermasalah.
-
-Estimated Cost
-
-Rp850.000
-
-Status
-
-Menunggu Persetujuan
-
-Show the technician moving through:
-
-Antrean
-
-↓
-
-Detail Tiket
-
-↓
-
-Diagnosis
-
-↓
-
-Estimasi
-
-↓
-
-Persetujuan
-
-↓
-
-Pengerjaan
-
-↓
-
-QC
-
-↓
-
-Selesai
-
-Make this section visually distinct from the Owner section.
-
-19. CUSTOMER PERSONA
-
-Headline concept:
-
-Pelanggan tahu kondisi servis tanpa harus bertanya berulang kali.
-
-Show the customer experience.
-
-Example:
-
-SERVICE TRACKING
-
-URT-1024
-
-MacBook Pro 2020
-
-Diagnosis
-
-✓
-
-Estimasi
-
-✓
-
-Persetujuan
-
-✓
-
-Dalam Pengerjaan
-
-●
-
-QC
-
-○
-
-Selesai
-
-○
-
-Estimated completion
-
-Today, 16:00
-
-Show that the customer can:
-
-Submit a service
-
-View ticket
-
-See diagnosis
-
-Review estimate
-
-Approve/reject
-
-Track status
-
-View service history
-
-The tracking UI should be a major visual component.
-
-20. CONNECT THE THREE PERSONAS
-
-Create a section demonstrating that these aren't separate products.
-
-Show:
-
-CUSTOMER
-
-Mengajukan servis
-
-↓
-
-URT SERVICE TICKET
-
-↓
-
-TECHNICIAN
-
-Diagnosis & pengerjaan
-
-↓
-
-OWNER
-
-Mengelola operasional
-
-↓
-
-CUSTOMER
-
-Melacak progress
-
-Use a visually clear flow.
-
-This should communicate URT's central value proposition.
-
-21. SERVICE JOURNEY
-
-Create a visual workflow:
-
-Pengajuan
-
-→
-
-Tiket Servis
-
-→
-
-Diagnosis
-
-→
-
-Estimasi
-
-→
-
-Persetujuan
-
-→
-
-Dalam Pengerjaan
-
-→
-
-QC
-
-→
-
-Selesai
-
-→
-
-Riwayat
-
-Use status indicators.
-
-Do not use color as the only way to communicate status.
-
-Use labels and/or icons in addition to colors.
-
-22. FEATURES
-
-Group features according to the actual workflow.
-
-Service Management
-
-Pengajuan servis
-
-Tiket servis
-
-Diagnosis
-
-Estimasi
-
-Approval
-
-Tracking
-
-Riwayat
-
-Operational Management
-
-Customer management
-
-Technician management
-
-Service queue
-
-Transactions
-
-Reports
-
-Inventory
-
-Customer Experience
-
-Service tracking
-
-Service history
-
-Approval
-
-Transparent estimates
-
-Service updates
-
-Do not turn every feature into a huge colorful card.
-
-Use editorial layouts.
-
-23. BEFORE VS AFTER
-
-Create a strong comparison section.
-
-Before URT
-
-WhatsApp
-
-Catatan manual
-
-Spreadsheet
-
-Status tidak jelas
-
-Follow-up berulang
-
-Data tersebar
-
-With URT
-
-Satu platform
-
-Tiket terstruktur
-
-Status jelas
-
-Estimasi transparan
-
-Tracking
-
-Riwayat servis
-
-Operational dashboard
-
-This section should be visually simple and highly readable.
-
-24. PRODUCT UI STORYTELLING
-
-Whenever possible, explain functionality through UI rather than generic icons.
-
-Instead of:
-
-✓ Easy tracking
-
-Show an actual tracking interface.
-
-Instead of:
-
-✓ Manage technicians
-
-Show a technician management dashboard.
-
-Instead of:
-
-✓ Service history
-
-Show a realistic service history table.
-
-The product itself should become the visual language of the website.
-
-25. PRICING
-
-Create a clean pricing section based on the PRD.
-
-Use professional SaaS pricing cards.
-
-Avoid overly decorative pricing designs.
-
-Clearly distinguish:
-
-Monthly
-
-Annual
-
-If annual pricing provides a benefit, communicate it clearly.
-
-Include CTA:
-
-Mulai Gunakan URT
-
-26. FINAL CTA
-
-Create a strong final section.
-
-Example:
-
-Siap membuat operasional tempat servis lebih rapi?
-
-Kelola servis, teknisi, pelanggan, dan operasional
-
-dalam satu platform.
-
-[ Daftar Tempat Servis ]
-
-Use Navy 950 as the dominant background where appropriate.
-
-27. FOOTER
-
-Use:
-
-URT
-
-Operasional rapi.
-
-Servis lebih profesional.
-
-Platform digital untuk membantu tempat servis
-
-mengelola pelanggan, teknisi, dan operasional.
-
-Include relevant navigation and legal links.
-
-Footer background:
-
-#0F172A
-
-Keep it clean.
-
-28. HTML REQUIREMENTS
-
-Use semantic HTML5.
-
-Required structural elements where appropriate:
-
-<header>
-
-<nav>
-
-<main>
-
-<section>
-
-<article>
-
-<footer>
-
-Use proper heading hierarchy:
-
-h1
-
-├── h2
-
-│ ├── h3
-
-│ └── h3
-
-├── h2
-
-│ └── h3
-
-└── h2
-
-Avoid meaningless <div> structures where semantic elements are more appropriate.
-
-Do not use:
-
-<button>
-
-<a href="">
-
-</button>
-
-or:
-
-<a>
-
-<button>
-
-</a>
-
-Use either a button or link depending on the action.
-
-Avoid:
-
-href="#"
-
-for real navigation.
-
-All navigation links must point to meaningful destinations or sections.
-
-29. CSS REQUIREMENTS
-
-Create:
-
-css/style.css
-
-The CSS should contain:
-
-CSS reset
-
-Design tokens
-
-Typography
-
-Layout system
-
-Navigation
-
-Hero
-
-Persona sections
-
-Product mockups
-
-Cards
-
-Buttons
-
-Workflow
-
-Pricing
-
-Footer
-
-Responsive layouts
-
-Hover states
-
-Focus states
-
-Animations
-
-Use CSS variables:
-
-:root {
-
---color-navy-950: #0F172A;
-
---color-navy-800: #1E293B;
-
---color-slate-600: #475569;
-
---color-slate-400: #94A3B8;
-
---color-slate-200: #E2E8F0;
-
---color-canvas: #F8FAFC;
-
---color-card: #FFFFFF;
-
---color-blue-600: #2563EB;
-
---color-blue-700: #1D4ED8;
-
---color-green-600: #16A34A;
-
---color-orange-600: #EA580C;
-
---color-red-600: #DC2626;
-
---color-purple-600: #7C3AED;
-
-}
-
-Use a consistent max-width around:
-
-1200–1280px
-
-Use generous vertical spacing.
-
-Avoid excessive shadows.
-
-Use subtle borders.
-
-30. JAVASCRIPT REQUIREMENTS
-
-Create:
-
-js/script.js
-
-JavaScript should handle actual interactions.
-
-At minimum implement:
-
-Mobile navigation
-
-Open/close mobile menu.
-
-Smooth navigation
-
-Navigation should scroll naturally to sections where applicable.
-
-Persona interaction
-
-Allow visitors to interact with the Owner / Technician / Customer showcase.
-
-For example:
-
-Owner
-
-Technician
-
-Customer
-
-Clicking each persona can update the relevant visual/content panel.
-
-Pricing toggle
-
-Monthly ↔ Annual.
-
-Scroll reveal
-
-Use subtle intersection-observer animations.
-
-Navigation state
-
-Optionally highlight the active section while scrolling.
-
-Accessibility
-
-Keyboard interaction must work.
-
-Do not create JavaScript interactions that are impossible to use with keyboard navigation.
-
-31. RESPONSIVE DESIGN
-
-The website must work on:
-
-Desktop
-
-Tablet
-
-Mobile
-
-Desktop should prioritize:
-
-Large editorial layouts
-
-Product UI
-
-Side-by-side persona storytelling
-
-Mobile should prioritize:
-
-Vertical flow
-
-Readability
-
-Touch-friendly controls
-
-Collapsed navigation
-
-Product UI that remains understandable
-
-No horizontal overflow
-
-Do not simply shrink the desktop design.
-
-Recompose sections where necessary.
-
-32. ANIMATION
-
-Use subtle animation only.
-
-Examples:
-
-Fade in
-
-Slide up
-
-Slight product UI movement
-
-Hover transitions
-
-Persona switching
-
-Button interaction
-
-Avoid:
-
-Excessive parallax
-
-Huge transformations
-
-Constant floating animations
-
-Distracting motion
-
-Respect:
-
-prefers-reduced-motion
-
-33. ACCESSIBILITY
-
-Implement:
-
-Semantic HTML
-
-Proper labels
-
-Keyboard navigation
-
-Visible focus states
-
-Sufficient contrast
-
-Alt text for meaningful images
-
-aria-expanded for mobile navigation
-
-aria-current where appropriate
-
-Accessible interactive controls
-
-Reduced motion support
-
-Do not rely on color alone to communicate status.
-
-34. PERFORMANCE
-
-Keep the implementation lightweight.
-
-Avoid unnecessary dependencies.
-
-Prefer:
-
-HTML
-
-CSS
-
-Vanilla JavaScript
-
-Do not introduce React, Vue, Tailwind, Bootstrap, or another framework unless the existing project explicitly requires it.
-
-The landing page should work as a standard static website.
-
-35. CODE QUALITY
-
-The generated code must be:
-
-Clean
-
-Maintainable
-
-Organized
-
-Semantic
-
-Responsive
-
-Reusable
-
-Well-commented where useful
-
-Easy for another developer to continue
-
-Do not create giant unreadable HTML structures.
-
-Do not duplicate unnecessary CSS.
-
-Use meaningful class names.
-
-Example:
-
-.hero
-
-.hero\_\_content
-
-.hero\_\_visual
-
-.persona
-
-.persona\_\_content
-
-.persona\_\_visual
-
-.workflow
-
-.workflow\_\_step
-
-.pricing
-
-36. IMPORTANT: MODIFY THE EXISTING WEBSITE
-
-Do not treat this as a completely unrelated new website.
-
-Start from the existing URT HTML and project structure.
-
-Preserve useful:
-
-Content
-
-Navigation
-
-Links
-
-Existing sections
-
-Existing product terminology
-
-Existing URT identity
-
-Then redesign and restructure where necessary.
-
-If existing sections conflict with the PRD, prioritize the PRD.
-
-If existing markup is semantically poor, refactor it.
-
-The final implementation should feel like a complete redesign of the existing URT landing page, not a generic generated template.
-
-37. FINAL FILE STRUCTURE
-
-The final result should be:
-
-URT/
-
+```
+URT-Your-Service-Tracker/
 │
-
-├── index.html
-
+├── assets/
+│   └── screenshots/               # Tangkapan layar antarmuka aplikasi nyata
+│       ├── landing-page.png
+│       ├── owner-dashboard.png
+│       ├── teknisi-dashboard.png
+│       ├── pelanggan-dashboard.png
+│       ├── ticket-detail.png
+│       ├── service-tracking.png
+│       ├── service-history.png
+│       └── mobile-view.png
 │
-
 ├── css/
-
-│ └── style.css
-
+│   └── style.css                  # Berkas CSS utama untuk landing page & public tracking
 │
-
+├── image/
+│   └── logo-urt.svg               # Berkas aset logo resmi vektor URT
+│
 ├── js/
-
-│ └── script.js
-
+│   ├── data.js                    # Mock data terpusat (tiket servis, teknisi, pelanggan)
+│   └── script.js                  # Logika interaktif landing page & navigasi responsif
 │
-
-└── assets/
-
-└── ...
-
-If the existing project uses a different asset structure, preserve it where appropriate.
-
-38. FINAL QUALITY CHECK
-
-Before finishing, verify:
-
-Product
-
-Does the page clearly explain URT?
-
-Does it use the PRD terminology?
-
-Are Owner, Technician, and Customer clearly represented?
-
-Can a visitor understand how each persona works?
-
-Design
-
-Does it feel inspired by Ada without copying it?
-
-Does it have a distinct URT identity?
-
-Is the visual hierarchy strong?
-
-Is there enough whitespace?
-
-Are product UI mockups the main visual storytelling device?
-
-UX
-
-Is the workflow understandable?
-
-Are CTAs obvious?
-
-Does navigation work?
-
-Does mobile navigation work?
-
-Do persona interactions work?
-
-Does pricing toggle work?
-
-HTML
-
-Is it semantic HTML5?
-
-Is heading hierarchy correct?
-
-Are links and buttons used correctly?
-
-Are there dead-end links?
-
-Are there invalid nested interactive elements?
-
-CSS
-
-Is all styling in css/style.css?
-
-Is the design responsive?
-
-Are design tokens centralized?
-
-Are focus/hover states implemented?
-
-JavaScript
-
-Is all behavior in js/script.js?
-
-Does mobile navigation work?
-
-Do persona interactions work?
-
-Does pricing toggle work?
-
-Are animations accessible?
-
-Final Experience
-
-The final landing page should make a visitor understand this story within a few minutes:
-
-A customer submits a device for service → URT creates a structured service ticket → the technician diagnoses and works on it → the customer receives transparent updates and approvals → the owner manages the entire operation from one platform.
-
-The website should sell this workflow, not merely list features.
-
-
-I want to implement the URT (Your Service Tracker) Owner authentication and subscription flow based on the 5 reference screenshots provided.
-
-IMPORTANT:
-- Write all code, comments, variable names, function names, and technical instructions in English.
-- ALL VISIBLE TEXT IN THE WEB INTERFACE MUST REMAIN IN INDONESIAN.
-- Do NOT translate the Indonesian UI text into English.
-- The screenshots are the SOURCE OF TRUTH for the visual design.
-- Do not redesign the interface.
-- Do not create a generic SaaS design that is only approximately similar.
-- Reproduce the screenshots as accurately as possible.
-
-The implementation must use:
-- Semantic HTML5
-- Vanilla CSS3
-- Vanilla JavaScript
-- No React
-- No Vue
-- No Tailwind CSS
-- No Bootstrap
-- No UI framework
-
-Separate the implementation into HTML, CSS, and JavaScript files.
-
-==================================================
-1. REFERENCE SCREENSHOTS
-==================================================
-
-The provided screenshots represent:
-
-1. Owner registration
-2. Subscription selection
-3. Monthly payment
-4. Yearly payment
-5. Owner login
-
-Use these screenshots as the primary visual reference.
-
-Pay close attention to:
-- Layout
-- Spacing
-- Card dimensions
-- Typography
-- Font sizes
-- Colors
-- Borders
-- Border radius
-- Shadows
-- Icon placement
-- Button dimensions
-- Progress stepper
-- Alignment
-- Whitespace
-- Visual hierarchy
-- Responsive behavior
-
-Do not add unnecessary UI elements that do not exist in the screenshots.
-
-==================================================
-2. LANGUAGE REQUIREMENT
-==================================================
-
-Technical implementation language:
-ENGLISH.
-
-Visible website language:
-INDONESIAN.
-
-For example, use Indonesian UI text such as:
-
-"Your Service Tracker"
-"UNTUK PEMILIK USAHA"
-"PEMILIK USAHA"
-"Bangun operasi servis yang lebih rapi."
-"Daftarkan usaha Anda..."
-"Kelola servis dari satu tempat"
-"Hubungkan seluruh tim"
-"Keputusan berbasis data"
-"Daftarkan usaha Anda"
-"Nama Usaha"
-"Nama Pemilik"
-"Nomor WhatsApp"
-"Email"
-"Kata Sandi"
-"Konfirmasi Kata Sandi"
-"Lanjut Pilih Langganan"
-"Sudah punya akun? Masuk"
-"Data Usaha"
-"Pilih Paket"
-"Pembayaran"
-"Pembayaran aman"
-"Bulanan"
-"Tahunan"
-"REKOMENDASI"
-"Pilih Paket Bulanan"
-"Pilih Paket Tahunan"
-"Selesaikan pembayaran"
-"Pilih metode pembayaran"
-"Ringkasan pesanan"
-"Bayar dengan QRIS"
-"Transaksi terenkripsi"
-"Login"
-"Masuk"
-"Lupa Password?"
-"Pesanan berhasil"
-"Pembayaran berhasil"
-
-Do not translate these strings into English.
-
-==================================================
-3. PROJECT STRUCTURE
-==================================================
-
-Use the following structure if compatible with the existing project:
-
-/owner/
-    register.html
-    subscription.html
-    payment.html
-    login.html
-    payment-success.html
-
-/css/
-    owner-auth.css
-
-/js/
-    owner-auth.js
-    qr-payment.js
-
-If the existing project already has a different structure, adapt to it instead of unnecessarily restructuring or breaking existing files.
-
-==================================================
-4. DESIGN SYSTEM
-==================================================
-
-The design must match the screenshots.
-
-Visual direction:
-- Clean SaaS
-- Professional
-- Minimal
-- Trustworthy
-- Modern
-- Generous whitespace
-- Subtle borders
-- Subtle shadows
-- Rounded cards
-- Blue primary actions
-- Dark navy registration sidebar
-- Light gray/off-white background
-
-Do not introduce gradients unless they are clearly present in the screenshots.
-
-Use CSS variables for the shared design system:
-
-:root {
-    --primary: ...;
-    --primary-hover: ...;
-    --navy: ...;
-    --background: ...;
-    --surface: #ffffff;
-    --border: ...;
-    --text: ...;
-    --muted: ...;
-    --success: ...;
-    --radius: ...;
-}
-
-The exact values should be visually sampled/approximated from the screenshots.
-
-Use:
-
-Inter,
-system-ui,
--apple-system,
-BlinkMacSystemFont,
-"Segoe UI",
-sans-serif;
-
-unless the existing project already defines the correct font.
-
-==================================================
-5. PAGE 1 — OWNER REGISTRATION
-==================================================
-
-Create:
-
-register.html
-
-The desktop layout must reproduce the first screenshot.
-
-LEFT SIDEBAR:
-
-Use a dark navy background.
-
-Include:
-
-Brand:
-"Your Service Tracker"
-
-Tagline:
-"UNTUK PEMILIK USAHA"
-
-Section label:
-"PEMILIK USAHA"
-
-Main heading:
-
-"Bangun operasi servis
-yang lebih rapi."
-
-Description:
-
-"Daftarkan usaha Anda untuk mulai mengelola usaha servis, teknisi, pelanggan, dan layanan dalam satu sistem."
-
-Feature 1:
-
-"Kelola servis dari satu tempat"
-
-Description:
-
-"Pantau tiket, estimasi, dan progres pekerjaan secara real-time."
-
-Feature 2:
-
-"Hubungkan seluruh tim"
-
-Description:
-
-"Atur teknisi dan pelanggan tanpa biaya langganan tambahan."
-
-Feature 3:
-
-"Keputusan berbasis data"
-
-Description:
-
-"Lihat performa layanan dan kesehatan operasional usaha."
-
-Bottom information box:
-
-"Hanya Pemilik Usaha yang membayar langganan URT. Teknisi dan pelanggan tidak dikenakan biaya."
-
-RIGHT SIDE:
-
-Top progress stepper:
-
-1 Data Usaha
-2 Pilih Paket
-3 Pembayaran
-
-Step 1 must be active.
-
-Top right:
-
-"Sudah punya akun? Masuk"
-
-Main registration card:
-
-Small label:
-
-"LANGKAH 1 DARI 3"
-
-Heading:
-
-"Daftarkan usaha Anda"
-
-Description:
-
-"Buat akun khusus Pemilik Usaha. Setelah ini Anda akan memilih paket langganan yang paling sesuai."
-
-Two-column desktop form:
-
-Field:
-"Nama Usaha"
-
-Placeholder:
-"Contoh: ServisKita"
-
-Field:
-"Nama Pemilik"
-
-Placeholder:
-"Nama lengkap Anda"
-
-Field:
-"Nomor WhatsApp"
-
-Placeholder:
-"08xx xxxx xxxx"
-
-Field:
-"Email"
-
-Placeholder:
-"nama@usaha.com"
-
-Field:
-"Kata Sandi"
-
-Field:
-"Konfirmasi Kata Sandi"
-
-Password fields must have show/hide controls.
-
-Checkbox:
-
-"Saya menyetujui Syarat Penggunaan dan Kebijakan Privasi URT."
-
-Primary button:
-
-"Lanjut Pilih Langganan →"
-
-==================================================
-6. REGISTRATION FUNCTIONALITY
-==================================================
-
-Use semantic HTML.
-
-Every input must have:
-- A proper label
-- A unique id
-- A matching for attribute
-
-Use:
-- type="email" for email
-- type="tel" for WhatsApp
-- type="password" for passwords
-
-Validation requirements:
-- All required fields must be validated.
-- Email must be valid.
-- Password confirmation must match.
-- Terms checkbox must be checked.
-- Show clean validation messages.
-- Do not cause large layout shifts when displaying errors.
-- Do not navigate to the next page if validation fails.
-
-For the prototype, store non-sensitive registration data in localStorage.
-
-Use:
-
-localStorage.setItem(
-    "urt_registration",
-    JSON.stringify({
-        businessName,
-        ownerName,
-        whatsapp,
-        email
-    })
-);
-
-Do NOT store the real password in localStorage in production.
-
-Add a code comment:
-
-// PROTOTYPE ONLY:
-// Production authentication must be handled by the backend.
-
-==================================================
-7. PAGE 2 — SUBSCRIPTION SELECTION
-==================================================
-
-Create:
-
-subscription.html
-
-Match the second screenshot.
-
-Header:
-- URT logo on the left
-- Progress stepper in the center
-- "Pembayaran aman" on the right
-
-Progress:
-
-1 Data Usaha
-2 Pilih Paket
-3 Pembayaran
-
-Step 2 must be active.
-
-Main centered content:
-
-"LANGKAH 2 DARI 3"
-
-Heading:
-
-"Pilih langganan untuk ServisKita"
-
-Description:
-
-"Satu langganan untuk seluruh operasional usaha. Teknisi dan pelanggan dapat menggunakan URT tanpa membayar langganan."
-
-Create two pricing cards.
-
-MONTHLY CARD:
-
-"Bulanan"
-
-"Ditagih setiap bulan"
-
-"Rp99.000 / bulan"
-
-"Fleksibel, perpanjang setiap bulan"
-
-Features:
-
-✓ Tiket servis tanpa batas
-✓ Kelola teknisi & pelanggan
-✓ Customer Portal dengan tautan unik
-✓ Laporan operasional usaha
-✓ Notifikasi WhatsApp
-✓ Dukungan prioritas
-
-Button:
-
-"Pilih Paket Bulanan"
-
-YEARLY CARD:
-
-"Tahunan"
-
-"Ditagih sekali setahun"
-
-Badge:
-
-"REKOMENDASI"
-
-Price:
-
-"Rp999.000 / tahun"
-
-Green saving badge:
-
-"Hemat Setara Rp83.250 per bulan"
-
-Use the same features.
-
-Button:
-
-"Pilih Paket Tahunan"
-
-The yearly card should be visually emphasized in the same way as the screenshot.
-
-Bottom information:
-
-"Batalkan kapan saja • Data usaha tetap aman • Harga sudah termasuk pajak"
-
-==================================================
-8. SUBSCRIPTION FUNCTIONALITY
-==================================================
-
-When the monthly plan is selected:
-
-localStorage.setItem(
-    "urt_subscription",
-    JSON.stringify({
-        plan: "monthly",
-        price: 99000,
-        duration: 30
-    })
-);
-
-When the yearly plan is selected:
-
-localStorage.setItem(
-    "urt_subscription",
-    JSON.stringify({
-        plan: "yearly",
-        price: 999000,
-        duration: 365
-    })
-);
-
-Then navigate to:
-
-payment.html
-
-The payment page must dynamically read the selected plan.
-
-Do not create separate payment HTML files for monthly and yearly.
-
-==================================================
-9. PAGE 3 — PAYMENT
-==================================================
-
-Create:
-
-payment.html
-
-This page must support:
-- Monthly subscription
-- Yearly subscription
-
-The design must match screenshots 3a and 3b.
-
-Header:
-
-URT logo
-
-Progress:
-
-1 Data Usaha
-2 Pilih Paket
-3 Pembayaran
-
-Step 3 active.
-
-Right side:
-
-"Transaksi terenkripsi"
-
-Main heading:
-
-"LANGKAH 3 DARI 3"
-
-"Selesaikan pembayaran"
-
-Description:
-
-"Aktifkan akun Pemilik Usaha ServisKita dan mulai kelola operasional hari ini."
-
-DESKTOP LAYOUT:
-
-Two columns.
-
-LEFT CARD:
-
-Heading:
-
-"Pilih metode pembayaran"
-
-Description:
-
-"Pembayaran diproses otomatis dan aman."
-
-Payment methods:
-
-1. QRIS
-2. Virtual Account
-3. E-Wallet
-
-QRIS:
-"Scan dengan aplikasi bank atau e-wallet"
-
-Virtual Account:
-"BCA, BNI, BRI, Mandiri, dan Permata"
-
-E-Wallet:
-"GoPay, OVO, DANA, dan ShopeePay"
-
-QRIS should be selected by default.
-
-Each payment method must be a selectable card with a radio-style control.
-
-Information box:
-
-"Data pembayaran tidak disimpan oleh URT. Konfirmasi dikirim ke email dan WhatsApp Pemilik Usaha."
-
-RIGHT CARD:
-
-Heading:
-
-"Ringkasan pesanan"
-
-For monthly:
-
-"Paket Bulanan"
-
-"ServisKita • Pemilik Usaha"
-
-"Masa aktif"
-"30 Hari"
-
-"Harga paket"
-"Rp99.000"
-
-"Biaya layanan"
-"Rp0"
-
-"Pajak"
-"Termasuk"
-
-"Total pembayaran"
-"Rp99.000"
-
-For yearly:
-
-Badge:
-
-"HEMAT 16%"
-
-"Paket Tahunan"
-
-"ServisKita • Pemilik Usaha"
-
-"Masa aktif"
-"12 bulan"
-
-"Harga paket"
-"Rp999.000"
-
-"Biaya layanan"
-"Rp0"
-
-"Pajak"
-"Termasuk"
-
-"Total pembayaran"
-"Rp999.000"
-
-Primary button:
-
-"Bayar dengan QRIS →"
-
-==================================================
-10. DYNAMIC QR CODE
-==================================================
-
-This is a critical requirement.
-
-Do NOT use a static QR image.
-
-Generate the QR Code dynamically with JavaScript.
-
-A lightweight QR Code library may be loaded through CDN.
-
-For example, use a reliable QR Code JavaScript library such as qrcode.js or another suitable library.
-
-The QR Code must encode a transaction-specific URL.
-
-Example:
-
-const paymentUrl =
-    `${window.location.origin}/owner/payment-success.html?order=${orderId}`;
-
-The QR Code should encode:
-
-paymentUrl
-
-NOT:
-
-"Pesanan berhasil"
-
-The QR Code should contain a URL only.
-
-==================================================
-11. QR CODE CONFIGURATION
-==================================================
-
-Create one centralized configuration:
-
-const QR_CONFIG = {
-    baseUrl: "/owner/payment-success.html"
-};
-
-Then:
-
-function generatePaymentUrl(orderId) {
-    return `${QR_CONFIG.baseUrl}?order=${encodeURIComponent(orderId)}`;
-}
-
-Do not hardcode the QR URL in multiple files.
-
-The system must be able to change the base URL from one centralized location.
-
-For example, changing:
-
-"/owner/payment-success.html"
-
-to:
-
-"/payment/status.html"
-
-should only require changing the configuration.
-
-For production, the backend should generate the transaction URL.
-
-==================================================
-12. ORDER CREATION
-==================================================
-
-When the user clicks:
-
-"Bayar dengan QRIS"
-
-create a unique order.
-
-Example:
-
-ORD-20261017-0001
-
-The system should generate the order ID dynamically.
-
-Create an order object:
-
-{
-    orderId,
-    businessName,
-    plan,
-    price,
-    status,
-    createdAt,
-    paymentUrl
-}
-
-Store the prototype order in localStorage:
-
-localStorage.setItem(
-    "urt_order",
-    JSON.stringify(order)
-);
-
-Example:
-
-{
-    "orderId": "ORD-20261017-0001",
-    "businessName": "ServisKita",
-    "plan": "monthly",
-    "price": 99000,
-    "status": "PENDING",
-    "createdAt": "2026-10-17T07:00:00+08:00",
-    "paymentUrl": "/owner/payment-success.html?order=ORD-20261017-0001"
-}
-
-==================================================
-13. QR PAYMENT FLOW
-==================================================
-
-Implement this prototype flow:
-
-OWNER REGISTRATION
-        ↓
-SUBSCRIPTION SELECTION
-        ↓
-PAYMENT PAGE
-        ↓
-CLICK "Bayar dengan QRIS"
-        ↓
-CREATE ORDER
-        ↓
-GENERATE UNIQUE ORDER ID
-        ↓
-GENERATE PAYMENT URL
-        ↓
-GENERATE QR CODE
-        ↓
-USER SCANS QR
-        ↓
-PAYMENT STATUS PAGE
-        ↓
-"Pesanan berhasil"
-
-The QR must be unique for each order.
-
-For example:
-
-Order A:
-
-/owner/payment-success.html?order=ORD-001
-
-Order B:
-
-/owner/payment-success.html?order=ORD-002
-
-Therefore, the generated QR codes will be different.
-
-==================================================
-14. PAYMENT SUCCESS PAGE
-==================================================
-
-Create:
-
-payment-success.html
-
-The page should read:
-
-payment-success.html?order=ORD-20261017-0001
-
-Use JavaScript:
-
-const params = new URLSearchParams(window.location.search);
-const orderId = params.get("order");
-
-Then retrieve the corresponding order.
-
-Design:
-- URT visual language
-- Centered card
-- Clean white card
-- Light background
-- Green success icon
-- Strong success state
-
-Visible text must remain Indonesian.
-
-Heading:
-
-"Pesanan berhasil"
-
-Description:
-
-"Pembayaran Anda telah berhasil diproses."
-
-Details:
-
-"Nomor Pesanan"
-
-"ORD-20261017-0001"
-
-"Paket"
-
-"Paket Bulanan"
-
-"Total"
-
-"Rp99.000"
-
-"Status"
-
-"Pembayaran berhasil"
-
-Button:
-
-"Kembali ke URT"
-
-==================================================
-15. IMPORTANT PAYMENT SECURITY NOTE
-==================================================
-
-This is a prototype.
-
-Do NOT claim that the generated QR is a real QRIS payment transaction.
-
-The prototype QR only opens a transaction status URL.
-
-Prototype:
-
-QR Code
-    ↓
-Transaction URL
-    ↓
-Payment status page
-    ↓
-"Pesanan berhasil"
-
-For production, integrate the frontend with a backend and a real payment gateway.
-
-The backend must handle:
-- Order creation
-- Payment transaction creation
-- Payment status
-- QRIS payload
-- Payment verification
-- Webhooks
-- Transaction security
-
-Never trust:
-
-?status=success
-
-as proof of payment.
-
-Never allow the frontend or URL query string alone to determine that a payment is successful.
-
-Add this comment in the code:
-
-// PROTOTYPE ONLY
-// Production payment status must be verified server-side.
-
-==================================================
-16. PAGE 4 — OWNER LOGIN
-==================================================
-
-Create:
-
-login.html
-
-Match screenshot 4 as closely as possible.
-
-Background:
-light gray/off-white.
-
-Centered login card.
-
-URT logo.
-
-Text:
-
-"YOUR SERVICE TRACKER"
-
-Heading:
-
-"Login"
-
-Description:
-
-"Masuk untuk mengelola tiket dan proses servis pelanggan."
-
-Fields:
-
-"Email"
-
-"Password"
-
-Primary button:
-
-"Masuk"
-
-Link:
-
-"Lupa Password?"
-
-Information box:
-
-"Isi username dan password untuk masuk."
-
-Password must support show/hide.
-
-Add basic client-side validation.
-
-==================================================
-17. NAVIGATION
-==================================================
-
-All pages must be connected.
-
-Flow:
-
-register.html
-    ↓
-subscription.html
-    ↓
-payment.html
-    ↓
-payment-success.html
-
-Registration page:
-
-"Sudah punya akun? Masuk"
-
-must navigate to:
-
-login.html
-
-Do not use:
-
-href="#"
-
-Do not create dead-end links.
-
-Every navigation element must have a real destination or JavaScript action.
-
-==================================================
-18. RESPONSIVE DESIGN
-==================================================
-
-Primary target:
-
-1440 × 1024
-
-Desktop must closely match the screenshots.
-
-Breakpoints:
-
->= 1200px
-Desktop
-
-768px - 1199px
-Tablet
-
-< 768px
-Mobile
-
-Registration:
-Desktop = sidebar + content
-Mobile = stacked layout
-
-Subscription:
-Desktop = two horizontal cards
-Mobile = stacked cards
-
-Payment:
-Desktop = two-column layout
-Mobile = single-column layout
-
-Do not sacrifice the desktop visual match simply to make the mobile version more elaborate.
-
-==================================================
-19. ACCESSIBILITY
-==================================================
-
-Use semantic HTML5:
-
-<header>
-<nav>
-<main>
-<section>
-<form>
-<label>
-<footer>
-
-Every form field must have a proper label.
-
-Use:
-
-<button>
-
-for actions.
-
-Use:
-
-<a>
-
-for navigation.
-
-Never create:
-
-<button>
-    <a href="...">
-</button>
-
-Never use a <div> as a fake button.
-
-Never use href="#".
-
-==================================================
-20. ICONS
-==================================================
-
-Use a lightweight icon library such as Lucide Icons if needed.
-
-Do not use emoji as interface icons.
-
-Keep icon size, stroke weight, alignment, and spacing consistent with the screenshots.
-
-==================================================
-21. CODE ORGANIZATION
-==================================================
-
-Keep responsibilities separated.
-
-HTML:
-Structure and semantic content.
-
-CSS:
-All visual styling.
-
-JavaScript:
-Interactions, validation, navigation, localStorage, order generation, and QR generation.
-
-Use clear English function names such as:
-
-validateRegistration()
-saveRegistration()
-loadRegistration()
-selectPlan()
-loadSubscription()
-createOrder()
-generateOrderId()
-generatePaymentUrl()
-generateQRCode()
-loadOrder()
-renderPaymentSummary()
-showPaymentSuccess()
-
-==================================================
-22. FINAL VISUAL QA
-==================================================
-
-After implementation, compare every page against the screenshots.
-
-Check:
-
-1. Overall layout
-2. Sidebar width
-3. Card width
-4. Card height
-5. Top spacing
-6. Horizontal alignment
-7. Vertical alignment
-8. Heading size
-9. Body text size
-10. Paragraph width
-11. Button height
-12. Button radius
-13. Border radius
-14. Border color
-15. Shadow intensity
-16. Icon size
-17. Form spacing
-18. Pricing card spacing
-19. Progress stepper
-20. Header spacing
-21. Whitespace
-22. Responsive behavior
-
-The result should look like the screenshots, not like a newly invented UI.
-
-Do not add unnecessary sections.
-
-Do not change the Indonesian copy unless technically necessary.
-
-Do not translate the Indonesian UI text.
-
-==================================================
-23. FINAL TESTING
-==================================================
-
-Verify this complete flow:
-
-1. Open register.html
-2. Fill the registration form
-3. Validate the form
-4. Click "Lanjut Pilih Langganan"
-5. Open subscription.html
-6. Select Monthly
-7. Verify monthly price
-8. Open payment.html
-9. Verify monthly summary
-10. Click "Bayar dengan QRIS"
-11. Generate order ID
-12. Generate transaction URL
-13. Generate QR Code
-14. Scan QR Code
-15. Open payment-success.html
-16. Display the correct order ID
-17. Display the correct plan
-18. Display the correct price
-19. Display "Pesanan berhasil"
-
-Then repeat the entire flow for:
-
-Yearly subscription.
-
-Verify:
-
-- No broken links
-- No JavaScript console errors
-- No missing assets
-- localStorage works
-- Monthly and yearly data are different
-- QR Code is dynamically generated
-- QR Code URL is generated from the order ID
-- QR Code is NOT static
-- "Pesanan berhasil" is NOT directly encoded into the QR
-- QR URL can be changed from one centralized configuration
-- All visible UI text remains Indonesian
-
-Do not stop at creating the files. Test the actual navigation and JavaScript behavior.
-
+├── owner/                         # Modul Portal Owner (Pemilik Usaha)
+│   ├── css/
+│   │   ├── owner-auth.css         # Styling halaman login & registrasi owner
+│   │   └── owner.css              # Styling utama dashboard, tiket, & manajemen owner
+│   ├── js/
+│   │   ├── owner-auth.js          # Skrip validasi formulir akun owner
+│   │   ├── owner.js               # Skrip logika antarmuka portal owner
+│   │   └── qr-payment.js          # Skrip simulasi pembayaran langganan QRIS
+│   ├── beranda-owner.html         # Dashboard utama pemilik usaha
+│   ├── tiket-servis.html          # Manajemen & filter daftar tiket servis
+│   ├── detail-tiket.html          # Halaman detail tiket & penetapan teknisi
+│   ├── teknisi.html               # Daftar teknisi & beban kerja
+│   ├── detail-teknisi.html        # Detail profil & riwayat pekerjaan teknisi
+│   ├── tambah-teknisi.html        # Formulir pendaftaran teknisi baru
+│   ├── edit-teknisi.html          # Formulir ubah data teknisi
+│   ├── pelanggan.html             # Database master pelanggan
+│   ├── detail-pelanggan.html      # Detail data & histori servis pelanggan
+│   ├── tambah-pelanggan.html      # Formulir tambah pelanggan manual
+│   ├── edit-pelanggan.html        # Formulir ubah data pelanggan
+│   ├── import-pelanggan.html      # Antarmuka import kontak pelanggan
+│   ├── layanan.html               # Katalog layanan perbaikan & suku cadang
+│   ├── detail-layanan.html        # Rincian layanan perbaikan
+│   ├── tambah-layanan.html        # Formulir penambahan jenis layanan
+│   ├── edit-layanan.html          # Formulir ubah jenis layanan
+│   ├── laporan.html               # Laporan pendapatan & statistik operasional
+│   ├── langganan.html             # Status paket langganan Tempat Servis
+│   ├── subscription.html          # Halaman informasi langganan
+│   ├── pilih-langganan.html       # Pemilihan paket langganan URT
+│   ├── perpanjang-langganan.html  # Alur perpanjangan paket langganan
+│   ├── payment.html               # Halaman checkout pembayaran langganan
+│   ├── pembayaran.html            # Pilihan metode pembayaran
+│   ├── instruksi-pembayaran.html  # Petunjuk transfer VA & QRIS
+│   ├── payment-success.html       # Konfirmasi pembayaran sukses
+│   ├── pembayaran-berhasil.html   # Status verifikasi transaksi berhasil
+│   ├── invoice-langganan.html     # Faktur tagihan langganan Tempat Servis
+│   ├── pengaturan.html            # Pengaturan operasional Tempat Servis
+│   ├── profil-owner.html          # Profil pemilik usaha
+│   ├── login.html                 # Halaman autentikasi login owner
+│   ├── register.html              # Pendaftaran Tempat Servis baru
+│   └── daftar-bisnis.html         # Formulir identitas bisnis Tempat Servis
+│
+├── pelanggan/                     # Modul Portal Pelanggan (Customer)
+│   ├── js/
+│   │   └── customer.js            # Logika dashboard & interaksi persetujuan pelanggan
+│   ├── beranda-pelanggan.html     # Dashboard utama pelanggan & tiket aktif
+│   ├── detail-servis.html         # Halaman rincian servis & status pengerjaan
+│   ├── pengajuan-servis.html      # Formulir permohonan servis mandiri
+│   ├── persetujuan-servis.html    # Halaman peninjauan estimasi & persetujuan biaya
+│   ├── persetujuan-disetujui.html # Status konfirmasi servis disetujui
+│   ├── persetujuan-ditolak.html   # Status konfirmasi servis dibatalkan/ditolak
+│   ├── profil-pelanggan.html      # Profil & pengaturan kontak pelanggan
+│   ├── riwayat-servis.html        # Arsip histori servis yang telah selesai
+│   └── style-customer.css         # Styling komprehensif portal pelanggan
+│
+├── teknisi/                       # Modul Portal Teknisi (Technician)
+│   ├── css/
+│   │   ├── auth-teknisi.css       # Styling autentikasi login teknisi
+│   │   └── style-teknisi.css      # Styling dashboard, antrean, & kartu teknisi
+│   ├── js/
+│   │   ├── auth-teknisi.js        # Validasi formulir autentikasi teknisi
+│   │   └── teknisi.js             # Skrip interaksi teknisi & simulasi diagnosis
+│   ├── antrean.html               # Halaman antrean tiket servis mendesak
+│   ├── antrian-servis.html        # Daftar antrean tiket perbaikan
+│   ├── auth-teknisi.html          # Halaman masuk/login teknisi
+│   ├── beranda-teknisi.html       # Dashboard teknisi & kartu tiket terpilih
+│   ├── detail-tiket.html          # Detail tiket & formulir input diagnosis
+│   ├── estimasi.html              # Formulir peninjauan rincian estimasi biaya
+│   ├── profil.html                # Profil teknisi & spesialisasi
+│   ├── ringkasan-terkirim.html    # Notifikasi pesan estimasi berhasil dikirim
+│   ├── riwayat.html               # Rekam jejak servis yang diselesaikan teknisi
+│   ├── riwayat-tiket.html         # Arsip tiket pekerjaan teknisi
+│   └── tiket-selesai.html         # Checklist QC & penutupan tiket selesai
+│
+├── index.html                     # Halaman landing page utama URT
+├── masuk.html                     # Halaman pemilih portal akses peran
+├── registrasi.html                # Halaman pemilih pendaftaran akun peran
+├── tracking_result.html           # Halaman hasil pelacakan publik mandiri
+├── privacy.html                   # Halaman kebijakan privasi
+├── terms.html                     # Halaman syarat dan ketentuan
+├── prd.md                         # Product Requirements Document (PRD)
+└── README.md                      # Dokumentasi utama proyek repositori
+```
+
+---
+
+## How to Run
+
+Proyek ini dibangun menggunakan teknologi web murni (*pure static web*), sehingga tidak memerlukan instalasi dependensi *package manager*, kompilasi, atau pembangunan berkas (*build step*).
+
+### Metode 1: Menggunakan Local Development Server (Direkomendasikan)
+Menjalankan proyek melalui server lokal memastikan font, gambar SVG, dan skrip JavaScript termuat sempurna tanpa batasan kebijakan keamanan lokal peramban (*CORS/file:// protocol*).
+
+**Menggunakan Python:**
+```bash
+# Buka terminal pada direktori proyek
+python -m http.server 8000
+```
+Buka peramban dan navigasikan ke `http://localhost:8000/`.
+
+**Menggunakan Node.js:**
+```bash
+# Menjalankan npx serve
+npx serve .
+```
+
+**Menggunakan VS Code:**
+Pasang ekstensi **Live Server**, klik kanan pada berkas `index.html`, lalu pilih **"Open with Live Server"**.
+
+### Metode 2: Membuka Berkas HTML Secara Langsung
+Anda juga dapat langsung membuka berkas `index.html` dengan mengklik ganda (*double-click*) pada *file explorer* di peramban web modern (Google Chrome, Microsoft Edge, Mozilla Firefox, Safari).
+
+### Akses Cepat Antar Portal
+Setelah halaman utama terbuka:
+- Klik tombol **"Masuk Portal"** pada bilah navigasi atas (mengarah ke `masuk.html`) untuk memilih masuk ke **Portal Pelanggan**, **Portal Teknisi**, atau **Portal Owner**.
+- Pelacakan tiket publik dapat langsung diuji melalui kolom pencarian di landing page atau membuka `tracking_result.html?ticket=URT-2026-001`.
+
+---
+
+## Figma Design — Modul 5
+
+Seluruh rancangan antarmuka pengguna, sistem desain, alur pengguna (*user flow*), dan spesifikasi komponen visual URT mengacu pada purwarupa Figma resmi kelompok:
+
+- **Nama Desain:** URT Prototype — Kelompok 2 PELURU UT
+- **Tautan Figma:** [URT Prototype Kelompok 2 PELURU UT](https://www.figma.com/design/SuxeFXuYaTvilZ7u932dcX/URT-prototyp-Kelompok-2-PELURU-UT?node-id=0-1&p=f&t=2xAAu8hRIRzdcvFi-0)
+
+---
+
+## Team Contributions
+
+Proyek ini dikerjakan secara kolaboratif oleh seluruh anggota tim dengan pembagian tugas yang jelas mulai dari inisiasi struktur, penataan gaya visual awal, penyusunan materi presentasi, hingga tahap integrasi akhir, konsistensi antarmuka, dan dokumentasi.
+
+| No | Nama Anggota | Peran / Fokus Utama | Ringkasan Kontribusi |
+|:---:|---|---|---|
+| 1 | **Nurul Faiziah M.** | **Team Leader & Final Integration** | Memimpin koordinasi tim, penulisan PRD & dokumentasi, pengembangan & perbaikan landing page, integrasi tipografi & logo resmi SVG, standarisasi styling seluruh portal, implementasi navigasi responsif/hamburger mobile, pembuatan halaman registrasi owner & teknisi, *refinement* final antarmuka, *debugging*, dan integrasi proyek sebelum rilis. |
+| 2 | **Nino Rachimas** | **Initial Portal & Landing Styling** | Mengerjakan penataan gaya visual (*styling*) awal pada landing page, berkontribusi pada *styling* awal Portal Pelanggan dan Portal Teknisi, serta mengelola integrasi *branch* dan *merge* kode pada tahap pengembangan awal. |
+| 3 | **Sofia Malvalena A.** | **Initial Customer Portal Structure & Styling** | Merancang dan membangun kerangka struktur awal (*div/class*) Portal Pelanggan, penataan CSS awal modul pelanggan, serta berkontribusi pada implementasi aset visual awal portal. |
+| 4 | **Wildan Krisna H.** | **Initial Owner Portal Implementation** | Membuat implementasi awal struktur halaman beranda (*home*) Portal Owner dan kontribusi dasar pada berkas CSS awal Portal Owner. |
+| 5 | **Auliya Nur Aini** | **Project Presentation & Documentation Support** | Menyusun materi presentasi proyek (PPT), mempersiapkan kelengkapan paparan laporan tugas, dan membantu koordinasi materi pendukung presentasi kelompok. |
+
+### Contribution Details
+
+- **Nurul Faiziah M. — Team Leader:**
+  - Team leadership and project coordination
+  - Landing page development and refinement
+  - Final UI refinement across the project
+  - Improved and standardized styling across pages
+  - Responsive design improvements
+  - Sidebar and navigation improvements
+  - Owner and technician registration pages
+  - Typography integration (Inter font standardization)
+  - Official URT logo integration
+  - UI consistency improvements between Owner, Teknisi, and Pelanggan portals
+  - Final refinement of pages initially implemented by other members
+  - Debugging and fixing UI inconsistencies
+  - README and project documentation
+  - PRD preparation
+  - Final project integration
+  - Final visual review before submission
+
+- **Nino Rachimas:**
+  - Initial landing page styling
+  - Initial Customer Portal styling
+  - Initial Teknisi Portal styling
+  - Branch and merge integration
+  - Contributed to the initial visual implementation of the portals
+
+- **Sofia Malvalena A.:**
+  - Created the initial Customer Portal structure
+  - Created the initial Customer Portal styling
+  - Contributed to the early-stage Customer Portal implementation
+
+- **Wildan Krisna H.:**
+  - Added the initial Owner Portal home / Beranda Owner page
+  - Added the initial CSS implementation for the Owner Portal home page
+  - Contributed to the initial Owner Portal interface implementation
+
+- **Auliya Nur Aini:**
+  - Prepared the project presentation / PPT
+  - Assisted with presentation materials for the project submission
+
+### Contribution Note
+> The project was developed collaboratively. Several team members contributed initial page structures, styling, and implementation, while the final application went through additional integration, consistency fixes, responsive improvements, debugging, and visual refinement before submission. As team leader, Nurul handled much of the final integration and refinement to ensure a consistent final interface across the URT application.
+
+---
+
+## AI-Assisted Development
+
+Dalam proses perancangan dan pengembangan prototipe URT, alat bantu berbasis kecerdasan buatan (*AI-assisted tools*) dimanfaatkan sebagai asisten produktivitas pada beberapa tahapan teknis:
+- **Bantuan Implementasi Kode:** Mempercepat penulisan sintaks markup semantik dan boilerplate JavaScript.
+- **Implementasi Antarmuka Pengguna (UI):** Eksplorasi alternatif struktur komponen kartu, tata letak *grid/flexbox*, dan palet warna pendukung.
+- **Debugging & Identifikasi Masalah:** Membantu mendeteksi galat styling CSS, inkonsistensi kelas antarmuka, dan perbaikan tata letak overflow.
+- **Refactoring & Optimasi:** Merapikan pemisahan berkas antara HTML, CSS, dan skrip JavaScript interaktif.
+- **Saran Desain Responsif:** Memberikan rekomendasi penyesuaian breakpoint media query untuk layar smartphone dan tablet.
+- **Dokumentasi Proyek:** Membantu penataan struktur dokumen teknis dan standardisasi format dokumentasi repositori.
+- **Refinement Prototipe:** Penyempurnaan alur navigasi agar selaras dengan skenario pengujian prototipe.
+- **Pemecahan Masalah:** Menguji skenario alternatif untuk penanganan data tiruan (*mock data*) tiket servis.
+
+Seluruh saran dan potongan kode yang dihasilkan melalui alat bantu AI telah ditinjau secara kritis, diuji, disesuaikan dengan kebutuhan nyata proyek, dan diintegrasikan secara manual oleh tim.
+
+---
+
+## Prompt Log & Manual Improvements
+
+Tabel berikut merangkum pemanfaatan bantuan AI dan tindakan perbaikan manual yang dilakukan oleh tim pengembang:
+
+| Tahap Pengembangan | Bantuan AI (*AI Assistance*) | Perbaikan Manual oleh Tim (*Manual Improvement*) |
+|---|---|---|
+| **UI Implementation** | Memberikan saran implementasi struktur HTML dan komponen antarmuka. | Meninjau, memilih, dan menyesuaikan struktur antarmuka agar sesuai dengan kebutuhan fungsional Tempat Servis. |
+| **Responsive Design** | Memberikan saran penyesuaian tata letak responsif dan breakpoint media queries. | Menguji langsung pada berbagai resolusi viewport, memperbaiki bungkus (*wrap*) elemen, dan mengoptimalkan navigasi mobile hamburger. |
+| **Debugging** | Memberikan hipotesis kemungkinan penyebab galat tampilan dan saran perbaikan. | Memverifikasi penyebab langsung, menguji perbaikan pada peramban, dan menerapkan perbaikan kode secara definitif. |
+| **Documentation** | Memberikan rekomendasi struktur dan kerangka dokumentasi teknis. | Meninjau seluruh isi dokumentasi terhadap implementasi kode aktual di repositori dan menyelaraskan terminologi proyek. |
+| **UI Refinement** | Memberikan rekomendasi visual mengenai kontras warna, hierarki teks, dan spasi komponen. | Menyesuaikan *design tokens* CSS, menyelaraskan font Inter, dan memastikan konsistensi visual di ketiga portal peran. |
+| **Final Integration** | Membantu pengecekan konsistensi tautan antar halaman dan standarisasi elemen bersama. | Tim meninjau alur navigasi ujung-ke-ujung (*end-to-end*), menguji interaktivitas, dan memfinalisasi berkas rilis. |
+
+---
+
+## Git Workflow
+
+Kolaborasi tim pada repositori GitHub dijalankan dengan alur kerja cabang (*branching model*) yang terstruktur:
+
+```
+Clone Repository
+       │
+       ▼
+Create / Work on Branch (e.g. dev-nino, fix-logo-urt-color-tech)
+       │
+       ▼
+Implement Changes & Features
+       │
+       ▼
+Test Locally in Browser
+       │
+       ▼
+Commit with Clear Messages
+       │
+       ▼
+Push Branch to Remote Repository
+       │
+       ▼
+Create Pull Request & Code Review
+       │
+       ▼
+Merge into Main Branch
+```
+
+---
+
+## Project Status
+
+**URT — Your Service Tracker** saat ini berstatus sebagai **Academic Project Prototype** yang dikembangkan dalam rangka pemenuhan aktivitas pembelajaran **UI/UX Design**, metodologi **Design Thinking**, dan implementasi antarmuka web semantik berbasis standar W3C. 
+
+Sistem mendemonstrasikan kelayakan alur kerja operasional digital untuk Tempat Servis dan siap untuk dieksplorasi serta dikembangkan lebih lanjut menuju integrasi *backend* basis data dan layanan komersial di masa mendatang.
+
+---
+
+## Team
+
+Proyek ini disusun dan dikembangkan oleh **Kelompok 2 — PELURU UT**:
+
+- **Nurul Faiziah M.** — *Team Leader, Coordination, Final Refinement & Documentation*
+- **Nino Rachimas** — *Initial Portal & Landing Styling, Merge Integration*
+- **Sofia Malvalena A.** — *Initial Customer Portal Structure & Early Styling*
+- **Wildan Krisna H.** — *Initial Owner Portal Implementation & Structure*
+- **Auliya Nur Aini** — *Project Presentation & Report Preparation*
+
+---
+
+<p align="center">
+  <sub>© 2026 URT — Your Service Tracker. Dikembangkan untuk kemajuan operasional Tempat Servis Indonesia.</sub>
+</p>
