@@ -5,62 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perpanjang Langganan — Portal Pemilik — Your Service Tracker</title>
   <link rel="stylesheet" href="css/owner.css">
-  <style>
-    .renew-grid {
-      display: grid;
-      grid-template-columns: 1.8fr 1.2fr;
-      gap: var(--space-6);
-      align-items: start;
-    }
-    @media (max-width: 900px) {
-      .renew-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .renew-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6);
-      box-shadow: var(--shadow-sm);
-    }
-    .plan-radio-card {
-      border: 2px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: var(--space-4);
-      margin-bottom: var(--space-3);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-    .plan-radio-card:hover {
-      border-color: var(--primary);
-      background: #eff6ff;
-    }
-    .plan-radio-card.is-selected {
-      border-color: var(--primary);
-      background: #eff6ff;
-    }
-    .payment-option-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-2);
-      margin-top: var(--space-2);
-    }
-    .payment-btn-label {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: var(--text-body-sm);
-      cursor: pointer;
-      background: var(--background);
-    }
-  </style>
 </head>
 <body>
   <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
@@ -248,7 +192,7 @@
           <button class="primary-button" type="submit" style="width: 100%; padding: 14px; font-size: 15px;">
             Lanjutkan Pembayaran &rarr;
           </button>
-          <a class="secondary-button" href="langganan.html" style="width: 100%; text-align: center; margin-top: 10px; display: block; text-decoration: none;">
+          <a class="secondary-button btn-block" href="langganan.html">
             Batal
           </a>
         </div>
@@ -258,29 +202,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="../js/data.js"></script>
   <script src="js/owner.js"></script>
-  <script>
-    document.querySelectorAll('input[name="plan"]').forEach(radio => {
-      radio.addEventListener('change', () => {
-        document.querySelectorAll('.plan-radio-card').forEach(c => c.classList.remove('is-selected'));
-        radio.closest('.plan-radio-card').classList.add('is-selected');
-        const price = radio.value === 'annual' ? 'Rp999.000' : 'Rp99.000';
-        document.getElementById('summaryPrice').textContent = price;
-        document.getElementById('summaryTotal').textContent = price;
-      });
-    });
-
-    document.getElementById('renewForm')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const toast = document.getElementById('toast');
-      if (toast) {
-        toast.textContent = 'Membuat tagihan perpanjangan... Mengalihkan ke pembayaran.';
-        toast.classList.add('is-visible');
-        setTimeout(() => {
-          window.location.href = 'pembayaran-berhasil.html';
-        }, 1200);
-      }
-    });
-  </script>
 </body>
 </html>

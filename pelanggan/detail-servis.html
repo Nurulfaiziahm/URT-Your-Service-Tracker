@@ -11,46 +11,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style-customer.css" />
+    <script src="../js/data.js" defer></script>
     <script src="js/customer.js" defer></script>
-    <style>
-      .detail-grid {
-        display: grid;
-        grid-template-columns: 2fr 1.2fr;
-        gap: 24px;
-        align-items: start;
-      }
-      @media (max-width: 900px) {
-        .detail-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-      .kv-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-      }
-      .kv-table td {
-        padding: 12px 0;
-        border-bottom: 1px solid #f1f5f9;
-        vertical-align: top;
-      }
-      .kv-table td:first-child {
-        width: 38%;
-        color: var(--text-muted);
-        font-weight: 500;
-      }
-      .kv-table td:last-child {
-        color: var(--text-dark);
-        font-weight: 600;
-      }
-      .cost-summary-card {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 16px;
-      }
-    </style>
   </head>
   <body>
     <!-- SIDEBAR -->

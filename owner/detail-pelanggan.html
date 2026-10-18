@@ -5,50 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detail Pelanggan — Nino Rachimas — Portal Pemilik</title>
   <link rel="stylesheet" href="css/owner.css">
-  <style>
-    .cust-profile-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6);
-      box-shadow: var(--shadow-sm);
-      margin-bottom: var(--space-6);
-    }
-    .cust-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-      border-bottom: 1px solid var(--border-light);
-      padding-bottom: var(--space-4);
-      margin-bottom: var(--space-4);
-    }
-    .cust-meta-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-4);
-      font-size: var(--text-body-sm);
-    }
-    .cust-meta-grid dt {
-      color: var(--text-muted);
-      font-size: var(--text-caption);
-      text-transform: uppercase;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    .cust-meta-grid dd {
-      color: var(--text);
-      font-weight: 600;
-      font-size: var(--text-body-base);
-      margin: 0;
-    }
-    .stat-badge-num {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--primary);
-    }
-  </style>
 </head>
 <body>
   <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
@@ -228,6 +184,7 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="../js/data.js"></script>
   <script src="js/owner.js"></script>
 </body>
 </html>

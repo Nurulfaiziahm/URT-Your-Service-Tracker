@@ -10,7 +10,8 @@
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../teknisi/css/style-teknisi.css" />
+    <link rel="stylesheet" href="css/style-teknisi.css" />
+    <script src="../js/data.js" defer></script>
     <script src="js/teknisi.js" defer></script>
   </head>
   <body>
@@ -183,6 +184,74 @@ Halo Nino Rachimas, diagnosis ASUS VivoBook 14 telah selesai. Ditemukan debu pad
           </form>
         </section>
 
+        <!-- TIMELINE SERVIS / PERJALANAN TIKET -->
+        <section aria-labelledby="timeline-section" style="background: #ffffff; border: 1px solid var(--border-soft, #e2e8f0); border-radius: 12px; padding: 24px; margin-top: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-soft, #f1f5f9); padding-bottom: 12px; margin-bottom: 16px;">
+            <h2 id="timeline-section" style="font-size: 16px; margin: 0; color: #0f172a;">Perjalanan Tiket</h2>
+            <span class="status status--neutral" style="font-size: 11px;">Real-time</span>
+          </div>
+
+          <ol class="timeline-steps">
+            <li class="timeline-step is-done">
+              <span class="timeline-step__marker" aria-hidden="true">&#10003;</span>
+              <div class="timeline-step__content">
+                <strong class="timeline-step__title">Tiket Diterima di Outlet</strong>
+                <div class="timeline-step__meta">
+                  <span class="timeline-step__time">1 Sep 2026, 10:15 WIB</span>
+                  <span class="timeline-step__actor">&bull; Staf Front Desk</span>
+                </div>
+              </div>
+            </li>
+            <li class="timeline-step is-done">
+              <span class="timeline-step__marker" aria-hidden="true">&#10003;</span>
+              <div class="timeline-step__content">
+                <strong class="timeline-step__title">Penugasan Teknisi: Sofia M. Adam</strong>
+                <div class="timeline-step__meta">
+                  <span class="timeline-step__time">1 Sep 2026, 11:30 WIB</span>
+                  <span class="timeline-step__actor">&bull; Oleh Pemilik Usaha</span>
+                </div>
+              </div>
+            </li>
+            <li class="timeline-step is-done">
+              <span class="timeline-step__marker" aria-hidden="true">&#10003;</span>
+              <div class="timeline-step__content">
+                <strong class="timeline-step__title">Diagnosis Selesai &amp; Estimasi Diajukan</strong>
+                <div class="timeline-step__meta">
+                  <span class="timeline-step__time">2 Sep 2026, 09:40 WIB</span>
+                  <span class="timeline-step__actor">&bull; Rp250.000</span>
+                </div>
+              </div>
+            </li>
+            <li class="timeline-step is-current">
+              <span class="timeline-step__marker" aria-hidden="true">&bull;</span>
+              <div class="timeline-step__content">
+                <strong class="timeline-step__title">Menunggu Persetujuan Pelanggan</strong>
+                <div class="timeline-step__meta">
+                  <span class="timeline-step__time">Link persetujuan aktif di Portal Pelanggan</span>
+                </div>
+              </div>
+            </li>
+            <li class="timeline-step">
+              <span class="timeline-step__marker" aria-hidden="true">&cir;</span>
+              <div class="timeline-step__content">
+                <strong class="timeline-step__title">Dalam Perbaikan &amp; Pengujian QC</strong>
+                <div class="timeline-step__meta">
+                  <span class="timeline-step__time">Menunggu persetujuan Nino Rachimas</span>
+                </div>
+              </div>
+            </li>
+            <li class="timeline-step">
+              <span class="timeline-step__marker" aria-hidden="true">&cir;</span>
+              <div class="timeline-step__content">
+                <strong class="timeline-step__title">Unit Siap Diambil / Selesai</strong>
+                <div class="timeline-step__meta">
+                  <span class="timeline-step__time">Estimasi target 3 Sep 2026</span>
+                </div>
+              </div>
+            </li>
+          </ol>
+        </section>
+
         <!-- QC & COMPLETION SECTION -->
         <section aria-labelledby="qc-section" style="border: 1px solid #10b981; border-radius: 12px; padding: 20px; background: #ecfdf5; margin-top: 24px;">
           <h2 id="qc-section" style="color: #065f46; margin: 0 0 8px;">Tindakan Quality Control &amp; Penutupan Tiket</h2>
@@ -202,7 +271,7 @@ Halo Nino Rachimas, diagnosis ASUS VivoBook 14 telah selesai. Ditemukan debu pad
     </main>
 
     <footer>
-      <p><a href="beranda-teknisi.html">Kembali ke Beranda</a></p>
+      <p><a href="beranda-teknisi.html">&larr; Kembali ke Beranda</a></p>
     </footer>
   </body>
 </html>

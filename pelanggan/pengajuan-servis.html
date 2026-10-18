@@ -12,6 +12,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style-customer.css" />
+    <script src="../js/data.js" defer></script>
     <script src="js/customer.js" defer></script>
   </head>
   <body>
@@ -286,25 +287,5 @@ Kota Semarang, Jawa Tengah</textarea
         URT — Your Service Tracker <span>Kelompok 2</span>
       </footer>
     </div>
-
-    <script>
-      document
-        .getElementById("form-servis")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-          window.location.href = "persetujuan-servis.html";
-        });
-
-      const navItems = document.querySelectorAll(".nav-menu .nav-item");
-
-      navItems.forEach((item) => {
-        item.addEventListener("click", function () {
-          // Remove active class from all items
-          navItems.forEach((nav) => nav.classList.remove("active"));
-          // Set active state on the clicked item
-          this.classList.add("active");
-        });
-      });
-    </script>
   </body>
 </html>

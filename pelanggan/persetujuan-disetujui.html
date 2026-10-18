@@ -6,59 +6,8 @@
     <title>Persetujuan Biaya - URT</title>
     <!-- Menyambungkan ke CSS utama -->
     <link rel="stylesheet" href="style-customer.css" />
+    <script src="../js/data.js" defer></script>
     <script src="js/customer.js" defer></script>
-    <style>
-      /* Tambahan styling khusus untuk halaman detail/persetujuan jika diperlukan */
-      .dl-grid {
-        display: grid;
-        grid-template-columns: 150px 1fr;
-        gap: 12px;
-        margin: 16px 0;
-        font-size: 14px;
-      }
-      .dl-grid dt {
-        color: var(--text-muted);
-        font-weight: 500;
-      }
-      .dl-grid dd {
-        font-weight: 600;
-        color: var(--text-dark);
-      }
-      .alert-success {
-        background-color: #d1fae5;
-        border: 1px solid #34d399;
-        color: #065f46;
-        padding: 16px;
-        border-radius: 8px;
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-      .timeline-list {
-        list-style: none;
-        padding: 0;
-        margin-top: 16px;
-      }
-      .timeline-list li {
-        position: relative;
-        padding-left: 24px;
-        margin-bottom: 16px;
-      }
-      .timeline-list li::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 6px;
-        width: 10px;
-        height: 10px;
-        background-color: var(--primary-blue);
-        border-radius: 50%;
-      }
-      .timeline-list li:last-child {
-        margin-bottom: 0;
-      }
-    </style>
   </head>
   <body>
     <!-- SIDEBAR -->
@@ -385,18 +334,5 @@
           <p>URT — Your Service Tracker | Kelompok 2</p>
         </footer>
       </div>
-    </main>
-    <script>
-      const navItems = document.querySelectorAll(".nav-menu .nav-item");
-
-      navItems.forEach((item) => {
-        item.addEventListener("click", function () {
-          // Remove active class from all items
-          navItems.forEach((nav) => nav.classList.remove("active"));
-          // Set active state on the clicked item
-          this.classList.add("active");
-        });
-      });
-    </script>
   </body>
 </html>

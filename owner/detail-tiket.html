@@ -1,415 +1,422 @@
 <!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detail Tiket #URT-2026-001 — Portal Pemilik — Your Service Tracker</title>
-  <link rel="stylesheet" href="css/owner.css">
-  <style>
-    .ticket-detail-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr;
-      gap: var(--space-6);
-      align-items: start;
-    }
-    @media (max-width: 960px) {
-      .ticket-detail-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .detail-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6);
-      box-shadow: var(--shadow-sm);
-      margin-bottom: var(--space-6);
-    }
-    .detail-card__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: var(--space-4);
-      margin-bottom: var(--space-4);
-      border-bottom: 1px solid var(--border-light);
-    }
-    .detail-card__header h2 {
-      font-size: var(--text-h3);
-      font-weight: var(--weight-semibold);
-      color: var(--text);
-      margin: 0;
-    }
-    .meta-list {
-      display: grid;
-      grid-template-columns: 140px 1fr;
-      gap: var(--space-3) var(--space-4);
-      font-size: var(--text-body-sm);
-    }
-    .meta-list dt {
-      color: var(--text-muted);
-      font-weight: var(--weight-medium);
-    }
-    .meta-list dd {
-      color: var(--text);
-      font-weight: var(--weight-semibold);
-      margin: 0;
-    }
-    .cost-box {
-      background: var(--background);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: var(--space-4);
-      margin-top: var(--space-4);
-    }
-    .cost-row {
-      display: flex;
-      justify-content: space-between;
-      padding: var(--space-2) 0;
-      font-size: var(--text-body-sm);
-    }
-    .cost-row--total {
-      border-top: 1px dashed var(--border);
-      margin-top: var(--space-2);
-      padding-top: var(--space-3);
-      font-weight: var(--weight-bold);
-      font-size: var(--text-body-base);
-      color: var(--primary);
-    }
-    .timeline-steps {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      position: relative;
-    }
-    .timeline-steps::before {
-      content: "";
-      position: absolute;
-      top: 10px;
-      bottom: 10px;
-      left: 11px;
-      width: 2px;
-      background: var(--border);
-    }
-    .timeline-step {
-      position: relative;
-      padding-left: 32px;
-      margin-bottom: var(--space-4);
-      font-size: var(--text-body-sm);
-    }
-    .timeline-step:last-child {
-      margin-bottom: 0;
-    }
-    .timeline-step__marker {
-      position: absolute;
-      left: 3px;
-      top: 3px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--surface);
-      border: 2px solid var(--text-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-    }
-    .timeline-step.is-done .timeline-step__marker {
-      background: var(--success);
-      border-color: var(--success);
-    }
-    .timeline-step.is-current .timeline-step__marker {
-      background: var(--primary);
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-    }
-    .timeline-step strong {
-      display: block;
-      color: var(--text);
-    }
-    .timeline-step small {
-      color: var(--text-muted);
-      font-size: var(--text-caption);
-    }
-  </style>
-</head>
-<body>
-  <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">URT</span>
-      <div class="brand-copy">
-        <strong>Your Service Tracker</strong>
-        <span>PORTAL PEMILIK</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Detail Tiket #URT-2026-001 — Portal Pemilik — Your Service Tracker
+    </title>
+    <link rel="stylesheet" href="css/owner.css" />
+  </head>
+  <body>
+    <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">URT</span>
+        <div class="brand-copy">
+          <strong>Your Service Tracker</strong>
+          <span>PORTAL PEMILIK</span>
+        </div>
       </div>
+
+      <nav class="sidebar-nav" aria-label="Navigasi utama pemilik">
+        <a class="nav-item" href="beranda-owner.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+          <span>Beranda</span>
+        </a>
+        <a
+          class="nav-item is-active"
+          href="tiket-servis.html"
+          aria-current="page"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z"></path>
+            <path d="M12 7v12" stroke-dasharray="2 2"></path>
+          </svg>
+          <span>Tiket Servis</span>
+        </a>
+        <a class="nav-item" href="teknisi.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M16 3.2a4 4 0 0 1 0 7.6M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          </svg>
+          <span>Teknisi</span>
+        </a>
+        <a class="nav-item" href="pelanggan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="5" y="5" width="14" height="16" rx="2"></rect>
+            <path d="M9 5V3h6v2"></path>
+            <circle cx="12" cy="11" r="2.5"></circle>
+            <path d="M8.5 17c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"></path>
+          </svg>
+          <span>Pelanggan</span>
+        </a>
+        <a class="nav-item" href="layanan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path
+              d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"
+            ></path>
+          </svg>
+          <span>Layanan</span>
+        </a>
+        <a class="nav-item" href="laporan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M5 20v-6M10 20V9M15 20V4M20 20v-10"></path>
+          </svg>
+          <span>Laporan</span>
+        </a>
+        <a class="nav-item" href="langganan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="6" width="18" height="13" rx="2"></rect>
+            <path d="M3 10h18"></path>
+          </svg>
+          <span>Langganan</span>
+        </a>
+        <a class="nav-item" href="pengaturan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H10.4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-3.2h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h3.2v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.35.34.55.8.6 1.3v.1h1v3.2h-1v.1c-.05.5-.25.96-.6 1.3Z"
+            ></path>
+          </svg>
+          <span>Pengaturan</span>
+        </a>
+        <a class="nav-item" href="profil-owner.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="3.5"></circle>
+            <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"></path>
+          </svg>
+          <span>Profil</span>
+        </a>
+
+        <a class="nav-item nav-item--logout" href="login.html" title="Keluar">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span>Keluar</span>
+        </a>
+      </nav>
+
+      <a
+        class="owner-mini-profile"
+        href="profil-owner.html"
+        aria-label="Buka profil Andi Ramadhan"
+      >
+        <span class="avatar avatar-solid" aria-hidden="true">AR</span>
+        <span class="owner-mini-profile__copy">
+          <strong>Andi Ramadhan</strong>
+          <small>Pemilik • ServisKita</small>
+        </span>
+      </a>
+    </aside>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="system-status">
+          <span class="owner-chip">PEMILIK USAHA</span>
+          <span class="online-dot" aria-hidden="true"></span>
+          <span>Sistem Online</span>
+        </div>
+        <div class="topbar-actions">
+          <button
+            class="icon-button"
+            id="notificationButton"
+            type="button"
+            aria-label="Buka notifikasi"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+              <path d="M10 21h4"></path>
+            </svg>
+          </button>
+          <a
+            class="avatar avatar-outline"
+            href="profil-owner.html"
+            aria-label="Buka profil pemilik"
+            >AR</a
+          >
+        </div>
+      </header>
+
+      <main class="owner-main">
+        <section class="page-heading">
+          <span class="eyebrow">PORTAL PEMILIK &bull; DETAIL TIKET</span>
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 16px;
+            "
+          >
+            <div>
+              <h1 id="ticketIdHeading">#URT-2026-001</h1>
+              <p>
+                ASUS VivoBook 14 &bull; Nino Rachimas &bull; Servis Masuk 1 Sep
+                2026
+              </p>
+            </div>
+            <div style="display: flex; gap: 10px">
+              <a
+                class="secondary-button"
+                href="tiket-servis.html"
+                style="padding-left: 20px; padding-right: 20px"
+                >&larr; Kembali</a
+              >
+              <button class="primary-button" id="btnPrintStruk" type="button">
+                Cetak Struk Servis
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="ticket-detail-grid">
+          <!-- LEFT COLUMN: TICKET DETAILS & DIAGNOSIS -->
+          <div>
+            <!-- CARD 1: DATA PERANGKAT & KELUHAN -->
+            <article class="detail-card">
+              <div class="detail-card__header">
+                <h2>Informasi Perangkat &amp; Keluhan</h2>
+                <span class="status status--warning" id="ticketStatusBadge"
+                  >MENUNGGU PERSETUJUAN</span
+                >
+              </div>
+
+              <dl class="meta-list">
+                <dt>Nomor Tiket</dt>
+                <dd>#URT-2026-001</dd>
+
+                <dt>Nama Perangkat</dt>
+                <dd>ASUS VivoBook 14 (A416MA)</dd>
+
+                <dt>Nomor Seri</dt>
+                <dd>ASUS-VB14-2026-001</dd>
+
+                <dt>Tanggal Masuk</dt>
+                <dd>1 Sep 2026, 10:15 WIB</dd>
+
+                <dt>Estimasi Selesai</dt>
+                <dd>3 Sep 2026 (1–2 hari kerja)</dd>
+
+                <dt>Keluhan Awal</dt>
+                <dd style="font-weight: 500; line-height: 1.5">
+                  Laptop mati mendadak setelah 10-15 menit digunakan. Area
+                  casing bawah dan ventilasi kipas terasa sangat panas.
+                </dd>
+              </dl>
+            </article>
+
+            <!-- CARD 2: DIAGNOSIS & BIAYA -->
+            <article class="detail-card">
+              <div class="detail-card__header">
+                <h2>Temuan Diagnosis &amp; Rincian Biaya</h2>
+                <span class="status status--neutral">ESTIMASI VALID</span>
+              </div>
+
+              <p
+                style="
+                  font-size: var(--text-body-sm);
+                  color: var(--text-muted);
+                  line-height: 1.6;
+                  margin-bottom: 16px;
+                "
+              >
+                <strong>Catatan Teknisi:</strong> Debu tebal menumpuk pada sirip
+                heatsink dan kipas pendingin laptop, memicu thermal throttling
+                hingga laptop mati mendadak. Kualitas thermal paste CPU/GPU
+                telah kering mengeras dan wajib diganti dengan pasta
+                konduktivitas tinggi.
+              </p>
+
+              <div class="cost-box">
+                <div class="cost-row">
+                  <span>Jasa Deep Cleaning &amp; Pembersihan Pendingin</span>
+                  <strong>Rp150.000</strong>
+                </div>
+                <div class="cost-row">
+                  <span>Suku Cadang: Arctic MX-4 Thermal Paste</span>
+                  <strong>Rp100.000</strong>
+                </div>
+                <div class="cost-row cost-row--total">
+                  <span>Total Estimasi Biaya Servis</span>
+                  <span>Rp250.000</span>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- RIGHT COLUMN: PENUGASAN TEKNISI, PELANGGAN & TIMELINE -->
+          <div>
+            <!-- CARD 3: PENUGASAN TEKNISI -->
+            <article class="detail-card">
+              <div class="detail-card__header">
+                <h2>Penugasan Teknisi</h2>
+                <span class="owner-chip" style="font-size: 11px"
+                  >KONTROL OWNER</span
+                >
+              </div>
+
+              <form id="assignTechnicianForm">
+                <label class="form-field">
+                  <span>Pilih Teknisi Penanggung Jawab</span>
+                  <select
+                    id="technicianSelect"
+                    name="technicianId"
+                    style="
+                      width: 100%;
+                      padding: 10px 12px;
+                      border: 1px solid var(--border);
+                      border-radius: var(--radius-md);
+                      font-family: inherit;
+                      font-size: var(--text-body-sm);
+                    "
+                  >
+                    <option value="sofia-adam" selected>
+                      Sofia Malvalena Adam (Laptop • Hardware • 5 Tiket)
+                    </option>
+                    <option value="ardi-pratama">
+                      Ardi Pratama (Laptop • Diagnosis • 4 Tiket)
+                    </option>
+                    <option value="dimas-saputra">
+                      Dimas Saputra (Software • OS • 3 Tiket)
+                    </option>
+                    <option value="rani-oktaviani">
+                      Rani Oktaviani (Laptop • QC • 4 Tiket)
+                    </option>
+                    <option value="fajar-nugroho">
+                      Fajar Nugroho (Hardware • Pendingin • 3 Tiket)
+                    </option>
+                    <option value="bayu-setiawan">
+                      Bayu Setiawan (Laptop • Hardware • 4 Tiket)
+                    </option>
+                    <option value="intan-permata">
+                      Intan Permata (Software • Data • 2 Tiket)
+                    </option>
+                    <option value="rizal-hidayat">
+                      Rizal Hidayat (Laptop • QC • 3 Tiket)
+                    </option>
+                  </select>
+                </label>
+
+                <button
+                  class="primary-button"
+                  type="submit"
+                  style="width: 100%; margin-top: 14px"
+                >
+                  Perbarui Penugasan
+                </button>
+              </form>
+            </article>
+
+            <!-- CARD 4: DATA PELANGGAN -->
+            <article class="detail-card">
+              <div class="detail-card__header">
+                <h2>Data Pelanggan</h2>
+                <a class="detail-action" href="detail-pelanggan.html"
+                  >Profil &rarr;</a
+                >
+              </div>
+
+              <dl class="meta-list">
+                <dt>Nama Lengkap</dt>
+                <dd>Nino Rachimas</dd>
+
+                <dt>No. WhatsApp</dt>
+                <dd>0812 3456 7890</dd>
+
+                <dt>Email</dt>
+                <dd>nino.rachimas@email.com</dd>
+
+                <dt>Alamat</dt>
+                <dd>Jakarta Pusat</dd>
+              </dl>
+            </article>
+
+            <!-- CARD 5: TIMELINE SERVIS -->
+            <article class="detail-card">
+              <div class="detail-card__header">
+                <h2>Perjalanan Tiket</h2>
+                <span style="font-size: 12px; color: var(--text-muted)"
+                  >Real-time</span
+                >
+              </div>
+
+              <ol class="timeline-steps">
+                <li class="timeline-step is-done">
+                  <span class="timeline-step__marker" aria-hidden="true">&#10003;</span>
+                  <div class="timeline-step__content">
+                    <strong class="timeline-step__title">Tiket Diterima di Outlet</strong>
+                    <div class="timeline-step__meta">
+                      <span class="timeline-step__time">1 Sep 2026, 10:15 WIB</span>
+                      <span class="timeline-step__actor">&bull; Staf Front Desk</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="timeline-step is-done">
+                  <span class="timeline-step__marker" aria-hidden="true">&#10003;</span>
+                  <div class="timeline-step__content">
+                    <strong class="timeline-step__title">Penugasan Teknisi: Sofia M. Adam</strong>
+                    <div class="timeline-step__meta">
+                      <span class="timeline-step__time">1 Sep 2026, 11:30 WIB</span>
+                      <span class="timeline-step__actor">&bull; Oleh Pemilik Usaha</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="timeline-step is-done">
+                  <span class="timeline-step__marker" aria-hidden="true">&#10003;</span>
+                  <div class="timeline-step__content">
+                    <strong class="timeline-step__title">Diagnosis Selesai &amp; Estimasi Diajukan</strong>
+                    <div class="timeline-step__meta">
+                      <span class="timeline-step__time">2 Sep 2026, 09:40 WIB</span>
+                      <span class="timeline-step__actor">&bull; Rp250.000</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="timeline-step is-current">
+                  <span class="timeline-step__marker" aria-hidden="true">&bull;</span>
+                  <div class="timeline-step__content">
+                    <strong class="timeline-step__title">Menunggu Persetujuan Pelanggan</strong>
+                    <div class="timeline-step__meta">
+                      <span class="timeline-step__time">Link persetujuan aktif di Portal Pelanggan</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="timeline-step">
+                  <span class="timeline-step__marker" aria-hidden="true">&cir;</span>
+                  <div class="timeline-step__content">
+                    <strong class="timeline-step__title">Dalam Perbaikan &amp; Pengujian QC</strong>
+                    <div class="timeline-step__meta">
+                      <span class="timeline-step__time">Menunggu persetujuan Nino Rachimas</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="timeline-step">
+                  <span class="timeline-step__marker" aria-hidden="true">&cir;</span>
+                  <div class="timeline-step__content">
+                    <strong class="timeline-step__title">Unit Siap Diambil / Selesai</strong>
+                    <div class="timeline-step__meta">
+                      <span class="timeline-step__time">Estimasi target 3 Sep 2026</span>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </article>
+          </div>
+        </div>
+      </main>
     </div>
 
-    <nav class="sidebar-nav" aria-label="Navigasi utama pemilik">
-      <a class="nav-item" href="beranda-owner.html">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
-        <span>Beranda</span>
-      </a>
-      <a class="nav-item is-active" href="tiket-servis.html" aria-current="page">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z"></path><path d="M12 7v12" stroke-dasharray="2 2"></path></svg>
-        <span>Tiket Servis</span>
-      </a>
-      <a class="nav-item" href="teknisi.html">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 3.2a4 4 0 0 1 0 7.6M22 21v-2a4 4 0 0 0-3-3.87"></path></svg>
-        <span>Teknisi</span>
-      </a>
-      <a class="nav-item" href="pelanggan.html">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"></rect><path d="M9 5V3h6v2"></path><circle cx="12" cy="11" r="2.5"></circle><path d="M8.5 17c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"></path></svg>
-        <span>Pelanggan</span>
-      </a>
-      <a class="nav-item" href="layanan.html">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"></path></svg>
-        <span>Layanan</span>
-      </a>
-      <a class="nav-item" href="laporan.html">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20v-6M10 20V9M15 20V4M20 20v-10"></path></svg>
-        <span>Laporan</span>
-      </a>
-      <a class="nav-item" href="langganan.html">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18"></path></svg>
-        <span>Langganan</span>
-      </a>
-      <a class="nav-item" href="pengaturan.html">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H10.4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-3.2h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h3.2v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.35.34.55.8.6 1.3v.1h1v3.2h-1v.1c-.05.5-.25.96-.6 1.3Z"></path></svg>
-        <span>Pengaturan</span>
-      </a>
-      <a class="nav-item" href="profil-owner.html">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"></path></svg>
-        <span>Profil</span>
-      </a>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-      <a class="nav-item nav-item--logout" href="login.html" title="Keluar">
-        <svg aria-hidden="true" viewBox="0 0 24 24">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" y1="12" x2="9" y2="12" />
-        </svg>
-        <span>Keluar</span>
-      </a>
-    </nav>
-
-    <a class="owner-mini-profile" href="profil-owner.html" aria-label="Buka profil Andi Ramadhan">
-      <span class="avatar avatar-solid" aria-hidden="true">AR</span>
-      <span class="owner-mini-profile__copy">
-        <strong>Andi Ramadhan</strong>
-        <small>Pemilik • ServisKita</small>
-      </span>
-    </a>
-  </aside>
-
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="system-status">
-        <span class="owner-chip">PEMILIK USAHA</span>
-        <span class="online-dot" aria-hidden="true"></span>
-        <span>Sistem Online</span>
-      </div>
-      <div class="topbar-actions">
-        <button class="icon-button" id="notificationButton" type="button" aria-label="Buka notifikasi">
-          <svg aria-hidden="true" viewBox="0 0 24 24">
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
-            <path d="M10 21h4"></path>
-          </svg>
-        </button>
-        <a class="avatar avatar-outline" href="profil-owner.html" aria-label="Buka profil pemilik">AR</a>
-      </div>
-    </header>
-
-    <main class="owner-main">
-      <section class="page-heading">
-        <span class="eyebrow">PORTAL PEMILIK &bull; DETAIL TIKET</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-          <div>
-            <h1 id="ticketIdHeading">#URT-2026-001</h1>
-            <p>ASUS VivoBook 14 &bull; Nino Rachimas &bull; Servis Masuk 1 Sep 2026</p>
-          </div>
-          <div style="display: flex; gap: 10px;">
-            <a class="secondary-button" href="tiket-servis.html">&larr; Kembali ke Daftar</a>
-            <button class="primary-button" id="btnPrintStruk" type="button">Cetak Struk Servis</button>
-          </div>
-        </div>
-      </section>
-
-      <div class="ticket-detail-grid">
-        <!-- LEFT COLUMN: TICKET DETAILS & DIAGNOSIS -->
-        <div>
-          <!-- CARD 1: DATA PERANGKAT & KELUHAN -->
-          <article class="detail-card">
-            <div class="detail-card__header">
-              <h2>Informasi Perangkat &amp; Keluhan</h2>
-              <span class="status status--warning" id="ticketStatusBadge">MENUNGGU PERSETUJUAN</span>
-            </div>
-
-            <dl class="meta-list">
-              <dt>Nomor Tiket</dt>
-              <dd>#URT-2026-001</dd>
-
-              <dt>Nama Perangkat</dt>
-              <dd>ASUS VivoBook 14 (A416MA)</dd>
-
-              <dt>Nomor Seri</dt>
-              <dd>ASUS-VB14-2026-001</dd>
-
-              <dt>Tanggal Masuk</dt>
-              <dd>1 Sep 2026, 10:15 WIB</dd>
-
-              <dt>Estimasi Selesai</dt>
-              <dd>3 Sep 2026 (1–2 hari kerja)</dd>
-
-              <dt>Keluhan Awal</dt>
-              <dd style="font-weight: 500; line-height: 1.5;">
-                Laptop mati mendadak setelah 10-15 menit digunakan. Area casing bawah dan ventilasi kipas terasa sangat panas.
-              </dd>
-            </dl>
-          </article>
-
-          <!-- CARD 2: DIAGNOSIS & BIAYA -->
-          <article class="detail-card">
-            <div class="detail-card__header">
-              <h2>Temuan Diagnosis &amp; Rincian Biaya</h2>
-              <span class="status status--neutral">ESTIMASI VALID</span>
-            </div>
-
-            <p style="font-size: var(--text-body-sm); color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
-              <strong>Catatan Teknisi:</strong> Debu tebal menumpuk pada sirip heatsink dan kipas pendingin laptop, memicu thermal throttling hingga laptop mati mendadak. Kualitas thermal paste CPU/GPU telah kering mengeras dan wajib diganti dengan pasta konduktivitas tinggi.
-            </p>
-
-            <div class="cost-box">
-              <div class="cost-row">
-                <span>Jasa Deep Cleaning &amp; Pembersihan Pendingin</span>
-                <strong>Rp150.000</strong>
-              </div>
-              <div class="cost-row">
-                <span>Suku Cadang: Arctic MX-4 Thermal Paste</span>
-                <strong>Rp100.000</strong>
-              </div>
-              <div class="cost-row cost-row--total">
-                <span>Total Estimasi Biaya Servis</span>
-                <span>Rp250.000</span>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <!-- RIGHT COLUMN: PENUGASAN TEKNISI, PELANGGAN & TIMELINE -->
-        <div>
-          <!-- CARD 3: PENUGASAN TEKNISI -->
-          <article class="detail-card">
-            <div class="detail-card__header">
-              <h2>Penugasan Teknisi</h2>
-              <span class="owner-chip" style="font-size: 11px;">KONTROL OWNER</span>
-            </div>
-
-            <form id="assignTechnicianForm">
-              <label class="form-field">
-                <span>Pilih Teknisi Penanggung Jawab</span>
-                <select id="technicianSelect" name="technicianId" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: inherit; font-size: var(--text-body-sm);">
-                  <option value="sofia-adam" selected>Sofia Malvalena Adam (Laptop • Hardware • 5 Tiket)</option>
-                  <option value="ardi-pratama">Ardi Pratama (Laptop • Diagnosis • 4 Tiket)</option>
-                  <option value="dimas-saputra">Dimas Saputra (Software • OS • 3 Tiket)</option>
-                  <option value="rani-oktaviani">Rani Oktaviani (Laptop • QC • 4 Tiket)</option>
-                  <option value="fajar-nugroho">Fajar Nugroho (Hardware • Pendingin • 3 Tiket)</option>
-                  <option value="bayu-setiawan">Bayu Setiawan (Laptop • Hardware • 4 Tiket)</option>
-                  <option value="intan-permata">Intan Permata (Software • Data • 2 Tiket)</option>
-                  <option value="rizal-hidayat">Rizal Hidayat (Laptop • QC • 3 Tiket)</option>
-                </select>
-              </label>
-
-              <button class="primary-button" type="submit" style="width: 100%; margin-top: 14px;">
-                Perbarui Penugasan
-              </button>
-            </form>
-          </article>
-
-          <!-- CARD 4: DATA PELANGGAN -->
-          <article class="detail-card">
-            <div class="detail-card__header">
-              <h2>Data Pelanggan</h2>
-              <a class="detail-action" href="detail-pelanggan.html">Profil &rarr;</a>
-            </div>
-
-            <dl class="meta-list">
-              <dt>Nama Lengkap</dt>
-              <dd>Nino Rachimas</dd>
-
-              <dt>No. WhatsApp</dt>
-              <dd>0812 3456 7890</dd>
-
-              <dt>Email</dt>
-              <dd>nino.rachimas@email.com</dd>
-
-              <dt>Alamat</dt>
-              <dd>Jakarta Pusat</dd>
-            </dl>
-          </article>
-
-          <!-- CARD 5: TIMELINE SERVIS -->
-          <article class="detail-card">
-            <div class="detail-card__header">
-              <h2>Perjalanan Tiket</h2>
-              <span style="font-size: 12px; color: var(--text-muted);">Real-time</span>
-            </div>
-
-            <ol class="timeline-steps">
-              <li class="timeline-step is-done">
-                <span class="timeline-step__marker" aria-hidden="true">&#10003;</span>
-                <strong>Tiket Diterima di Outlet</strong>
-                <small>1 Sep 2026, 10:15 WIB &bull; Staf Front Desk</small>
-              </li>
-              <li class="timeline-step is-done">
-                <span class="timeline-step__marker" aria-hidden="true">&#10003;</span>
-                <strong>Penugasan Teknisi: Sofia M. Adam</strong>
-                <small>1 Sep 2026, 11:30 WIB &bull; Oleh Pemilik Usaha</small>
-              </li>
-              <li class="timeline-step is-done">
-                <span class="timeline-step__marker" aria-hidden="true">&#10003;</span>
-                <strong>Diagnosis Selesai &amp; Estimasi Diajukan</strong>
-                <small>2 Sep 2026, 09:40 WIB &bull; Rp250.000</small>
-              </li>
-              <li class="timeline-step is-current">
-                <span class="timeline-step__marker" aria-hidden="true">&bull;</span>
-                <strong>Menunggu Persetujuan Pelanggan</strong>
-                <small>Link persetujuan aktif di Portal Pelanggan</small>
-              </li>
-              <li class="timeline-step">
-                <span class="timeline-step__marker" aria-hidden="true"></span>
-                <strong>Dalam Perbaikan &amp; Pengujian QC</strong>
-                <small>Menunggu persetujuan Nino Rachimas</small>
-              </li>
-              <li class="timeline-step">
-                <span class="timeline-step__marker" aria-hidden="true"></span>
-                <strong>Unit Siap Diambil / Selesai</strong>
-                <small>Estimasi target 3 Sep 2026</small>
-              </li>
-            </ol>
-          </article>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script src="js/owner.js"></script>
-  <script>
-    // Penugasan teknisi form handler
-    document.getElementById('assignTechnicianForm')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const select = document.getElementById('technicianSelect');
-      const techName = select.options[select.selectedIndex].text.split('(')[0].trim();
-      const toast = document.getElementById('toast');
-      if (toast) {
-        toast.textContent = `Penugasan tiket berhasil diperbarui ke ${techName}.`;
-        toast.classList.add('is-visible');
-        setTimeout(() => toast.classList.remove('is-visible'), 2400);
-      }
-    });
-
-    document.getElementById('btnPrintStruk')?.addEventListener('click', () => {
-      window.print();
-    });
-  </script>
-</body>
+    <script src="../js/data.js"></script>
+    <script src="js/owner.js"></script>
+  </body>
 </html>

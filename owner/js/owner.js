@@ -95,6 +95,420 @@
     showToast("Tidak ada notifikasi baru.");
   });
 
+  /* ==========================================================================
+     Central Data Layer Integration for Owner Portal
+     Populates HTML dynamic elements from window.URT_DATA
+     ========================================================================== */
+  function populateOwnerPortalData() {
+    if (typeof window.URT_DATA === "undefined") return;
+    const { owner, technicians, customers, tickets, services } = window.URT_DATA;
+
+    // 1. Dashboard Statistics (beranda-owner.html)
+    const statCards = document.querySelectorAll(".stats-grid .stat-card");
+    if (statCards.length >= 4) {
+      const stats = typeof window.getDashboardStats === "function" ? window.getDashboardStats() : {
+        activeTickets: 28,
+        totalCustomers: 186,
+        activeTechnicians: 8,
+        subscriptionRemainingDays: 328
+      };
+      const v0 = statCards[0].querySelector(".stat-value");
+      if (v0) v0.innerHTML = `<span class="stat-accent stat-accent--blue"></span>${stats.activeTickets}`;
+      const v1 = statCards[1].querySelector(".stat-value");
+      if (v1) v1.innerHTML = `<span class="stat-accent stat-accent--green"></span>${stats.totalCustomers}`;
+      const v2 = statCards[2].querySelector(".stat-value");
+      if (v2) v2.innerHTML = `<span class="stat-accent stat-accent--orange"></span>${stats.activeTechnicians}`;
+      const v3 = statCards[3].querySelector(".stat-value");
+      if (v3) v3.innerHTML = `<span class="stat-accent stat-accent--blue"></span>${stats.subscriptionRemainingDays} hari`;
+    }
+
+    // 1b. Recent tickets in dashboard
+    const activityTableBody = document.querySelector(".activity-panel tbody");
+    if (activityTableBody) {
+      const recentTickets = tickets.slice(0, 3);
+      activityTableBody.innerHTML = recentTickets.map((t) => {
+        const cust = window.getCustomerById ? window.getCustomerById(t.customerId) : null;
+        const tech = window.getTechnicianById ? window.getTechnicianById(t.technicianId) : null;
+        const custName = cust ? cust.name : "Pelanggan";
+        const techName = tech ? tech.name.split(" ").slice(0, 2).join(" ") : "Teknisi";
+        return `
+          <tr>
+            <td><a class="ticket-link" href="detail-tiket.html?id=${t.id}">#${t.id}</a></td>
+            <td><strong>${t.device}</strong></td>
+            <td>${custName}</td>
+            <td>${techName}</td>
+            <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // 2. Tiket Servis Table (tiket-servis.html)
+    const ticketTable = document.getElementById("ticketTable");
+    if (ticketTable) {
+      const tbody = ticketTable.querySelector("tbody");
+      if (tbody) {
+        const rowsHtml = tickets.map((t) => {
+          const cust = window.getCustomerById ? window.getCustomerById(t.customerId) : null;
+          const tech = window.getTechnicianById ? window.getTechnicianById(t.technicianId) : null;
+          const custName = cust ? cust.name : "Pelanggan";
+          const techName = tech ? tech.name.split(" ").slice(0, 2).join(" ") : "Teknisi";
+          const searchContent = `#${t.id.toLowerCase()} ${t.device.toLowerCase()} ${custName.toLowerCase()} ${techName.toLowerCase()} ${t.status.toLowerCase()}`;
+          return `
+            <tr data-ticket-row data-search="${searchContent}" data-status="${t.status.toLowerCase()}" data-month="${t.month || '2026-08'}">
+              <td><strong>#${t.id}</strong></td>
+              <td>${t.device}</td>
+              <td>${custName}</td>
+              <td>${techName}</td>
+              <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
+              <td><a class="detail-action" href="detail-tiket.html?id=${t.id}">Detail</a></td>
+            </tr>
+          `;
+        }).join("");
+
+        tbody.innerHTML = rowsHtml + `<tr id="ticketEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada tiket yang sesuai dengan pencarian atau filter.</td></tr>`;
+      }
+    }
+
+    // 3. Teknisi Table (teknisi.html)
+    const techTable = document.querySelector(".technician-table tbody");
+    if (techTable) {
+      techTable.innerHTML = technicians.map((tech) => {
+        const searchContent = `${tech.name.toLowerCase()} ${tech.username.toLowerCase()} ${tech.specialty.toLowerCase()}`;
+        return `
+          <tr data-technician-row data-search="${searchContent}" data-specialty="${tech.specialties.join(' ')}" data-workload="${tech.workload}" data-status="${tech.status}">
+            <td><strong>${tech.name}</strong></td>
+            <td>${tech.username}</td>
+            <td>${tech.specialty}</td>
+            <td>${tech.activeTickets} tiket</td>
+            <td><span class="status status--success">${tech.status.toUpperCase()}</span></td>
+            <td>
+              <div class="technician-actions">
+                <a href="detail-teknisi.html?id=${tech.slug || tech.id}">Lihat</a>
+                <a href="edit-teknisi.html?id=${tech.slug || tech.id}">Edit</a>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("") + `<tr id="technicianEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada teknisi yang sesuai.</td></tr>`;
+    }
+
+    // 4. Pelanggan Table (pelanggan.html)
+    const custTable = document.querySelector(".resource-table tbody");
+    const isPelangganPage = window.location.pathname.includes("pelanggan.html");
+    if (custTable && isPelangganPage) {
+      custTable.innerHTML = customers.map((c) => {
+        const searchContent = `${c.name.toLowerCase()} ${c.email.toLowerCase()} ${c.phone}`;
+        const activeCount = tickets.filter((t) => t.customerId === c.id && t.status !== "SELESAI").length;
+        const ticketSummary = activeCount > 0 ? `${activeCount} aktif` : `1 selesai`;
+        return `
+          <tr data-customer-row data-search="${searchContent}" data-status="${c.status}">
+            <td><strong>${c.name}</strong></td>
+            <td>${c.email}</td>
+            <td>${c.phone}</td>
+            <td>${ticketSummary}</td>
+            <td>${c.registeredDate}</td>
+            <td>
+              <div class="row-actions">
+                <a href="detail-pelanggan.html?id=${c.slug || c.id}">Lihat</a>
+                <a href="edit-pelanggan.html?id=${c.slug || c.id}">Edit</a>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("") + `<tr id="customerEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada pelanggan yang sesuai.</td></tr>`;
+    }
+
+    // 5. Layanan Table (layanan.html)
+    const isLayananPage = window.location.pathname.includes("layanan.html");
+    if (custTable && isLayananPage) {
+      custTable.innerHTML = services.map((s) => {
+        const searchContent = `${s.name.toLowerCase()} ${s.category.toLowerCase()}`;
+        return `
+          <tr data-service-row data-search="${searchContent}" data-category="${s.categories.join(' ')}" data-status="${s.status}">
+            <td><strong>${s.name}</strong></td>
+            <td>${s.category}</td>
+            <td>${s.priceLabel || window.formatCurrency(s.price)}</td>
+            <td>${s.duration}</td>
+            <td><span class="status status--success">${s.status.toUpperCase()}</span></td>
+            <td>
+              <div class="row-actions">
+                <a href="detail-layanan.html?id=${s.slug || s.id}">Lihat</a>
+                <a href="edit-layanan.html?id=${s.slug || s.id}">Edit</a>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("") + `<tr id="serviceEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada layanan yang sesuai.</td></tr>`;
+    }
+
+    // 6. Detail Tiket (detail-tiket.html)
+    const ticketIdHeading = document.getElementById("ticketIdHeading");
+    if (ticketIdHeading) {
+      const params = new URLSearchParams(window.location.search);
+      const ticketId = params.get("id") || "URT-2026-001";
+      const ticket = window.getTicketById ? window.getTicketById(ticketId) || tickets[0] : tickets[0];
+      const customer = window.getCustomerById ? window.getCustomerById(ticket.customerId) || customers[0] : customers[0];
+      const technician = window.getTechnicianById ? window.getTechnicianById(ticket.technicianId) || technicians[0] : technicians[0];
+
+      ticketIdHeading.textContent = `#${ticket.id}`;
+      const subtitleEl = ticketIdHeading.nextElementSibling;
+      if (subtitleEl) {
+        subtitleEl.textContent = `${ticket.device} • ${customer.name} • Servis Masuk ${ticket.createdAt.split(',')[0]}`;
+      }
+
+      const badge = document.getElementById("ticketStatusBadge");
+      if (badge) {
+        badge.className = `status status--${ticket.statusClass || 'warning'}`;
+        badge.textContent = ticket.statusLabel.toUpperCase();
+      }
+
+      // Meta list: Card 1
+      const metaList1 = document.querySelector(".detail-card .meta-list");
+      if (metaList1) {
+        metaList1.innerHTML = `
+          <dt>Nomor Tiket</dt><dd>#${ticket.id}</dd>
+          <dt>Nama Perangkat</dt><dd>${ticket.deviceDetail || ticket.device}</dd>
+          <dt>Nomor Seri</dt><dd>${ticket.serialNumber || 'SN-' + ticket.id}</dd>
+          <dt>Tanggal Masuk</dt><dd>${ticket.createdAt}</dd>
+          <dt>Estimasi Selesai</dt><dd>${ticket.estimatedCompletion}</dd>
+          <dt>Keluhan Awal</dt><dd style="font-weight: 500; line-height: 1.5;">${ticket.issue}</dd>
+        `;
+      }
+
+      // Diagnosis notes & cost box: Card 2
+      const card2 = document.querySelectorAll(".ticket-detail-grid > div:first-child .detail-card")[1];
+      if (card2) {
+        const diagNote = card2.querySelector("p");
+        if (diagNote) {
+          diagNote.innerHTML = `<strong>Catatan Teknisi:</strong> ${ticket.diagnosis}`;
+        }
+        const costBox = card2.querySelector(".cost-box");
+        if (costBox) {
+          const breakdown = ticket.costBreakdown && ticket.costBreakdown.length
+            ? ticket.costBreakdown
+            : [{ item: "Jasa Perbaikan & Pemeriksaan", amount: ticket.estimatedCost }];
+          
+          const breakdownHtml = breakdown.map((item) => `
+            <div class="cost-row">
+              <span>${item.item}</span>
+              <strong>${window.formatCurrency(item.amount)}</strong>
+            </div>
+          `).join("");
+
+          costBox.innerHTML = breakdownHtml + `
+            <div class="cost-row cost-row--total">
+              <span>Total Estimasi Biaya Servis</span>
+              <span>${window.formatCurrency(ticket.estimatedCost)}</span>
+            </div>
+          `;
+        }
+      }
+
+      // Technician Select dropdown: Card 3
+      const techSelect = document.getElementById("technicianSelect");
+      if (techSelect) {
+        techSelect.innerHTML = technicians.map((t) => {
+          const isSelected = t.id === ticket.technicianId ? "selected" : "";
+          return `<option value="${t.slug}" ${isSelected}>${t.name} (${t.specialty} • ${t.activeTickets} Tiket)</option>`;
+        }).join("");
+      }
+
+      // Customer Card: Card 4
+      const custCard = document.querySelectorAll(".ticket-detail-grid > div:last-child .detail-card")[1];
+      if (custCard) {
+        const link = custCard.querySelector(".detail-action");
+        if (link) link.href = `detail-pelanggan.html?id=${customer.slug || customer.id}`;
+
+        const dl = custCard.querySelector(".meta-list");
+        if (dl) {
+          dl.innerHTML = `
+            <dt>Nama Lengkap</dt><dd>${customer.name}</dd>
+            <dt>No. WhatsApp</dt><dd>${customer.phone}</dd>
+            <dt>Email</dt><dd>${customer.email}</dd>
+            <dt>Alamat</dt><dd>${customer.address}</dd>
+          `;
+        }
+      }
+
+      // Timeline Steps: Card 5
+      const timelineOl = document.querySelector(".timeline-steps");
+      if (timelineOl && ticket.timeline) {
+        timelineOl.innerHTML = ticket.timeline.map((step) => {
+          const isDone = step.done;
+          const isCurrent = step.current;
+          const stepClass = isDone ? "is-done" : (isCurrent ? "is-current" : "");
+          const marker = isDone ? "&#10003;" : (isCurrent ? "&bull;" : "&cir;");
+          return `
+            <li class="timeline-step ${stepClass}">
+              <span class="timeline-step__marker" aria-hidden="true">${marker}</span>
+              <div class="timeline-step__content">
+                <strong class="timeline-step__title">${step.title}</strong>
+                <div class="timeline-step__meta">
+                  <span class="timeline-step__time">${step.time}</span>
+                  ${step.actor ? `<span class="timeline-step__actor">&bull; ${step.actor}</span>` : ""}
+                </div>
+              </div>
+            </li>
+          `;
+        }).join("");
+      }
+    }
+
+    // 7. Detail Teknisi (detail-teknisi.html)
+    const techProfileCard = document.querySelector(".tech-profile-card");
+    if (techProfileCard && window.location.pathname.includes("detail-teknisi.html")) {
+      const params = new URLSearchParams(window.location.search);
+      const techId = params.get("id") || "TECH-001";
+      const tech = window.getTechnicianById ? window.getTechnicianById(techId) || technicians[0] : technicians[0];
+
+      const avatar = techProfileCard.querySelector(".tech-header-row div > div:first-child");
+      if (avatar) avatar.textContent = tech.initials || "TK";
+
+      const h2 = techProfileCard.querySelector(".tech-header-row h2");
+      if (h2) h2.textContent = tech.name;
+
+      const sub = techProfileCard.querySelector(".tech-header-row h2 + span");
+      if (sub) {
+        sub.innerHTML = `Username: <strong>${tech.username}</strong> &bull; Spesialis: ${tech.specialty}`;
+      }
+
+      const dl = techProfileCard.querySelector(".tech-meta-grid");
+      if (dl) {
+        dl.innerHTML = `
+          <div><dt>Email</dt><dd>${tech.email}</dd></div>
+          <div><dt>Nomor Telepon</dt><dd>${tech.phone}</dd></div>
+          <div><dt>Beban Tiket Aktif</dt><dd class="stat-badge-num">${tech.activeTickets} <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">tiket</span></dd></div>
+          <div><dt>Total Tiket Selesai</dt><dd class="stat-badge-num" style="color: var(--success);">${tech.completedTickets} <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">unit</span></dd></div>
+        `;
+      }
+
+      // Assigned tickets table
+      const techTicketsTbody = document.querySelector(".data-table tbody");
+      if (techTicketsTbody) {
+        const assignedTickets = window.getTicketsByTechnicianId ? window.getTicketsByTechnicianId(tech.id) : [];
+        if (assignedTickets.length) {
+          techTicketsTbody.innerHTML = assignedTickets.map((t) => {
+            const c = window.getCustomerById ? window.getCustomerById(t.customerId) : null;
+            return `
+              <tr>
+                <td><strong>#${t.id}</strong></td>
+                <td>${t.device}</td>
+                <td>${c ? c.name : 'Pelanggan'}</td>
+                <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
+                <td>${t.estimatedCompletion}</td>
+                <td><a class="detail-action" href="detail-tiket.html?id=${t.id}">Kelola</a></td>
+              </tr>
+            `;
+          }).join("");
+        } else {
+          techTicketsTbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Belum ada tiket yang ditugaskan saat ini.</td></tr>`;
+        }
+      }
+    }
+
+    // 8. Detail Pelanggan (detail-pelanggan.html)
+    const custProfileCard = document.querySelector(".cust-profile-card");
+    if (custProfileCard && window.location.pathname.includes("detail-pelanggan.html")) {
+      const params = new URLSearchParams(window.location.search);
+      const custId = params.get("id") || "CUS-001";
+      const cust = window.getCustomerById ? window.getCustomerById(custId) || customers[0] : customers[0];
+
+      const avatar = custProfileCard.querySelector(".cust-header-row div > div:first-child");
+      if (avatar) avatar.textContent = cust.initials || "PL";
+
+      const h2 = custProfileCard.querySelector(".cust-header-row h2");
+      if (h2) h2.textContent = cust.name;
+
+      const sub = custProfileCard.querySelector(".cust-header-row h2 + span");
+      if (sub) {
+        sub.innerHTML = `Member Sejak: <strong>${cust.memberSince}</strong> &bull; Total Unit Diservis: <strong>${cust.totalDevices} Perangkat</strong>`;
+      }
+
+      const dl = custProfileCard.querySelector(".cust-meta-grid");
+      if (dl) {
+        dl.innerHTML = `
+          <div><dt>Nomor WhatsApp</dt><dd>${cust.phone}</dd></div>
+          <div><dt>Email</dt><dd>${cust.email}</dd></div>
+          <div><dt>Alamat Domisili</dt><dd>${cust.address}</dd></div>
+          <div><dt>Total Belanja Servis</dt><dd class="stat-badge-num">${window.formatCurrency(cust.totalSpent)}</dd></div>
+        `;
+      }
+
+      // Customer Tickets History table
+      const custTicketsTbody = document.querySelector(".data-table tbody");
+      if (custTicketsTbody) {
+        const custTickets = window.getTicketsByCustomerId ? window.getTicketsByCustomerId(cust.id) : [];
+        if (custTickets.length) {
+          custTicketsTbody.innerHTML = custTickets.map((t) => {
+            const tech = window.getTechnicianById ? window.getTechnicianById(t.technicianId) : null;
+            return `
+              <tr>
+                <td><strong>#${t.id}</strong></td>
+                <td>${t.device}</td>
+                <td>${t.actionNeeded || t.issue}</td>
+                <td>${tech ? tech.name : 'Teknisi'}</td>
+                <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
+                <td>${window.formatCurrency(t.estimatedCost)}</td>
+                <td><a class="detail-action" href="detail-tiket.html?id=${t.id}">Lihat</a></td>
+              </tr>
+            `;
+          }).join("");
+        } else {
+          custTicketsTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Belum ada riwayat tiket untuk pelanggan ini.</td></tr>`;
+        }
+      }
+    }
+
+    // 9. Detail Layanan (detail-layanan.html)
+    const svcDetailCard = document.querySelector(".service-detail-card");
+    if (svcDetailCard && window.location.pathname.includes("detail-layanan.html")) {
+      const params = new URLSearchParams(window.location.search);
+      const svcId = params.get("id") || "deep-cleaning-mx4";
+      const svc = window.getServiceById ? window.getServiceById(svcId) || services[1] : services[1];
+
+      const headerDiv = svcDetailCard.querySelector(".service-header-row > div");
+      if (headerDiv) {
+        headerDiv.innerHTML = `
+          <span style="font-size: 12px; color: var(--primary); font-weight: 700; text-transform: uppercase;">${svc.category}</span>
+          <h2 style="font-size: 22px; margin: 4px 0; color: var(--text);">${svc.name}</h2>
+          <span style="color: var(--text-muted); font-size: 14px;">Estimasi Pengerjaan: <strong>${svc.duration}</strong></span>
+        `;
+      }
+
+      const dl = svcDetailCard.querySelector(".service-meta-grid");
+      if (dl) {
+        dl.innerHTML = `
+          <div><dt>Harga Dasar</dt><dd class="stat-badge-num">${svc.priceLabel || window.formatCurrency(svc.price)}</dd></div>
+          <div><dt>Kategori</dt><dd>${svc.category}</dd></div>
+          <div><dt>Total Unit Selesai</dt><dd class="stat-badge-num" style="color: var(--success);">18 <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">unit</span></dd></div>
+          <div><dt>Garansi Layanan</dt><dd>30 Hari (Garansi Performa)</dd></div>
+        `;
+      }
+
+      const descP = svcDetailCard.querySelector("p");
+      if (descP && svc.description) {
+        descP.textContent = svc.description;
+      }
+    }
+
+    // 10. Profil Owner (profil-owner.html)
+    const profileForm = document.getElementById("profileForm");
+    if (profileForm && window.location.pathname.includes("profil-owner.html")) {
+      const nameInput = profileForm.elements.namedItem("profileName");
+      if (nameInput && !nameInput.value) nameInput.value = owner.name;
+      const emailInput = profileForm.elements.namedItem("profileEmail");
+      if (emailInput && !emailInput.value) emailInput.value = owner.email;
+      const phoneInput = profileForm.elements.namedItem("profilePhone");
+      if (phoneInput && !phoneInput.value) phoneInput.value = owner.phone;
+      const usernameInput = profileForm.elements.namedItem("profileUsername");
+      if (usernameInput && !usernameInput.value) usernameInput.value = owner.username;
+    }
+  }
+
+  // Populate dynamic data across owner pages
+  populateOwnerPortalData();
+
   // ---------------- Tiket Servis ----------------
   const ticketRows = Array.from(document.querySelectorAll("[data-ticket-row]"));
   if (ticketRows.length) {
@@ -518,4 +932,161 @@ Pemilik: Andi Ramadhan`;
       });
     }
   }
+
+  /* ==========================================================================
+     Owner Subpage Form & Action Handlers
+     ========================================================================== */
+  function initOwnerSubpageForms() {
+    // 1. Assign technician & print in detail-tiket.html
+    const assignForm = document.getElementById("assignTechnicianForm");
+    if (assignForm) {
+      assignForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const select = document.getElementById("technicianSelect");
+        const techName = select?.options[select.selectedIndex]?.text.split("(")[0].trim() || "Teknisi";
+        showToast(`Penugasan tiket berhasil diperbarui ke ${techName}.`);
+      });
+    }
+
+    const btnPrint = document.getElementById("btnPrintStruk");
+    if (btnPrint) {
+      btnPrint.addEventListener("click", () => {
+        window.print();
+      });
+    }
+
+    // 2. Add technician
+    const addTechForm = document.getElementById("addTechnicianForm");
+    if (addTechForm) {
+      addTechForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("techName")?.value.trim() || "baru";
+        showToast(`Teknisi ${name} berhasil ditambahkan ke tim!`);
+        setTimeout(() => {
+          window.location.href = "teknisi.html";
+        }, 1200);
+      });
+    }
+
+    // 3. Edit technician
+    const editTechForm = document.getElementById("editTechnicianForm");
+    if (editTechForm) {
+      editTechForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("techName")?.value.trim() || "";
+        showToast(`Data teknisi ${name} berhasil diperbarui!`);
+        setTimeout(() => {
+          window.location.href = "teknisi.html";
+        }, 1200);
+      });
+    }
+
+    // 4. Add customer
+    const addCustForm = document.getElementById("addCustomerForm");
+    if (addCustForm) {
+      addCustForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("custName")?.value.trim() || "baru";
+        showToast(`Pelanggan ${name} berhasil ditambahkan!`);
+        setTimeout(() => {
+          window.location.href = "pelanggan.html";
+        }, 1200);
+      });
+    }
+
+    // 5. Edit customer
+    const editCustForm = document.getElementById("editCustomerForm");
+    if (editCustForm) {
+      editCustForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("custName")?.value.trim() || "";
+        showToast(`Data pelanggan ${name} berhasil diperbarui!`);
+        setTimeout(() => {
+          window.location.href = "pelanggan.html";
+        }, 1200);
+      });
+    }
+
+    // 6. Add service
+    const addSvcForm = document.getElementById("addServiceForm");
+    if (addSvcForm) {
+      addSvcForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("serviceName")?.value.trim() || "baru";
+        showToast(`Layanan ${name} berhasil ditambahkan!`);
+        setTimeout(() => {
+          window.location.href = "layanan.html";
+        }, 1200);
+      });
+    }
+
+    // 7. Edit service
+    const editSvcForm = document.getElementById("editServiceForm");
+    if (editSvcForm) {
+      editSvcForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("serviceName")?.value.trim() || "";
+        showToast(`Layanan ${name} berhasil diperbarui!`);
+        setTimeout(() => {
+          window.location.href = "layanan.html";
+        }, 1200);
+      });
+    }
+
+    // 8. Import customer
+    const fileInput = document.getElementById("fileInput");
+    const selectedFileName = document.getElementById("selectedFileName");
+    fileInput?.addEventListener("change", () => {
+      if (fileInput.files.length && selectedFileName) {
+        selectedFileName.textContent = `File terpilih: ${fileInput.files[0].name}`;
+      }
+    });
+
+    document.getElementById("btnDownloadTemplate")?.addEventListener("click", () => {
+      const csvHeader = "nama_lengkap,nomor_telepon,email,alamat,catatan\nNino Rachimas,081234567890,nino.rachimas@email.com,Jakarta Pusat,Customer VIP\n";
+      const blob = new Blob([csvHeader], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "template_pelanggan_urt.csv";
+      a.click();
+    });
+
+    const btnImport = document.getElementById("btnStartImport");
+    if (btnImport) {
+      btnImport.addEventListener("click", () => {
+        showToast("Memproses data pelanggan... 12 kontak baru berhasil diimpor!");
+        setTimeout(() => {
+          window.location.href = "pelanggan.html";
+        }, 1400);
+      });
+    }
+
+    // 9. Renew subscription plan cards
+    document.querySelectorAll('input[name="plan"]').forEach((radio) => {
+      radio.addEventListener("change", () => {
+        document.querySelectorAll(".plan-radio-card").forEach((c) => c.classList.remove("is-selected"));
+        radio.closest(".plan-radio-card")?.classList.add("is-selected");
+        const price = radio.value === "annual" ? "Rp999.000" : "Rp99.000";
+        const sumPrice = document.getElementById("summaryPrice");
+        const sumTotal = document.getElementById("summaryTotal");
+        if (sumPrice) sumPrice.textContent = price;
+        if (sumTotal) sumTotal.textContent = price;
+      });
+    });
+
+    const renewForm = document.getElementById("renewForm");
+    if (renewForm) {
+      renewForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        showToast("Membuat tagihan perpanjangan... Mengalihkan ke pembayaran.");
+        setTimeout(() => {
+          window.location.href = "pembayaran-berhasil.html";
+        }, 1200);
+      });
+    }
+  }
+
+  // Initialize subpage forms if present
+  initOwnerSubpageForms();
 })();

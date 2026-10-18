@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initRegistrationForm();
   initSubscriptionPage();
   initLoginForm();
+  initCustomerRegisterForm();
 });
 
 /**
@@ -232,3 +233,87 @@ function initLoginForm() {
     }
   });
 }
+
+/**
+ * Customer Registration Form handler (registrasi.html)
+ */
+function initCustomerRegisterForm() {
+  const form = document.getElementById("customerRegisterForm");
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let isValid = true;
+
+    ["regName", "regEmail", "regPhone", "regPassword"].forEach((id) => {
+      const errEl = document.getElementById(id + "Error");
+      if (errEl) errEl.textContent = "";
+      const inp = document.getElementById(id);
+      if (inp) inp.classList.remove("is-invalid");
+    });
+
+    const name = document.getElementById("regName")?.value.trim();
+    const email = document.getElementById("regEmail")?.value.trim();
+    const phone = document.getElementById("regPhone")?.value.trim();
+    const password = document.getElementById("regPassword")?.value;
+
+    if (!name) {
+      const err = document.getElementById("regNameError");
+      if (err) err.textContent = "Nama lengkap wajib diisi.";
+      document.getElementById("regName")?.classList.add("is-invalid");
+      isValid = false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      const err = document.getElementById("regEmailError");
+      if (err) err.textContent = "Email wajib diisi.";
+      document.getElementById("regEmail")?.classList.add("is-invalid");
+      isValid = false;
+    } else if (!emailRegex.test(email)) {
+      const err = document.getElementById("regEmailError");
+      if (err) err.textContent = "Format email tidak valid.";
+      document.getElementById("regEmail")?.classList.add("is-invalid");
+      isValid = false;
+    }
+
+    if (!phone) {
+      const err = document.getElementById("regPhoneError");
+      if (err) err.textContent = "Nomor WhatsApp wajib diisi.";
+      document.getElementById("regPhone")?.classList.add("is-invalid");
+      isValid = false;
+    } else if (phone.replace(/\D/g, "").length < 9) {
+      const err = document.getElementById("regPhoneError");
+      if (err) err.textContent = "Nomor WhatsApp minimal 9 digit.";
+      document.getElementById("regPhone")?.classList.add("is-invalid");
+      isValid = false;
+    }
+
+    if (!password) {
+      const err = document.getElementById("regPasswordError");
+      if (err) err.textContent = "Kata sandi wajib diisi.";
+      document.getElementById("regPassword")?.classList.add("is-invalid");
+      isValid = false;
+    } else if (password.length < 6) {
+      const err = document.getElementById("regPasswordError");
+      if (err) err.textContent = "Kata sandi minimal 6 karakter.";
+      document.getElementById("regPassword")?.classList.add("is-invalid");
+      isValid = false;
+    }
+
+    if (isValid) {
+      const toast = document.getElementById("toastSuccess");
+      if (toast) toast.style.display = "flex";
+      setTimeout(() => {
+        window.location.href = "pelanggan/beranda-pelanggan.html";
+      }, 800);
+    }
+  });
+}
+
+// Print receipt handler
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelector(".btn-print")?.addEventListener("click", () => {
+    window.print();
+  });
+});

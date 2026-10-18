@@ -5,43 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tambah Teknisi Baru — Portal Pemilik — Your Service Tracker</title>
   <link rel="stylesheet" href="css/owner.css">
-  <style>
-    .form-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6);
-      box-shadow: var(--shadow-sm);
-      max-width: 800px;
-    }
-    .form-grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-    }
-    @media (max-width: 640px) {
-      .form-grid-2 {
-        grid-template-columns: 1fr;
-      }
-    }
-    .checkbox-group {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: var(--space-2) var(--space-4);
-      margin-top: var(--space-2);
-      padding: var(--space-3);
-      background: var(--background);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-    }
-    .checkbox-group label {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      font-size: var(--text-body-sm);
-      cursor: pointer;
-    }
-  </style>
 </head>
 <body>
   <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
@@ -191,7 +154,7 @@
           </label>
         </div>
 
-        <div style="display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-6);">
+        <div class="form-actions">
           <a class="secondary-button" href="teknisi.html">Batal</a>
           <button class="primary-button" type="submit">Simpan &amp; Daftarkan Teknisi</button>
         </div>
@@ -201,20 +164,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="../js/data.js"></script>
   <script src="js/owner.js"></script>
-  <script>
-    document.getElementById('addTechnicianForm')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('techName').value.trim();
-      const toast = document.getElementById('toast');
-      if (toast) {
-        toast.textContent = `Teknisi ${name} berhasil ditambahkan ke tim!`;
-        toast.classList.add('is-visible');
-        setTimeout(() => {
-          window.location.href = 'teknisi.html';
-        }, 1200);
-      }
-    });
-  </script>
 </body>
 </html>
