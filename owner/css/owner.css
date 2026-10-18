@@ -37,6 +37,17 @@
   --status-danger: var(--red-600);
   --status-info: var(--purple-600);
 
+  /* Compatibility & card tokens */
+  --surface: #ffffff;
+  --border: var(--slate-200);
+  --border-light: #f1f5f9;
+  --background: var(--slate-50);
+  --primary: var(--blue-600);
+  --text: var(--navy-950);
+  --text-h3: 18px;
+  --text-body-base: 14px;
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+
   /* Typography tokens — 100% unified with Teknisi, Pelanggan, and Landing */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --text-display: 32px;
@@ -2867,12 +2878,12 @@ tbody td strong,
 .service-detail-card,
 .renew-card,
 .import-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: var(--space-6);
+  background: #ffffff;
+  border: 1px solid var(--border-default, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-6, 24px);
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  margin-bottom: var(--space-6, 24px);
 }
 .detail-card__header,
 .tech-header-row,
@@ -2940,11 +2951,11 @@ tbody td strong,
 }
 
 .form-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-sm);
+  background: #ffffff;
+  border: 1px solid var(--border-default, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-6, 24px);
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
   max-width: 800px;
 }
 .form-grid-2 {
