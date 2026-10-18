@@ -1,7 +1,8 @@
 (() => {
   "use strict";
 
-  document.addEventListener("DOMContentLoaded", () => {
+  function setupTeknisiSidebar() {
+    // Target the main sidebar header
     const header = document.querySelector("body > header");
     if (!header) return;
 
@@ -12,6 +13,7 @@
       toggleBtn = document.createElement("button");
       toggleBtn.type = "button";
       toggleBtn.className = "sidebar-toggle";
+      toggleBtn.id = "teknisiSidebarToggle";
       toggleBtn.setAttribute("aria-label", "Menu navigasi");
       toggleBtn.setAttribute("aria-expanded", "false");
       toggleBtn.innerHTML = `
@@ -30,8 +32,11 @@
       }
     }
 
-    if (toggleBtn) {
+    if (toggleBtn && !toggleBtn.dataset.wired) {
+      toggleBtn.dataset.wired = "true";
+
       toggleBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         e.stopPropagation();
         const isOpen = header.classList.toggle("is-open");
         toggleBtn.setAttribute("aria-expanded", String(isOpen));
@@ -62,5 +67,11 @@
         });
       });
     }
-  });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupTeknisiSidebar);
+  } else {
+    setupTeknisiSidebar();
+  }
 })();

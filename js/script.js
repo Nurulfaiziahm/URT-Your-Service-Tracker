@@ -1,7 +1,7 @@
 /**
  * URT — Your Service Tracker Landing Page Script
  * Responsible for UI interactions:
- * 1. Responsive Mobile Navigation
+ * 1. Responsive Mobile Navigation (with Animated Hamburger-to-X)
  * 2. Persona Showcase Tab Switching
  * 3. Monthly / Annual Pricing Toggle
  * 4. Tracking Sample Input Helper
@@ -21,7 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     navToggle.addEventListener('click', () => {
       const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
       navToggle.setAttribute('aria-expanded', String(!isExpanded));
+
+      // Toggle dropdown and hamburger-to-X animation
       primaryNav.classList.toggle('is-open');
+      navToggle.classList.toggle('is-active');
 
       if (!isExpanded) {
         navToggle.setAttribute('aria-label', 'Tutup menu navigasi');
@@ -30,12 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Close mobile nav when clicking a navigation link
+    // Close mobile nav when clicking any nav link
     const navLinks = primaryNav.querySelectorAll('.site-nav__link');
     navLinks.forEach((link) => {
       link.addEventListener('click', () => {
         if (primaryNav.classList.contains('is-open')) {
           primaryNav.classList.remove('is-open');
+          navToggle.classList.remove('is-active');
           navToggle.setAttribute('aria-expanded', 'false');
           navToggle.setAttribute('aria-label', 'Buka menu navigasi');
         }
