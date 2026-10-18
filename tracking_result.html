@@ -1,57 +1,396 @@
 <!doctype html>
 <html lang="id">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hasil Pelacakan - URT Device Tracker</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hasil Pelacakan Servis — URT Your Service Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      .tracking-page-wrap {
+        min-height: 100vh;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+      }
+      .tracking-nav {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .tracking-main {
+        flex: 1;
+        max-width: 860px;
+        width: 100%;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+      .result-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
+        padding: 32px;
+        margin-bottom: 24px;
+      }
+      .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 20px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .ticket-id {
+        font-family: monospace;
+        font-size: 22px;
+        font-weight: 800;
+        color: #1d4ed8;
+      }
+      .status-pill-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        background: #fef3c7;
+        color: #b45309;
+      }
+      .status-dot-pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #d97706;
+      }
+      /* Stepper */
+      .tracker-stepper {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 36px 0;
+      }
+      .tracker-stepper::before {
+        content: "";
+        position: absolute;
+        top: 18px;
+        left: 20px;
+        right: 20px;
+        height: 3px;
+        background: #e2e8f0;
+        z-index: 1;
+      }
+      .tracker-step {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        flex: 1;
+      }
+      .step-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 3px solid #cbd5e1;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-weight: 700;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      .tracker-step.is-done .step-circle {
+        background: #16a34a;
+        border-color: #16a34a;
+        color: #ffffff;
+      }
+      .tracker-step.is-active .step-circle {
+        background: #1d4ed8;
+        border-color: #93c5fd;
+        color: #ffffff;
+        box-shadow: 0 0 0 4px #dbeafe;
+      }
+      .step-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+      }
+      .tracker-step.is-active .step-label {
+        color: #1d4ed8;
+        font-weight: 700;
+      }
+      .tracker-step.is-done .step-label {
+        color: #0f172a;
+      }
+      /* Details Grid */
+      .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+      }
+      .detail-cell dt {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      .detail-cell dd {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+      }
+      .action-banner {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .search-again-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+      .search-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 14px;
+      }
+      .search-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
+      @media (max-width: 640px) {
+        .tracking-nav {
+          padding: 12px 16px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        .tracking-nav > div {
+          width: 100%;
+          justify-content: space-between;
+        }
+        .tracking-main {
+          padding: 0 12px;
+          margin: 16px auto 36px;
+        }
+        .result-card {
+          padding: 20px 16px;
+          border-radius: 12px;
+        }
+        .tracker-stepper {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: 8px;
+          margin: 20px 0;
+        }
+        .tracker-stepper::before {
+          display: none;
+        }
+        .tracker-step {
+          flex: 0 0 auto;
+          width: 76px;
+        }
+        .step-circle {
+          width: 32px;
+          height: 32px;
+          font-size: 12px;
+        }
+        .step-label {
+          font-size: 10px;
+        }
+        .details-grid {
+          grid-template-columns: 1fr;
+          padding: 14px;
+          gap: 12px;
+        }
+        .action-banner {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 14px;
+          padding: 16px;
+        }
+        .action-banner .btn {
+          width: 100%;
+          min-height: 44px;
+          text-align: center;
+          justify-content: center;
+        }
+        .search-again-bar {
+          flex-direction: column;
+        }
+        .search-again-bar .btn {
+          min-height: 44px;
+        }
+      }
+    </style>
   </head>
-  <body class="page-portal page-tracking">
-    <header>
-      <a href="index.html">
-        <img src="image/logo-urt.svg" alt="URT — Your Service Tracker" height="40">
+  <body class="tracking-page-wrap">
+    <nav class="tracking-nav">
+      <a href="index.html" style="display: inline-block; line-height: 0;">
+        <img src="image/logo-urt.svg" alt="URT Your Service Tracker" height="38" />
       </a>
-      <p>Status Pelacakan Servis Perangkat Anda</p>
-      <hr>
-      <nav>
-        <a href="index.html">Kembali ke Beranda</a>
-      </nav>
-    </header>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="index.html" style="font-size: 14px; color: #64748b; text-decoration: none; font-weight: 500;">&larr; Kembali ke Beranda</a>
+        <a href="masuk.html" class="btn btn--primary btn--sm" style="padding: 8px 16px; font-size: 13px;">Masuk Portal</a>
+      </div>
+    </nav>
 
-    <main>
-      <section>
-        <h2>Hasil Pelacakan</h2>
-        <p>Berikut adalah status dari tiket yang Anda cari.</p>
+    <main class="tracking-main">
+      <!-- Search Again Bar -->
+      <form action="tracking_result.html" method="get" class="search-again-bar">
+        <input
+          type="text"
+          name="ticket"
+          id="searchTicketInput"
+          class="search-input"
+          placeholder="Lacak nomor tiket lain (contoh: URT-2026-001)"
+          required
+        />
+        <button type="submit" class="btn btn--primary" style="padding: 12px 20px; font-size: 14px;">Lacak</button>
+      </form>
 
-        <table>
-          <tr>
-            <td><strong>Nomor Tiket</strong></td>
-            <td>#URT-2026-123456</td>
-          </tr>
-          <tr>
-            <td><strong>Status</strong></td>
-            <td><strong>Pemeriksaan / Menunggu Persetujuan</strong></td>
-          </tr>
-          <tr>
-            <td><strong>Estimasi Selesai</strong></td>
-            <td>3 Hari Lagi</td>
-          </tr>
-        </table>
+      <!-- Main Result Card -->
+      <section class="result-card" aria-labelledby="trackingResultHeading">
+        <div class="result-header">
+          <div>
+            <div style="font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 4px;">NOMOR TIKET SERVIS</div>
+            <div class="ticket-id" id="displayTicketId">#URT-2026-001</div>
+          </div>
+          <div>
+            <span class="status-pill-badge" id="displayStatusBadge">
+              <span class="status-dot-pulse"></span>
+              <span id="displayStatusText">Menunggu Persetujuan Biaya</span>
+            </span>
+          </div>
+        </div>
 
-        <br>
-        <p>
-          Untuk melihat detail lebih lengkap dan menyetujui biaya servis,
-          silakan <a href="masuk.html">Masuk ke Portal Pelanggan</a>.
-        </p>
+        <!-- Stepper -->
+        <div class="tracker-stepper">
+          <div class="tracker-step is-done">
+            <div class="step-circle">&#10003;</div>
+            <div class="step-label">Pendaftaran</div>
+          </div>
+          <div class="tracker-step is-done">
+            <div class="step-circle">&#10003;</div>
+            <div class="step-label">Diagnosis</div>
+          </div>
+          <div class="tracker-step is-active">
+            <div class="step-circle">3</div>
+            <div class="step-label">Persetujuan</div>
+          </div>
+          <div class="tracker-step">
+            <div class="step-circle">4</div>
+            <div class="step-label">Pengerjaan</div>
+          </div>
+          <div class="tracker-step">
+            <div class="step-circle">5</div>
+            <div class="step-label">Siap Diambil</div>
+          </div>
+        </div>
+
+        <!-- Details Grid -->
+        <dl class="details-grid">
+          <div class="detail-cell">
+            <dt>Perangkat</dt>
+            <dd id="displayDevice">ASUS VivoBook 14</dd>
+          </div>
+          <div class="detail-cell">
+            <dt>Pemilik / Pelanggan</dt>
+            <dd id="displayCustomer">Nino Rachimas</dd>
+          </div>
+          <div class="detail-cell">
+            <dt>Teknisi Penanggung Jawab</dt>
+            <dd id="displayTechnician">Sofia Malvalena Adam</dd>
+          </div>
+          <div class="detail-cell">
+            <dt>Tempat Servis</dt>
+            <dd>ServisKita (iFix Lab)</dd>
+          </div>
+          <div class="detail-cell">
+            <dt>Temuan Masalah</dt>
+            <dd>Thermal Paste Kering & Debu Kipas</dd>
+          </div>
+          <div class="detail-cell">
+            <dt>Estimasi Biaya</dt>
+            <dd style="color: #1d4ed8; font-size: 16px;">Rp250.000</dd>
+          </div>
+        </dl>
+
+        <!-- Action / Approval Callout -->
+        <div class="action-banner">
+          <div>
+            <h2 style="font-size: 15px; font-weight: 700; color: #1e40af; margin-bottom: 4px;">Tindakan Perlu Persetujuan Anda</h2>
+            <p style="font-size: 13px; color: #3b82f6; margin: 0;">Teknisi telah menyelesaikan diagnosis dan memerlukan persetujuan estimasi Rp250.000 sebelum pekerjaan dimulai.</p>
+          </div>
+          <a href="pelanggan/persetujuan-servis.html" class="btn btn--primary" style="padding: 10px 20px; font-size: 14px; white-space: nowrap;">
+            Tinjau & Setujui Biaya &rarr;
+          </a>
+        </div>
       </section>
+
+      <!-- Back links -->
+      <div style="text-align: center; font-size: 13px; color: #64748b;">
+        Punya akun pelanggan? <a href="pelanggan/beranda-pelanggan.html" style="color: #2563eb; font-weight: 600;">Buka Dashboard Pelanggan</a>
+      </div>
     </main>
 
-    <footer>
-      <hr>
-      <p>URT — Your Device Tracker | Kelompok 2</p>
+    <footer style="text-align: center; padding: 24px; font-size: 13px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #ffffff;">
+      URT — Your Service Tracker | Kelompok 2
     </footer>
+
+    <script>
+      // Parse URL search parameters for ticket query
+      const urlParams = new URLSearchParams(window.location.search);
+      const ticketQuery = urlParams.get('ticket');
+
+      if (ticketQuery) {
+        const cleanQuery = ticketQuery.trim().toUpperCase();
+        const displayTicket = cleanQuery.startsWith('#') ? cleanQuery : '#' + cleanQuery;
+        document.getElementById('displayTicketId').textContent = displayTicket;
+        document.getElementById('searchTicketInput').value = displayTicket;
+
+        // If completed ticket searched
+        if (cleanQuery.includes('0004') || cleanQuery.includes('SELESAI')) {
+          document.getElementById('displayDevice').textContent = 'Lenovo IdeaPad 3';
+          document.getElementById('displayStatusText').textContent = 'Servis Selesai & Diambil';
+          document.getElementById('displayStatusBadge').style.background = '#dcfce7';
+          document.getElementById('displayStatusBadge').style.color = '#15803d';
+          const steps = document.querySelectorAll('.tracker-step');
+          steps.forEach(s => {
+            s.classList.add('is-done');
+            s.classList.remove('is-active');
+            s.querySelector('.step-circle').textContent = '✓';
+          });
+        }
+      }
+    </script>
   </body>
 </html>

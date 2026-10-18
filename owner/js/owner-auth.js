@@ -228,8 +228,7 @@ function initLoginForm() {
     }
 
     if (valid) {
-      // PROTOTYPE ONLY
-      alert("Login berhasil (Prototipe)");
+      window.location.href = "beranda-owner.html";
     }
   });
 }

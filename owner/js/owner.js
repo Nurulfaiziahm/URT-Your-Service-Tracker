@@ -464,8 +464,58 @@ Pemilik: Andi Ramadhan`;
     });
   }
 
-  // Pagination sederhana yang memang hanya 1 halaman pada desain saat ini
-  document.querySelectorAll(".pagination-button").forEach((button) => {
-    button.addEventListener("click", () => showToast("Halaman 1 sedang ditampilkan."));
-  });
+  // Mobile Hamburger Navigation Toggle
+  const sidebar = document.querySelector(".sidebar");
+  if (sidebar) {
+    let toggleBtn = sidebar.querySelector(".sidebar-toggle");
+    const brand = sidebar.querySelector(".brand");
+
+    // Automatically inject hamburger button if not present in markup
+    if (!toggleBtn && brand) {
+      toggleBtn = document.createElement("button");
+      toggleBtn.type = "button";
+      toggleBtn.className = "sidebar-toggle";
+      toggleBtn.setAttribute("aria-label", "Menu navigasi");
+      toggleBtn.setAttribute("aria-expanded", "false");
+      toggleBtn.innerHTML = `
+        <svg class="icon-hamburger" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg class="icon-close" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      `;
+      brand.appendChild(toggleBtn);
+    }
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = sidebar.classList.toggle("is-open");
+        toggleBtn.setAttribute("aria-expanded", String(isOpen));
+      });
+
+      document.addEventListener("click", (e) => {
+        if (sidebar.classList.contains("is-open") && !sidebar.contains(e.target)) {
+          sidebar.classList.remove("is-open");
+          toggleBtn.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && sidebar.classList.contains("is-open")) {
+          sidebar.classList.remove("is-open");
+          toggleBtn.setAttribute("aria-expanded", "false");
+          toggleBtn.focus();
+        }
+      });
+
+      sidebar.querySelectorAll(".sidebar-nav a").forEach((link) => {
+        link.addEventListener("click", () => {
+          sidebar.classList.remove("is-open");
+          toggleBtn.setAttribute("aria-expanded", "false");
+        });
+      });
+    }
+  }
 })();

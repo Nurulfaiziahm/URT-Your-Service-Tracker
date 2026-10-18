@@ -63,7 +63,7 @@
           </ul>
 
           <div class="site-nav__actions">
-            <a href="owner/login.html" class="btn btn--secondary btn--sm"
+            <a href="masuk.html" class="btn btn--secondary btn--sm"
               >Masuk Portal</a
             >
             <a href="owner/register.html" class="btn btn--primary btn--sm"
@@ -90,7 +90,7 @@
               profesional.
             </p>
             <div class="hero__actions">
-              <a href="registrasi.html" class="btn btn--primary btn--lg"
+              <a href="masuk.html" class="btn btn--primary btn--lg"
                 >Masuk ke Portal</a
               >
               <a href="#alur-kerja" class="btn btn--secondary btn--lg"
@@ -103,24 +103,33 @@
             </p>
           </div>
 
-          <!-- Hero Realistic UI Mockup -->
+          <!-- Hero Dashboard Screen Preview (monday.com style) -->
           <div class="hero__visual">
-            <div class="ui-window">
-              <div class="ui-window__header">
-                <div class="ui-window__controls">
+            <div class="app-screen">
+              <div class="app-screen__header">
+                <div class="app-screen__controls" aria-hidden="true">
                   <span class="dot dot--red"></span>
                   <span class="dot dot--yellow"></span>
                   <span class="dot dot--green"></span>
                 </div>
-                <div class="ui-window__address">app.urt.id/owner/dashboard</div>
-                <div class="ui-window__meta">
-                  <span class="status-badge status-badge--success"
-                    >Live Sync</span
-                  >
+                <div class="app-screen__tabs">
+                  <span class="app-screen__tab is-active">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right: 4px; vertical-align: -1px;"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
+                    Ringkasan Operasional
+                  </span>
+                  <span class="app-screen__tab">
+                    Tiket Aktif (24)
+                  </span>
+                </div>
+                <div class="app-screen__meta">
+                  <span class="status-badge status-badge--success">
+                    <span class="badge-dot badge-dot--success" style="animation: pulse-dot 2s infinite;"></span>
+                    Live Sync
+                  </span>
                 </div>
               </div>
 
-              <div class="ui-window__body">
+              <div class="app-screen__body">
                 <div class="dashboard-preview">
                   <div class="dashboard-preview__header">
                     <div>
@@ -128,8 +137,7 @@
                         Ringkasan Operasional Tempat Servis
                       </h2>
                       <p class="ui-subtext">
-                        Pusat kendali antrean, penugasan, dan persetujuan hari
-                        ini
+                        Pusat kendali antrean, penugasan, dan persetujuan hari ini
                       </p>
                     </div>
                     <span class="tag tag--navy">iFix Lab Jakarta</span>
@@ -139,34 +147,22 @@
                     <article class="metric-card">
                       <span class="metric-card__label">Servis Aktif</span>
                       <strong class="metric-card__value">24</strong>
-                      <span
-                        class="metric-card__trend metric-card__trend--neutral"
-                        >Total berjalan</span
-                      >
+                      <span class="metric-card__trend metric-card__trend--neutral">Total berjalan</span>
                     </article>
                     <article class="metric-card">
                       <span class="metric-card__label">Menunggu Diagnosis</span>
                       <strong class="metric-card__value">8</strong>
-                      <span
-                        class="metric-card__trend metric-card__trend--warning"
-                        >Antrean teknisi</span
-                      >
+                      <span class="metric-card__trend metric-card__trend--warning">Antrean teknisi</span>
                     </article>
                     <article class="metric-card">
                       <span class="metric-card__label">Dalam Pengerjaan</span>
                       <strong class="metric-card__value">12</strong>
-                      <span
-                        class="metric-card__trend metric-card__trend--active"
-                        >Sedang diproses</span
-                      >
+                      <span class="metric-card__trend metric-card__trend--active">Sedang diproses</span>
                     </article>
                     <article class="metric-card">
                       <span class="metric-card__label">Siap Diambil</span>
                       <strong class="metric-card__value">4</strong>
-                      <span
-                        class="metric-card__trend metric-card__trend--success"
-                        >QC selesai</span
-                      >
+                      <span class="metric-card__trend metric-card__trend--success">QC selesai</span>
                     </article>
                   </div>
 
@@ -189,21 +185,19 @@
                         <tbody>
                           <tr>
                             <td class="font-mono">#URT-1024</td>
-                            <td>MacBook Pro 13" (2020)</td>
+                            <td><strong>MacBook Pro 13" (2020)</strong></td>
                             <td>Ahmad Fauzi</td>
                             <td>Rizky Pratama</td>
                             <td>
                               <span class="status-badge status-badge--warning">
-                                <span
-                                  class="badge-dot badge-dot--warning"
-                                ></span>
+                                <span class="badge-dot badge-dot--warning"></span>
                                 Menunggu Persetujuan
                               </span>
                             </td>
                           </tr>
                           <tr>
                             <td class="font-mono">#URT-1025</td>
-                            <td>iPhone 14 Pro Max</td>
+                            <td><strong>iPhone 14 Pro Max</strong></td>
                             <td>Rina Putri</td>
                             <td>Budi Santoso</td>
                             <td>
@@ -215,14 +209,12 @@
                           </tr>
                           <tr>
                             <td class="font-mono">#URT-1026</td>
-                            <td>ASUS VivoBook 15</td>
+                            <td><strong>ASUS VivoBook 15</strong></td>
                             <td>Hendra Wijaya</td>
                             <td>Andi Saputra</td>
                             <td>
                               <span class="status-badge status-badge--active">
-                                <span
-                                  class="badge-dot badge-dot--active"
-                                ></span>
+                                <span class="badge-dot badge-dot--active"></span>
                                 Dalam Pengerjaan
                               </span>
                             </td>

@@ -1,64 +1,343 @@
 <!doctype html>
 <html lang="id">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk — URT Your Device Tracker</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pilih Portal Masuk — URT Your Service Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="owner/css/owner-auth.css" />
+    <style>
+      .portal-select-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #0b1329;
+        color: #ffffff;
+      }
+      .portal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 32px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .portal-header-logo img {
+        height: 38px;
+        filter: brightness(0) invert(1);
+      }
+      .portal-header-links {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+      .portal-header-links a {
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .portal-header-links a:hover {
+        color: #ffffff;
+      }
+      .portal-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 24px;
+        max-width: 1080px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .portal-title-area {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .portal-title-area .eyebrow {
+        color: #3b82f6;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .portal-title-area h1 {
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        color: #ffffff;
+      }
+      .portal-title-area p {
+        color: #94a3b8;
+        font-size: 16px;
+        max-width: 580px;
+        margin: 0 auto;
+      }
+      .portal-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        width: 100%;
+        margin-bottom: 36px;
+      }
+      @media (max-width: 860px) {
+        .portal-cards-grid {
+          grid-template-columns: 1fr;
+          max-width: 440px;
+        }
+      }
+      @media (max-width: 600px) {
+        .portal-header {
+          padding: 16px 20px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+        .portal-header-links {
+          width: 100%;
+          justify-content: space-between;
+          font-size: 13px;
+        }
+        .portal-content {
+          padding: 24px 16px 40px;
+        }
+        .portal-title-area {
+          margin-bottom: 24px;
+        }
+        .portal-title-area h1 {
+          font-size: 24px;
+        }
+        .portal-title-area p {
+          font-size: 14px;
+        }
+        .portal-card {
+          padding: 24px 18px;
+        }
+        .portal-card__btn {
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+      .portal-card {
+        background: #162038;
+        border: 1px solid #223055;
+        border-radius: 16px;
+        padding: 32px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .portal-card:hover {
+        transform: translateY(-4px);
+        border-color: #3b82f6;
+        box-shadow: 0 12px 28px -6px rgba(37, 99, 235, 0.25);
+      }
+      .portal-card__icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      .icon-pelanggan {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+      }
+      .icon-teknisi {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+      }
+      .icon-owner {
+        background: rgba(59, 130, 246, 0.15);
+        color: #3b82f6;
+      }
+      .portal-card__role {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+      .role-pelanggan { color: #10b981; }
+      .role-teknisi { color: #f59e0b; }
+      .role-owner { color: #60a5fa; }
+      .portal-card__title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 8px;
+      }
+      .portal-card__desc {
+        color: #94a3b8;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 24px;
+        flex-grow: 1;
+      }
+      .portal-card__demo-user {
+        font-size: 12px;
+        color: #cbd5e1;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 8px 12px;
+        border-radius: 8px;
+        width: 100%;
+        margin-bottom: 20px;
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+      }
+      .portal-card__btn {
+        width: 100%;
+        padding: 12px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        text-align: center;
+        display: inline-block;
+        background: #2563eb;
+        color: #ffffff;
+        transition: background 0.2s;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .portal-card__btn:hover {
+        background: #1d4ed8;
+      }
+      .portal-card__btn--green {
+        background: #059669;
+      }
+      .portal-card__btn--green:hover {
+        background: #047857;
+      }
+      .portal-card__btn--amber {
+        background: #d97706;
+      }
+      .portal-card__btn--amber:hover {
+        background: #b45309;
+      }
+      .portal-footer {
+        padding: 24px;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        color: #64748b;
+        font-size: 13px;
+      }
+    </style>
   </head>
   <body class="page-portal page-login">
-    <header>
-      <a href="index.html">
-        <img src="image/logo-urt.svg" alt="URT — Your Service Tracker" height="40">
-      </a>
-      <nav aria-label="Navigasi halaman">
-        <a href="index.html">Kembali ke Beranda</a>
-        <a href="registrasi.html">Belum Memiliki Akun? Registrasi</a>
-      </nav>
-    </header>
+    <div class="portal-select-container">
+      <header class="portal-header">
+        <a href="index.html" class="portal-header-logo">
+          <img src="image/logo-urt.svg" alt="URT — Your Service Tracker" />
+        </a>
+        <nav class="portal-header-links" aria-label="Navigasi Halaman Masuk">
+          <a href="index.html">&larr; Kembali ke Landing Page</a>
+          <a href="registrasi.html" style="color: #60a5fa;">Daftar Akun Baru</a>
+        </nav>
+      </header>
 
-    <main>
-      <section aria-labelledby="judul-masuk">
-        <h2 id="judul-masuk">Masuk ke Portal</h2>
-        <form>
+      <main class="portal-content">
+        <div class="portal-title-area">
+          <div class="eyebrow">PORTAL AKSES TERINTEGRASI</div>
+          <h1>Pilih Portal Akses URT</h1>
           <p>
-            <label for="email">Email</label><br>
-            <input
-              name="email"
-              id="email"
-              type="email"
-              placeholder="email@contoh.com"
-              required>
+            Masuk ke lingkungan kerja sesuai peran Anda: Pelanggan yang memantau servis, Teknisi yang mengerjakan diagnosis, atau Pemilik Usaha yang memantau performa.
           </p>
+        </div>
 
-          <p>
-            <label for="password">Password</label><br>
-            <input name="password" id="password" type="password" required>
-          </p>
+        <div class="portal-cards-grid">
+          <!-- CARD 1: PELANGGAN -->
+          <div class="portal-card">
+            <div class="portal-card__icon icon-pelanggan">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+            <div class="portal-card__role role-pelanggan">Pelanggan</div>
+            <h2 class="portal-card__title">Portal Pelanggan</h2>
+            <p class="portal-card__desc">
+              Pantau status perbaikan perangkat Anda, beri persetujuan biaya estimasi, dan ajukan tiket servis baru secara mandiri.
+            </p>
+            <div class="portal-card__demo-user">
+              <strong>Demo:</strong> Nino Rachimas (NR)<br />
+              <span style="color: #94a3b8;">Tiket: #URT-2026-001</span>
+            </div>
+            <a href="pelanggan/beranda-pelanggan.html" class="portal-card__btn portal-card__btn--green">
+              Masuk Portal Pelanggan &rarr;
+            </a>
+          </div>
 
-          <fieldset>
-            <legend>Pilih Portal</legend>
-            <button type="submit" formaction="pelanggan/beranda-pelanggan.html">
-              Masuk sebagai Pelanggan
-            </button>
-            <button type="submit" formaction="teknisi/beranda-teknisi.html">
-              Masuk sebagai Teknisi
-            </button>
-            <button type="submit" formaction="owner/beranda-owner.html">
-              Masuk sebagai Owner
-            </button>
-          </fieldset>
-        </form>
+          <!-- CARD 2: TEKNISI -->
+          <div class="portal-card">
+            <div class="portal-card__icon icon-teknisi">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+              </svg>
+            </div>
+            <div class="portal-card__role role-teknisi">Teknisi Servis</div>
+            <h2 class="portal-card__title">Portal Teknisi</h2>
+            <p class="portal-card__desc">
+              Kelola antrean tiket penugasan, input hasil diagnosis kerusakan, buat rincian estimasi biaya, dan catat penyelesaian QC.
+            </p>
+            <div class="portal-card__demo-user">
+              <strong>Demo:</strong> Sofia Malvalena Adam<br />
+              <span style="color: #94a3b8;">Spesialis: Laptop • Hardware</span>
+            </div>
+            <a href="teknisi/beranda-teknisi.html" class="portal-card__btn portal-card__btn--amber">
+              Masuk Portal Teknisi &rarr;
+            </a>
+          </div>
 
-        <p><a href="index.html">Batal</a></p>
-      </section>
-    </main>
+          <!-- CARD 3: OWNER -->
+          <div class="portal-card">
+            <div class="portal-card__icon icon-owner">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+            </div>
+            <div class="portal-card__role role-owner">Pemilik Usaha</div>
+            <h2 class="portal-card__title">Portal Owner</h2>
+            <p class="portal-card__desc">
+              Pusat kendali tempat servis: pantau pendapatan, beban kerja 8 teknisi, database pelanggan, dan manajemen paket langganan.
+            </p>
+            <div class="portal-card__demo-user">
+              <strong>Demo:</strong> Andi Ramadhan (ServisKita)<br />
+              <span style="color: #94a3b8;">Status: Paket Tahunan Aktif</span>
+            </div>
+            <a href="owner/beranda-owner.html" class="portal-card__btn">
+              Masuk Portal Owner &rarr;
+            </a>
+          </div>
+        </div>
 
-    <footer>
-      <p>URT — Your Device Tracker | Kelompok 2 UT</p>
-    </footer>
+        <div style="color: #64748b; font-size: 14px; text-align: center;">
+          Ingin login manual dengan kata sandi? 
+          <a href="owner/login.html" style="color: #60a5fa; text-decoration: underline; margin-left: 4px;">Login Owner</a> &bull; 
+          <a href="teknisi/auth-teknisi.html" style="color: #60a5fa; text-decoration: underline; margin-left: 4px;">Login Teknisi</a>
+        </div>
+      </main>
+
+      <footer class="portal-footer">
+        &copy; 2026 URT — Your Service Tracker | Kelompok 2 UT. Hak cipta dilindungi.
+      </footer>
+    </div>
   </body>
 </html>

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 /* ==========================================================================
    URT Design System & Tokens
    Sampled directly from reference screenshots
@@ -1197,3 +1199,56 @@ body {
     align-items: flex-start;
   }
 }
+
+@media (max-width: 600px) {
+  .register-content {
+    padding: 24px 16px 48px !important;
+  }
+  .register-topbar {
+    padding: 16px !important;
+  }
+  .register-card-wrapper {
+    max-width: 100%;
+  }
+  .stepper {
+    gap: 6px;
+  }
+  .stepper-line {
+    width: 16px;
+  }
+  .step-item span:last-child {
+    font-size: 11px;
+  }
+  .login-card {
+    padding: 32px 20px !important;
+    margin: 16px !important;
+    width: calc(100% - 32px) !important;
+  }
+  .main-wrapper {
+    padding: 24px 16px 48px !important;
+  }
+  .pricing-card {
+    padding: 24px 18px !important;
+  }
+  .price-main {
+    font-size: 26px;
+  }
+  .payment-wrapper {
+    padding: 20px 14px 48px !important;
+  }
+  .payment-card {
+    padding: 20px 16px !important;
+  }
+  .form-control {
+    min-height: 44px;
+  }
+  .btn-primary {
+    min-height: 44px;
+  }
+  .success-card {
+    padding: 32px 18px !important;
+    margin: 16px !important;
+    width: calc(100% - 32px) !important;
+  }
+}
+

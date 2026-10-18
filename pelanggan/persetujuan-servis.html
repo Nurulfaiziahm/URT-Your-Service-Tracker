@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Detail Riwayat Servis - URT</title>
+    <title>Persetujuan Biaya Servis — URT</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -11,26 +11,50 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style-customer.css" />
+    <script src="js/customer.js" defer></script>
+    <style>
+      .cost-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        font-size: 14px;
+      }
+      .cost-table th, .cost-table td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .cost-table th {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        background: #f8fafc;
+      }
+      .cost-table .text-right {
+        text-align: right;
+      }
+      .cost-table .total-row td {
+        font-weight: 700;
+        font-size: 16px;
+        border-top: 2px solid #cbd5e1;
+        border-bottom: none;
+        color: var(--text-dark);
+      }
+    </style>
   </head>
   <body>
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <a
-          href="beranda-pelanggan.html"
-          style="display: inline-block; line-height: 0"
-        >
+        <a href="beranda-pelanggan.html">
           <img
             src="../image/logo-urt.svg"
             alt="URT Your Service Tracker"
             height="38"
           />
         </a>
-        <div>
-          <p style="font-size: 10px; font-weight: 800; color: #aebbd3">
-            portal pelanggan
-          </p>
-        </div>
+        <p>PORTAL PELANGGAN</p>
       </div>
       <nav class="nav-menu">
         <a href="beranda-pelanggan.html" class="nav-item active">
@@ -56,6 +80,14 @@
           </svg>
           <span>Profil</span>
         </a>
+        <a href="../masuk.html" class="nav-item nav-item--logout" title="Keluar dari portal">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span>Keluar</span>
+        </a>
       </nav>
       <div class="sidebar-footer">
         <div class="avatar">NR</div>
@@ -65,93 +97,112 @@
         </div>
       </div>
     </aside>
+
     <div class="main-wrapper">
       <header class="top-header">
         <div>
-          <span class="badge-pelanggan">PELANGGAN</span
-          ><span class="online-label">Sistem Online</span>
+          <span class="badge-pelanggan">PELANGGAN</span>
+          <span class="online-label">Sistem Online</span>
         </div>
         <div class="header-right">
           <span class="avatar avatar-outline">NR</span>
         </div>
       </header>
+
       <main class="content">
         <div class="page-header">
           <div>
-            <span class="page-title">RIWAYAT SERVIS</span>
-            <h1>Detail Riwayat Servis</h1>
+            <span class="page-title">PORTAL PELANGGAN</span>
+            <h1>Persetujuan Estimasi Biaya</h1>
             <p class="subtitle">
-              Informasi lengkap mengenai riwayat perbaikan perangkat Anda.
+              Tinjau hasil diagnosis teknisi dan beri konfirmasi persetujuan agar perbaikan dapat segera dikerjakan.
             </p>
           </div>
-          <a class="btn-secondary" href="riwayat-servis.html"
-            >← Kembali ke Riwayat</a
-          >
+          <a class="btn-secondary" href="beranda-pelanggan.html">
+            &larr; Kembali ke Beranda
+          </a>
         </div>
+
         <div class="card">
           <div class="section-heading">
             <div>
-              <span class="eyebrow">DETAIL TIKET</span>
+              <span class="eyebrow">DETAIL TIKET SERVIS</span>
               <h2>#URT-2026-001</h2>
-              <p class="subtitle">ASUS ROG Zephyrus G14</p>
+              <p class="subtitle">ASUS VivoBook 14 &bull; Nino Rachimas</p>
             </div>
             <span class="status-pill warning">Menunggu Persetujuan</span>
           </div>
+
           <div class="info-list">
             <div><span>Nama Pelanggan</span><strong>Nino Rachimas</strong></div>
-            <div>
-              <span>Perangkat</span><strong>ASUS ROG Zephyrus G14</strong>
-            </div>
-            <div>
-              <span>Serial Number</span><strong>ASUS-G14-998877</strong>
-            </div>
-            <div>
-              <span>Keluhan Awal</span
-              ><strong
-                >Mati total, tidak bisa di-charge, lampu indikator mati.</strong
-              >
-            </div>
+            <div><span>Nomor Telepon</span><strong>0812 3456 7890</strong></div>
+            <div><span>Perangkat</span><strong>ASUS VivoBook 14</strong></div>
+            <div><span>Serial Number</span><strong>ASUS-VB14-2026-001</strong></div>
+            <div><span>Keluhan Awal</span><strong>Laptop mati tiba-tiba dan terasa panas</strong></div>
+            <div><span>Teknisi Penanggung Jawab</span><strong>Sofia Malvalena Adam</strong></div>
           </div>
+
           <div class="subsection">
-            <h3>Tindakan Teknisi</h3>
+            <h3>Temuan Diagnosis &amp; Rekomendasi Teknisi</h3>
             <p>
-              Pembongkaran unit dan pengecekan arus listrik pada motherboard.
-              Penggantian IC Power diperlukan. Estimasi pengerjaan memakan waktu
-              2–3 hari kerja setelah sparepart tersedia.
+              Debu tebal menumpuk pada fan dan sirip heatsink sehingga pembuangan panas terhambat. Kualitas thermal paste pendingin CPU &amp; GPU telah kering mengeras, memicu laptop mati mendadak demi keamanan komponen. Diperlukan pembersihan menyeluruh (deep cleaning) dan re-paste menggunakan pasta termal berkualitas tinggi.
+            </p>
+          </div>
+
+          <div class="subsection">
+            <h3>Rincian Item &amp; Biaya Servis</h3>
+            <table class="cost-table">
+              <thead>
+                <tr>
+                  <th>Deskripsi Tindakan / Sparepart</th>
+                  <th>Kategori</th>
+                  <th class="text-right">Biaya</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Deep Cleaning Fan, Heatsink &amp; Motherboard</td>
+                  <td>Jasa Servis</td>
+                  <td class="text-right">Rp150.000</td>
+                </tr>
+                <tr>
+                  <td>Thermal Paste High Performance (Arctic MX-4)</td>
+                  <td>Suku Cadang</td>
+                  <td class="text-right">Rp100.000</td>
+                </tr>
+                <tr class="total-row">
+                  <td colspan="2">Total Estimasi Biaya Servis</td>
+                  <td class="text-right" style="color: #2563eb;">Rp250.000</td>
+                </tr>
+              </tbody>
+            </table>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">
+              Estimasi selesai: <strong>3 Sep 2026</strong> (1–2 hari kerja setelah persetujuan).
             </p>
           </div>
         </div>
+
         <section class="card action-card">
-          <span class="eyebrow">PERSETUJUAN TINDAKAN</span>
-          <h2>Konfirmasi biaya perbaikan</h2>
+          <span class="eyebrow">PERSETUJUAN BIAYA</span>
+          <h2>Konfirmasi Keputusan Pengerjaan</h2>
           <p>
-            Apakah Anda menyetujui biaya perbaikan sebesar
-            <strong>Rp850.000</strong>?
+            Apakah Anda menyetujui biaya estimasi perbaikan sebesar
+            <strong>Rp250.000</strong>?
           </p>
           <div class="button-row">
-            <a class="btn-primary" href="persetujuan-disetujui.html"
-              >✓ Setujui Perbaikan</a
-            ><a class="btn-danger" href="persetujuan-ditolak.html"
-              >Tolak Perbaikan</a
-            >
+            <a class="btn-primary" href="persetujuan-disetujui.html">
+              ✓ Setujui Perbaikan (Rp250.000)
+            </a>
+            <a class="btn-danger" href="persetujuan-ditolak.html">
+              ✕ Tolak Perbaikan
+            </a>
           </div>
         </section>
       </main>
+
       <footer class="site-footer">
-        URT — Your Service Tracker <span>Kelompok 2</span>
+        URT &mdash; Your Service Tracker <span>Kelompok 2 UT</span>
       </footer>
     </div>
-    <script>
-      const navItems = document.querySelectorAll(".nav-menu .nav-item");
-
-      navItems.forEach((item) => {
-        item.addEventListener("click", function () {
-          // Remove active class from all items
-          navItems.forEach((nav) => nav.classList.remove("active"));
-          // Set active state on the clicked item
-          this.classList.add("active");
-        });
-      });
-    </script>
   </body>
 </html>

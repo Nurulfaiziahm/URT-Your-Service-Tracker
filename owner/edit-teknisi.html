@@ -3,12 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Teknisi — Portal Pemilik — Your Service Tracker</title>
+  <title>Edit Data Teknisi — Portal Pemilik — Your Service Tracker</title>
   <link rel="stylesheet" href="css/owner.css">
-  <script src="js/owner.js" defer></script>
+  <style>
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+      max-width: 800px;
+    }
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    @media (max-width: 640px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--space-2) var(--space-4);
+      margin-top: var(--space-2);
+      padding: var(--space-3);
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body-sm);
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-<aside class="sidebar" aria-label="Sidebar Portal Pemilik">
+  <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true">URT</span>
       <div class="brand-copy">
@@ -19,33 +55,50 @@
 
     <nav class="sidebar-nav" aria-label="Navigasi utama pemilik">
       <a class="nav-item" href="beranda-owner.html">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
-          <span>Beranda</span>
-        </a><a class="nav-item" href="tiket-servis.html">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z"></path><path d="M12 7v12" stroke-dasharray="2 2"></path></svg>
-          <span>Tiket Servis</span>
-        </a><a class="nav-item" href="teknisi.html">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 3.2a4 4 0 0 1 0 7.6M22 21v-2a4 4 0 0 0-3-3.87"></path></svg>
-          <span>Teknisi</span>
-        </a><a class="nav-item" href="pelanggan.html">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"></rect><path d="M9 5V3h6v2"></path><circle cx="12" cy="11" r="2.5"></circle><path d="M8.5 17c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"></path></svg>
-          <span>Pelanggan</span>
-        </a><a class="nav-item is-active" href="layanan.html" aria-current="page">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"></path></svg>
-          <span>Layanan</span>
-        </a><a class="nav-item" href="laporan.html">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20v-6M10 20V9M15 20V4M20 20v-10"></path></svg>
-          <span>Laporan</span>
-        </a><a class="nav-item" href="langganan.html">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18"></path></svg>
-          <span>Langganan</span>
-        </a><a class="nav-item" href="pengaturan.html">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H10.4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-3.2h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h3.2v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.35.34.55.8.6 1.3v.1h1v3.2h-1v.1c-.05.5-.25.96-.6 1.3Z"></path></svg>
-          <span>Pengaturan</span>
-        </a><a class="nav-item" href="profil-owner.html">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"></path></svg>
-          <span>Profil</span>
-        </a>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+        <span>Beranda</span>
+      </a>
+      <a class="nav-item" href="tiket-servis.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z"></path><path d="M12 7v12" stroke-dasharray="2 2"></path></svg>
+        <span>Tiket Servis</span>
+      </a>
+      <a class="nav-item is-active" href="teknisi.html" aria-current="page">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 3.2a4 4 0 0 1 0 7.6M22 21v-2a4 4 0 0 0-3-3.87"></path></svg>
+        <span>Teknisi</span>
+      </a>
+      <a class="nav-item" href="pelanggan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"></rect><path d="M9 5V3h6v2"></path><circle cx="12" cy="11" r="2.5"></circle><path d="M8.5 17c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"></path></svg>
+        <span>Pelanggan</span>
+      </a>
+      <a class="nav-item" href="layanan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"></path></svg>
+        <span>Layanan</span>
+      </a>
+      <a class="nav-item" href="laporan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20v-6M10 20V9M15 20V4M20 20v-10"></path></svg>
+        <span>Laporan</span>
+      </a>
+      <a class="nav-item" href="langganan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18"></path></svg>
+        <span>Langganan</span>
+      </a>
+      <a class="nav-item" href="pengaturan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H10.4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-3.2h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h3.2v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.35.34.55.8.6 1.3v.1h1v3.2h-1v.1c-.05.5-.25.96-.6 1.3Z"></path></svg>
+        <span>Pengaturan</span>
+      </a>
+      <a class="nav-item" href="profil-owner.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"></path></svg>
+        <span>Profil</span>
+      </a>
+
+      <a class="nav-item nav-item--logout" href="login.html" title="Keluar">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        <span>Keluar</span>
+      </a>
     </nav>
 
     <a class="owner-mini-profile" href="profil-owner.html" aria-label="Buka profil Andi Ramadhan">
@@ -56,6 +109,7 @@
       </span>
     </a>
   </aside>
+
   <div class="app-shell">
     <header class="topbar">
       <div class="system-status">
@@ -73,19 +127,100 @@
         <a class="avatar avatar-outline" href="profil-owner.html" aria-label="Buka profil pemilik">AR</a>
       </div>
     </header>
+
     <main class="owner-main">
       <section class="page-heading">
-        <span class="eyebrow">PORTAL PEMILIK</span>
-        <h1>Edit Teknisi</h1>
-        <p>Halaman ini sudah disiapkan sebagai tujuan navigasi dan akan diganti mengikuti desain Figma yang diberikan berikutnya.</p>
+        <span class="eyebrow">PORTAL PEMILIK &bull; TIM TEKNISI</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h1>Edit Data Teknisi</h1>
+            <p>Perbarui informasi profil, spesialisasi, atau status kerja teknisi.</p>
+          </div>
+          <a class="secondary-button" href="teknisi.html">&larr; Kembali ke Daftar Teknisi</a>
+        </div>
       </section>
-      <section class="data-panel">
-        <h2>Halaman lanjutan</h2>
-        <p class="placeholder-copy">Navigasi dari halaman utama sudah terhubung dengan benar. Konten final halaman ini akan diimplementasikan ketika desain detailnya tersedia.</p>
-        <a class="secondary-link-button" href="teknisi.html">Kembali</a>
-      </section>
+
+      <form class="form-card" id="editTechnicianForm">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+          <h2 style="font-size: var(--text-h3); margin: 0; color: var(--text);">Profil: Sofia Malvalena Adam</h2>
+          <span class="status status--success">AKTIF</span>
+        </div>
+
+        <div class="form-grid-2">
+          <label class="form-field">
+            <span>Nama Lengkap *</span>
+            <input type="text" id="editName" name="name" value="Sofia Malvalena Adam" required>
+          </label>
+
+          <label class="form-field">
+            <span>Nama Pengguna (Username)</span>
+            <input type="text" id="editUsername" name="username" value="sofia.adam" readonly style="background: var(--background); cursor: not-allowed;">
+          </label>
+        </div>
+
+        <div class="form-grid-2">
+          <label class="form-field">
+            <span>Email</span>
+            <input type="email" id="editEmail" name="email" value="sofia.adam@serviskita.id" required>
+          </label>
+
+          <label class="form-field">
+            <span>Nomor WhatsApp / HP</span>
+            <input type="tel" id="editPhone" name="phone" value="0812 9988 7766" required>
+          </label>
+        </div>
+
+        <div class="form-field" style="margin-top: var(--space-2);">
+          <span>Bidang Keahlian / Spesialisasi</span>
+          <div class="checkbox-group">
+            <label><input type="checkbox" name="specialty" value="Laptop" checked> Laptop &amp; Notebook</label>
+            <label><input type="checkbox" name="specialty" value="Hardware" checked> Perbaikan Hardware</label>
+            <label><input type="checkbox" name="specialty" value="Software"> Instalasi &amp; OS</label>
+            <label><input type="checkbox" name="specialty" value="Diagnosis" checked> Diagnosis &amp; Kelistrikan</label>
+            <label><input type="checkbox" name="specialty" value="Pendingin" checked> Sistem Pendingin / Fan</label>
+            <label><input type="checkbox" name="specialty" value="QC"> Quality Control (QC)</label>
+          </div>
+        </div>
+
+        <div class="form-grid-2" style="margin-top: var(--space-3);">
+          <label class="form-field">
+            <span>Status Kerja</span>
+            <select name="status" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: inherit;">
+              <option value="aktif" selected>Aktif (Bisa Menerima Tiket)</option>
+              <option value="cuti">Sedang Cuti / Istirahat</option>
+              <option value="nonaktif">Nonaktif</option>
+            </select>
+          </label>
+
+          <label class="form-field">
+            <span>Reset Kata Sandi</span>
+            <input type="password" placeholder="Kosongkan jika tidak diubah">
+          </label>
+        </div>
+
+        <div style="display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-6);">
+          <a class="secondary-button" href="teknisi.html">Batal</a>
+          <button class="primary-button" type="submit">Simpan Perubahan</button>
+        </div>
+      </form>
     </main>
   </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/owner.js"></script>
+  <script>
+    document.getElementById('editTechnicianForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const toast = document.getElementById('toast');
+      if (toast) {
+        toast.textContent = 'Perubahan data teknisi berhasil disimpan.';
+        toast.classList.add('is-visible');
+        setTimeout(() => {
+          window.location.href = 'teknisi.html';
+        }, 1200);
+      }
+    });
+  </script>
 </body>
 </html>
