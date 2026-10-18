@@ -463,9 +463,6 @@ Proyek ini dikerjakan secara kolaboratif oleh seluruh anggota tim dengan pembagi
   - Prepared the project presentation / PPT
   - Assisted with presentation materials for the project submission
 
-### Contribution Note
-> The project was developed collaboratively. Several team members contributed initial page structures, styling, and implementation, while the final application went through additional integration, consistency fixes, responsive improvements, debugging, and visual refinement before submission. As team leader, Nurul handled much of the final integration and refinement to ensure a consistent final interface across the URT application.
-
 ---
 
 ## AI-Assisted Development
