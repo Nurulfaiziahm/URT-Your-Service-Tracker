@@ -7,7 +7,10 @@
   <title>Pelanggan — Portal Pemilik — Your Service Tracker</title>
   <link rel="stylesheet" href="css/owner.css">
   <script src="../js/data.js" defer></script>
+  <script src="../js/store.js" defer></script>
+  <script src="../js/ux.js" defer></script>
   <script src="js/owner.js" defer></script>
+  <link rel="stylesheet" href="../css/ux.css">
 </head>
 <body>
 
@@ -155,31 +158,7 @@
             <caption class="sr-only">Daftar pelanggan ServisKita</caption>
             <thead><tr><th>Pelanggan</th><th>Email</th><th>Nomor HP</th><th>Tiket</th><th>Terdaftar</th><th>Aksi</th></tr></thead>
             <tbody>
-              <tr data-customer-row data-search="nadia putri nadia.putri@email.com 0813 2211 9087" data-status="aktif">
-      <td><strong>Nadia Putri</strong></td><td>nadia.putri@email.com</td><td>0813 2211 9087</td><td>1 aktif</td><td>24 Agu 2026</td>
-      <td><div class="row-actions"><a href="detail-pelanggan.html?id=nadia-putri">Lihat</a><a href="edit-pelanggan.html?id=nadia-putri">Edit</a></div></td>
-    </tr>
-<tr data-customer-row data-search="rizky fauzan rizky.fauzan@email.com 0812 9988 1102" data-status="aktif">
-      <td><strong>Rizky Fauzan</strong></td><td>rizky.fauzan@email.com</td><td>0812 9988 1102</td><td>1 aktif</td><td>24 Agu 2026</td>
-      <td><div class="row-actions"><a href="detail-pelanggan.html?id=rizky-fauzan">Lihat</a><a href="edit-pelanggan.html?id=rizky-fauzan">Edit</a></div></td>
-    </tr>
-<tr data-customer-row data-search="dewi lestari dewi.lestari@email.com 0857 2211 3478" data-status="selesai">
-      <td><strong>Dewi Lestari</strong></td><td>dewi.lestari@email.com</td><td>0857 2211 3478</td><td>1 selesai</td><td>23 Agu 2026</td>
-      <td><div class="row-actions"><a href="detail-pelanggan.html?id=dewi-lestari">Lihat</a><a href="edit-pelanggan.html?id=dewi-lestari">Edit</a></div></td>
-    </tr>
-<tr data-customer-row data-search="nino rachimas nino.rachimas@email.com 0812 3456 7890" data-status="aktif">
-      <td><strong>Nino Rachimas</strong></td><td>nino.rachimas@email.com</td><td>0812 3456 7890</td><td>1 aktif</td><td>24 Agu 2026</td>
-      <td><div class="row-actions"><a href="detail-pelanggan.html?id=nino-rachimas">Lihat</a><a href="edit-pelanggan.html?id=nino-rachimas">Edit</a></div></td>
-    </tr>
-<tr data-customer-row data-search="aulia rahman aulia.rahman@email.com 0813 4499 6721" data-status="selesai">
-      <td><strong>Aulia Rahman</strong></td><td>aulia.rahman@email.com</td><td>0813 4499 6721</td><td>1 selesai</td><td>18 Agu 2026</td>
-      <td><div class="row-actions"><a href="detail-pelanggan.html?id=aulia-rahman">Lihat</a><a href="edit-pelanggan.html?id=aulia-rahman">Edit</a></div></td>
-    </tr>
-<tr data-customer-row data-search="maya putri maya.putri@email.com 0856 8877 1302" data-status="selesai">
-      <td><strong>Maya Putri</strong></td><td>maya.putri@email.com</td><td>0856 8877 1302</td><td>1 selesai</td><td>7 Agu 2026</td>
-      <td><div class="row-actions"><a href="detail-pelanggan.html?id=maya-putri">Lihat</a><a href="edit-pelanggan.html?id=maya-putri">Edit</a></div></td>
-    </tr>
-              <tr id="customerEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada pelanggan yang sesuai.</td></tr>
+              <!-- Baris dirender dinamis dari URT_API (js/store.js) -->
             </tbody>
           </table>
         </div>

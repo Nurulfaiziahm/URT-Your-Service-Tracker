@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tambah Layanan Baru — Portal Pemilik — Your Service Tracker</title>
   <link rel="stylesheet" href="css/owner.css">
+  <link rel="stylesheet" href="../css/ux.css">
 </head>
 <body>
   <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
@@ -115,10 +116,10 @@
           <label class="form-field">
             <span>Kategori Layanan *</span>
             <select name="category" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: inherit;">
-              <option value="Hardware" selected>Hardware &amp; Komponen Fisik</option>
-              <option value="Software">Software &amp; Sistem Operasi</option>
-              <option value="Maintenance">Maintenance &amp; Cleaning</option>
-              <option value="Data">Pemulihan &amp; Backup Data</option>
+              <option value="Laptop / Notebook" selected>Laptop / Notebook</option>
+              <option value="Hardware">Hardware</option>
+              <option value="Software">Software</option>
+              <option value="Penyimpanan">Penyimpanan</option>
             </select>
           </label>
         </div>
@@ -151,6 +152,8 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="../js/data.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/ux.js"></script>
   <script src="js/owner.js"></script>
 </body>
 </html>
