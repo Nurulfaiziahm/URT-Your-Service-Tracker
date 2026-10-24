@@ -1,8 +1,6 @@
 (() => {
   "use strict";
 
-  const E = (v) => (window.URT_UX ? window.URT_UX.esc(v) : String(v == null ? "" : v));
-
   function setupCustomerSidebar() {
     const sidebar = document.querySelector(".sidebar");
     if (!sidebar) return;
@@ -68,101 +66,52 @@
 
   /* ==========================================================================
      Central Data Layer Integration for Customer Portal
-     Populates HTML dynamic elements from window.URT_DATA
+     Populates HTML dynamic elements from window.URT_DATA (MySQL Connected)
      ========================================================================== */
   function populateCustomerPortalData() {
     if (typeof window.URT_DATA === "undefined") return;
     const { customers, tickets, technicians } = window.URT_DATA;
 
-    // Logged in customer: Nino Rachimas (CUS-001)
-    const customer = (window.getCustomerById && window.getCustomerById("CUS-001")) || customers[0];
+    // Deteksi nama pelanggan dari UI (karena dirender oleh PHP)
+    const userInfoEl = document.querySelector(".user-info p");
+    const loggedInName = userInfoEl ? userInfoEl.textContent.trim() : "";
+    
+    // Cari customer berdasarkan nama dari UI, atau gunakan index 0 sebagai fallback
+    const customer = customers.find(c => c.name === loggedInName) || customers[0];
+    if (!customer) return;
+
     const custTickets = window.getTicketsByCustomerId
       ? window.getTicketsByCustomerId(customer.id)
-      : tickets.filter((t) => t.customerId === customer.id);
+      : tickets.filter((t) => t.customerId == customer.id);
 
-    // 1. Sidebar & Topbar profile info
-    const footer = document.querySelector(".sidebar-footer");
-    if (footer) {
-      const avatar = footer.querySelector(".avatar");
-      if (avatar) avatar.textContent = customer.initials || "NR";
-      const nameP = footer.querySelector(".user-info p");
-      if (nameP) nameP.textContent = customer.name;
-    }
-
-    const topbarAvatars = document.querySelectorAll(".user-avatar-circle, .avatar-outline");
-    topbarAvatars.forEach((el) => {
-      el.textContent = customer.initials || "NR";
-      el.setAttribute("aria-label", customer.name);
-    });
-
-    // 2. Beranda Pelanggan (beranda-pelanggan.html)
-    if (window.location.pathname.includes("beranda-pelanggan.html")) {
-      const pageTitle = document.querySelector(".page-title");
-      if (pageTitle) pageTitle.textContent = `Halo, ${customer.name}`;
-
-      // Stat cards: Servis Aktif, Servis Selesai, Riwayat Servis
-      const statBigNumbers = document.querySelectorAll(".stats-cards-grid .stat-big-number");
-      if (statBigNumbers.length >= 3) {
-        const activeCount = custTickets.filter((t) => t.status !== "SELESAI").length;
-        statBigNumbers[0].textContent = activeCount || 1;
-        statBigNumbers[1].textContent = custTickets.filter((t) => t.status === "SELESAI").length;
-        statBigNumbers[2].textContent = customer.totalDevices || 3;
-      }
-
-      // Left Card: Tiket Aktif
-      const activeTicket = custTickets.find((t) => t.id === "URT-2026-001") || custTickets[0] || tickets[0];
-      const tech = window.getTechnicianById ? window.getTechnicianById(activeTicket.technicianId) : technicians[0];
-
-      const ticketHeading = document.querySelector(".ticket-id-title");
-      if (ticketHeading) ticketHeading.textContent = `#${activeTicket.id}`;
-
-      const statusPill = document.querySelector(".badge-status-orange-pill");
-      if (statusPill) statusPill.textContent = activeTicket.statusLabel || "Persetujuan Biaya";
-
-      const deviceName = document.querySelector(".device-name-text");
-      if (deviceName) deviceName.textContent = activeTicket.device;
-
-      const deviceComplaint = document.querySelector(".device-complaint-text");
-      if (deviceComplaint) deviceComplaint.textContent = `\u201C${activeTicket.issue}\u201D`;
-
-      const metaDatas = document.querySelectorAll(".ticket-meta-info-strip .meta-info-data");
-      if (metaDatas.length >= 3) {
-        metaDatas[0].textContent = activeTicket.estimatedCompletion;
-        metaDatas[1].textContent = tech ? tech.name : "Belum ditugaskan";
-        metaDatas[2].textContent = window.formatCurrency ? window.formatCurrency(activeTicket.estimatedCost) : "Rp" + activeTicket.estimatedCost;
-      }
-
-      const viewDetailBtn = document.querySelector(".btn-view-detail-service");
-      if (viewDetailBtn) {
-        viewDetailBtn.href = `persetujuan-servis.html?id=${activeTicket.id}`;
-      }
-
-      // Bottom Card: Servis Sebelumnya
-      const prevTbody = document.querySelector(".clean-table tbody");
-      if (prevTbody) {
-        const prevTickets = [
-          tickets.find((t) => t.id === "URT-2026-004") || tickets[3],
-          tickets.find((t) => t.id === "URT-2026-003") || tickets[2],
-        ].filter(Boolean);
-
-        prevTbody.innerHTML = prevTickets.map((t) => `
-          <tr>
-            <td><strong class="table-ticket-code">#${t.id}</strong></td>
-            <td><strong class="table-device-bold">${E(t.device)}</strong></td>
-            <td>${t.serviceName || t.diagnosisSummary || 'Cleaning & Thermal Paste'}</td>
-            <td>${t.createdAt.split(',')[0]}</td>
-            <td><span class="status-pill-green">Selesai</span></td>
-          </tr>
-        `).join("");
+    // 1. Beranda Pelanggan (beranda-pelanggan.php)
+    if (window.location.pathname.includes("beranda-pelanggan.php")) {
+      
+      // Ambil tiket aktif pertama secara dinamis (bukan hardcode)
+      const activeTicket = custTickets.find((t) => t.status !== "SELESAI" && t.status !== "DITOLAK");
+      
+      if (activeTicket) {
+        const viewDetailBtn = document.querySelector(".btn-view-detail-service, .btn-primary-action[href*='persetujuan']");
+        if (viewDetailBtn) {
+          // Arahkan tombol ke halaman persetujuan atau detail sesuai status dari database
+          if (activeTicket.status === "MENUNGGU_PERSETUJUAN") {
+            viewDetailBtn.href = `persetujuan-servis.php?id=${activeTicket.id.replace('URT-', '')}`;
+          } else {
+            viewDetailBtn.href = `detail-servis.php?id=${activeTicket.id.replace('URT-', '')}`;
+          }
+        }
       }
     }
 
-    // 3. Detail Servis (detail-servis.html)
-    if (window.location.pathname.includes("detail-servis.html")) {
+    // 2. Detail Servis (detail-servis.php)
+    if (window.location.pathname.includes("detail-servis.php")) {
       const params = new URLSearchParams(window.location.search);
-      const ticketId = params.get("id") || "URT-2026-001";
-      const ticket = (window.getTicketById && window.getTicketById(ticketId)) || null;
-      if (!ticket) return renderNotFound("Tiket tidak ditemukan", "Tiket " + ticketId + " tidak ada atau sudah dihapus.");
+      const ticketIdNum = params.get("id");
+      const ticketId = ticketIdNum ? `URT-${ticketIdNum}` : custTickets[0]?.id;
+      
+      const ticket = (window.getTicketById && window.getTicketById(ticketId)) || tickets[0];
+      if(!ticket) return;
+
       const tech = (window.getTechnicianById && window.getTechnicianById(ticket.technicianId)) || null;
 
       const h2 = document.querySelector(".card h2");
@@ -174,7 +123,7 @@
 
       const statusPill = document.querySelector(".status-pill");
       if (statusPill) {
-        statusPill.className = `status-pill status-pill--${ticket.statusClass || 'warning'}`;
+        statusPill.className = `status-pill status-pill--${ticket.status === 'SELESAI' ? 'success' : 'warning'}`;
         statusPill.textContent = ticket.statusLabel || ticket.status;
       }
 
@@ -186,31 +135,33 @@
         kvRows[2].children[1].textContent = ticket.serialNumber || `SN-${ticket.id}`;
         kvRows[3].children[1].textContent = ticket.createdAt;
         kvRows[4].children[1].textContent = ticket.issue;
-        kvRows[5].children[1].textContent = ticket.diagnosis;
-        kvRows[6].children[1].textContent = ticket.actionRequired || "Deep Cleaning & Thermal Paste Replacement";
-        kvRows[7].children[1].textContent = tech ? `${tech.name} (${tech.specialty})` : "Belum ditugaskan";
-        if (kvRows[8]) kvRows[8].children[1].textContent = `${ticket.estimatedCompletion} (1\u20132 hari kerja setelah persetujuan)`;
+        kvRows[5].children[1].textContent = ticket.diagnosis || 'Menunggu diagnosis teknisi';
+        kvRows[6].children[1].textContent = ticket.actionRequired || "Sesuai rincian diagnosis";
+        kvRows[7].children[1].textContent = tech ? `${tech.name}` : "Menunggu Penugasan";
       }
 
       // Cost card
       const costNumber = document.querySelector(".cost-summary-card div[style*='font-weight: 800']");
       if (costNumber) {
-        costNumber.textContent = window.formatCurrency ? window.formatCurrency(ticket.estimatedCost) : "Rp" + ticket.estimatedCost;
+        costNumber.textContent = window.formatCurrency ? window.formatCurrency(ticket.estimatedCost) : "Rp" + (ticket.estimatedCost || 0);
       }
 
       const approveLink = document.querySelector(".btn-primary[href*='persetujuan-servis']");
-      if (approveLink) approveLink.href = `persetujuan-servis.html?id=${ticket.id}`;
+      if (approveLink) approveLink.href = `persetujuan-servis.php?id=${ticket.id.replace('URT-', '')}`;
 
       const rejectLink = document.querySelector(".btn-danger[href*='persetujuan-ditolak']");
-      if (rejectLink) rejectLink.href = `persetujuan-ditolak.html?id=${ticket.id}`;
+      if (rejectLink) rejectLink.href = `persetujuan-ditolak.php?id=${ticket.id.replace('URT-', '')}`;
     }
 
-    // 4. Persetujuan Biaya (persetujuan-servis.html)
-    if (window.location.pathname.includes("persetujuan-servis.html")) {
+    // 3. Persetujuan Biaya (persetujuan-servis.php)
+    if (window.location.pathname.includes("persetujuan-servis.php")) {
       const params = new URLSearchParams(window.location.search);
-      const ticketId = params.get("id") || "URT-2026-001";
-      const ticket = (window.getTicketById && window.getTicketById(ticketId)) || null;
-      if (!ticket) return renderNotFound("Tiket tidak ditemukan", "Tiket " + ticketId + " tidak ada atau sudah dihapus.");
+      const ticketIdNum = params.get("id");
+      const ticketId = ticketIdNum ? `URT-${ticketIdNum}` : custTickets[0]?.id;
+      
+      const ticket = (window.getTicketById && window.getTicketById(ticketId)) || tickets[0];
+      if(!ticket) return;
+
       const tech = (window.getTechnicianById && window.getTechnicianById(ticket.technicianId)) || null;
 
       const h2 = document.querySelector(".section-heading h2");
@@ -222,7 +173,7 @@
 
       const statusPill = document.querySelector(".section-heading .status-pill");
       if (statusPill) {
-        statusPill.className = `status-pill ${ticket.statusClass || 'warning'}`;
+        statusPill.className = `status-pill warning`;
         statusPill.textContent = ticket.statusLabel || ticket.status;
       }
 
@@ -230,12 +181,12 @@
       const infoList = document.querySelector(".info-list");
       if (infoList) {
         infoList.innerHTML = `
-          <div><span>Nama Pelanggan</span><strong>${E(customer.name)}</strong></div>
-          <div><span>Nomor Telepon</span><strong>${E(customer.phone)}</strong></div>
-          <div><span>Perangkat</span><strong>${E(ticket.device)}</strong></div>
-          <div><span>Serial Number</span><strong>${E(ticket.serialNumber || 'SN-' + ticket.id)}</strong></div>
-          <div><span>Keluhan Awal</span><strong>${E(ticket.issue)}</strong></div>
-          <div><span>Teknisi Penanggung Jawab</span><strong>${E(tech ? tech.name : 'Belum ditugaskan')}</strong></div>
+          <div><span>Nama Pelanggan</span><strong>${customer.name}</strong></div>
+          <div><span>Nomor Telepon</span><strong>${customer.phone}</strong></div>
+          <div><span>Perangkat</span><strong>${ticket.device}</strong></div>
+          <div><span>Serial Number</span><strong>${ticket.serialNumber || 'SN-' + ticket.id}</strong></div>
+          <div><span>Keluhan Awal</span><strong>${ticket.issue}</strong></div>
+          <div><span>Teknisi Penanggung Jawab</span><strong>${tech ? tech.name : 'Menunggu Penugasan'}</strong></div>
         `;
       }
 
@@ -246,19 +197,12 @@
       // Cost table
       const costTbody = document.querySelector(".cost-table tbody");
       if (costTbody) {
-        const breakdown = ticket.costBreakdown && ticket.costBreakdown.length
-          ? ticket.costBreakdown
-          : [{ item: "Jasa Servis & Sparepart", amount: ticket.estimatedCost, category: "Servis" }];
-
-        const breakdownRows = breakdown.map((item) => `
+        costTbody.innerHTML = `
           <tr>
-            <td>${E(item.item)}</td>
-            <td>${item.category || 'Jasa Servis'}</td>
-            <td class="text-right">${window.formatCurrency ? window.formatCurrency(item.amount) : 'Rp' + item.amount}</td>
+            <td>Tindakan Servis & Pergantian Suku Cadang</td>
+            <td>Jasa Servis</td>
+            <td class="text-right">${window.formatCurrency ? window.formatCurrency(ticket.estimatedCost) : 'Rp' + ticket.estimatedCost}</td>
           </tr>
-        `).join("");
-
-        costTbody.innerHTML = breakdownRows + `
           <tr class="total-row">
             <td colspan="2">Total Estimasi Biaya Servis</td>
             <td class="text-right" style="color: #2563eb;">${window.formatCurrency ? window.formatCurrency(ticket.estimatedCost) : 'Rp' + ticket.estimatedCost}</td>
@@ -267,150 +211,22 @@
       }
     }
 
-    // 5. Riwayat Servis (riwayat-servis.html)
-    if (window.location.pathname.includes("riwayat-servis.html")) {
-      const historyTbody = document.querySelector(".history-table tbody");
-      if (historyTbody) {
-        const completedTickets = tickets.filter((t) => t.status === "SELESAI");
-        historyTbody.innerHTML = completedTickets.map((t) => `
-          <tr>
-            <td>
-              <strong>#${t.id}</strong><span class="table-subtext">${E(t.device)}</span>
-            </td>
-            <td>${t.serviceName || t.diagnosisSummary || 'Pemeriksaan & Servis Berkala'}</td>
-            <td>${t.createdAt.split(',')[0]}</td>
-            <td class="price-cell">${window.formatCurrency ? window.formatCurrency(t.estimatedCost) : 'Rp' + t.estimatedCost}</td>
-            <td><span class="status-pill success">Selesai</span></td>
-            <td>
-              <a class="table-link" href="detail-servis.html?id=${t.id}">Detail &rarr;</a>
-            </td>
-          </tr>
-        `).join("");
-      }
-    }
-
-    // 6. Profil Pelanggan (profil-pelanggan.html)
-    if (window.location.pathname.includes("profil-pelanggan.html")) {
+    // 4. Profil Pelanggan (profil-pelanggan.php)
+    if (window.location.pathname.includes("profil-pelanggan.php")) {
       const namaInput = document.getElementById("nama");
       if (namaInput) namaInput.value = customer.name;
-      const usernameInput = document.getElementById("username");
-      if (usernameInput) usernameInput.value = customer.username;
       const emailInput = document.getElementById("email");
       if (emailInput) emailInput.value = customer.email;
       const telInput = document.getElementById("telepon");
       if (telInput) telInput.value = customer.phone;
-      const alamatInput = document.getElementById("alamat");
-      if (alamatInput) alamatInput.value = customer.address;
     }
 
-    // 7. Pengajuan Servis: validasi -> simpan tiket baru ke store -> toast -> detail servis
+    // 5. Pengajuan Servis Form handler
     const formServis = document.getElementById("form-servis");
-    if (formServis && window.URT_UX && window.URT_API) wirePengajuanServis(formServis, customer);
-
-    // 8. Aksi persetujuan biaya (Setujui / Tolak) benar-benar mengubah status tiket
-    if (window.location.pathname.includes("persetujuan-servis.html")) wireApprovalActions();
-  }
-
-  function renderNotFound(title, message) {
-    const area = document.querySelector(".content") || document.querySelector("main");
-    if (!area || !window.URT_UX) return;
-    area.innerHTML = window.URT_UX.stateHtml({ type: "error", title: title, message: message }) +
-      '<div style="text-align:center"><a class="btn-secondary" href="beranda-pelanggan.html">&larr; Kembali ke Beranda</a></div>';
-  }
-
-  function wirePengajuanServis(form, customer) {
-    const UX = window.URT_UX;
-    form.setAttribute("novalidate", "");
-    UX.liveClear(form);
-    const rules = {
-      nama: { label: "Nama lengkap", required: true, minLength: 3, maxLength: 80 },
-      email: { label: "Email", required: true, type: "email" },
-      nohp: { label: "Nomor HP / WhatsApp", required: true, type: "phone" },
-      alamat: { label: "Alamat lengkap", required: true, minLength: 10, maxLength: 200 },
-      jenis_perangkat: { label: "Jenis perangkat", required: true },
-      model: { label: "Merek / model", required: true, minLength: 3, maxLength: 80 },
-      keluhan: { label: "Keluhan", required: true, minLength: 10, maxLength: 500 }
-    };
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const btn = form.querySelector('button[type="submit"]');
-      if (btn && btn.disabled) return;
-      const { valid, values } = UX.validate(form, rules);
-      if (!valid) {
-        UX.toast("Periksa kembali isian yang ditandai merah.", "error");
-        return;
-      }
-      UX.setLoading(btn, true, "Mengirim...");
-      try {
-        const select = form.elements.namedItem("jenis_perangkat");
-        const ticket = await window.URT_API.create("tickets", {
-          customerId: customer.id,
-          device: values.model,
-          deviceType: select.options[select.selectedIndex].text,
-          issue: values.keluhan
-        });
-        UX.flash("Pengajuan servis berhasil dikirim! Nomor tiket #" + ticket.id, "success");
-        window.location.href = "detail-servis.html?id=" + encodeURIComponent(ticket.id);
-      } catch (err) {
-        UX.setLoading(btn, false);
-        UX.toast((err && err.message) || "Gagal mengirim pengajuan. Coba lagi.", "error");
-      }
-    });
-  }
-
-  function wireApprovalActions() {
-    const UX = window.URT_UX;
-    if (!UX || !window.URT_API) return;
-    const ticketId = new URLSearchParams(window.location.search).get("id");
-    const links = [
-      { el: document.querySelector('.btn-primary[href*="persetujuan-disetujui"]'), approve: true },
-      { el: document.querySelector('.btn-danger[href*="persetujuan-ditolak"]'), approve: false }
-    ];
-    links.forEach(({ el, approve }) => {
-      if (!el) return;
-      const target = el.getAttribute("href");
-      el.addEventListener("click", async (event) => {
-        event.preventDefault();
-        if (el.classList.contains("is-loading")) return;
-        const ok = await UX.confirm({
-          title: approve ? "Setujui estimasi biaya?" : "Tolak estimasi biaya?",
-          message: approve
-            ? "Teknisi akan langsung memulai perbaikan setelah Anda menyetujui."
-            : "Perbaikan tidak akan dilanjutkan dan tiket ini ditandai dibatalkan.",
-          confirmLabel: approve ? "Ya, setujui" : "Ya, tolak",
-          danger: !approve
-        });
-        if (!ok) return;
-        const original = el.innerHTML;
-        el.classList.add("is-loading");
-        el.style.pointerEvents = "none";
-        el.innerHTML = '<span class="urt-spinner" aria-hidden="true"></span>Memproses...';
-        try {
-          const current = window.getTicketById(ticketId || "URT-2026-001");
-          const tl = (current.timeline || []).map((x) => Object.assign({}, x));
-          const ci = tl.findIndex((x) => x.current);
-          if (ci > -1) {
-            tl[ci].current = false;
-            tl[ci].done = true;
-            tl[ci].time = (approve ? "Disetujui pelanggan" : "Ditolak pelanggan");
-            if (approve && tl[ci + 1]) {
-              tl[ci + 1].current = true;
-              tl[ci + 1].time = "Sedang berlangsung";
-            }
-          }
-          await window.URT_API.update("tickets", current.id, approve
-            ? { status: "PERBAIKAN", statusLabel: "Dalam Pengerjaan", statusClass: "progress", timeline: tl, currentStep: 4 }
-            : { status: "DIBATALKAN", statusLabel: "Dibatalkan Pelanggan", statusClass: "danger", timeline: tl });
-          UX.flash(approve ? "Estimasi biaya disetujui. Perbaikan segera dimulai." : "Estimasi biaya ditolak.", approve ? "success" : "info");
-          window.location.href = target;
-        } catch (err) {
-          el.classList.remove("is-loading");
-          el.style.pointerEvents = "";
-          el.innerHTML = original;
-          UX.toast((err && err.message) || "Gagal memproses keputusan. Coba lagi.", "error");
-        }
-      });
-    });
+    if (formServis) {
+      // Jika form diubah jadi PHP, JS default prevent tidak diperlukan.
+      // Namun kita biarkan jika masih menggunakan AJAX di masa depan.
+    }
   }
 
   function setupNavItems() {
@@ -423,44 +239,9 @@
     });
   }
 
-  const FILE = window.location.pathname.split("/").pop();
-  const GATED = ["beranda-pelanggan.html", "riwayat-servis.html", "detail-servis.html", "persetujuan-servis.html"];
-
-  // Skeleton -> data -> (empty | error) untuk halaman yang menampilkan data tiket
-  function loadWithStates() {
-    const UX = window.URT_UX;
-    if (!UX || !window.URT_API || !GATED.includes(FILE)) return populateCustomerPortalData();
-    const tbodies = [".history-table tbody", ".clean-table tbody"].map((q) => document.querySelector(q)).filter(Boolean);
-    const colsOf = (tb) => tb.closest("table")?.querySelectorAll("thead th").length || 5;
-    const area = document.querySelector(".content") || document.querySelector(".dashboard-main-area") || document.querySelector("main");
-    const pageLevel = FILE !== "riwayat-servis.html"; // riwayat: skeleton pada baris tabel
-    const run = () => {
-      if (pageLevel) UX.pageLoading(area, true);
-      else tbodies.forEach((tb) => UX.skeletonRows(tb, colsOf(tb), 3));
-      window.URT_API.ready()
-        .then(() => {
-          if (pageLevel) UX.pageLoading(area, false);
-          populateCustomerPortalData();
-          tbodies.forEach((tb) => {
-            if (!tb.querySelector("tr"))
-              UX.showState(tb, { type: "empty", title: "Belum ada servis selesai", message: "Riwayat akan muncul setelah servis Anda selesai." }, colsOf(tb));
-          });
-        })
-        .catch(() => {
-          const opts = { type: "error", title: "Gagal memuat data", message: "Periksa koneksi internet Anda lalu coba lagi.", actionLabel: "Coba lagi ↻", onAction: run };
-          if (pageLevel) {
-            UX.pageLoading(area, false);
-            UX.showState(area, Object.assign({}, opts, { onAction: () => window.location.reload() }));
-          } else tbodies.forEach((tb) => UX.showState(tb, opts, colsOf(tb)));
-          UX.toast("Gagal memuat data. Coba lagi.", "error");
-        });
-    };
-    run();
-  }
-
   function init() {
     setupCustomerSidebar();
-    loadWithStates();
+    populateCustomerPortalData();
     setupNavItems();
   }
 
