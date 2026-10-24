@@ -862,6 +862,12 @@
     return "Rp" + num.toLocaleString("id-ID");
   }
 
+  // Jumlah data awal (seed) — dipakai agar statistik dashboard ikut bertambah saat CRUD
+  const SEED = {
+    customers: URT_DATA.customers.length,
+    activeTickets: URT_DATA.tickets.filter((t) => t.status !== "SELESAI").length
+  };
+
   function getDashboardStats() {
     const activeTickets = URT_DATA.tickets.filter(
       (t) => t.status !== "SELESAI"
@@ -872,13 +878,13 @@
     const completedTickets = URT_DATA.tickets.filter(
       (t) => t.status === "SELESAI"
     ).length;
-    const totalCustomers = 186; // total registered across ServisKita
+    const totalCustomers = 186 + (URT_DATA.customers.length - SEED.customers); // 186 = angka dasar ServisKita
     const activeTechnicians = URT_DATA.technicians.filter(
       (t) => t.status === "aktif"
     ).length;
 
     return {
-      activeTickets: 28, // platform standard stat for ServisKita
+      activeTickets: 28 + (activeTickets - SEED.activeTickets), // 28 = angka dasar ServisKita
       activeTicketsSample: activeTickets,
       pendingApproval,
       completedToday: 8,
