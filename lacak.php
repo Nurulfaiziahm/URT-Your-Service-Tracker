@@ -11,22 +11,21 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/ux.css">
-</head>
+  </head>
   <body class="tracking-page-wrap">
     <nav class="tracking-nav">
-      <a href="index.html" style="display: inline-block; line-height: 0;">
+      <a href="index.php" style="display: inline-block; line-height: 0;">
         <img src="image/logo-urt.svg" alt="URT Your Service Tracker" height="38" />
       </a>
       <div style="display: flex; gap: 12px; align-items: center;">
-        <a href="index.html" style="font-size: 14px; color: #64748b; text-decoration: none; font-weight: 500;">&larr; Kembali ke Beranda</a>
+        <a href="index.php" style="font-size: 14px; color: #64748b; text-decoration: none; font-weight: 500;">&larr; Kembali ke Beranda</a>
         <a href="masuk.html" class="btn btn--primary btn--sm" style="padding: 8px 16px; font-size: 13px;">Masuk Portal</a>
       </div>
     </nav>
 
     <main class="tracking-main">
       <!-- Search Again Bar -->
-      <form action="tracking_result.html" method="get" class="search-again-bar">
+      <form action="lacak.php" method="get" class="search-again-bar">
         <input
           type="text"
           name="ticket"
