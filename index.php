@@ -1,3 +1,24 @@
+<?php
+session_start();
+require_once 'koneksi.php';
+
+$sql_metrik = "SELECT 
+    (SELECT COUNT(*) FROM tiket_servis WHERE status NOT IN ('selesai', 'ditolak')) as tiket_aktif,
+    (SELECT COUNT(*) FROM tiket_servis WHERE status = 'menunggu') as antrean_baru,
+    (SELECT COUNT(*) FROM tiket_servis WHERE status = 'diproses') as sedang_diproses,
+    (SELECT COUNT(*) FROM tiket_servis WHERE status = 'selesai' AND DATE(updated_at) = CURDATE()) as selesai_hari_ini";
+$hasil_metrik = $conn->query($sql_metrik);
+$data_metrik = $hasil_metrik->fetch_assoc();
+
+$sql_tiket_terbaru = "SELECT t.id_tiket, l.nama_layanan, p.nama as nama_pelanggan, tk.nama as nama_teknisi, t.status 
+                      FROM tiket_servis t
+                      JOIN layanan l ON t.id_layanan = l.id_layanan
+                      JOIN users p ON t.id_pelanggan = p.id_user
+                      LEFT JOIN users tk ON t.id_teknisi = tk.id_user
+                      ORDER BY t.created_at DESC LIMIT 3";
+$tiket_terbaru = $conn->query($sql_tiket_terbaru);
+?>
+
 <!doctype html>
 <html lang="id">
   <head>
@@ -15,16 +36,14 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/style.css" />
-    <script src="js/ux.js" defer></script>
     <script src="js/script.js" defer></script>
-    <link rel="stylesheet" href="css/ux.css">
-</head>
+  </head>
   <body>
     <!-- Top Navigation Bar -->
     <header class="site-header">
       <div class="site-header__container">
         <a
-          href="index.html"
+          href="index.php"
           class="site-header__brand"
           aria-label="URT Beranda"
         >
@@ -51,7 +70,7 @@
         <nav class="site-nav" id="primaryNav" aria-label="Navigasi Utama">
           <ul class="site-nav__list">
             <li>
-              <a href="index.html" class="site-nav__link" aria-current="page"
+              <a href="index.php" class="site-nav__link" aria-current="page"
                 >Beranda</a
               >
             </li>
@@ -65,7 +84,7 @@
           </ul>
 
           <div class="site-nav__actions">
-            <a href="masuk.html" class="btn btn--secondary btn--sm"
+            <a href="masuk.php" class="btn btn--secondary btn--sm"
               >Masuk Portal</a
             >
             <a href="owner/register.html" class="btn btn--primary btn--sm"
@@ -77,7 +96,6 @@
     </header>
 
     <main id="main-content">
-      <!-- 01 HERO SECTION -->
       <section class="hero" aria-labelledby="hero-title">
         <div class="container hero__container">
           <div class="hero__content">
@@ -92,7 +110,7 @@
               profesional.
             </p>
             <div class="hero__actions">
-              <a href="masuk.html" class="btn btn--primary btn--lg"
+              <a href="masuk.php" class="btn btn--primary btn--lg"
                 >Masuk ke Portal</a
               >
               <a href="#alur-kerja" class="btn btn--secondary btn--lg"
@@ -105,7 +123,6 @@
             </p>
           </div>
 
-          <!-- Hero Dashboard Screen Preview (monday.com style) -->
           <div class="hero__visual">
             <div class="app-screen">
               <div class="app-screen__header">
@@ -145,28 +162,28 @@
                     <span class="tag tag--navy">iFix Lab Jakarta</span>
                   </div>
 
-                  <div class="metrics-grid">
-                    <article class="metric-card">
-                      <span class="metric-card__label">Servis Aktif</span>
-                      <strong class="metric-card__value">24</strong>
-                      <span class="metric-card__trend metric-card__trend--neutral">Total berjalan</span>
-                    </article>
-                    <article class="metric-card">
-                      <span class="metric-card__label">Menunggu Diagnosis</span>
-                      <strong class="metric-card__value">8</strong>
-                      <span class="metric-card__trend metric-card__trend--warning">Antrean teknisi</span>
-                    </article>
-                    <article class="metric-card">
-                      <span class="metric-card__label">Dalam Pengerjaan</span>
-                      <strong class="metric-card__value">12</strong>
-                      <span class="metric-card__trend metric-card__trend--active">Sedang diproses</span>
-                    </article>
-                    <article class="metric-card">
-                      <span class="metric-card__label">Siap Diambil</span>
-                      <strong class="metric-card__value">4</strong>
-                      <span class="metric-card__trend metric-card__trend--success">QC selesai</span>
-                    </article>
-                  </div>
+<div class="metrics-grid">
+  <article class="metric-card">
+    <span class="metric-card__label">Servis Aktif</span>
+    <strong class="metric-card__value"><?= $data_metrik['tiket_aktif'] ?? 0; ?></strong>
+    <span class="metric-card__trend metric-card__trend--neutral">Total berjalan</span>
+  </article>
+  <article class="metric-card">
+    <span class="metric-card__label">Menunggu Diagnosis</span>
+    <strong class="metric-card__value"><?= $data_metrik['antrean_baru'] ?? 0; ?></strong>
+    <span class="metric-card__trend metric-card__trend--warning">Antrean teknisi</span>
+  </article>
+  <article class="metric-card">
+    <span class="metric-card__label">Dalam Pengerjaan</span>
+    <strong class="metric-card__value"><?= $data_metrik['sedang_diproses'] ?? 0; ?></strong>
+    <span class="metric-card__trend metric-card__trend--active">Sedang diproses</span>
+  </article>
+  <article class="metric-card">
+    <span class="metric-card__label">Selesai Hari Ini</span>
+    <strong class="metric-card__value"><?= $data_metrik['selesai_hari_ini'] ?? 0; ?></strong>
+    <span class="metric-card__trend metric-card__trend--success">Siap diambil</span>
+  </article>
+</div>
 
                   <div class="table-card">
                     <div class="table-card__header">
@@ -184,44 +201,33 @@
                             <th scope="col">Status</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          <tr>
-                            <td class="font-mono">#URT-1024</td>
-                            <td><strong>MacBook Pro 13" (2020)</strong></td>
-                            <td>Ahmad Fauzi</td>
-                            <td>Rizky Pratama</td>
-                            <td>
-                              <span class="status-badge status-badge--warning">
-                                <span class="badge-dot badge-dot--warning"></span>
-                                Menunggu Persetujuan
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td class="font-mono">#URT-1025</td>
-                            <td><strong>iPhone 14 Pro Max</strong></td>
-                            <td>Rina Putri</td>
-                            <td>Budi Santoso</td>
-                            <td>
-                              <span class="status-badge status-badge--info">
-                                <span class="badge-dot badge-dot--info"></span>
-                                Diagnosis
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td class="font-mono">#URT-1026</td>
-                            <td><strong>ASUS VivoBook 15</strong></td>
-                            <td>Hendra Wijaya</td>
-                            <td>Andi Saputra</td>
-                            <td>
-                              <span class="status-badge status-badge--active">
-                                <span class="badge-dot badge-dot--active"></span>
-                                Dalam Pengerjaan
-                              </span>
-                            </td>
-                          </tr>
-                        </tbody>
+<tbody>
+  <?php while($row = $tiket_terbaru->fetch_assoc()): ?>
+    <tr>
+      <td class="font-mono">#URT-<?= htmlspecialchars($row['id_tiket']) ?></td>
+      <td><strong><?= htmlspecialchars($row['nama_layanan']) ?></strong></td>
+      <td><?= substr($row['nama_pelanggan'], 0, 3) ?>***</td> 
+      <td><?= htmlspecialchars($row['nama_teknisi'] ?? 'Belum Ditugaskan') ?></td>
+      <td>
+        <?php 
+          $badge_class = "status-badge--neutral";
+          $dot_class = "badge-dot--neutral";
+          if($row['status'] == 'menunggu_persetujuan') {
+              $badge_class = "status-badge--warning"; $dot_class = "badge-dot--warning";
+          } elseif($row['status'] == 'diproses') {
+              $badge_class = "status-badge--active"; $dot_class = "badge-dot--active";
+          } elseif($row['status'] == 'selesai') {
+              $badge_class = "status-badge--success"; $dot_class = "badge-dot--success";
+          }
+        ?>
+        <span class="status-badge <?= $badge_class ?>">
+          <span class="badge-dot <?= $dot_class ?>"></span>
+          <?= ucwords(str_replace('_', ' ', $row['status'])) ?>
+        </span>
+      </td>
+    </tr>
+  <?php endwhile; ?>
+</tbody>
                       </table>
                     </div>
                   </div>
@@ -232,7 +238,6 @@
         </div>
       </section>
 
-      <!-- 02 PROBLEM SECTION -->
       <section class="section section--canvas" aria-labelledby="problem-title">
         <div class="container">
           <div class="section-header text-center">
@@ -422,7 +427,7 @@
                 </div>
 
                 <div class="persona-layout__action">
-                  <a href="masuk.html" class="btn btn--primary"
+                  <a href="masuk.php" class="btn btn--primary"
                     >Jelajahi Portal Owner</a
                   >
                   <a href="#harga" class="btn btn--secondary"
@@ -572,7 +577,7 @@
                 </div>
 
                 <div class="persona-layout__action">
-                  <a href="masuk.html" class="btn btn--primary"
+                  <a href="masuk.php" class="btn btn--primary"
                     >Jelajahi Portal Teknisi</a
                   >
                 </div>
@@ -1165,29 +1170,27 @@
             </div>
 
             <form
-              action="tracking_result.html"
-              method="get"
-              class="tracking-form"
-              id="trackingForm"
-              aria-label="Formulir Lacak Servis"
+action="lacak.php" 
+  method="GET" 
+  class="tracking-form"
+  id="trackingForm"
+  aria-label="Formulir Lacak Servis"
             >
-              <div class="tracking-form__group">
-                <label for="nomor-tiket" class="sr-only"
-                  >Nomor Tiket Servis</label
-                >
-                <input
-                  type="text"
-                  id="nomor-tiket"
-                  name="ticket"
-                  class="tracking-form__input"
-                  placeholder="Contoh: URT-1024 atau URT-2026-123456"
-                  required
-                  autocomplete="off"
-                />
-                <button type="submit" class="btn btn--primary">
-                  Lacak Servis
-                </button>
-              </div>
+<div class="tracking-form__group">
+    <label for="nomor-tiket" class="sr-only">Nomor Tiket Servis</label>
+    <input
+      type="text"
+      id="nomor-tiket"
+      name="id_tiket"
+      class="tracking-form__input"
+      placeholder="Contoh: 1024"
+      required
+      autocomplete="off"
+    />
+    <button type="submit" class="btn btn--primary">
+      Lacak Servis
+    </button>
+  </div>
               <p class="tracking-form__help">
                 Nomor tiket tertera pada struk fisik atau pesan konfirmasi saat
                 perangkat diserahkan.
@@ -1200,9 +1203,9 @@
                 type="button"
                 class="btn-text font-mono"
                 id="btnFillDemoTicket"
-                data-ticket="URT-2026-001"
+                data-ticket="URT-1024"
               >
-                Isi #URT-2026-001
+                Isi #URT-1024
               </button>
             </div>
           </div>
@@ -1291,7 +1294,7 @@
               </ul>
 
               <div class="pricing-card__action">
-                <a href="registrasi.html" class="btn btn--secondary btn--block"
+                <a href="registrasi.php" class="btn btn--secondary btn--block"
                   >Pilih Paket Bulanan</a
                 >
               </div>
@@ -1337,7 +1340,7 @@
               </ul>
 
               <div class="pricing-card__action">
-                <a href="registrasi.html" class="btn btn--primary btn--block"
+                <a href="registrasi.php" class="btn btn--primary btn--block"
                   >Daftar Paket Tahunan</a
                 >
               </div>
@@ -1362,10 +1365,10 @@
             profesional.
           </p>
           <div class="cta-section__actions">
-            <a href="registrasi.html" class="btn btn--white btn--lg"
+            <a href="registrasi.php" class="btn btn--white btn--lg"
               >Daftar Tempat Servis</a
             >
-            <a href="masuk.html" class="btn btn--outline-white btn--lg"
+            <a href="masuk.php" class="btn btn--outline-white btn--lg"
               >Masuk ke Portal</a
             >
           </div>
@@ -1378,7 +1381,7 @@
       <div class="container site-footer__container">
         <div class="site-footer__brand-col">
           <a
-            href="index.html"
+            href="index.php"
             class="site-footer__brand"
             aria-label="URT Beranda"
           >
@@ -1401,7 +1404,7 @@
         <nav class="site-footer__col" aria-label="Tautan Platform">
           <h3 class="site-footer__heading">Platform</h3>
           <ul class="site-footer__links">
-            <li><a href="index.html">Beranda</a></li>
+            <li><a href="index.php">Beranda</a></li>
             <li><a href="#alur-kerja">Alur Servis</a></li>
             <li><a href="#peran">Tiga Peran</a></li>
             <li><a href="#layanan">Fitur &amp; Modul</a></li>
@@ -1413,10 +1416,10 @@
         <nav class="site-footer__col" aria-label="Portal Akses">
           <h3 class="site-footer__heading">Akses Portal</h3>
           <ul class="site-footer__links">
-            <li><a href="masuk.html">Portal Owner</a></li>
-            <li><a href="masuk.html">Portal Teknisi</a></li>
-            <li><a href="masuk.html">Portal Pelanggan</a></li>
-            <li><a href="registrasi.html">Pendaftaran Akun Baru</a></li>
+            <li><a href="masuk.php">Portal Owner</a></li>
+            <li><a href="masuk.php">Portal Teknisi</a></li>
+            <li><a href="masuk.php">Portal Pelanggan</a></li>
+            <li><a href="registrasi.php">Pendaftaran Akun Baru</a></li>
           </ul>
         </nav>
 
