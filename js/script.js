@@ -148,6 +148,42 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnFillDemoTicket = document.getElementById('btnFillDemoTicket');
   const ticketInput = document.getElementById('nomor-tiket');
 
+  const trackingForm = document.getElementById('trackingForm');
+  if (trackingForm && ticketInput) {
+    trackingForm.setAttribute('novalidate', '');
+    const group = trackingForm.querySelector('.tracking-form__group');
+    const clearErr = () => {
+      ticketInput.classList.remove('is-invalid');
+      ticketInput.removeAttribute('aria-invalid');
+      trackingForm.querySelectorAll('.urt-field-error').forEach((n) => n.remove());
+    };
+    ticketInput.addEventListener('input', clearErr);
+    trackingForm.addEventListener('submit', (event) => {
+      clearErr();
+      const value = ticketInput.value.trim().replace(/\s+/g, '');
+      ticketInput.value = value;
+      let message = '';
+      if (!value) message = 'Nomor tiket wajib diisi.';
+      else if (!/^#?URT-\d{2,4}(-\d{2,6})?$/i.test(value))
+        message = 'Format nomor tiket tidak valid. Contoh: URT-2026-001.';
+      if (message) {
+        event.preventDefault();
+        ticketInput.classList.add('is-invalid');
+        ticketInput.setAttribute('aria-invalid', 'true');
+        const err = document.createElement('small');
+        err.className = 'urt-field-error';
+        err.setAttribute('role', 'alert');
+        err.textContent = message;
+        (group || ticketInput).insertAdjacentElement('afterend', err);
+        ticketInput.focus();
+        return;
+      }
+      ticketInput.value = value.replace(/^#/, '').toUpperCase();
+      const btn = trackingForm.querySelector('button[type="submit"]');
+      if (btn && window.URT_UX) window.URT_UX.setLoading(btn, true, 'Mencari...');
+    });
+  }
+
   if (btnFillDemoTicket && ticketInput) {
     btnFillDemoTicket.addEventListener('click', () => {
       const demoTicket = btnFillDemoTicket.getAttribute('data-ticket') || 'URT-1024';
@@ -191,7 +227,55 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      6. Public Service Tracker (tracking_result.html)
      ========================================================================== */
+  function showTrackingState(opts) {
+    const card = document.querySelector('.result-card:not(#trackingState)');
+    if (!card || !window.URT_UX) return;
+    let holder = document.getElementById('trackingState');
+    if (!holder) {
+      holder = document.createElement('div');
+      holder.id = 'trackingState';
+      holder.className = 'result-card';
+      card.parentNode.insertBefore(holder, card);
+    }
+    card.style.display = 'none';
+    holder.style.display = '';
+    if (opts.skeleton) window.URT_UX.skeletonBlock(holder, 6);
+    else window.URT_UX.showState(holder, opts);
+  }
+
+  function hideTrackingState() {
+    const holder = document.getElementById('trackingState');
+    if (holder) holder.style.display = 'none';
+    const card = document.querySelector('.result-card:not(#trackingState)');
+    if (card) card.style.display = '';
+  }
+
+  // Loading skeleton -> hasil | error | tiket tidak ditemukan
   function initTrackingResultPage() {
+    if (!document.getElementById('displayTicketId')) return;
+    if (!window.URT_API || !window.URT_UX) return renderTrackingResult();
+    const run = () => {
+      showTrackingState({ skeleton: true });
+      window.URT_API.ready()
+        .then(() => {
+          hideTrackingState();
+          renderTrackingResult();
+        })
+        .catch(() => {
+          showTrackingState({
+            type: 'error',
+            title: 'Gagal memuat data servis',
+            message: 'Periksa koneksi internet Anda lalu coba lagi.',
+            actionLabel: 'Coba lagi ↻',
+            onAction: run
+          });
+          window.URT_UX.toast('Gagal memuat data. Coba lagi.', 'error');
+        });
+    };
+    run();
+  }
+
+  function renderTrackingResult() {
     const displayTicketIdEl = document.getElementById('displayTicketId');
     if (!displayTicketIdEl) return;
 
@@ -206,10 +290,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const ticket = (window.getTicketById && window.getTicketById(targetId)) ||
-      (window.URT_DATA && window.URT_DATA.tickets.find(t => t.id === targetId)) ||
-      (window.URT_DATA && window.URT_DATA.tickets[0]);
+      (window.URT_DATA && window.URT_DATA.tickets.find(t => t.id === targetId));
 
-    if (!ticket) return;
+    if (!ticket) {
+      showTrackingState({
+        type: 'empty',
+        title: 'Yah, tiket tidak ditemukan 🔍',
+        message: 'Nomor tiket "' + targetId + '" tidak terdaftar. Periksa kembali nomor di struk Anda.',
+        actionLabel: 'Cari Tiket Lain',
+        onAction: () => { window.location.href = 'index.html'; }
+      });
+      return;
+    }
 
     const customer = window.getCustomerById ? window.getCustomerById(ticket.customerId) : null;
     const technician = window.getTechnicianById ? window.getTechnicianById(ticket.technicianId) : null;
@@ -281,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
         actionBanner.innerHTML = `
           <div>
             <h2 style="font-size: 15px; font-weight: 700; color: #166534; margin-bottom: 4px;">Perangkat Siap Diambil</h2>
-            <p style="font-size: 13px; color: #15803d; margin: 0;">Pengerjaan servis ${ticket.device} telah selesai dan lulus uji Quality Control. Silakan ambil unit di counter ServisKita.</p>
+            <p style="font-size: 13px; color: #15803d; margin: 0;">Pengerjaan servis ${window.URT_UX ? window.URT_UX.esc(ticket.device) : ticket.device} telah selesai dan lulus uji Quality Control. Silakan ambil unit di counter ServisKita.</p>
           </div>
           <a href="pelanggan/beranda-pelanggan.html" class="btn btn--primary" style="padding: 10px 20px; font-size: 14px; white-space: nowrap; background: #16a34a; border-color: #16a34a;">
             Buka Portal Pelanggan &rarr;
@@ -316,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
         actionBanner.innerHTML = `
           <div>
             <h2 style="font-size: 15px; font-weight: 700; color: #1e40af; margin-bottom: 4px;">Unit Sedang Dalam Penanganan</h2>
-            <p style="font-size: 13px; color: #3b82f6; margin: 0;">Teknisi ${technician ? technician.name : 'kami'} sedang menangani perangkat ${ticket.device}. Anda akan menerima pemberitahuan otomatis setelah tahap selesai.</p>
+            <p style="font-size: 13px; color: #3b82f6; margin: 0;">Teknisi ${technician ? (window.URT_UX ? window.URT_UX.esc(technician.name) : technician.name) : 'kami'} sedang menangani perangkat ${window.URT_UX ? window.URT_UX.esc(ticket.device) : ticket.device}. Anda akan menerima pemberitahuan otomatis setelah tahap selesai.</p>
           </div>
           <a href="pelanggan/beranda-pelanggan.html" class="btn btn--primary" style="padding: 10px 20px; font-size: 14px; white-space: nowrap;">
             Buka Portal Pelanggan &rarr;
