@@ -65,10 +65,33 @@ CREATE TABLE tiket_servis (
     catatan_teknisi TEXT,
     biaya_estimasi DECIMAL(10,2),
     biaya_akhir DECIMAL(10,2),
-    status ENUM('menunggu', 'diestimasi', 'menunggu_persetujuan', 'disetujui', 'ditolak', 'diproses', 'selesai') DEFAULT 'menunggu',
+    status ENUM('MASUK', 'DIAGNOSIS', 'PERSETUJUAN', 'PERBAIKAN', 'QC', 'SELESAI', 'DITOLAK') DEFAULT 'MASUK',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_pelanggan) REFERENCES users(id_user),
     FOREIGN KEY (id_teknisi) REFERENCES users(id_user),
     FOREIGN KEY (id_layanan) REFERENCES layanan(id_layanan)
+);
+
+-- Demo catalog so a clean installation can submit its first service request.
+INSERT IGNORE INTO users (nama, email, password, role, no_telp)
+VALUES ('URT Demo Owner', 'demo-owner@urt.local', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi', 'owner', '0800000000');
+
+INSERT INTO bisnis (id_owner, nama_bisnis, alamat)
+SELECT u.id_user, 'URT Service Center', 'Alamat demo'
+FROM users u
+WHERE u.email = 'demo-owner@urt.local'
+  AND NOT EXISTS (SELECT 1 FROM bisnis b WHERE b.id_owner = u.id_user);
+
+INSERT INTO layanan (id_bisnis, nama_layanan, deskripsi, harga_dasar)
+SELECT b.id_bisnis, seed.nama_layanan, seed.deskripsi, seed.harga_dasar
+FROM bisnis b
+JOIN users u ON u.id_user = b.id_owner AND u.email = 'demo-owner@urt.local'
+CROSS JOIN (
+    SELECT 'Pemeriksaan dan Diagnosis' AS nama_layanan, 'Pemeriksaan awal perangkat' AS deskripsi, 0.00 AS harga_dasar
+    UNION ALL SELECT 'Perbaikan Perangkat', 'Perbaikan perangkat dan komponen', 150000.00
+    UNION ALL SELECT 'Pembersihan Perangkat', 'Pembersihan internal perangkat', 75000.00
+) seed
+WHERE NOT EXISTS (
+    SELECT 1 FROM layanan l WHERE l.id_bisnis = b.id_bisnis AND l.nama_layanan = seed.nama_layanan
 );

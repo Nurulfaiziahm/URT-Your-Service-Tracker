@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnFillDemoTicket && ticketInput) {
     btnFillDemoTicket.addEventListener('click', () => {
-      const demoTicket = btnFillDemoTicket.getAttribute('data-ticket') || 'URT-1024';
+      const demoTicket = btnFillDemoTicket.getAttribute('data-ticket') || 'URT-2026-001';
       ticketInput.value = demoTicket;
       ticketInput.focus();
     });
@@ -197,26 +197,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const ticketQuery = urlParams.get('ticket');
-    const defaultId = 'URT-2026-001';
-
-    let targetId = defaultId;
-    if (ticketQuery) {
-      const raw = ticketQuery.trim().replace(/^#/, '').toUpperCase();
-      if (raw) targetId = raw;
+    const inputEl = document.getElementById('searchTicketInput');
+    if (inputEl) inputEl.value = ticketQuery || '';
+    const ticket = window.getTicketById(ticketQuery);
+    if (!ticket) {
+      const card = document.querySelector('.result-card');
+      card.replaceChildren();
+      const heading = document.createElement('h2');
+      heading.textContent = 'Tiket tidak ditemukan (Ticket not found)';
+      heading.setAttribute('role', 'alert');
+      card.appendChild(heading);
+      return;
     }
-
-    const ticket = (window.getTicketById && window.getTicketById(targetId)) ||
-      (window.URT_DATA && window.URT_DATA.tickets.find(t => t.id === targetId)) ||
-      (window.URT_DATA && window.URT_DATA.tickets[0]);
-
-    if (!ticket) return;
 
     const customer = window.getCustomerById ? window.getCustomerById(ticket.customerId) : null;
     const technician = window.getTechnicianById ? window.getTechnicianById(ticket.technicianId) : null;
 
     displayTicketIdEl.textContent = '#' + ticket.id;
-    const inputEl = document.getElementById('searchTicketInput');
-    if (inputEl && ticketQuery) inputEl.value = '#' + ticket.id;
+    if (inputEl) inputEl.value = ticket.id;
 
     const deviceEl = document.getElementById('displayDevice');
     if (deviceEl) deviceEl.textContent = ticket.device;
@@ -239,18 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Stepper mapping
     const steps = document.querySelectorAll('.tracker-stepper .tracker-step');
-    steps.forEach(s => {
+    steps.forEach((s, index) => {
       s.classList.remove('is-done', 'is-active');
       const circle = s.querySelector('.step-circle');
-      if (circle) circle.textContent = circle.getAttribute('data-step') || circle.textContent;
+      if (circle) circle.textContent = String(index + 1);
     });
 
-    let activeIndex = 2; // Default Persetujuan
-    if (ticket.status === 'MASUK') activeIndex = 0;
-    else if (ticket.status === 'DIAGNOSA') activeIndex = 1;
-    else if (ticket.status === 'PERSETUJUAN') activeIndex = 2;
-    else if (ticket.status === 'PENGERJAAN' || ticket.status === 'QC') activeIndex = 3;
-    else if (ticket.status === 'SELESAI') activeIndex = 4;
+    const activeIndex = window.TICKET_STATUSES[ticket.status].step;
 
     steps.forEach((step, idx) => {
       const circle = step.querySelector('.step-circle');
@@ -281,13 +274,20 @@ document.addEventListener('DOMContentLoaded', () => {
         actionBanner.innerHTML = `
           <div>
             <h2 style="font-size: 15px; font-weight: 700; color: #166534; margin-bottom: 4px;">Perangkat Siap Diambil</h2>
-            <p style="font-size: 13px; color: #15803d; margin: 0;">Pengerjaan servis ${ticket.device} telah selesai dan lulus uji Quality Control. Silakan ambil unit di counter ServisKita.</p>
+            <p style="font-size: 13px; color: #15803d; margin: 0;">Pengerjaan servis ${window.escapeHtml(ticket.device)} telah selesai dan lulus uji Quality Control. Silakan ambil unit di counter ServisKita.</p>
           </div>
           <a href="pelanggan/beranda-pelanggan.html" class="btn btn--primary" style="padding: 10px 20px; font-size: 14px; white-space: nowrap; background: #16a34a; border-color: #16a34a;">
             Buka Portal Pelanggan &rarr;
           </a>
         `;
       }
+    } else if (ticket.status === 'DITOLAK') {
+      if (statusBadge) {
+        statusBadge.style.background = '#fee2e2';
+        statusBadge.style.color = '#991b1b';
+      }
+      if (statusText) statusText.textContent = ticket.statusLabel;
+      if (actionBanner) actionBanner.textContent = 'Estimasi ditolak. Hubungi tempat servis untuk pengambilan unit.';
     } else if (ticket.status === 'PERSETUJUAN') {
       if (statusBadge) {
         statusBadge.style.background = '#fef3c7';
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
         actionBanner.innerHTML = `
           <div>
             <h2 style="font-size: 15px; font-weight: 700; color: #1e40af; margin-bottom: 4px;">Unit Sedang Dalam Penanganan</h2>
-            <p style="font-size: 13px; color: #3b82f6; margin: 0;">Teknisi ${technician ? technician.name : 'kami'} sedang menangani perangkat ${ticket.device}. Anda akan menerima pemberitahuan otomatis setelah tahap selesai.</p>
+            <p style="font-size: 13px; color: #3b82f6; margin: 0;">Teknisi ${window.escapeHtml(technician ? technician.name : 'kami')} sedang menangani perangkat ${window.escapeHtml(ticket.device)}. Anda akan menerima pemberitahuan otomatis setelah tahap selesai.</p>
           </div>
           <a href="pelanggan/beranda-pelanggan.html" class="btn btn--primary" style="padding: 10px 20px; font-size: 14px; white-space: nowrap;">
             Buka Portal Pelanggan &rarr;

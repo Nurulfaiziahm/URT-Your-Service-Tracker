@@ -370,34 +370,35 @@ URT-Your-Service-Tracker/
 
 ## How to Run
 
-Proyek ini dibangun menggunakan teknologi web murni (*pure static web*), sehingga tidak memerlukan instalasi dependensi *package manager*, kompilasi, atau pembangunan berkas (*build step*).
+Antarmuka menggunakan HTML, CSS, dan JavaScript. Alur login, registrasi, pengajuan, dan pelacakan berbasis PHP memerlukan PHP, MySQL, dan web server lokal.
 
-### Metode 1: Menggunakan Local Development Server (Direkomendasikan)
-Menjalankan proyek melalui server lokal memastikan font, gambar SVG, dan skrip JavaScript termuat sempurna tanpa batasan kebijakan keamanan lokal peramban (*CORS/file:// protocol*).
+### Menjalankan versi PHP
+Jalankan Apache dan MySQL (misalnya melalui XAMPP), impor `urt.sql` ke MySQL, lalu buka `http://localhost/URT - Your Service Tracker/`. Sesuaikan kredensial database pada `koneksi.php` jika konfigurasi lokal berbeda.
 
-**Menggunakan Python:**
+Halaman PHP tidak dapat dijalankan melalui `python -m http.server`, `npx serve`, Live Server, atau dengan membuka HTML langsung. Halaman statis HTML tetap dapat dijelajahi melalui server statis.
+
+Impor `urt.sql` juga membuat akun demo owner `demo-owner@urt.local` dengan kata sandi `password` beserta katalog layanan awal. Ganti kredensial demo sebelum memakai database untuk data nyata.
+
+**Server statis untuk halaman HTML saja:**
 ```bash
 # Buka terminal pada direktori proyek
 python -m http.server 8000
 ```
 Buka peramban dan navigasikan ke `http://localhost:8000/`.
 
-**Menggunakan Node.js:**
+**Server statis Node.js untuk halaman HTML saja:**
 ```bash
 # Menjalankan npx serve
 npx serve .
 ```
 
-**Menggunakan VS Code:**
-Pasang ekstensi **Live Server**, klik kanan pada berkas `index.html`, lalu pilih **"Open with Live Server"**.
-
-### Metode 2: Membuka Berkas HTML Secara Langsung
-Anda juga dapat langsung membuka berkas `index.html` dengan mengklik ganda (*double-click*) pada *file explorer* di peramban web modern (Google Chrome, Microsoft Edge, Mozilla Firefox, Safari).
+### Membuka halaman statis
+Halaman `.html` dapat dibuka langsung atau melalui Live Server. Halaman `.php` harus dijalankan melalui PHP web server.
 
 ### Akses Cepat Antar Portal
 Setelah halaman utama terbuka:
-- Klik tombol **"Masuk Portal"** pada bilah navigasi atas (mengarah ke `masuk.html`) untuk memilih masuk ke **Portal Pelanggan**, **Portal Teknisi**, atau **Portal Owner**.
-- Pelacakan tiket publik dapat langsung diuji melalui kolom pencarian di landing page atau membuka `tracking_result.html?ticket=URT-2026-001`.
+- Klik tombol **"Masuk Portal"** pada bilah navigasi atas (mengarah ke `masuk.php`) untuk masuk.
+- Pelacakan tiket publik tersedia melalui kolom pencarian pada landing page dan membaca tiket dari database.
 
 ---
 

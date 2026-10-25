@@ -89,8 +89,8 @@
           <div>
             <span class="page-title">PORTAL PELANGGAN</span>
             <h1>Penolakan Perbaikan</h1>
-            <p class="subtitle">
-              Konfirmasi penolakan estimasi perbaikan untuk tiket #URT-2026-001 (ASUS VivoBook 14).
+            <p class="subtitle" data-ticket-bind="subtitle">
+              Konfirmasi penolakan estimasi perbaikan untuk tiket #&#8212; (&#8212;).
             </p>
           </div>
           <a href="beranda-pelanggan.html" class="btn-secondary" style="text-decoration: none;">
@@ -124,13 +124,13 @@
               <span class="badge-danger-tag">DIBATALKAN</span>
             </div>
 
-            <p style="font-size: 14px; color: var(--primary-blue); font-weight: 600;">
-              #URT-2026-001 &bull; ASUS VivoBook 14
+            <p style="font-size: 14px; color: var(--primary-blue); font-weight: 600;" data-ticket-bind="summary">
+              #&#8212; &bull; &#8212;
             </p>
 
             <dl class="dl-grid">
               <dt>Pemilik Unit</dt>
-              <dd>Nino Rachimas</dd>
+              <dd>&#8212;</dd>
 
               <dt>Nomor Telepon</dt>
               <dd>0812 3456 7890</dd>
@@ -142,13 +142,13 @@
               <dd>Debu menumpuk pada fan &amp; thermal paste kering</dd>
 
               <dt>Estimasi Ditolak</dt>
-              <dd><span style="text-decoration: line-through; color: #94a3b8;">Rp250.000</span> (Tidak disetujui)</dd>
+              <dd><span style="text-decoration: line-through; color: #94a3b8;">&#8212;</span> (Tidak disetujui)</dd>
 
               <dt>Status Unit</dt>
               <dd><strong style="color: #059669;">Siap Diambil di Outlet</strong></dd>
 
               <dt>Teknisi Pemeriksa</dt>
-              <dd>Sofia Malvalena Adam</dd>
+              <dd>&#8212;</dd>
             </dl>
 
             <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 20px 0;" />
@@ -179,21 +179,21 @@
                 <div class="pickup-step-num">1</div>
                 <div>
                   <strong>Tunjukkan Kode Tiket</strong><br />
-                  <span style="color: var(--text-muted);">Sebutkan kode tiket <strong>#URT-2026-001</strong> ke staf counter outlet.</span>
+                  <span style="color: var(--text-muted);">Sebutkan kode tiket <strong data-ticket-bind="ticket">-</strong> ke staf counter outlet.</span>
                 </div>
               </div>
               <div class="pickup-step">
                 <div class="pickup-step-num">2</div>
                 <div>
                   <strong>Verifikasi Identitas</strong><br />
-                  <span style="color: var(--text-muted);">Tunjukkan nomor WhatsApp atau identitas sesuai data pendaftaran (Nino Rachimas).</span>
+                  <span style="color: var(--text-muted);">Tunjukkan nomor WhatsApp atau identitas sesuai data pendaftaran (<span data-ticket-bind="customer">-</span>).</span>
                 </div>
               </div>
               <div class="pickup-step">
                 <div class="pickup-step-num">3</div>
                 <div>
                   <strong>Cek Kelengkapan Unit</strong><br />
-                  <span style="color: var(--text-muted);">Pastikan unit laptop ASUS VivoBook 14 dan adaptor charger Anda lengkap saat diserahterimakan.</span>
+                  <span style="color: var(--text-muted);">Pastikan unit <span data-ticket-bind="device">-</span> dan adaptor charger Anda lengkap saat diserahterimakan.</span>
                 </div>
               </div>
             </div>

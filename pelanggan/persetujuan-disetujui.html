@@ -96,9 +96,9 @@
           <div>
             <span class="page-title">PORTAL PELANGGAN</span>
             <h1>Persetujuan Biaya</h1>
-            <p class="subtitle">
-              Konfirmasi biaya perbaikan ASUS VivoBook 14 pada tiket
-              #URT-2026-001.
+            <p class="subtitle" data-ticket-bind="subtitle">
+              Konfirmasi biaya perbaikan &#8212; pada tiket
+              #&#8212;.
             </p>
           </div>
           <a
@@ -122,8 +122,8 @@
             >
               ✓ Perbaikan telah Anda setujui
             </h3>
-            <p style="font-size: 14px">
-              Persetujuan Nino Rachimas tercatat pada 26 Agu 2026. Teknisi telah
+            <p style="font-size: 14px" data-ticket-bind="decision">
+              Persetujuan &#8212; tercatat pada 26 Agu 2026. Teknisi telah
               menerima konfirmasi persetujuan dan dapat melanjutkan pekerjaan.
             </p>
           </div>
@@ -149,19 +149,19 @@
               <span class="badge-green">BIAYA DISETUJUI</span>
             </div>
 
-            <p
+            <p data-ticket-bind="summary"
               style="
                 font-size: 14px;
                 color: var(--primary-blue);
                 font-weight: 600;
               "
             >
-              #URT-2026-001 • ASUS VivoBook 14
+              #&#8212; • &#8212;
             </p>
 
             <dl class="dl-grid">
               <dt>Pelanggan</dt>
-              <dd>Nino Rachimas</dd>
+              <dd>&#8212;</dd>
 
               <dt>Temuan Diagnosis</dt>
               <dd>Thermal Paste Kering &amp; Debu Kipas</dd>
@@ -179,7 +179,7 @@
               <dd>3 Sep 2026</dd>
 
               <dt>Teknisi</dt>
-              <dd>Sofia Malvalena Adam</dd>
+              <dd>&#8212;</dd>
             </dl>
 
             <hr
@@ -197,14 +197,14 @@
                 <p style="font-size: 14px; color: var(--text-muted)">
                   Total Biaya Servis
                 </p>
-                <p
+                <p data-ticket-bind="amount"
                   style="
                     font-size: 24px;
                     font-weight: 700;
                     color: var(--primary-blue);
                   "
                 >
-                  Rp250.000
+                  &#8212;
                 </p>
               </div>
               <div style="text-align: right">
@@ -217,7 +217,7 @@
                 >
                   ✓ Saya menyetujui tindakan & estimasi
                 </p>
-                <p style="font-size: 12px; color: var(--text-muted)">
+                <p style="font-size: 12px; color: var(--text-muted)" data-ticket-bind="saved">
                   Tersimpan • 26 Agu 2026
                 </p>
               </div>
@@ -270,7 +270,7 @@
                 </li>
                 <li>
                   <strong style="font-size: 14px">Proses perbaikan</strong>
-                  <p
+                  <p data-ticket-bind="action"
                     style="
                       font-size: 12px;
                       color: var(--text-muted);
@@ -334,5 +334,6 @@
           <p>URT — Your Service Tracker | Kelompok 2</p>
         </footer>
       </div>
+    </main>
   </body>
 </html>

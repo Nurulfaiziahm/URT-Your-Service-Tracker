@@ -812,7 +812,7 @@
           normalizeKey(t.id) === key ||
           normalizeKey(t.slug) === key ||
           normalizeKey(t.username) === key ||
-          normalizeKey(t.name).includes(key)
+          normalizeKey(t.name) === key
       ) || null
     );
   }
@@ -820,16 +820,11 @@
   function getTicketById(id) {
     if (!id) return null;
     const cleanId = normalizeKey(id);
-    return (
-      URT_DATA.tickets.find((t) => {
-        const ticketClean = normalizeKey(t.id);
-        return (
-          ticketClean === cleanId ||
-          ticketClean.endsWith(cleanId) ||
-          cleanId.endsWith(ticketClean)
-        );
-      }) || null
+    const matches = URT_DATA.tickets.filter((ticket) =>
+      normalizeKey(ticket.id) === cleanId ||
+      (/^\d{3,4}$/.test(cleanId) && normalizeKey(ticket.id).split("-").pop() === cleanId)
     );
+    return matches.length === 1 ? matches[0] : null;
   }
 
   function getServiceById(idOrSlug) {
@@ -862,9 +857,183 @@
     return "Rp" + num.toLocaleString("id-ID");
   }
 
+  // Canonical ticket stages. Labels are presentation text, never comparison values.
+  const TICKET_STATUSES = Object.freeze({
+    MASUK: { label: "Menunggu Diagnosis", className: "warning", step: 0 },
+    DIAGNOSIS: { label: "Dalam Diagnosis", className: "warning", step: 1 },
+    PERSETUJUAN: { label: "Menunggu Persetujuan", className: "warning", step: 2 },
+    PERBAIKAN: { label: "Dalam Perbaikan", className: "progress", step: 3 },
+    QC: { label: "Pemeriksaan QC", className: "progress", step: 3 },
+    SELESAI: { label: "Selesai", className: "success", step: 4 },
+    DITOLAK: { label: "Ditolak", className: "danger", step: 2 }
+  });
+
+  // Keep fixture edits and new requests in one shared ticket collection.
+  const RECORD_STORAGE_KEY = "urt_record_updates_v1";
+  let recordUpdates = {};
+  try {
+    const saved = JSON.parse(localStorage.getItem(RECORD_STORAGE_KEY) || "{}");
+    if (saved && typeof saved === "object" && !Array.isArray(saved)) recordUpdates = saved;
+  } catch { /* A fresh demo still works when storage is unavailable. */ }
+  ["tickets", "customers", "technicians", "services"].forEach((collection) => {
+    URT_DATA[collection].forEach((record) => {
+      const patch = recordUpdates[collection]?.[record.id];
+      if (patch && typeof patch === "object") Object.assign(record, patch, { id: record.id });
+    });
+  });
+  Object.entries(recordUpdates.tickets || {}).forEach(([id, record]) => {
+    if (!URT_DATA.tickets.some((ticket) => ticket.id === id) &&
+        record?.customerId && record?.device && record?.issue) {
+      URT_DATA.tickets.push({ ...record, id });
+    }
+  });
+  URT_DATA.tickets.forEach((ticket) => {
+    const stage = TICKET_STATUSES[ticket.status];
+    if (stage) Object.assign(ticket, { statusLabel: stage.label, statusClass: stage.className, currentStep: stage.step + 1 });
+    if (!ticket.estimatedCompletionDate) {
+      const match = ticket.estimatedCompletion?.match(/^(\d{1,2}) (\w+) (\d{4})/);
+      const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+      if (match && months.includes(match[2])) {
+        ticket.estimatedCompletionDate = `${match[3]}-${String(months.indexOf(match[2]) + 1).padStart(2, "0")}-${match[1].padStart(2, "0")}`;
+      }
+    }
+  });
+
+  function saveRecord(collection, id, changes, create = false) {
+    const record = URT_DATA[collection]?.find((item) => item.id === id);
+    if (!record && !(create && collection === "tickets")) return false;
+    const patch = { ...changes };
+    delete patch.id;
+    const updates = { ...recordUpdates, [collection]: {
+      ...recordUpdates[collection],
+      [id]: { ...recordUpdates[collection]?.[id], ...patch }
+    } };
+    try {
+      localStorage.setItem(RECORD_STORAGE_KEY, JSON.stringify(updates));
+    } catch {
+      window.alert("Perubahan belum disimpan. Izinkan penyimpanan browser lalu coba lagi.");
+      return false;
+    }
+    recordUpdates = updates;
+    if (record) Object.assign(record, patch);
+    else URT_DATA.tickets.push({ ...patch, id });
+    return true;
+  }
+
+  function createTicket(customer, request) {
+    if (!customer || !request?.device?.trim() || !request?.issue?.trim()) return null;
+    const year = new Date().getFullYear();
+    let number = 1000;
+    let id;
+    do {
+      id = `URT-${year}-${++number}`;
+    } while (URT_DATA.tickets.some((ticket) => ticket.id === id));
+    const createdAt = new Date().toLocaleString("id-ID");
+    const stage = TICKET_STATUSES.MASUK;
+    const ticket = {
+      customerId: customer.id, technicianId: null,
+      device: request.device.trim(), deviceDetail: request.device.trim(),
+      deviceType: request.type || "Perangkat", issue: request.issue.trim(),
+      diagnosis: "Menunggu pemeriksaan teknisi", actionNeeded: "Menunggu diagnosis",
+      sparepart: "-", status: "MASUK", statusLabel: stage.label,
+      statusClass: stage.className, estimatedCost: 0, costBreakdown: [],
+      createdAt, month: `${year}-${String(new Date().getMonth() + 1).padStart(2, "0")}`,
+      estimatedCompletion: "Menunggu diagnosis", currentStep: 1,
+      timeline: [
+        { title: "Pengajuan Servis Diterima", time: createdAt, done: true },
+        { title: stage.label, time: "Menunggu teknisi", current: true }
+      ]
+    };
+    return saveRecord("tickets", id, ticket, true) ? getTicketById(id) : null;
+  }
+
+  function setTicketStatus(ticket, status, changes = {}) {
+    const stage = TICKET_STATUSES[status];
+    if (!ticket || !stage) return false;
+    const timeline = (ticket.timeline || []).filter((entry) => entry.done || entry.current)
+      .map((entry) => ({ ...entry, done: true, current: false }));
+    timeline.push({ title: stage.label, time: new Date().toLocaleString("id-ID"),
+      done: status === "SELESAI", current: status !== "SELESAI" });
+    return saveRecord("tickets", ticket.id, { ...changes, status,
+      statusLabel: stage.label, statusClass: stage.className, currentStep: stage.step + 1, timeline });
+  }
+
+  function getCurrentCustomer() {
+    // The existing customer portal uses this demo identity (there is no backend login).
+    return getCustomerById("CUS-001");
+  }
+
+  function showRecordError(message = "Tiket tidak ditemukan (Ticket not found). Periksa nomor tiket Anda.") {
+    const container = document.querySelector("main .content, main, .content");
+    if (!container) return;
+    const section = document.createElement("section");
+    section.className = "card";
+    section.setAttribute("role", "alert");
+    const heading = document.createElement("h1");
+    heading.textContent = message;
+    section.appendChild(heading);
+    container.replaceChildren(section);
+  }
+
+  function getSelectedRecord(collection, customerId) {
+    const id = new URLSearchParams(window.location.search).get("id");
+    const resolvers = { tickets: getTicketById, customers: getCustomerById,
+      technicians: getTechnicianById, services: getServiceById };
+    const record = resolvers[collection]?.(id);
+    if (!record || (customerId && record.customerId !== customerId)) {
+      showRecordError(collection === "tickets" ? undefined : "Data tidak ditemukan. Pilih data dari daftar.");
+      return null;
+    }
+    return record;
+  }
+
+  function recordUrl(path, record, parameter = "id") {
+    const url = new URL(path, window.location.href);
+    url.searchParams.set(parameter, record.id);
+    return url.href;
+  }
+
+  function preserveTicketLinks(root, ticket) {
+    const pages = ["detail-tiket.html", "detail-servis.html", "estimasi.html",
+      "ringkasan-terkirim.html", "tiket-selesai.html", "persetujuan-servis.html",
+      "persetujuan-disetujui.html", "persetujuan-ditolak.html", "tracking_result.html"];
+    root.querySelectorAll("a[href]").forEach((link) => {
+      const url = new URL(link.getAttribute("href"), window.location.href);
+      if (url.origin === window.location.origin && pages.includes(url.pathname.split("/").pop())) {
+        link.href = recordUrl(url.href, ticket, url.pathname.endsWith("tracking_result.html") ? "ticket" : "id");
+      }
+    });
+    root.querySelectorAll("form[action]").forEach((form) => {
+      const url = new URL(form.getAttribute("action"), window.location.href);
+      if (!pages.includes(url.pathname.split("/").pop())) return;
+      let field = form.querySelector('input[name="id"]');
+      if (!field) {
+        field = document.createElement("input");
+        field.type = "hidden";
+        field.name = "id";
+        form.appendChild(field);
+      }
+      field.value = ticket.id;
+    });
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+  }
+
+  function renderDashboardTimeline(container, ticket) {
+    if (!container) return;
+    container.innerHTML = (ticket.timeline || []).map((entry) => `
+      <div class="timeline-step"><div class="timeline-circle circle-blue"></div><div class="timeline-step-body">
+      <div class="timeline-step-header"><span class="timeline-step-title">${escapeHtml(entry.title)}</span>
+      <span class="timeline-step-time">${escapeHtml(entry.time)}</span></div>
+      <p class="timeline-step-desc">${escapeHtml(entry.actor || '')}</p></div></div>`).join('');
+  }
+
   function getDashboardStats() {
     const activeTickets = URT_DATA.tickets.filter(
-      (t) => t.status !== "SELESAI"
+      (t) => t.status !== "SELESAI" && t.status !== "DITOLAK"
     ).length;
     const pendingApproval = URT_DATA.tickets.filter(
       (t) => t.status === "PERSETUJUAN"
@@ -998,6 +1167,17 @@
 
   // Export to global window scope
   window.URT_DATA = URT_DATA;
+  window.TICKET_STATUSES = TICKET_STATUSES;
+  window.saveRecord = saveRecord;
+  window.createTicket = createTicket;
+  window.setTicketStatus = setTicketStatus;
+  window.getCurrentCustomer = getCurrentCustomer;
+  window.getSelectedRecord = getSelectedRecord;
+  window.showRecordError = showRecordError;
+  window.recordUrl = recordUrl;
+  window.preserveTicketLinks = preserveTicketLinks;
+  window.escapeHtml = escapeHtml;
+  window.renderDashboardTimeline = renderDashboardTimeline;
   window.getCustomerById = getCustomerById;
   window.getTechnicianById = getTechnicianById;
   window.getTicketById = getTicketById;

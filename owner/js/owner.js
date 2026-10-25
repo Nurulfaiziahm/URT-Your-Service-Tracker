@@ -1,6 +1,22 @@
 (() => {
   "use strict";
 
+  const page = window.location.pathname.split('/').pop();
+  const selectedCollections = {
+    'detail-tiket.html': 'tickets',
+    'detail-teknisi.html': 'technicians', 'edit-teknisi.html': 'technicians',
+    'detail-pelanggan.html': 'customers', 'edit-pelanggan.html': 'customers',
+    'detail-layanan.html': 'services', 'edit-layanan.html': 'services'
+  };
+  const collection = selectedCollections[page];
+  const selectedRecord = collection ? window.getSelectedRecord(collection) : null;
+  if (collection && !selectedRecord) return;
+  if (selectedRecord) {
+    document.querySelectorAll('main a[href^="edit-"]').forEach((link) => {
+      link.href = window.recordUrl(link.getAttribute('href'), selectedRecord);
+    });
+  }
+
   const toast = document.getElementById("toast");
   let toastTimer;
 
@@ -134,9 +150,9 @@
         return `
           <tr>
             <td><a class="ticket-link" href="detail-tiket.html?id=${t.id}">#${t.id}</a></td>
-            <td><strong>${t.device}</strong></td>
-            <td>${custName}</td>
-            <td>${techName}</td>
+            <td><strong>${window.escapeHtml(t.device)}</strong></td>
+            <td>${window.escapeHtml(custName)}</td>
+            <td>${window.escapeHtml(techName)}</td>
             <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
           </tr>
         `;
@@ -155,11 +171,11 @@
           const techName = tech ? tech.name.split(" ").slice(0, 2).join(" ") : "Teknisi";
           const searchContent = `#${t.id.toLowerCase()} ${t.device.toLowerCase()} ${custName.toLowerCase()} ${techName.toLowerCase()} ${t.status.toLowerCase()}`;
           return `
-            <tr data-ticket-row data-search="${searchContent}" data-status="${t.status.toLowerCase()}" data-month="${t.month || '2026-08'}">
+            <tr data-ticket-row data-search="${window.escapeHtml(searchContent)}" data-status="${t.status.toLowerCase()}" data-month="${t.month || '2026-08'}">
               <td><strong>#${t.id}</strong></td>
-              <td>${t.device}</td>
-              <td>${custName}</td>
-              <td>${techName}</td>
+              <td>${window.escapeHtml(t.device)}</td>
+              <td>${window.escapeHtml(custName)}</td>
+              <td>${window.escapeHtml(techName)}</td>
               <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
               <td><a class="detail-action" href="detail-tiket.html?id=${t.id}">Detail</a></td>
             </tr>
@@ -176,10 +192,10 @@
       techTable.innerHTML = technicians.map((tech) => {
         const searchContent = `${tech.name.toLowerCase()} ${tech.username.toLowerCase()} ${tech.specialty.toLowerCase()}`;
         return `
-          <tr data-technician-row data-search="${searchContent}" data-specialty="${tech.specialties.join(' ')}" data-workload="${tech.workload}" data-status="${tech.status}">
-            <td><strong>${tech.name}</strong></td>
-            <td>${tech.username}</td>
-            <td>${tech.specialty}</td>
+          <tr data-technician-row data-search="${window.escapeHtml(searchContent)}" data-specialty="${window.escapeHtml(tech.specialties.join(' '))}" data-workload="${tech.workload}" data-status="${tech.status}">
+            <td><strong>${window.escapeHtml(tech.name)}</strong></td>
+            <td>${window.escapeHtml(tech.username)}</td>
+            <td>${window.escapeHtml(tech.specialty)}</td>
             <td>${tech.activeTickets} tiket</td>
             <td><span class="status status--success">${tech.status.toUpperCase()}</span></td>
             <td>
@@ -199,13 +215,13 @@
     if (custTable && isPelangganPage) {
       custTable.innerHTML = customers.map((c) => {
         const searchContent = `${c.name.toLowerCase()} ${c.email.toLowerCase()} ${c.phone}`;
-        const activeCount = tickets.filter((t) => t.customerId === c.id && t.status !== "SELESAI").length;
+        const activeCount = tickets.filter((t) => t.customerId === c.id && t.status !== "SELESAI" && t.status !== "DITOLAK").length;
         const ticketSummary = activeCount > 0 ? `${activeCount} aktif` : `1 selesai`;
         return `
-          <tr data-customer-row data-search="${searchContent}" data-status="${c.status}">
-            <td><strong>${c.name}</strong></td>
-            <td>${c.email}</td>
-            <td>${c.phone}</td>
+          <tr data-customer-row data-search="${window.escapeHtml(searchContent)}" data-status="${c.status}">
+            <td><strong>${window.escapeHtml(c.name)}</strong></td>
+            <td>${window.escapeHtml(c.email)}</td>
+            <td>${window.escapeHtml(c.phone)}</td>
             <td>${ticketSummary}</td>
             <td>${c.registeredDate}</td>
             <td>
@@ -225,11 +241,11 @@
       custTable.innerHTML = services.map((s) => {
         const searchContent = `${s.name.toLowerCase()} ${s.category.toLowerCase()}`;
         return `
-          <tr data-service-row data-search="${searchContent}" data-category="${s.categories.join(' ')}" data-status="${s.status}">
-            <td><strong>${s.name}</strong></td>
-            <td>${s.category}</td>
+          <tr data-service-row data-search="${window.escapeHtml(searchContent)}" data-category="${window.escapeHtml(s.categories.join(' '))}" data-status="${s.status}">
+            <td><strong>${window.escapeHtml(s.name)}</strong></td>
+            <td>${window.escapeHtml(s.category)}</td>
             <td>${s.priceLabel || window.formatCurrency(s.price)}</td>
-            <td>${s.duration}</td>
+            <td>${window.escapeHtml(s.duration)}</td>
             <td><span class="status status--success">${s.status.toUpperCase()}</span></td>
             <td>
               <div class="row-actions">
@@ -245,11 +261,8 @@
     // 6. Detail Tiket (detail-tiket.html)
     const ticketIdHeading = document.getElementById("ticketIdHeading");
     if (ticketIdHeading) {
-      const params = new URLSearchParams(window.location.search);
-      const ticketId = params.get("id") || "URT-2026-001";
-      const ticket = window.getTicketById ? window.getTicketById(ticketId) || tickets[0] : tickets[0];
-      const customer = window.getCustomerById ? window.getCustomerById(ticket.customerId) || customers[0] : customers[0];
-      const technician = window.getTechnicianById ? window.getTechnicianById(ticket.technicianId) || technicians[0] : technicians[0];
+      const ticket = selectedRecord;
+      const customer = window.getCustomerById(ticket.customerId);
 
       ticketIdHeading.textContent = `#${ticket.id}`;
       const subtitleEl = ticketIdHeading.nextElementSibling;
@@ -272,7 +285,7 @@
           <dt>Nomor Seri</dt><dd>${ticket.serialNumber || 'SN-' + ticket.id}</dd>
           <dt>Tanggal Masuk</dt><dd>${ticket.createdAt}</dd>
           <dt>Estimasi Selesai</dt><dd>${ticket.estimatedCompletion}</dd>
-          <dt>Keluhan Awal</dt><dd style="font-weight: 500; line-height: 1.5;">${ticket.issue}</dd>
+          <dt>Keluhan Awal</dt><dd style="font-weight: 500; line-height: 1.5;">${window.escapeHtml(ticket.issue)}</dd>
         `;
       }
 
@@ -281,7 +294,7 @@
       if (card2) {
         const diagNote = card2.querySelector("p");
         if (diagNote) {
-          diagNote.innerHTML = `<strong>Catatan Teknisi:</strong> ${ticket.diagnosis}`;
+          diagNote.innerHTML = `<strong>Catatan Teknisi:</strong> ${window.escapeHtml(ticket.diagnosis)}`;
         }
         const costBox = card2.querySelector(".cost-box");
         if (costBox) {
@@ -291,7 +304,7 @@
           
           const breakdownHtml = breakdown.map((item) => `
             <div class="cost-row">
-              <span>${item.item}</span>
+              <span>${window.escapeHtml(item.item)}</span>
               <strong>${window.formatCurrency(item.amount)}</strong>
             </div>
           `).join("");
@@ -310,7 +323,7 @@
       if (techSelect) {
         techSelect.innerHTML = technicians.map((t) => {
           const isSelected = t.id === ticket.technicianId ? "selected" : "";
-          return `<option value="${t.slug}" ${isSelected}>${t.name} (${t.specialty} • ${t.activeTickets} Tiket)</option>`;
+          return `<option value="${t.slug}" ${isSelected}>${window.escapeHtml(t.name)} (${window.escapeHtml(t.specialty)} • ${t.activeTickets} Tiket)</option>`;
         }).join("");
       }
 
@@ -323,10 +336,10 @@
         const dl = custCard.querySelector(".meta-list");
         if (dl) {
           dl.innerHTML = `
-            <dt>Nama Lengkap</dt><dd>${customer.name}</dd>
-            <dt>No. WhatsApp</dt><dd>${customer.phone}</dd>
-            <dt>Email</dt><dd>${customer.email}</dd>
-            <dt>Alamat</dt><dd>${customer.address}</dd>
+            <dt>Nama Lengkap</dt><dd>${window.escapeHtml(customer.name)}</dd>
+            <dt>No. WhatsApp</dt><dd>${window.escapeHtml(customer.phone)}</dd>
+            <dt>Email</dt><dd>${window.escapeHtml(customer.email)}</dd>
+            <dt>Alamat</dt><dd>${window.escapeHtml(customer.address)}</dd>
           `;
         }
       }
@@ -343,10 +356,10 @@
             <li class="timeline-step ${stepClass}">
               <span class="timeline-step__marker" aria-hidden="true">${marker}</span>
               <div class="timeline-step__content">
-                <strong class="timeline-step__title">${step.title}</strong>
+                <strong class="timeline-step__title">${window.escapeHtml(step.title)}</strong>
                 <div class="timeline-step__meta">
-                  <span class="timeline-step__time">${step.time}</span>
-                  ${step.actor ? `<span class="timeline-step__actor">&bull; ${step.actor}</span>` : ""}
+                  <span class="timeline-step__time">${window.escapeHtml(step.time)}</span>
+                  ${step.actor ? `<span class="timeline-step__actor">&bull; ${window.escapeHtml(step.actor)}</span>` : ""}
                 </div>
               </div>
             </li>
@@ -358,9 +371,7 @@
     // 7. Detail Teknisi (detail-teknisi.html)
     const techProfileCard = document.querySelector(".tech-profile-card");
     if (techProfileCard && window.location.pathname.includes("detail-teknisi.html")) {
-      const params = new URLSearchParams(window.location.search);
-      const techId = params.get("id") || "TECH-001";
-      const tech = window.getTechnicianById ? window.getTechnicianById(techId) || technicians[0] : technicians[0];
+      const tech = selectedRecord;
 
       const avatar = techProfileCard.querySelector(".tech-header-row div > div:first-child");
       if (avatar) avatar.textContent = tech.initials || "TK";
@@ -370,14 +381,14 @@
 
       const sub = techProfileCard.querySelector(".tech-header-row h2 + span");
       if (sub) {
-        sub.innerHTML = `Username: <strong>${tech.username}</strong> &bull; Spesialis: ${tech.specialty}`;
+        sub.innerHTML = `Username: <strong>${window.escapeHtml(tech.username)}</strong> &bull; Spesialis: ${window.escapeHtml(tech.specialty)}`;
       }
 
       const dl = techProfileCard.querySelector(".tech-meta-grid");
       if (dl) {
         dl.innerHTML = `
-          <div><dt>Email</dt><dd>${tech.email}</dd></div>
-          <div><dt>Nomor Telepon</dt><dd>${tech.phone}</dd></div>
+          <div><dt>Email</dt><dd>${window.escapeHtml(tech.email)}</dd></div>
+          <div><dt>Nomor Telepon</dt><dd>${window.escapeHtml(tech.phone)}</dd></div>
           <div><dt>Beban Tiket Aktif</dt><dd class="stat-badge-num">${tech.activeTickets} <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">tiket</span></dd></div>
           <div><dt>Total Tiket Selesai</dt><dd class="stat-badge-num" style="color: var(--success);">${tech.completedTickets} <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">unit</span></dd></div>
         `;
@@ -393,7 +404,7 @@
             return `
               <tr>
                 <td><strong>#${t.id}</strong></td>
-                <td>${t.device}</td>
+                <td>${window.escapeHtml(t.device)}</td>
                 <td>${c ? c.name : 'Pelanggan'}</td>
                 <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
                 <td>${t.estimatedCompletion}</td>
@@ -410,9 +421,7 @@
     // 8. Detail Pelanggan (detail-pelanggan.html)
     const custProfileCard = document.querySelector(".cust-profile-card");
     if (custProfileCard && window.location.pathname.includes("detail-pelanggan.html")) {
-      const params = new URLSearchParams(window.location.search);
-      const custId = params.get("id") || "CUS-001";
-      const cust = window.getCustomerById ? window.getCustomerById(custId) || customers[0] : customers[0];
+      const cust = selectedRecord;
 
       const avatar = custProfileCard.querySelector(".cust-header-row div > div:first-child");
       if (avatar) avatar.textContent = cust.initials || "PL";
@@ -428,9 +437,9 @@
       const dl = custProfileCard.querySelector(".cust-meta-grid");
       if (dl) {
         dl.innerHTML = `
-          <div><dt>Nomor WhatsApp</dt><dd>${cust.phone}</dd></div>
-          <div><dt>Email</dt><dd>${cust.email}</dd></div>
-          <div><dt>Alamat Domisili</dt><dd>${cust.address}</dd></div>
+          <div><dt>Nomor WhatsApp</dt><dd>${window.escapeHtml(cust.phone)}</dd></div>
+          <div><dt>Email</dt><dd>${window.escapeHtml(cust.email)}</dd></div>
+          <div><dt>Alamat Domisili</dt><dd>${window.escapeHtml(cust.address)}</dd></div>
           <div><dt>Total Belanja Servis</dt><dd class="stat-badge-num">${window.formatCurrency(cust.totalSpent)}</dd></div>
         `;
       }
@@ -445,7 +454,7 @@
             return `
               <tr>
                 <td><strong>#${t.id}</strong></td>
-                <td>${t.device}</td>
+                <td>${window.escapeHtml(t.device)}</td>
                 <td>${t.actionNeeded || t.issue}</td>
                 <td>${tech ? tech.name : 'Teknisi'}</td>
                 <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
@@ -463,16 +472,14 @@
     // 9. Detail Layanan (detail-layanan.html)
     const svcDetailCard = document.querySelector(".service-detail-card");
     if (svcDetailCard && window.location.pathname.includes("detail-layanan.html")) {
-      const params = new URLSearchParams(window.location.search);
-      const svcId = params.get("id") || "deep-cleaning-mx4";
-      const svc = window.getServiceById ? window.getServiceById(svcId) || services[1] : services[1];
+      const svc = selectedRecord;
 
       const headerDiv = svcDetailCard.querySelector(".service-header-row > div");
       if (headerDiv) {
         headerDiv.innerHTML = `
-          <span style="font-size: 12px; color: var(--primary); font-weight: 700; text-transform: uppercase;">${svc.category}</span>
-          <h2 style="font-size: 22px; margin: 4px 0; color: var(--text);">${svc.name}</h2>
-          <span style="color: var(--text-muted); font-size: 14px;">Estimasi Pengerjaan: <strong>${svc.duration}</strong></span>
+          <span style="font-size: 12px; color: var(--primary); font-weight: 700; text-transform: uppercase;">${window.escapeHtml(svc.category)}</span>
+          <h2 style="font-size: 22px; margin: 4px 0; color: var(--text);">${window.escapeHtml(svc.name)}</h2>
+          <span style="color: var(--text-muted); font-size: 14px;">Estimasi Pengerjaan: <strong>${window.escapeHtml(svc.duration)}</strong></span>
         `;
       }
 
@@ -480,7 +487,7 @@
       if (dl) {
         dl.innerHTML = `
           <div><dt>Harga Dasar</dt><dd class="stat-badge-num">${svc.priceLabel || window.formatCurrency(svc.price)}</dd></div>
-          <div><dt>Kategori</dt><dd>${svc.category}</dd></div>
+          <div><dt>Kategori</dt><dd>${window.escapeHtml(svc.category)}</dd></div>
           <div><dt>Total Unit Selesai</dt><dd class="stat-badge-num" style="color: var(--success);">18 <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">unit</span></dd></div>
           <div><dt>Garansi Layanan</dt><dd>30 Hari (Garansi Performa)</dd></div>
         `;
@@ -937,6 +944,63 @@ Pemilik: Andi Ramadhan`;
      Owner Subpage Form & Action Handlers
      ========================================================================== */
   function initOwnerSubpageForms() {
+    // Selected records drive both initial values and the save target.
+    const editForms = {
+      technicians: 'editTechnicianForm', customers: 'editCustomerForm', services: 'editServiceForm'
+    };
+    const editForm = selectedRecord && document.getElementById(editForms[collection]);
+    if (editForm) {
+      const fieldValue = (field) => field.name === 'specialty' ? '' : selectedRecord[field.name] ?? '';
+      Array.from(editForm.elements).forEach((field) => {
+        if (!field.name) return;
+        if (field.type === 'checkbox') {
+          field.checked = (selectedRecord.specialties || []).includes(field.value.toLowerCase());
+        } else if (field.tagName === 'SELECT') {
+          const value = String(fieldValue(field));
+          if (value && !Array.from(field.options).some((option) => option.value === value)) {
+            const option = document.createElement('option');
+            option.value = value; option.textContent = value; field.appendChild(option);
+          }
+          field.value = value;
+        } else {
+          field.value = fieldValue(field);
+        }
+      });
+      const heading = editForm.querySelector('h2');
+      if (heading) heading.textContent = `Profil: ${selectedRecord.name}`;
+      const badge = editForm.querySelector('.status');
+      if (badge) {
+        badge.textContent = selectedRecord.status.toUpperCase();
+        badge.className = `status status--${selectedRecord.status === 'aktif' ? 'success' : 'warning'}`;
+      }
+      const idInput = document.createElement('input');
+      idInput.type = 'hidden'; idInput.name = 'id'; idInput.value = selectedRecord.id;
+      editForm.appendChild(idInput);
+      editForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (!editForm.reportValidity()) return;
+        const changes = Object.fromEntries(new FormData(editForm).entries());
+        delete changes.id;
+        if (collection === 'technicians') {
+          const offered = Array.from(editForm.querySelectorAll('input[name="specialty"]')).map((field) => field.value.toLowerCase());
+          changes.specialties = [...(selectedRecord.specialties || []).filter((value) => !offered.includes(value)),
+            ...getCheckedValues(editForm, 'input[name="specialty"]').map((value) => value.toLowerCase())];
+          const specialtyChanged = JSON.stringify(changes.specialties) !== JSON.stringify(selectedRecord.specialties || []);
+          changes.specialty = specialtyChanged ? changes.specialties.join(' / ') : selectedRecord.specialty;
+          changes.initials = changes.name.trim().split(/\s+/).map((part) => part[0]).join('').slice(0, 3);
+        }
+        if (collection === 'customers') changes.initials = changes.name.trim().split(/\s+/).map((part) => part[0]).join('').slice(0, 3);
+        if (collection === 'services') {
+          changes.price = Number(changes.price);
+          changes.priceLabel = window.formatCurrency(changes.price);
+          changes.categories = changes.category === 'Laptop / Notebook' ? ['laptop', 'notebook'] : [changes.category.toLowerCase()];
+        }
+        if (!window.saveRecord(collection, selectedRecord.id, changes)) return;
+        const detailPages = { technicians: 'detail-teknisi.html', customers: 'detail-pelanggan.html', services: 'detail-layanan.html' };
+        window.location.href = window.recordUrl(detailPages[collection], selectedRecord);
+      });
+    }
+
     // 1. Assign technician & print in detail-tiket.html
     const assignForm = document.getElementById("assignTechnicianForm");
     if (assignForm) {
@@ -944,6 +1008,8 @@ Pemilik: Andi Ramadhan`;
         e.preventDefault();
         const select = document.getElementById("technicianSelect");
         const techName = select?.options[select.selectedIndex]?.text.split("(")[0].trim() || "Teknisi";
+        const technician = window.getTechnicianById(select?.value);
+        if (!technician || !window.saveRecord('tickets', selectedRecord.id, { technicianId: technician.id })) return;
         showToast(`Penugasan tiket berhasil diperbarui ke ${techName}.`);
       });
     }
@@ -968,19 +1034,6 @@ Pemilik: Andi Ramadhan`;
       });
     }
 
-    // 3. Edit technician
-    const editTechForm = document.getElementById("editTechnicianForm");
-    if (editTechForm) {
-      editTechForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const name = document.getElementById("techName")?.value.trim() || "";
-        showToast(`Data teknisi ${name} berhasil diperbarui!`);
-        setTimeout(() => {
-          window.location.href = "teknisi.html";
-        }, 1200);
-      });
-    }
-
     // 4. Add customer
     const addCustForm = document.getElementById("addCustomerForm");
     if (addCustForm) {
@@ -994,19 +1047,6 @@ Pemilik: Andi Ramadhan`;
       });
     }
 
-    // 5. Edit customer
-    const editCustForm = document.getElementById("editCustomerForm");
-    if (editCustForm) {
-      editCustForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const name = document.getElementById("custName")?.value.trim() || "";
-        showToast(`Data pelanggan ${name} berhasil diperbarui!`);
-        setTimeout(() => {
-          window.location.href = "pelanggan.html";
-        }, 1200);
-      });
-    }
-
     // 6. Add service
     const addSvcForm = document.getElementById("addServiceForm");
     if (addSvcForm) {
@@ -1014,19 +1054,6 @@ Pemilik: Andi Ramadhan`;
         e.preventDefault();
         const name = document.getElementById("serviceName")?.value.trim() || "baru";
         showToast(`Layanan ${name} berhasil ditambahkan!`);
-        setTimeout(() => {
-          window.location.href = "layanan.html";
-        }, 1200);
-      });
-    }
-
-    // 7. Edit service
-    const editSvcForm = document.getElementById("editServiceForm");
-    if (editSvcForm) {
-      editSvcForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const name = document.getElementById("serviceName")?.value.trim() || "";
-        showToast(`Layanan ${name} berhasil diperbarui!`);
         setTimeout(() => {
           window.location.href = "layanan.html";
         }, 1200);
