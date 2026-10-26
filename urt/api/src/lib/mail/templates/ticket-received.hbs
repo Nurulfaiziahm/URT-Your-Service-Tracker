@@ -1,0 +1,49 @@
+<h2 style='color: #0f172a; font-size: 20px; font-weight: 700; margin-bottom: 16px;'>Tiket Servis Diterima</h2>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Halo <strong>{{name}}</strong>,
+</p>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Perangkat Anda telah berhasil didaftarkan dan diterima untuk perbaikan di <strong>{{businessName}}</strong>.
+</p>
+
+<div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; margin: 24px 0;'>
+  <table style='width: 100%; border-collapse: collapse;'>
+    <tr>
+      <td style='padding: 8px 0; color: #64748b; font-size: 14px; width: 140px;'>Nomor Tiket:</td>
+      <td style='padding: 8px 0; color: #0f172a; font-weight: 700; font-size: 15px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;'>{{ticketCode}}</td>
+    </tr>
+    <tr>
+      <td style='padding: 8px 0; color: #64748b; font-size: 14px;'>Perangkat:</td>
+      <td style='padding: 8px 0; color: #0f172a; font-weight: 600; font-size: 14px;'>{{device}}</td>
+    </tr>
+    <tr>
+      <td style='padding: 8px 0; color: #64748b; font-size: 14px;'>Keluhan:</td>
+      <td style='padding: 8px 0; color: #334155; font-size: 14px;'>{{complaint}}</td>
+    </tr>
+    <tr>
+      <td style='padding: 8px 0; color: #64748b; font-size: 14px;'>Waktu Diterima:</td>
+      <td style='padding: 8px 0; color: #334155; font-size: 14px;'>{{formatDateID receivedAt timezone}}</td>
+    </tr>
+  </table>
+</div>
+
+<p style='margin-bottom: 24px; color: #334155;'>
+  Teknisi kami akan segera memeriksa perangkat Anda. Setelah diagnosis selesai, kami akan mengirimkan estimasi biaya suku cadang dan jasa untuk persetujuan Anda sebelum pekerjaan dimulai.
+</p>
+
+{{#if trackingUrl}}
+<div style='text-align: center; margin: 28px 0;'>
+  <a
+    href='{{trackingUrl}}'
+    class='button'
+  >
+    Lacak Status Servis
+  </a>
+</div>
+{{/if}}
+
+<p style='margin-top: 24px; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px;'>
+  Terima kasih telah mempercayakan perbaikan perangkat Anda kepada <strong>{{businessName}}</strong>.
+</p>

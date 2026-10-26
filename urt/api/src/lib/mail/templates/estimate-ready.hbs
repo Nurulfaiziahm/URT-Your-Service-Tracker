@@ -1,0 +1,51 @@
+<h2 style='color: #0f172a; font-size: 20px; font-weight: 700; margin-bottom: 16px;'>Estimasi Biaya Servis Siap Ditinjau</h2>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Halo <strong>{{name}}</strong>,
+</p>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Diagnosis perangkat <strong>{{device}}</strong> (Nomor Tiket: <strong>{{ticketCode}}</strong>) di <strong>{{businessName}}</strong> telah selesai. Berikut ringkasan estimasi biaya dan rencana perbaikan:
+</p>
+
+<div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; margin: 24px 0;'>
+  <table style='width: 100%; border-collapse: collapse;'>
+    <tr>
+      <td style='padding: 8px 0; color: #64748b; font-size: 14px; width: 150px;'>Nomor Tiket:</td>
+      <td style='padding: 8px 0; color: #0f172a; font-weight: 700; font-size: 15px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;'>{{ticketCode}}</td>
+    </tr>
+    <tr>
+      <td style='padding: 8px 0; color: #64748b; font-size: 14px;'>Penjelasan Teknisi:</td>
+      <td style='padding: 8px 0; color: #334155; font-size: 14px;'>{{customerExplanation}}</td>
+    </tr>
+    <tr>
+      <td style='padding: 8px 0; color: #64748b; font-size: 14px;'>Total Estimasi Biaya:</td>
+      <td style='padding: 8px 0; color: #2563eb; font-weight: 700; font-size: 17px;'>{{formatRupiah totalAmount}}</td>
+    </tr>
+    {{#if targetCompletionDate}}
+    <tr>
+      <td style='padding: 8px 0; color: #64748b; font-size: 14px;'>Target Selesai:</td>
+      <td style='padding: 8px 0; color: #334155; font-size: 14px;'>{{formatDateID targetCompletionDate timezone}}</td>
+    </tr>
+    {{/if}}
+  </table>
+</div>
+
+<p style='margin-bottom: 24px; color: #334155;'>
+  Pekerjaan perbaikan hanya akan dimulai setelah Anda memberikan persetujuan atas estimasi biaya ini.
+</p>
+
+{{#if approvalUrl}}
+<div style='text-align: center; margin: 28px 0;'>
+  <a
+    href='{{approvalUrl}}'
+    class='button'
+  >
+    Tinjau & Setujui Estimasi
+  </a>
+</div>
+{{/if}}
+
+<p style='margin-top: 24px; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px;'>
+  Jika Anda memiliki pertanyaan mengenai estimasi ini, silakan hubungi <strong>{{businessName}}</strong>.
+</p>

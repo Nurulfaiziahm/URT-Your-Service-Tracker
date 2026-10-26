@@ -1,0 +1,10 @@
+.notice { padding: 16px 20px; border: 1px solid #bfdbfe; border-radius: var(--radius-md); background: var(--blue-soft); color: #1e40af; font-size: .92rem; }
+.noticeError { padding: 16px 20px; border: 1px solid #fecaca; border-radius: var(--radius-md); background: #fef2f2; color: #991b1b; font-size: .92rem; }
+.noticeSuccess { padding: 16px 20px; border: 1px solid #bbf7d0; border-radius: var(--radius-md); background: #f0fdf4; color: #166534; font-size: .92rem; }
+.notice p, .noticeError p, .noticeSuccess p { color: inherit; }
+.state { display: grid; justify-items: center; gap: 16px; padding: 56px 24px; text-align: center; background: white; border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.state p { max-width: 480px; }
+.symbol { width: 52px; height: 52px; border: 1px solid var(--border); border-radius: var(--radius-lg); display: grid; place-items: center; font-weight: 700; color: var(--blue); background: var(--blue-soft); }
+.loader { min-height: 45vh; display: grid; place-content: center; justify-items: center; gap: 16px; color: var(--slate-600); }
+.spinner { width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

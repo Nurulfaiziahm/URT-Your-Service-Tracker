@@ -1,0 +1,31 @@
+<h2 style='color: #0f172a; font-size: 20px; font-weight: 700; margin-bottom: 16px;'>Verifikasi Alamat Email Anda</h2>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Halo <strong>{{name}}</strong>,
+</p>
+
+<p style='margin-bottom: 20px; color: #334155;'>
+  Terima kasih telah mendaftar di <strong>URT (Your Service Tracker)</strong>. Silakan masukkan kode verifikasi (OTP) berikut untuk memverifikasi akun Anda:
+</p>
+
+<div style='text-align: center; margin: 28px 0;'>
+  <div
+    style='display: inline-block; padding: 16px 36px; background-color: #eff6ff; border: 2px dashed #2563eb; border-radius: 8px;'
+  >
+    <span
+      style="font-size: 30px; font-weight: 800; letter-spacing: 8px; color: #1e40af; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"
+    >
+      {{otp}}
+    </span>
+  </div>
+</div>
+
+<div class='alert alert-warning'>
+  <strong>⚠️ Perhatian:</strong>
+  Kode verifikasi ini hanya berlaku selama
+  <strong>{{#if expiresIn}}{{expiresIn}}{{else}}5 menit{{/if}}</strong>. Jangan bagikan kode ini kepada siapa pun.
+</div>
+
+<p style='margin-top: 20px; font-size: 13px; color: #64748b;'>
+  Jika Anda tidak merasa mendaftar di URT, silakan abaikan email ini. Keamanan akun Anda tetap terjaga.
+</p>

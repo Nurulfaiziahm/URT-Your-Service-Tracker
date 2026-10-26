@@ -1,0 +1,343 @@
+.dashboard {
+  display: grid;
+  gap: 24px;
+}
+
+.heading {
+  margin-bottom: -4px;
+}
+
+.heading :global(.eyebrow) {
+  display: block;
+  margin-bottom: 4px;
+  letter-spacing: 0;
+}
+
+.heading h1 {
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+
+.heading p {
+  margin: 4px 0 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 20px;
+}
+
+.activity {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 3%);
+}
+
+.panelHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panelHeading h2, .portalCard h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.panelHeading p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #475569;
+}
+
+.tableAction {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.tickets table {
+  min-width: 650px;
+}
+
+.tickets th {
+  padding: 14px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.tickets td {
+  padding: 14px;
+  font-size: 12px;
+}
+
+.tickets td:first-child a {
+  color: #0f172a;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tickets td:nth-child(2) {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.tickets td[colspan] {
+  height: 150px;
+  text-align: center;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.subscription {
+  margin-top: 16px;
+  padding: 16px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.subscriptionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.subscriptionHeading h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.status[data-active='true'] {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.subscription p {
+  margin: 12px 0 8px;
+  color: #475569;
+  font-size: 12px;
+}
+
+.progress {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2563eb;
+}
+
+.subscriptionFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.subscriptionFooter small, .subscriptionFooter a {
+  font-size: 12px;
+}
+
+.subscriptionFooter small {
+  color: #94a3b8;
+}
+
+.subscriptionFooter a {
+  color: #2563eb;
+}
+
+.portals {
+  display: grid;
+  gap: 16px;
+}
+
+.portalCard {
+  min-width: 0;
+  min-height: 211px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #0f172a;
+  color: #fff;
+}
+
+.portalIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: #2563eb;
+}
+
+.portalCard p {
+  margin: 4px 0 16px;
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.portalLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 8px 0 12px;
+  border-radius: 8px;
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+.portalLink > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  user-select: all;
+}
+
+.portalActions {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.portalActions button, .portalActions a {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.portalActions button:hover, .portalActions a:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.sla {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 70px;
+  margin-top: 4px;
+  padding: 16px 20px;
+  border: 1px solid rgb(37 99 235 / 30%);
+  border-radius: 12px;
+  background: rgb(37 99 235 / 5%);
+}
+
+.slaCopy {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slaCopy > svg {
+  flex-shrink: 0;
+  color: #2563eb;
+}
+
+.slaCopy strong {
+  font-size: 12px;
+}
+
+.slaCopy p {
+  margin: 1px 0 0;
+  font-size: 12px;
+  color: #475569;
+}
+
+.slaScore {
+  white-space: nowrap;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.slaScore strong {
+  margin-right: 4px;
+  color: #2563eb;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .portals {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sla {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats, .portals {
+    grid-template-columns: 1fr;
+  }
+  .panelHeading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .activity {
+    padding: 16px;
+  }
+}

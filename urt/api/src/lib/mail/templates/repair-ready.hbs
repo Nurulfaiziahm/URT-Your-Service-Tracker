@@ -1,0 +1,57 @@
+<h2 style='color: #0f172a; font-size: 20px; font-weight: 700; margin-bottom: 16px;'>Perbaikan Selesai & Siap Diambil! 🎉</h2>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Halo <strong>{{name}}</strong>,
+</p>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Kabar baik! Perbaikan perangkat <strong>{{device}}</strong> (Nomor Tiket: <strong>{{ticketCode}}</strong>) telah selesai dan telah lulus uji kendali mutu (Quality Control) di <strong>{{businessName}}</strong>.
+</p>
+
+<div style='background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 18px 20px; margin: 24px 0;'>
+  <table style='width: 100%; border-collapse: collapse;'>
+    <tr>
+      <td style='padding: 8px 0; color: #166534; font-size: 14px; width: 150px;'>Nomor Tiket:</td>
+      <td style='padding: 8px 0; color: #14532d; font-weight: 700; font-size: 15px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;'>{{ticketCode}}</td>
+    </tr>
+    <tr>
+      <td style='padding: 8px 0; color: #166534; font-size: 14px;'>Perangkat:</td>
+      <td style='padding: 8px 0; color: #14532d; font-weight: 600; font-size: 14px;'>{{device}}</td>
+    </tr>
+    {{#if workSummary}}
+    <tr>
+      <td style='padding: 8px 0; color: #166534; font-size: 14px;'>Ringkasan Perbaikan:</td>
+      <td style='padding: 8px 0; color: #14532d; font-size: 14px;'>{{workSummary}}</td>
+    </tr>
+    {{/if}}
+    <tr>
+      <td style='padding: 8px 0; color: #166534; font-size: 14px;'>Waktu Selesai:</td>
+      <td style='padding: 8px 0; color: #14532d; font-size: 14px;'>{{formatDateID readyAt timezone}}</td>
+    </tr>
+    {{#if warrantyDays}}
+    <tr>
+      <td style='padding: 8px 0; color: #166534; font-size: 14px;'>Garansi Servis:</td>
+      <td style='padding: 8px 0; color: #15803d; font-weight: 700; font-size: 14px;'>{{warrantyDays}} hari</td>
+    </tr>
+    {{/if}}
+  </table>
+</div>
+
+<p style='margin-bottom: 24px; color: #334155;'>
+  Perangkat Anda kini siap diambil di lokasi <strong>{{businessName}}</strong>. Mohon siapkan dan tunjukkan nomor tiket servis saat pengambilan perangkat.
+</p>
+
+{{#if pickupUrl}}
+<div style='text-align: center; margin: 28px 0;'>
+  <a
+    href='{{pickupUrl}}'
+    class='button button-success'
+  >
+    Lihat Detail Pengambilan
+  </a>
+</div>
+{{/if}}
+
+<p style='margin-top: 24px; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px;'>
+  Terima kasih telah mempercayakan perbaikan perangkat Anda kepada <strong>{{businessName}}</strong>.
+</p>

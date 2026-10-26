@@ -1,0 +1,140 @@
+.container {
+  max-width: 840px;
+  margin: 32px auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.heading {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.heading h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--slate-900, #0f172a);
+  margin: 0;
+}
+
+.heading p {
+  font-size: 1rem;
+  color: var(--slate-600, #475569);
+  max-width: 580px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-lg, 12px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.cardIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.iconBlue {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.iconGreen {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.cardContent h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--slate-900, #0f172a);
+  margin: 0 0 6px 0;
+}
+
+.cardContent p {
+  font-size: 0.88rem;
+  color: var(--slate-600, #475569);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.formRow {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.formInput {
+  flex: 1;
+  padding: 9px 12px;
+  font-size: 0.9rem;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-md, 6px);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.formInput:focus {
+  border-color: var(--blue, #2563eb);
+}
+
+.submitBtn {
+  background: var(--blue, #2563eb);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md, 6px);
+  padding: 9px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.submitBtn:hover {
+  background: #1d4ed8;
+}
+
+.submitBtnGreen {
+  background: #16a34a;
+}
+
+.submitBtnGreen:hover {
+  background: #15803d;
+}
+
+.footerActions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
+}

@@ -1,0 +1,32 @@
+<h2 style='color: #0f172a; font-size: 20px; font-weight: 700; margin-bottom: 16px;'>Hubungkan Kontak Servis Anda</h2>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Halo <strong>{{name}}</strong>,
+</p>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  <strong>{{businessName}}</strong> mengundang Anda untuk menghubungkan akun <strong>URT (Your Service Tracker)</strong> Anda agar dapat melihat riwayat servis, menyetujui estimasi biaya, dan melacak tiket secara transparan.
+</p>
+
+<p style='margin-bottom: 24px; color: #334155;'>
+  Klik tombol di bawah ini untuk menghubungkan kontak servis Anda:
+</p>
+
+<div style='text-align: center; margin: 28px 0;'>
+  <a
+    href='{{invitationUrl}}'
+    class='button'
+  >
+    Hubungkan Akun Sekarang
+  </a>
+</div>
+
+<div class='alert alert-warning'>
+  <strong>⚠️ Perhatian:</strong>
+  Tautan ini berlaku selama
+  <strong>{{#if expiresIn}}{{expiresIn}}{{else}}7 hari{{/if}}</strong>.
+</div>
+
+<p style='margin-top: 20px; font-size: 13px; color: #64748b;'>
+  Jika Anda bukan pelanggan dari bisnis ini, Anda dapat mengabaikan email ini.
+</p>

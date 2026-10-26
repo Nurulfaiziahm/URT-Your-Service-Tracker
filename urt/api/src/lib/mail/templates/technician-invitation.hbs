@@ -1,0 +1,32 @@
+<h2 style='color: #0f172a; font-size: 20px; font-weight: 700; margin-bottom: 16px;'>Undangan Bergabung sebagai Teknisi</h2>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Halo <strong>{{name}}</strong>,
+</p>
+
+<p style='margin-bottom: 16px; color: #334155;'>
+  Anda telah diundang oleh <strong>{{businessName}}</strong> untuk bergabung sebagai teknisi di platform <strong>URT (Your Service Tracker)</strong>.
+</p>
+
+<p style='margin-bottom: 24px; color: #334155;'>
+  Dengan menghubungkan akun teknisi, Anda dapat menerima penugasan tiket servis, menginput diagnosis dan estimasi biaya, serta memperbarui progres pengerjaan servis secara langsung.
+</p>
+
+<div style='text-align: center; margin: 28px 0;'>
+  <a
+    href='{{invitationUrl}}'
+    class='button'
+  >
+    Terima Undangan Teknisi
+  </a>
+</div>
+
+<div class='alert alert-warning'>
+  <strong>⚠️ Perhatian:</strong>
+  Tautan undangan ini berlaku selama
+  <strong>{{#if expiresIn}}{{expiresIn}}{{else}}7 hari{{/if}}</strong>.
+</div>
+
+<p style='margin-top: 20px; font-size: 13px; color: #64748b;'>
+  Jika Anda tidak mengenali bisnis ini atau merasa salah menerima undangan ini, Anda dapat mengabaikan email ini.
+</p>
