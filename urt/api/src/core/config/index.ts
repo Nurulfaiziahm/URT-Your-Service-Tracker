@@ -140,7 +140,11 @@ if (
 }
 
 const trustProxy =
-  env.TRUST_PROXY === 'false' ? false : env.TRUST_PROXY.split(',').map((ip) => ip.trim());
+  env.TRUST_PROXY === 'false'
+    ? false
+    : /^[1-9]\d*$/.test(env.TRUST_PROXY)
+      ? Number(env.TRUST_PROXY)
+      : env.TRUST_PROXY.split(',').map((ip) => ip.trim());
 
 const requiredMail = (key: string): string => {
   const value = process.env[key] || '';

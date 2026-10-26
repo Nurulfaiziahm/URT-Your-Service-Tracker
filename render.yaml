@@ -12,6 +12,8 @@ services:
         value: production
       - key: APP_ID
         value: urt
+      - key: TRUST_PROXY
+        value: "1"
       - key: MONGO_URI
         sync: false
       - key: REDIS_URI

@@ -54,7 +54,7 @@ The application validates its environment variables at startup.
 | `R2_ACCESS_KEY_ID`     | Bucket-scoped R2 S3 access key ID |
 | `R2_SECRET_ACCESS_KEY` | R2 S3 secret access key; server only |
 | `R2_BUCKET_NAME`       | Private R2 bucket name |
-| `TRUST_PROXY`          | `false` for direct connections or trusted proxy addresses    |
+| `TRUST_PROXY`          | `false` for direct connections, a proxy hop count (Render: `1`), or trusted proxy addresses |
 | `COOKIE_SAME_SITE`     | Cookie policy: `lax`, `strict`, or `none`                    |
 | `COOKIE_SECURE`        | Set to `true` when cookies must use HTTPS                    |
 | `ACCESS_KEYS`          | JSON key ring for access tokens                              |
