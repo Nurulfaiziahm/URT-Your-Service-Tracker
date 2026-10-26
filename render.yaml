@@ -2,6 +2,7 @@ services:
   - type: web
     name: urt-api
     runtime: node
+    plan: free
     rootDir: urt/api
     buildCommand: npm ci && npm run build
     startCommand: npm start
