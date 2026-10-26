@@ -2,9 +2,6 @@ import dns from 'node:dns';
 import mongoose from 'mongoose';
 import { config } from './index.js';
 
-// Bypass the failing local DNS resolver used by Node for Atlas SRV lookups.
-dns.setServers(['1.1.1.1', '8.8.8.8']);
-
 interface ConnectionCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;

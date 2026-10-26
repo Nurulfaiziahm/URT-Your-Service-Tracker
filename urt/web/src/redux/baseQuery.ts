@@ -14,8 +14,13 @@ import type { RootState } from './store';
 import { getApiErrorMessage, successMessages } from '../lib/api-messages';
 import { toastAdded } from '../components/feedback/toastSlice';
 
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+const apiBaseUrl =
+  configuredApiBaseUrl ||
+  (import.meta.env.PROD ? 'https://urt-api.onrender.com/api/v1' : '/api/v1');
+
 export const rawBaseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_BASE_URL || '/api/v1',
+  baseUrl: apiBaseUrl,
   credentials: 'include',
   prepareHeaders(headers, { getState }) {
     const token = (getState() as RootState).auth.accessToken;

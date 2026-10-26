@@ -15,7 +15,7 @@ const subscriptionPaymentSchema = new Schema({
 }, { timestamps: true });
 
 subscriptionPaymentSchema.index(
-  { businessId: 1 },
+  { businessId: 1, status: 1 },
   { unique: true, partialFilterExpression: { status: 'pending' } },
 );
 
