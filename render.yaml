@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: urt-api
+    runtime: node
+    rootDir: urt/api
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_ID
+        value: urt
+      - key: MONGO_URI
+        sync: false
+      - key: REDIS_URI
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: ACCESS_KEYS
+        sync: false
+      - key: REFRESH_KEYS
+        sync: false
+      - key: SESSION_KEYS
+        sync: false
+
+  - type: web
+    name: urt-web
+    runtime: static
+    rootDir: urt/web
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false
