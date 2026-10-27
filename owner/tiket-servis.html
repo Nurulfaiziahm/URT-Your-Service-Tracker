@@ -7,10 +7,7 @@
   <title>Tiket Servis — Portal Pemilik — Your Service Tracker</title>
   <link rel="stylesheet" href="css/owner.css">
   <script src="../js/data.js" defer></script>
-  <script src="../js/store.js" defer></script>
-  <script src="../js/ux.js" defer></script>
   <script src="js/owner.js" defer></script>
-  <link rel="stylesheet" href="../css/ux.css">
 </head>
 <body>
   <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
@@ -196,7 +193,22 @@
               </tr>
             </thead>
             <tbody>
-              <!-- Baris dirender dinamis dari URT_API (js/store.js) -->
+              <tr data-ticket-row data-search="#urt-2026-0142 macbook air m2 nadia putri sofia m. adam diagnosis" data-status="diagnosis" data-month="2026-08">
+                <td><strong>#URT-2026-0142</strong></td><td>MacBook Air M2</td><td>Nadia Putri</td><td>Sofia M. Adam</td><td><span class="status status--warning">DIAGNOSIS</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-0142">Detail</a></td>
+              </tr>
+              <tr data-ticket-row data-search="#urt-2026-0141 asus vivobook 14 rizky fauzan ardi pratama perbaikan" data-status="perbaikan" data-month="2026-08">
+                <td><strong>#URT-2026-0141</strong></td><td>ASUS VivoBook 14</td><td>Rizky Fauzan</td><td>Ardi Pratama</td><td><span class="status status--progress">PERBAIKAN</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-0141">Detail</a></td>
+              </tr>
+              <tr data-ticket-row data-search="#urt-2026-0140 lenovo ideapad dewi lestari sofia m. adam selesai" data-status="selesai" data-month="2026-08">
+                <td><strong>#URT-2026-0140</strong></td><td>Lenovo IdeaPad</td><td>Dewi Lestari</td><td>Sofia M. Adam</td><td><span class="status status--success">SELESAI</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-0140">Detail</a></td>
+              </tr>
+              <tr data-ticket-row data-search="#urt-2026-001 asus vivobook 14 nino rachimas sofia m. adam persetujuan" data-status="persetujuan" data-month="2026-08">
+                <td><strong>#URT-2026-001</strong></td><td>ASUS VivoBook 14</td><td>Nino Rachimas</td><td>Sofia M. Adam</td><td><span class="status status--warning">PERSETUJUAN</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-001">Detail</a></td>
+              </tr>
+              <tr data-ticket-row data-search="#urt-2026-004 lenovo ideapad 3 aulia rahman sofia m. adam selesai" data-status="selesai" data-month="2026-08">
+                <td><strong>#URT-2026-004</strong></td><td>Lenovo IdeaPad 3</td><td>Aulia Rahman</td><td>Sofia M. Adam</td><td><span class="status status--success">SELESAI</span></td><td><a class="detail-action" href="detail-tiket.html?id=URT-2026-004">Detail</a></td>
+              </tr>
+              <tr id="ticketEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada tiket yang sesuai dengan pencarian atau filter.</td></tr>
             </tbody>
           </table>
         </div>

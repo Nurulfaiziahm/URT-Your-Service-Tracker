@@ -7,10 +7,7 @@
   <title>Teknisi — Portal Pemilik — Your Service Tracker</title>
   <link rel="stylesheet" href="css/owner.css">
   <script src="../js/data.js" defer></script>
-  <script src="../js/store.js" defer></script>
-  <script src="../js/ux.js" defer></script>
   <script src="js/owner.js" defer></script>
-  <link rel="stylesheet" href="../css/ux.css">
 </head>
 <body>
   <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
@@ -281,7 +278,121 @@
               </tr>
             </thead>
             <tbody>
-              <!-- Baris dirender dinamis dari URT_API (js/store.js) -->
+              <tr data-technician-row data-search="sofia malvalena adam sofia.adam" data-specialty="laptop hardware" data-workload="high" data-status="aktif">
+                <td><strong>Sofia Malvalena Adam</strong></td>
+                <td>sofia.adam</td>
+                <td>Laptop • Hardware</td>
+                <td>5 tiket</td>
+                <td><span class="status status--success">AKTIF</span></td>
+                <td>
+                  <div class="technician-actions">
+                    <a href="detail-teknisi.html?id=sofia-adam">Lihat</a>
+                    <a href="edit-teknisi.html?id=sofia-adam">Edit</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-technician-row data-search="ardi pratama ardi.pratama" data-specialty="laptop diagnosis" data-workload="medium" data-status="aktif">
+                <td><strong>Ardi Pratama</strong></td>
+                <td>ardi.pratama</td>
+                <td>Laptop • Diagnosis</td>
+                <td>4 tiket</td>
+                <td><span class="status status--success">AKTIF</span></td>
+                <td>
+                  <div class="technician-actions">
+                    <a href="detail-teknisi.html?id=ardi-pratama">Lihat</a>
+                    <a href="edit-teknisi.html?id=ardi-pratama">Edit</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-technician-row data-search="dimas saputra dimas.saputra" data-specialty="software os" data-workload="medium" data-status="aktif">
+                <td><strong>Dimas Saputra</strong></td>
+                <td>dimas.saputra</td>
+                <td>Software • OS</td>
+                <td>3 tiket</td>
+                <td><span class="status status--success">AKTIF</span></td>
+                <td>
+                  <div class="technician-actions">
+                    <a href="detail-teknisi.html?id=dimas-saputra">Lihat</a>
+                    <a href="edit-teknisi.html?id=dimas-saputra">Edit</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-technician-row data-search="rani oktaviani rani.oktaviani" data-specialty="laptop qc" data-workload="medium" data-status="aktif">
+                <td><strong>Rani Oktaviani</strong></td>
+                <td>rani.oktaviani</td>
+                <td>Laptop • QC</td>
+                <td>4 tiket</td>
+                <td><span class="status status--success">AKTIF</span></td>
+                <td>
+                  <div class="technician-actions">
+                    <a href="detail-teknisi.html?id=rani-oktaviani">Lihat</a>
+                    <a href="edit-teknisi.html?id=rani-oktaviani">Edit</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-technician-row data-search="fajar nugroho fajar.nugroho" data-specialty="hardware pendingin" data-workload="medium" data-status="aktif">
+                <td><strong>Fajar Nugroho</strong></td>
+                <td>fajar.nugroho</td>
+                <td>Hardware • Pendingin</td>
+                <td>3 tiket</td>
+                <td><span class="status status--success">AKTIF</span></td>
+                <td>
+                  <div class="technician-actions">
+                    <a href="detail-teknisi.html?id=fajar-nugroho">Lihat</a>
+                    <a href="edit-teknisi.html?id=fajar-nugroho">Edit</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-technician-row data-search="bayu setiawan bayu.setiawan" data-specialty="laptop hardware" data-workload="medium" data-status="aktif">
+                <td><strong>Bayu Setiawan</strong></td>
+                <td>bayu.setiawan</td>
+                <td>Laptop • Hardware</td>
+                <td>4 tiket</td>
+                <td><span class="status status--success">AKTIF</span></td>
+                <td>
+                  <div class="technician-actions">
+                    <a href="detail-teknisi.html?id=bayu-setiawan">Lihat</a>
+                    <a href="edit-teknisi.html?id=bayu-setiawan">Edit</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-technician-row data-search="intan permata intan.permata" data-specialty="software data" data-workload="light" data-status="aktif">
+                <td><strong>Intan Permata</strong></td>
+                <td>intan.permata</td>
+                <td>Software • Data</td>
+                <td>2 tiket</td>
+                <td><span class="status status--success">AKTIF</span></td>
+                <td>
+                  <div class="technician-actions">
+                    <a href="detail-teknisi.html?id=intan-permata">Lihat</a>
+                    <a href="edit-teknisi.html?id=intan-permata">Edit</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-technician-row data-search="rizal hidayat rizal.hidayat" data-specialty="laptop qc" data-workload="medium" data-status="aktif">
+                <td><strong>Rizal Hidayat</strong></td>
+                <td>rizal.hidayat</td>
+                <td>Laptop • QC</td>
+                <td>3 tiket</td>
+                <td><span class="status status--success">AKTIF</span></td>
+                <td>
+                  <div class="technician-actions">
+                    <a href="detail-teknisi.html?id=rizal-hidayat">Lihat</a>
+                    <a href="edit-teknisi.html?id=rizal-hidayat">Edit</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr id="technicianEmptyState" class="empty-row" hidden>
+                <td colspan="6">Tidak ada teknisi yang sesuai dengan pencarian atau filter.</td>
+              </tr>
             </tbody>
           </table>
         </div>

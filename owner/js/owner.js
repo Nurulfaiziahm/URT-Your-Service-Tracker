@@ -4,41 +4,12 @@
   const toast = document.getElementById("toast");
   let toastTimer;
 
-  // Toast: memakai URT_UX (stack, ikon, tombol tutup). Fallback ke #toast lama.
-  function showToast(message, type) {
-    if (window.URT_UX) {
-      window.URT_UX.toast(message, type || "success");
-      return;
-    }
+  function showToast(message) {
     if (!toast) return;
     clearTimeout(toastTimer);
     toast.textContent = message;
     toast.classList.add("is-visible");
     toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2200);
-  }
-
-  // Escape teks buatan user sebelum masuk innerHTML (cegah XSS dari form CRUD)
-  const E = (v) => (window.URT_UX ? window.URT_UX.esc(v) : String(v == null ? "" : v));
-
-  const BULAN_PANJANG = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-  function monthLabel(key) {
-    const [y, m] = String(key).split("-");
-    return (BULAN_PANJANG[parseInt(m, 10) - 1] || key) + " " + y;
-  }
-
-  // Baris empty-state dengan tombol Reset
-  function emptyRow(id, colspan, title, message) {
-    const box = window.URT_UX
-      ? window.URT_UX.stateHtml({ type: "empty", title: title, message: message, actionLabel: "Reset Pencarian" })
-      : title;
-    return `<tr id="${id}" class="empty-row urt-state-row" hidden><td colspan="${colspan}">${box}</td></tr>`;
-  }
-
-  // Hubungkan tombol Reset pada empty-state ke fungsi reset filter
-  function wireEmptyReset(emptyId, resetFn) {
-    const row = document.getElementById(emptyId);
-    const btn = row && row.querySelector("[data-urt-state-action]");
-    if (btn) btn.addEventListener("click", resetFn);
   }
 
   function normalize(value) {
@@ -124,31 +95,6 @@
     showToast("Tidak ada notifikasi baru.");
   });
 
-  // Halaman detail: data tidak ditemukan -> error state yang manusiawi
-  function renderNotFound(title, message, backHref, backLabel) {
-    const main = document.querySelector(".owner-main");
-    if (!main || !window.URT_UX) return;
-    main.innerHTML = window.URT_UX.stateHtml({ type: "error", title: title, message: message }) +
-      `<div style="text-align:center"><a class="secondary-button" href="${backHref}">&larr; ${backLabel}</a></div>`;
-  }
-
-  // Tautan "Edit" membawa ?id= dan tombol "Hapus" ditambahkan di header detail
-  function wireDetailActions(collection, record, editHref, listHref) {
-    const editLink = document.querySelector('a.primary-button[href^="' + editHref + '"]');
-    if (!editLink || editLink.dataset.wired) return;
-    editLink.dataset.wired = "true";
-    editLink.href = editHref + "?id=" + encodeURIComponent(record.slug || record.id);
-    const del = document.createElement("button");
-    del.type = "button";
-    del.className = "urt-btn-danger";
-    del.textContent = "Hapus";
-    del.dataset.delete = collection;
-    del.dataset.id = record.id;
-    del.dataset.name = record.name;
-    del.dataset.redirect = listHref;
-    editLink.parentNode.insertBefore(del, editLink);
-  }
-
   /* ==========================================================================
      Central Data Layer Integration for Owner Portal
      Populates HTML dynamic elements from window.URT_DATA
@@ -187,11 +133,11 @@
         const techName = tech ? tech.name.split(" ").slice(0, 2).join(" ") : "Teknisi";
         return `
           <tr>
-            <td><a class="ticket-link" href="detail-tiket.html?id=${E(t.id)}">#${E(t.id)}</a></td>
-            <td><strong>${E(t.device)}</strong></td>
-            <td>${E(custName)}</td>
-            <td>${E(techName)}</td>
-            <td><span class="status status--${t.statusClass || 'warning'}">${E(t.status)}</span></td>
+            <td><a class="ticket-link" href="detail-tiket.html?id=${t.id}">#${t.id}</a></td>
+            <td><strong>${t.device}</strong></td>
+            <td>${custName}</td>
+            <td>${techName}</td>
+            <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
           </tr>
         `;
       }).join("");
@@ -209,52 +155,42 @@
           const techName = tech ? tech.name.split(" ").slice(0, 2).join(" ") : "Teknisi";
           const searchContent = `#${t.id.toLowerCase()} ${t.device.toLowerCase()} ${custName.toLowerCase()} ${techName.toLowerCase()} ${t.status.toLowerCase()}`;
           return `
-            <tr data-ticket-row data-search="${E(searchContent)}" data-status="${t.status.toLowerCase()}" data-month="${t.month || '2026-08'}">
-              <td><strong>#${E(t.id)}</strong></td>
-              <td>${E(t.device)}</td>
-              <td>${E(custName)}</td>
-              <td>${E(techName)}</td>
-              <td><span class="status status--${t.statusClass || 'warning'}">${E(t.status)}</span></td>
-              <td><a class="detail-action" href="detail-tiket.html?id=${E(t.id)}">Detail</a></td>
+            <tr data-ticket-row data-search="${searchContent}" data-status="${t.status.toLowerCase()}" data-month="${t.month || '2026-08'}">
+              <td><strong>#${t.id}</strong></td>
+              <td>${t.device}</td>
+              <td>${custName}</td>
+              <td>${techName}</td>
+              <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
+              <td><a class="detail-action" href="detail-tiket.html?id=${t.id}">Detail</a></td>
             </tr>
           `;
         }).join("");
 
-        tbody.innerHTML = rowsHtml + emptyRow("ticketEmptyState", 6, "Yah, tiket tidak ditemukan 🔍", "Tidak ada tiket yang cocok dengan pencarian atau filter. Coba kata kunci lain.");
-
-        // Filter periode dibangun dari data tiket (bukan hardcode)
-        const monthSelect = document.getElementById("monthFilter");
-        if (monthSelect) {
-          const months = Array.from(new Set(tickets.map((t) => t.month).filter(Boolean))).sort().reverse();
-          monthSelect.innerHTML =
-            `<option value="all" selected>Semua Periode</option>` +
-            months.map((m) => `<option value="${m}">${monthLabel(m)}</option>`).join("");
-        }
+        tbody.innerHTML = rowsHtml + `<tr id="ticketEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada tiket yang sesuai dengan pencarian atau filter.</td></tr>`;
       }
     }
 
     // 3. Teknisi Table (teknisi.html)
-    const techTable = document.querySelector("#technicianTable tbody");
+    const techTable = document.querySelector(".technician-table tbody");
     if (techTable) {
       techTable.innerHTML = technicians.map((tech) => {
         const searchContent = `${tech.name.toLowerCase()} ${tech.username.toLowerCase()} ${tech.specialty.toLowerCase()}`;
         return `
-          <tr data-technician-row data-search="${E(searchContent)}" data-specialty="${tech.specialties.join(' ')}" data-workload="${E(tech.workload)}" data-status="${E(tech.status)}">
-            <td><strong>${E(tech.name)}</strong></td>
-            <td>${E(tech.username)}</td>
-            <td>${E(tech.specialty)}</td>
-            <td>${E(tech.activeTickets)} tiket</td>
-            <td><span class="status status--success">${E(tech.status.toUpperCase())}</span></td>
+          <tr data-technician-row data-search="${searchContent}" data-specialty="${tech.specialties.join(' ')}" data-workload="${tech.workload}" data-status="${tech.status}">
+            <td><strong>${tech.name}</strong></td>
+            <td>${tech.username}</td>
+            <td>${tech.specialty}</td>
+            <td>${tech.activeTickets} tiket</td>
+            <td><span class="status status--success">${tech.status.toUpperCase()}</span></td>
             <td>
               <div class="technician-actions">
                 <a href="detail-teknisi.html?id=${tech.slug || tech.id}">Lihat</a>
                 <a href="edit-teknisi.html?id=${tech.slug || tech.id}">Edit</a>
-                <button type="button" class="urt-link-danger" data-delete="technicians" data-id="${tech.id}" data-name="${E(tech.name)}">Hapus</button>
               </div>
             </td>
           </tr>
         `;
-      }).join("") + emptyRow("technicianEmptyState", 6, "Yah, teknisi tidak ditemukan 🔍", "Tidak ada teknisi yang cocok dengan pencarian atau filter.");
+      }).join("") + `<tr id="technicianEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada teknisi yang sesuai.</td></tr>`;
     }
 
     // 4. Pelanggan Table (pelanggan.html)
@@ -262,27 +198,25 @@
     const isPelangganPage = window.location.pathname.includes("pelanggan.html");
     if (custTable && isPelangganPage) {
       custTable.innerHTML = customers.map((c) => {
-        const searchContent = `${c.name.toLowerCase()} ${c.email.toLowerCase()} ${E(c.phone)}`;
+        const searchContent = `${c.name.toLowerCase()} ${c.email.toLowerCase()} ${c.phone}`;
         const activeCount = tickets.filter((t) => t.customerId === c.id && t.status !== "SELESAI").length;
-        const totalCount = tickets.filter((t) => t.customerId === c.id).length;
-        const ticketSummary = activeCount > 0 ? `${activeCount} aktif` : totalCount > 0 ? `${totalCount} selesai` : "Belum ada";
+        const ticketSummary = activeCount > 0 ? `${activeCount} aktif` : `1 selesai`;
         return `
-          <tr data-customer-row data-search="${E(searchContent)}" data-status="${E(c.status)}">
-            <td><strong>${E(c.name)}</strong></td>
-            <td>${E(c.email)}</td>
-            <td>${E(c.phone)}</td>
+          <tr data-customer-row data-search="${searchContent}" data-status="${c.status}">
+            <td><strong>${c.name}</strong></td>
+            <td>${c.email}</td>
+            <td>${c.phone}</td>
             <td>${ticketSummary}</td>
-            <td>${E(c.registeredDate)}</td>
+            <td>${c.registeredDate}</td>
             <td>
               <div class="row-actions">
                 <a href="detail-pelanggan.html?id=${c.slug || c.id}">Lihat</a>
                 <a href="edit-pelanggan.html?id=${c.slug || c.id}">Edit</a>
-                <button type="button" class="urt-link-danger" data-delete="customers" data-id="${c.id}" data-name="${E(c.name)}">Hapus</button>
               </div>
             </td>
           </tr>
         `;
-      }).join("") + emptyRow("customerEmptyState", 6, "Yah, pelanggan tidak ditemukan 🔍", "Tidak ada pelanggan yang cocok dengan pencarian atau filter.");
+      }).join("") + `<tr id="customerEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada pelanggan yang sesuai.</td></tr>`;
     }
 
     // 5. Layanan Table (layanan.html)
@@ -291,38 +225,36 @@
       custTable.innerHTML = services.map((s) => {
         const searchContent = `${s.name.toLowerCase()} ${s.category.toLowerCase()}`;
         return `
-          <tr data-service-row data-search="${E(searchContent)}" data-category="${s.categories.join(' ')}" data-status="${E(s.status)}">
-            <td><strong>${E(s.name)}</strong></td>
-            <td>${E(s.category)}</td>
+          <tr data-service-row data-search="${searchContent}" data-category="${s.categories.join(' ')}" data-status="${s.status}">
+            <td><strong>${s.name}</strong></td>
+            <td>${s.category}</td>
             <td>${s.priceLabel || window.formatCurrency(s.price)}</td>
-            <td>${E(s.duration)}</td>
-            <td><span class="status status--${s.status === 'aktif' ? 'success' : 'warning'}">${E(s.status.toUpperCase())}</span></td>
+            <td>${s.duration}</td>
+            <td><span class="status status--success">${s.status.toUpperCase()}</span></td>
             <td>
               <div class="row-actions">
                 <a href="detail-layanan.html?id=${s.slug || s.id}">Lihat</a>
                 <a href="edit-layanan.html?id=${s.slug || s.id}">Edit</a>
-                <button type="button" class="urt-link-danger" data-delete="services" data-id="${s.id}" data-name="${E(s.name)}">Hapus</button>
               </div>
             </td>
           </tr>
         `;
-      }).join("") + emptyRow("serviceEmptyState", 6, "Yah, layanan tidak ditemukan 🔍", "Tidak ada layanan yang cocok dengan pencarian atau filter.");
+      }).join("") + `<tr id="serviceEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada layanan yang sesuai.</td></tr>`;
     }
 
     // 6. Detail Tiket (detail-tiket.html)
     const ticketIdHeading = document.getElementById("ticketIdHeading");
     if (ticketIdHeading) {
       const params = new URLSearchParams(window.location.search);
-      const ticketId = params.get("id") || (tickets[0] && tickets[0].id) || "";
-      const ticket = window.getTicketById ? window.getTicketById(ticketId) : null;
-      if (!ticket) return renderNotFound("Tiket tidak ditemukan", "Tiket " + ticketId + " tidak ada atau sudah dihapus.", "tiket-servis.html", "Kembali ke Daftar Tiket");
-      const customer = (window.getCustomerById && window.getCustomerById(ticket.customerId)) || { name: "(pelanggan dihapus)", phone: "-", email: "-", address: "-", slug: "", id: "" };
-      const technician = (window.getTechnicianById && window.getTechnicianById(ticket.technicianId)) || null;
+      const ticketId = params.get("id") || "URT-2026-001";
+      const ticket = window.getTicketById ? window.getTicketById(ticketId) || tickets[0] : tickets[0];
+      const customer = window.getCustomerById ? window.getCustomerById(ticket.customerId) || customers[0] : customers[0];
+      const technician = window.getTechnicianById ? window.getTechnicianById(ticket.technicianId) || technicians[0] : technicians[0];
 
-      ticketIdHeading.textContent = `#${E(ticket.id)}`;
+      ticketIdHeading.textContent = `#${ticket.id}`;
       const subtitleEl = ticketIdHeading.nextElementSibling;
       if (subtitleEl) {
-        subtitleEl.textContent = `${E(ticket.device)} • ${E(customer.name)} • Servis Masuk ${ticket.createdAt.split(',')[0]}`;
+        subtitleEl.textContent = `${ticket.device} • ${customer.name} • Servis Masuk ${ticket.createdAt.split(',')[0]}`;
       }
 
       const badge = document.getElementById("ticketStatusBadge");
@@ -335,12 +267,12 @@
       const metaList1 = document.querySelector(".detail-card .meta-list");
       if (metaList1) {
         metaList1.innerHTML = `
-          <dt>Nomor Tiket</dt><dd>#${E(ticket.id)}</dd>
+          <dt>Nomor Tiket</dt><dd>#${ticket.id}</dd>
           <dt>Nama Perangkat</dt><dd>${ticket.deviceDetail || ticket.device}</dd>
           <dt>Nomor Seri</dt><dd>${ticket.serialNumber || 'SN-' + ticket.id}</dd>
-          <dt>Tanggal Masuk</dt><dd>${E(ticket.createdAt)}</dd>
-          <dt>Estimasi Selesai</dt><dd>${E(ticket.estimatedCompletion)}</dd>
-          <dt>Keluhan Awal</dt><dd style="font-weight: 500; line-height: 1.5;">${E(ticket.issue)}</dd>
+          <dt>Tanggal Masuk</dt><dd>${ticket.createdAt}</dd>
+          <dt>Estimasi Selesai</dt><dd>${ticket.estimatedCompletion}</dd>
+          <dt>Keluhan Awal</dt><dd style="font-weight: 500; line-height: 1.5;">${ticket.issue}</dd>
         `;
       }
 
@@ -349,7 +281,7 @@
       if (card2) {
         const diagNote = card2.querySelector("p");
         if (diagNote) {
-          diagNote.innerHTML = `<strong>Catatan Teknisi:</strong> ${E(ticket.diagnosis)}`;
+          diagNote.innerHTML = `<strong>Catatan Teknisi:</strong> ${ticket.diagnosis}`;
         }
         const costBox = card2.querySelector(".cost-box");
         if (costBox) {
@@ -359,7 +291,7 @@
           
           const breakdownHtml = breakdown.map((item) => `
             <div class="cost-row">
-              <span>${E(item.item)}</span>
+              <span>${item.item}</span>
               <strong>${window.formatCurrency(item.amount)}</strong>
             </div>
           `).join("");
@@ -378,7 +310,7 @@
       if (techSelect) {
         techSelect.innerHTML = technicians.map((t) => {
           const isSelected = t.id === ticket.technicianId ? "selected" : "";
-          return `<option value="${E(t.slug)}" ${isSelected}>${E(t.name)} (${E(t.specialty)} • ${E(t.activeTickets)} Tiket)</option>`;
+          return `<option value="${t.slug}" ${isSelected}>${t.name} (${t.specialty} • ${t.activeTickets} Tiket)</option>`;
         }).join("");
       }
 
@@ -391,10 +323,10 @@
         const dl = custCard.querySelector(".meta-list");
         if (dl) {
           dl.innerHTML = `
-            <dt>Nama Lengkap</dt><dd>${E(customer.name)}</dd>
-            <dt>No. WhatsApp</dt><dd>${E(customer.phone)}</dd>
-            <dt>Email</dt><dd>${E(customer.email)}</dd>
-            <dt>Alamat</dt><dd>${E(customer.address)}</dd>
+            <dt>Nama Lengkap</dt><dd>${customer.name}</dd>
+            <dt>No. WhatsApp</dt><dd>${customer.phone}</dd>
+            <dt>Email</dt><dd>${customer.email}</dd>
+            <dt>Alamat</dt><dd>${customer.address}</dd>
           `;
         }
       }
@@ -411,10 +343,10 @@
             <li class="timeline-step ${stepClass}">
               <span class="timeline-step__marker" aria-hidden="true">${marker}</span>
               <div class="timeline-step__content">
-                <strong class="timeline-step__title">${E(step.title)}</strong>
+                <strong class="timeline-step__title">${step.title}</strong>
                 <div class="timeline-step__meta">
-                  <span class="timeline-step__time">${E(step.time)}</span>
-                  ${step.actor ? `<span class="timeline-step__actor">&bull; ${E(step.actor)}</span>` : ""}
+                  <span class="timeline-step__time">${step.time}</span>
+                  ${step.actor ? `<span class="timeline-step__actor">&bull; ${step.actor}</span>` : ""}
                 </div>
               </div>
             </li>
@@ -428,8 +360,7 @@
     if (techProfileCard && window.location.pathname.includes("detail-teknisi.html")) {
       const params = new URLSearchParams(window.location.search);
       const techId = params.get("id") || "TECH-001";
-      const tech = window.getTechnicianById ? window.getTechnicianById(techId) : null;
-      if (!tech) return renderNotFound("Teknisi tidak ditemukan", "Data teknisi tidak ada atau sudah dihapus.", "teknisi.html", "Kembali ke Daftar Teknisi");
+      const tech = window.getTechnicianById ? window.getTechnicianById(techId) || technicians[0] : technicians[0];
 
       const avatar = techProfileCard.querySelector(".tech-header-row div > div:first-child");
       if (avatar) avatar.textContent = tech.initials || "TK";
@@ -439,17 +370,16 @@
 
       const sub = techProfileCard.querySelector(".tech-header-row h2 + span");
       if (sub) {
-        sub.innerHTML = `Username: <strong>${E(tech.username)}</strong> &bull; Spesialis: ${E(tech.specialty)}`;
+        sub.innerHTML = `Username: <strong>${tech.username}</strong> &bull; Spesialis: ${tech.specialty}`;
       }
 
-      wireDetailActions("technicians", tech, "edit-teknisi.html", "teknisi.html");
       const dl = techProfileCard.querySelector(".tech-meta-grid");
       if (dl) {
         dl.innerHTML = `
-          <div><dt>Email</dt><dd>${E(tech.email)}</dd></div>
-          <div><dt>Nomor Telepon</dt><dd>${E(tech.phone)}</dd></div>
-          <div><dt>Beban Tiket Aktif</dt><dd class="stat-badge-num">${E(tech.activeTickets)} <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">tiket</span></dd></div>
-          <div><dt>Total Tiket Selesai</dt><dd class="stat-badge-num" style="color: var(--success);">${E(tech.completedTickets)} <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">unit</span></dd></div>
+          <div><dt>Email</dt><dd>${tech.email}</dd></div>
+          <div><dt>Nomor Telepon</dt><dd>${tech.phone}</dd></div>
+          <div><dt>Beban Tiket Aktif</dt><dd class="stat-badge-num">${tech.activeTickets} <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">tiket</span></dd></div>
+          <div><dt>Total Tiket Selesai</dt><dd class="stat-badge-num" style="color: var(--success);">${tech.completedTickets} <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">unit</span></dd></div>
         `;
       }
 
@@ -462,12 +392,12 @@
             const c = window.getCustomerById ? window.getCustomerById(t.customerId) : null;
             return `
               <tr>
-                <td><strong>#${E(t.id)}</strong></td>
-                <td>${E(t.device)}</td>
+                <td><strong>#${t.id}</strong></td>
+                <td>${t.device}</td>
                 <td>${c ? c.name : 'Pelanggan'}</td>
-                <td><span class="status status--${t.statusClass || 'warning'}">${E(t.status)}</span></td>
-                <td>${E(t.estimatedCompletion)}</td>
-                <td><a class="detail-action" href="detail-tiket.html?id=${E(t.id)}">Kelola</a></td>
+                <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
+                <td>${t.estimatedCompletion}</td>
+                <td><a class="detail-action" href="detail-tiket.html?id=${t.id}">Kelola</a></td>
               </tr>
             `;
           }).join("");
@@ -482,8 +412,7 @@
     if (custProfileCard && window.location.pathname.includes("detail-pelanggan.html")) {
       const params = new URLSearchParams(window.location.search);
       const custId = params.get("id") || "CUS-001";
-      const cust = window.getCustomerById ? window.getCustomerById(custId) : null;
-      if (!cust) return renderNotFound("Pelanggan tidak ditemukan", "Data pelanggan tidak ada atau sudah dihapus.", "pelanggan.html", "Kembali ke Daftar Pelanggan");
+      const cust = window.getCustomerById ? window.getCustomerById(custId) || customers[0] : customers[0];
 
       const avatar = custProfileCard.querySelector(".cust-header-row div > div:first-child");
       if (avatar) avatar.textContent = cust.initials || "PL";
@@ -493,16 +422,15 @@
 
       const sub = custProfileCard.querySelector(".cust-header-row h2 + span");
       if (sub) {
-        sub.innerHTML = `Member Sejak: <strong>${E(cust.memberSince)}</strong> &bull; Total Unit Diservis: <strong>${E(cust.totalDevices)} Perangkat</strong>`;
+        sub.innerHTML = `Member Sejak: <strong>${cust.memberSince}</strong> &bull; Total Unit Diservis: <strong>${cust.totalDevices} Perangkat</strong>`;
       }
 
-      wireDetailActions("customers", cust, "edit-pelanggan.html", "pelanggan.html");
       const dl = custProfileCard.querySelector(".cust-meta-grid");
       if (dl) {
         dl.innerHTML = `
-          <div><dt>Nomor WhatsApp</dt><dd>${E(cust.phone)}</dd></div>
-          <div><dt>Email</dt><dd>${E(cust.email)}</dd></div>
-          <div><dt>Alamat Domisili</dt><dd>${E(cust.address)}</dd></div>
+          <div><dt>Nomor WhatsApp</dt><dd>${cust.phone}</dd></div>
+          <div><dt>Email</dt><dd>${cust.email}</dd></div>
+          <div><dt>Alamat Domisili</dt><dd>${cust.address}</dd></div>
           <div><dt>Total Belanja Servis</dt><dd class="stat-badge-num">${window.formatCurrency(cust.totalSpent)}</dd></div>
         `;
       }
@@ -516,13 +444,13 @@
             const tech = window.getTechnicianById ? window.getTechnicianById(t.technicianId) : null;
             return `
               <tr>
-                <td><strong>#${E(t.id)}</strong></td>
-                <td>${E(t.device)}</td>
+                <td><strong>#${t.id}</strong></td>
+                <td>${t.device}</td>
                 <td>${t.actionNeeded || t.issue}</td>
                 <td>${tech ? tech.name : 'Teknisi'}</td>
-                <td><span class="status status--${t.statusClass || 'warning'}">${E(t.status)}</span></td>
+                <td><span class="status status--${t.statusClass || 'warning'}">${t.status}</span></td>
                 <td>${window.formatCurrency(t.estimatedCost)}</td>
-                <td><a class="detail-action" href="detail-tiket.html?id=${E(t.id)}">Lihat</a></td>
+                <td><a class="detail-action" href="detail-tiket.html?id=${t.id}">Lihat</a></td>
               </tr>
             `;
           }).join("");
@@ -537,24 +465,22 @@
     if (svcDetailCard && window.location.pathname.includes("detail-layanan.html")) {
       const params = new URLSearchParams(window.location.search);
       const svcId = params.get("id") || "deep-cleaning-mx4";
-      const svc = window.getServiceById ? window.getServiceById(svcId) : null;
-      if (!svc) return renderNotFound("Layanan tidak ditemukan", "Data layanan tidak ada atau sudah dihapus.", "layanan.html", "Kembali ke Katalog Layanan");
+      const svc = window.getServiceById ? window.getServiceById(svcId) || services[1] : services[1];
 
       const headerDiv = svcDetailCard.querySelector(".service-header-row > div");
       if (headerDiv) {
         headerDiv.innerHTML = `
-          <span style="font-size: 12px; color: var(--primary); font-weight: 700; text-transform: uppercase;">${E(svc.category)}</span>
-          <h2 style="font-size: 22px; margin: 4px 0; color: var(--text);">${E(svc.name)}</h2>
-          <span style="color: var(--text-muted); font-size: 14px;">Estimasi Pengerjaan: <strong>${E(svc.duration)}</strong></span>
+          <span style="font-size: 12px; color: var(--primary); font-weight: 700; text-transform: uppercase;">${svc.category}</span>
+          <h2 style="font-size: 22px; margin: 4px 0; color: var(--text);">${svc.name}</h2>
+          <span style="color: var(--text-muted); font-size: 14px;">Estimasi Pengerjaan: <strong>${svc.duration}</strong></span>
         `;
       }
 
-      wireDetailActions("services", svc, "edit-layanan.html", "layanan.html");
       const dl = svcDetailCard.querySelector(".service-meta-grid");
       if (dl) {
         dl.innerHTML = `
           <div><dt>Harga Dasar</dt><dd class="stat-badge-num">${svc.priceLabel || window.formatCurrency(svc.price)}</dd></div>
-          <div><dt>Kategori</dt><dd>${E(svc.category)}</dd></div>
+          <div><dt>Kategori</dt><dd>${svc.category}</dd></div>
           <div><dt>Total Unit Selesai</dt><dd class="stat-badge-num" style="color: var(--success);">18 <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">unit</span></dd></div>
           <div><dt>Garansi Layanan</dt><dd>30 Hari (Garansi Performa)</dd></div>
         `;
@@ -580,8 +506,9 @@
     }
   }
 
+  // Populate dynamic data across owner pages
+  populateOwnerPortalData();
 
-  function initListFilters() {
   // ---------------- Tiket Servis ----------------
   const ticketRows = Array.from(document.querySelectorAll("[data-ticket-row]"));
   if (ticketRows.length) {
@@ -610,19 +537,15 @@
 
       if (empty) empty.hidden = visible !== 0;
       if (summary) {
-        summary.textContent = `Menampilkan ${visible} dari ${ticketRows.length} tiket`;
+        const defaultView = visible === ticketRows.length && selectedMonth === "2026-08" && !query && !statuses.length;
+        summary.textContent = defaultView
+          ? "Menampilkan 5 tiket terbaru • 28 tiket aktif di ServisKita"
+          : `Menampilkan ${visible} dari ${ticketRows.length} tiket contoh • 28 tiket aktif di ServisKita`;
       }
     };
 
     search?.addEventListener("input", update);
     month?.addEventListener("change", update);
-    wireEmptyReset("ticketEmptyState", () => {
-      if (search) search.value = "";
-      if (month) month.value = "all";
-      panel?.querySelectorAll('input[type="checkbox"]').forEach((i) => (i.checked = false));
-      statuses = [];
-      update();
-    });
     document.getElementById("applyTicketFilter")?.addEventListener("click", () => {
       statuses = getCheckedValues(panel, 'input[name="ticketStatus"]');
       update();
@@ -673,14 +596,6 @@
 
     search?.addEventListener("input", update);
     specialty?.addEventListener("change", update);
-    wireEmptyReset("technicianEmptyState", () => {
-      if (search) search.value = "";
-      if (specialty) specialty.value = "all";
-      panel?.querySelectorAll('input[type="checkbox"]').forEach((i) => (i.checked = false));
-      workloads = [];
-      statuses = [];
-      update();
-    });
 
     document.getElementById("applyTechnicianFilter")?.addEventListener("click", () => {
       workloads = getCheckedValues(panel, 'input[name="workloadFilter"]');
@@ -731,13 +646,6 @@
 
     search?.addEventListener("input", update);
     category?.addEventListener("change", update);
-    wireEmptyReset("serviceEmptyState", () => {
-      if (search) search.value = "";
-      if (category) category.value = "all";
-      panel?.querySelectorAll('input[type="checkbox"]').forEach((i) => (i.checked = false));
-      statuses = [];
-      update();
-    });
     document.getElementById("applyServiceFilter")?.addEventListener("click", () => {
       statuses = getCheckedValues(panel, 'input[name="serviceStatus"]');
       update();
@@ -777,18 +685,11 @@
         if (ok) visible += 1;
       });
       if (empty) empty.hidden = visible !== 0;
-      if (summary) summary.textContent = `Menampilkan ${visible} dari ${customerRows.length} pelanggan`;
+      if (summary) summary.textContent = `Menampilkan ${visible} dari 186 pelanggan • Halaman 1`;
     };
 
     search?.addEventListener("input", update);
     status?.addEventListener("change", update);
-    wireEmptyReset("customerEmptyState", () => {
-      if (search) search.value = "";
-      if (status) status.value = "all";
-      panel?.querySelectorAll('input[type="checkbox"]').forEach((i) => (i.checked = false));
-      augustOnly = false;
-      update();
-    });
     document.getElementById("applyCustomerFilter")?.addEventListener("click", () => {
       augustOnly = !!panel?.querySelector('input[name="customerPeriod"]')?.checked;
       update();
@@ -802,8 +703,6 @@
       showToast("Filter pelanggan direset.");
     });
     update();
-  }
-
   }
 
   // ---------------- Pengaturan ----------------
@@ -1038,33 +937,14 @@ Pemilik: Andi Ramadhan`;
      Owner Subpage Form & Action Handlers
      ========================================================================== */
   function initOwnerSubpageForms() {
-    // 1. Assign technician (disimpan ke store) & print in detail-tiket.html
+    // 1. Assign technician & print in detail-tiket.html
     const assignForm = document.getElementById("assignTechnicianForm");
     if (assignForm) {
-      assignForm.setAttribute("novalidate", "");
-      assignForm.addEventListener("submit", async (e) => {
+      assignForm.addEventListener("submit", (e) => {
         e.preventDefault();
         const select = document.getElementById("technicianSelect");
-        const btn = assignForm.querySelector('button[type="submit"], button:not([type])');
-        const ticketId = (document.getElementById("ticketIdHeading")?.textContent || "").replace("#", "").trim();
-        const tech = window.getTechnicianById && window.getTechnicianById(select?.value);
-        if (!select || !select.value || !tech || !ticketId) {
-          showToast("Pilih teknisi terlebih dahulu.", "error");
-          return;
-        }
-        window.URT_UX.setLoading(btn, true, "Menyimpan...");
-        try {
-          const current = window.getTicketById(ticketId);
-          const timeline = (current.timeline || []).map((st) =>
-            /^Penugasan Teknisi/.test(st.title) ? Object.assign({}, st, { title: "Penugasan Teknisi: " + tech.name.split(" ").slice(0, 2).join(" ") }) : st
-          );
-          await window.URT_API.update("tickets", ticketId, { technicianId: tech.id, timeline: timeline });
-          showToast(`Penugasan tiket berhasil diperbarui ke ${tech.name}.`);
-        } catch (err) {
-          showToast(err.message || "Gagal memperbarui penugasan. Coba lagi.", "error");
-        } finally {
-          window.URT_UX.setLoading(btn, false);
-        }
+        const techName = select?.options[select.selectedIndex]?.text.split("(")[0].trim() || "Teknisi";
+        showToast(`Penugasan tiket berhasil diperbarui ke ${techName}.`);
       });
     }
 
@@ -1075,7 +955,83 @@ Pemilik: Andi Ramadhan`;
       });
     }
 
-    initCrudForms();
+    // 2. Add technician
+    const addTechForm = document.getElementById("addTechnicianForm");
+    if (addTechForm) {
+      addTechForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("techName")?.value.trim() || "baru";
+        showToast(`Teknisi ${name} berhasil ditambahkan ke tim!`);
+        setTimeout(() => {
+          window.location.href = "teknisi.html";
+        }, 1200);
+      });
+    }
+
+    // 3. Edit technician
+    const editTechForm = document.getElementById("editTechnicianForm");
+    if (editTechForm) {
+      editTechForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("techName")?.value.trim() || "";
+        showToast(`Data teknisi ${name} berhasil diperbarui!`);
+        setTimeout(() => {
+          window.location.href = "teknisi.html";
+        }, 1200);
+      });
+    }
+
+    // 4. Add customer
+    const addCustForm = document.getElementById("addCustomerForm");
+    if (addCustForm) {
+      addCustForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("custName")?.value.trim() || "baru";
+        showToast(`Pelanggan ${name} berhasil ditambahkan!`);
+        setTimeout(() => {
+          window.location.href = "pelanggan.html";
+        }, 1200);
+      });
+    }
+
+    // 5. Edit customer
+    const editCustForm = document.getElementById("editCustomerForm");
+    if (editCustForm) {
+      editCustForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("custName")?.value.trim() || "";
+        showToast(`Data pelanggan ${name} berhasil diperbarui!`);
+        setTimeout(() => {
+          window.location.href = "pelanggan.html";
+        }, 1200);
+      });
+    }
+
+    // 6. Add service
+    const addSvcForm = document.getElementById("addServiceForm");
+    if (addSvcForm) {
+      addSvcForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("serviceName")?.value.trim() || "baru";
+        showToast(`Layanan ${name} berhasil ditambahkan!`);
+        setTimeout(() => {
+          window.location.href = "layanan.html";
+        }, 1200);
+      });
+    }
+
+    // 7. Edit service
+    const editSvcForm = document.getElementById("editServiceForm");
+    if (editSvcForm) {
+      editSvcForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("serviceName")?.value.trim() || "";
+        showToast(`Layanan ${name} berhasil diperbarui!`);
+        setTimeout(() => {
+          window.location.href = "layanan.html";
+        }, 1200);
+      });
+    }
 
     // 8. Import customer
     const fileInput = document.getElementById("fileInput");
@@ -1131,318 +1087,6 @@ Pemilik: Andi Ramadhan`;
     }
   }
 
-  /* ==========================================================================
-     CRUD Forms (Modul 8): validasi + sanitasi + simpan via URT_API + toast
-     ========================================================================== */
-  function getRecordParam() {
-    return new URLSearchParams(window.location.search).get("id");
-  }
-
-  function wireForm(form, cfg) {
-    const UX = window.URT_UX;
-    form.setAttribute("novalidate", "");
-    UX.liveClear(form);
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = form.querySelector('button[type="submit"]');
-      if (btn && btn.disabled) return; // tombol terkunci saat proses kirim
-      const { valid, values } = UX.validate(form, cfg.rules);
-      const extraOk = cfg.extraCheck ? cfg.extraCheck(form, values) : true;
-      if (!valid || extraOk === false) {
-        showToast("Periksa kembali isian yang ditandai merah.", "error");
-        return;
-      }
-      UX.setLoading(btn, true, "Menyimpan...");
-      try {
-        const record = await cfg.action(values, form);
-        UX.flash(cfg.successMessage(record), "success");
-        window.location.href = cfg.redirect; // tombol tetap terkunci sampai pindah halaman
-      } catch (err) {
-        UX.setLoading(btn, false);
-        const handled = err && err.field && UX.serverFieldError(form, err.field, err.message);
-        if (!handled) showToast((err && err.message) || "Gagal menyimpan data. Coba lagi.", "error");
-      }
-    });
-  }
-
-  // Halaman edit: ambil data dari store (skeleton -> isi form / error state)
-  function loadRecordIntoForm(form, collection, fill) {
-    const UX = window.URT_UX;
-    const id = getRecordParam();
-    const holder = document.createElement("div");
-    holder.className = "form-card";
-    form.style.display = "none";
-    form.parentNode.insertBefore(holder, form);
-
-    const run = () => {
-      if (!id) {
-        UX.showState(holder, { type: "error", title: "Data tidak ditemukan", message: "Alamat halaman tidak memuat ID data yang akan diedit." });
-        return;
-      }
-      UX.skeletonBlock(holder, 6);
-      window.URT_API.get(collection, id)
-        .then((rec) => {
-          holder.remove();
-          form.style.display = "";
-          form.dataset.recordId = rec.id;
-          fill(rec);
-        })
-        .catch((err) => {
-          UX.showState(holder, {
-            type: "error",
-            title: err.message === "Data tidak ditemukan." ? "Data tidak ditemukan" : "Gagal memuat data",
-            message: err.message === "Data tidak ditemukan." ? "Data mungkin sudah dihapus." : "Periksa koneksi Anda lalu coba lagi.",
-            actionLabel: err.message === "Data tidak ditemukan." ? "" : "Coba lagi ↻",
-            onAction: run
-          });
-        });
-    };
-    run();
-  }
-
-  function setVal(form, name, value) {
-    const el = form.elements.namedItem(name);
-    if (el) el.value = value == null ? "" : value;
-  }
-
-  function setHeading(form, rec) {
-    const h = form.querySelector("h2");
-    if (h && h.textContent.indexOf(":") > -1) h.textContent = h.textContent.split(":")[0] + ": " + rec.name;
-    const badge = form.querySelector(".status");
-    if (badge && rec.status) {
-      badge.textContent = String(rec.status).toUpperCase();
-      badge.className = "status status--" + (rec.status === "aktif" ? "success" : "warning");
-    }
-  }
-
-  function checkedValues(form, name) {
-    return Array.from(form.querySelectorAll('input[name="' + name + '"]:checked')).map((i) => i.value);
-  }
-
-  function requireSpecialty(form) {
-    const group = form.querySelector(".checkbox-group");
-    if (!group) return true;
-    group.nextElementSibling?.classList.contains("urt-field-error") && group.nextElementSibling.remove();
-    if (checkedValues(form, "specialty").length) return true;
-    const msg = document.createElement("small");
-    msg.className = "urt-field-error";
-    msg.setAttribute("role", "alert");
-    msg.textContent = "Pilih minimal satu bidang keahlian.";
-    group.insertAdjacentElement("afterend", msg);
-    return false;
-  }
-
-  function initCrudForms() {
-    if (!window.URT_UX || !window.URT_API) return;
-
-    const customerRules = {
-      name: { label: "Nama lengkap", required: true, minLength: 3, maxLength: 80 },
-      phone: { label: "Nomor HP", required: true, type: "phone" },
-      email: { label: "Email", type: "email", maxLength: 100 },
-      city: { label: "Kota / wilayah", maxLength: 60 },
-      address: { label: "Alamat lengkap", maxLength: 200 },
-      notes: { label: "Catatan", maxLength: 300 }
-    };
-    const technicianRules = {
-      name: { label: "Nama lengkap", required: true, minLength: 3, maxLength: 80 },
-      email: { label: "Email", required: true, type: "email", maxLength: 100 },
-      phone: { label: "Nomor HP", required: true, type: "phone" }
-    };
-    const serviceRules = {
-      name: { label: "Nama layanan", required: true, minLength: 3, maxLength: 100 },
-      price: { label: "Harga dasar", required: true, type: "number", min: 0, max: 100000000 },
-      duration: { label: "Estimasi pengerjaan", required: true, minLength: 2, maxLength: 40 },
-      description: { label: "Deskripsi", maxLength: 400 }
-    };
-
-    // ----- Tambah pelanggan -----
-    const addCust = document.getElementById("addCustomerForm");
-    if (addCust) {
-      wireForm(addCust, {
-        rules: customerRules,
-        action: (v) => window.URT_API.create("customers", v),
-        successMessage: (r) => `Pelanggan ${r.name} berhasil ditambahkan!`,
-        redirect: "pelanggan.html"
-      });
-    }
-
-    // ----- Edit pelanggan -----
-    const editCust = document.getElementById("editCustomerForm");
-    if (editCust) {
-      loadRecordIntoForm(editCust, "customers", (rec) => {
-        ["name", "phone", "email", "city", "address", "notes"].forEach((f) => setVal(editCust, f, f === "address" && rec.address === rec.city ? "" : rec[f]));
-        setHeading(editCust, rec);
-      });
-      wireForm(editCust, {
-        rules: customerRules,
-        action: (v, form) => window.URT_API.update("customers", form.dataset.recordId, v),
-        successMessage: (r) => `Data pelanggan ${r.name} berhasil diperbarui!`,
-        redirect: "pelanggan.html"
-      });
-    }
-
-    // ----- Tambah teknisi -----
-    const addTech = document.getElementById("addTechnicianForm");
-    if (addTech) {
-      wireForm(addTech, {
-        rules: Object.assign({}, technicianRules, {
-          username: { label: "Username", required: true, minLength: 3, maxLength: 30, pattern: /^[a-zA-Z0-9._-]+$/, patternMessage: "Username hanya boleh huruf, angka, titik, strip, dan underscore." },
-          password: { label: "Kata sandi", required: true, minLength: 6, maxLength: 64 },
-          password_confirm: { label: "Konfirmasi kata sandi", required: true, matches: "password" }
-        }),
-        extraCheck: requireSpecialty,
-        // kata sandi sengaja TIDAK disimpan (prototipe tanpa autentikasi backend)
-        action: (v, form) =>
-          window.URT_API.create("technicians", { name: v.name, username: v.username, email: v.email, phone: v.phone, specialties: checkedValues(form, "specialty") }),
-        successMessage: (r) => `Teknisi ${r.name} berhasil ditambahkan ke tim!`,
-        redirect: "teknisi.html"
-      });
-    }
-
-    // ----- Edit teknisi -----
-    const editTech = document.getElementById("editTechnicianForm");
-    if (editTech) {
-      loadRecordIntoForm(editTech, "technicians", (rec) => {
-        ["name", "username", "email", "phone"].forEach((f) => setVal(editTech, f, rec[f]));
-        setVal(editTech, "status", rec.status);
-        editTech.querySelectorAll('input[name="specialty"]').forEach((cb) => {
-          cb.checked = (rec.specialties || []).includes(cb.value.toLowerCase());
-        });
-        setHeading(editTech, rec);
-      });
-      wireForm(editTech, {
-        rules: technicianRules,
-        extraCheck: requireSpecialty,
-        action: (v, form) =>
-          window.URT_API.update("technicians", form.dataset.recordId, {
-            name: v.name, email: v.email, phone: v.phone,
-            username: form.elements.namedItem("username").value,
-            status: form.elements.namedItem("status")?.value,
-            specialties: checkedValues(form, "specialty")
-          }),
-        successMessage: (r) => `Data teknisi ${r.name} berhasil diperbarui!`,
-        redirect: "teknisi.html"
-      });
-    }
-
-    // ----- Tambah layanan -----
-    const addSvc = document.getElementById("addServiceForm");
-    if (addSvc) {
-      wireForm(addSvc, {
-        rules: serviceRules,
-        action: (v, form) => window.URT_API.create("services", Object.assign({}, v, { category: form.elements.namedItem("category").value })),
-        successMessage: (r) => `Layanan ${r.name} berhasil ditambahkan!`,
-        redirect: "layanan.html"
-      });
-    }
-
-    // ----- Edit layanan -----
-    const editSvc = document.getElementById("editServiceForm");
-    if (editSvc) {
-      loadRecordIntoForm(editSvc, "services", (rec) => {
-        ["name", "price", "duration", "description"].forEach((f) => setVal(editSvc, f, rec[f]));
-        const cat = editSvc.elements.namedItem("category");
-        if (cat) {
-          if (!Array.from(cat.options).some((o) => o.value === rec.category)) cat.add(new Option(rec.category, rec.category));
-          cat.value = rec.category;
-        }
-        setVal(editSvc, "status", rec.status);
-        setHeading(editSvc, rec);
-      });
-      wireForm(editSvc, {
-        rules: serviceRules,
-        action: (v, form) =>
-          window.URT_API.update("services", form.dataset.recordId, Object.assign({}, v, {
-            category: form.elements.namedItem("category").value,
-            status: form.elements.namedItem("status")?.value
-          })),
-        successMessage: (r) => `Layanan ${r.name} berhasil diperbarui!`,
-        redirect: "layanan.html"
-      });
-    }
-  }
-
-  // Hapus data (list & halaman detail) dengan dialog konfirmasi sendiri
-  document.addEventListener("click", async (event) => {
-    const btn = event.target.closest("[data-delete]");
-    if (!btn || !window.URT_UX || !window.URT_API) return;
-    const { delete: collection, id, name, redirect } = btn.dataset;
-    const ok = await window.URT_UX.confirm({
-      title: "Hapus data ini?",
-      message: `"${name}" akan dihapus permanen dari ServisKita. Tindakan ini tidak dapat dibatalkan.`,
-      confirmLabel: "Ya, hapus",
-      danger: true
-    });
-    if (!ok) return;
-    window.URT_UX.setLoading(btn, true, "Menghapus...");
-    try {
-      await window.URT_API.remove(collection, id);
-      window.URT_UX.flash(`${name} berhasil dihapus.`, "success");
-      if (redirect) window.location.href = redirect;
-      else window.location.reload();
-    } catch (err) {
-      window.URT_UX.setLoading(btn, false);
-      showToast(err.message || "Gagal menghapus data. Coba lagi.", "error");
-    }
-  });
-
-  /* ==========================================================================
-     Bootstrap halaman: skeleton -> data -> (empty | error) states
-     ========================================================================== */
-  const PAGE_FILE = window.location.pathname.split("/").pop();
-  const DATA_PAGES = [
-    "beranda-owner.html", "tiket-servis.html", "teknisi.html", "pelanggan.html", "layanan.html",
-    "detail-tiket.html", "detail-teknisi.html", "detail-pelanggan.html", "detail-layanan.html"
-  ];
-
-  function bootData() {
-    populateOwnerPortalData();
-    initListFilters();
-  }
-
-  function startPage() {
-    if (!window.URT_API || !window.URT_UX || !DATA_PAGES.includes(PAGE_FILE)) {
-      bootData();
-      return;
-    }
-    const UX = window.URT_UX;
-    const tbodies = ["#ticketTable tbody", "#technicianTable tbody", ".resource-table tbody", ".activity-panel tbody", ".data-table tbody"]
-      .filter((q) => q !== ".data-table tbody" || /detail-(teknisi|pelanggan)\.html$/.test(PAGE_FILE))
-      .map((q) => document.querySelector(q))
-      .filter(Boolean);
-    const colsOf = (tb) => tb.closest("table")?.querySelectorAll("thead th").length || 6;
-
-    const main = document.querySelector(".owner-main");
-    const isDetail = /^detail-/.test(PAGE_FILE);
-
-    const load = () => {
-      if (isDetail) UX.pageLoading(main, true);
-      else tbodies.forEach((tb) => UX.skeletonRows(tb, colsOf(tb), 5));
-      window.URT_API.ready()
-        .then(() => {
-          if (isDetail) UX.pageLoading(main, false);
-          bootData();
-        })
-        .catch(() => {
-          const errOpts = {
-            type: "error",
-            title: "Gagal memuat data",
-            message: "Periksa koneksi internet Anda lalu coba lagi.",
-            actionLabel: "Coba lagi ↻",
-            onAction: load
-          };
-          if (isDetail) {
-            UX.pageLoading(main, false);
-            UX.showState(main, Object.assign({}, errOpts, { onAction: () => window.location.reload() }));
-          } else if (tbodies.length) tbodies.forEach((tb) => UX.showState(tb, errOpts, colsOf(tb)));
-          else UX.showState(main, Object.assign({}, errOpts, { onAction: () => window.location.reload() }));
-          showToast("Gagal memuat data. Coba lagi.", "error");
-        });
-    };
-    load();
-  }
-
   // Initialize subpage forms if present
   initOwnerSubpageForms();
-  startPage();
 })();

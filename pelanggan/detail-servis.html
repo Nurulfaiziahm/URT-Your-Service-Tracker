@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detail Servis — URT Your Service Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style-customer.css" />
+    <script src="../js/data.js" defer></script>
+    <script src="js/customer.js" defer></script>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="beranda-pelanggan.html">
+          <img src="../image/logo-urt.svg" alt="URT Your Service Tracker" height="38" />
+        </a>
+        <p>PORTAL PELANGGAN</p>
+      </div>
+      <nav class="nav-menu">
+        <a href="beranda-pelanggan.html" class="nav-item">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Beranda</span>
+        </a>
+        <a href="riwayat-servis.html" class="nav-item active">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span>Riwayat Servis</span>
+        </a>
+        <a href="profil-pelanggan.html" class="nav-item">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <span>Profil</span>
+        </a>
+        <a href="../masuk.html" class="nav-item nav-item--logout" title="Keluar dari portal">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span>Keluar</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="avatar">NR</div>
+        <div class="user-info">
+          <p>Nino Rachimas</p>
+          <span>Pelanggan</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div>
+          <span class="badge-pelanggan">PELANGGAN</span>
+          <span class="online-label">Sistem Online</span>
+        </div>
+        <div class="header-right">
+          <span class="avatar avatar-outline">NR</span>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <span class="page-title">PORTAL PELANGGAN</span>
+            <h1>Detail Tiket Servis</h1>
+            <p class="subtitle">
+              Informasi lengkap spesifikasi perangkat, keluhan, hasil pemeriksaan, dan status tiket servis.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a class="btn-secondary" href="beranda-pelanggan.html">&larr; Beranda</a>
+            <a class="btn-secondary" href="riwayat-servis.html">Daftar Riwayat</a>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <!-- LEFT: TICKET INFO & SPECIFICATIONS -->
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px;">
+              <div>
+                <span class="eyebrow">NO. TIKET SERVIS</span>
+                <h2 style="font-size: 22px; margin: 4px 0;">#URT-2026-001</h2>
+                <strong style="color: var(--primary-blue);">ASUS VivoBook 14 (A416MA)</strong>
+              </div>
+              <span class="status-pill status-pill--warning">Menunggu Persetujuan</span>
+            </div>
+
+            <table class="kv-table">
+              <tbody>
+                <tr>
+                  <td>Pemilik Perangkat</td>
+                  <td>Nino Rachimas (0812 3456 7890)</td>
+                </tr>
+                <tr>
+                  <td>Tipe Perangkat</td>
+                  <td>Laptop / Ultrabook 14 Inci</td>
+                </tr>
+                <tr>
+                  <td>Nomor Seri (S/N)</td>
+                  <td>ASUS-VB14-2026-001</td>
+                </tr>
+                <tr>
+                  <td>Tanggal Masuk Servis</td>
+                  <td>1 Sep 2026, 10:15 WIB</td>
+                </tr>
+                <tr>
+                  <td>Keluhan Awal</td>
+                  <td>Laptop mendadak mati sendiri saat dipakai 10-15 menit. Bagian bawah keyboard terasa sangat panas.</td>
+                </tr>
+                <tr>
+                  <td>Temuan Diagnosis Teknisi</td>
+                  <td>Debu menumpuk pada fan dan sirip heatsink sehingga pembuangan panas terhambat. Kualitas thermal paste CPU/GPU sudah kering mengeras.</td>
+                </tr>
+                <tr>
+                  <td>Tindakan Diperlukan</td>
+                  <td>Deep Cleaning Fan, Heatsink &amp; Motherboard + Thermal Paste Replacement Arctic MX-4.</td>
+                </tr>
+                <tr>
+                  <td>Teknisi Penanggung Jawab</td>
+                  <td>Sofia Malvalena Adam (Spesialis Hardware &amp; Laptop)</td>
+                </tr>
+                <tr>
+                  <td>Estimasi Selesai</td>
+                  <td>3 Sep 2026 (1–2 hari kerja setelah persetujuan)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- RIGHT: ACTION & COST STATUS -->
+          <div class="side-stack">
+            <div class="card">
+              <h3 style="font-size: 16px; margin-bottom: 12px;">Status Pengerjaan</h3>
+              <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+                Saat ini pengerjaan sedang ditahan menunggu konfirmasi persetujuan biaya dari Anda.
+              </p>
+
+              <div class="cost-summary-card">
+                <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total Biaya Servis</span>
+                <div style="font-size: 24px; font-weight: 800; color: #2563eb; margin: 4px 0 8px;">
+                  Rp250.000
+                </div>
+                <div style="font-size: 12px; color: #64748b; line-height: 1.4;">
+                  Termasuk jasa deep cleaning dan sparepart thermal paste Arctic MX-4.
+                </div>
+              </div>
+
+              <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <a href="persetujuan-servis.html" class="btn-primary" style="text-align: center; text-decoration: none;">
+                  Beri Persetujuan Biaya &rarr;
+                </a>
+                <a href="persetujuan-ditolak.html" class="btn-danger" style="text-align: center; text-decoration: none;">
+                  Batalkan / Tolak Servis
+                </a>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+              <h3 style="font-size: 15px; margin-bottom: 8px;">Butuh Bantuan?</h3>
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+                Hubungi counter tempat servis iFix Lab jika Anda memiliki pertanyaan khusus seputar pengerjaan unit Anda.
+              </p>
+              <a
+                href="https://web.whatsapp.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-secondary"
+                style="text-align: center; text-decoration: none; display: block;"
+              >
+                Chat WhatsApp CS ServisKita
+              </a>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="site-footer">
+        URT &mdash; Your Service Tracker <span>Kelompok 2 UT</span>
+      </footer>
+    </div>
+  </body>
+</html>

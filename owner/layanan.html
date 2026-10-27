@@ -7,10 +7,7 @@
   <title>Layanan — Portal Pemilik — Your Service Tracker</title>
   <link rel="stylesheet" href="css/owner.css">
   <script src="../js/data.js" defer></script>
-  <script src="../js/store.js" defer></script>
-  <script src="../js/ux.js" defer></script>
   <script src="js/owner.js" defer></script>
-  <link rel="stylesheet" href="../css/ux.css">
 </head>
 <body>
 
@@ -160,7 +157,37 @@
             <caption class="sr-only">Katalog layanan ServisKita</caption>
             <thead><tr><th>Layanan</th><th>Kategori</th><th>Harga Dasar</th><th>Estimasi</th><th>Status</th><th>Aksi</th></tr></thead>
             <tbody>
-              <!-- Baris dirender dinamis dari URT_API (js/store.js) -->
+              <tr data-service-row data-search="cleaning & thermal paste laptop / notebook" data-category="laptop notebook" data-status="aktif">
+      <td><strong>Cleaning & Thermal Paste</strong></td><td>Laptop / Notebook</td><td>Rp150.000</td><td>1–2 hari</td>
+      <td><span class="status status--success">AKTIF</span></td>
+      <td><div class="row-actions"><a href="detail-layanan.html?id=cleaning-thermal">Lihat</a><a href="edit-layanan.html?id=cleaning-thermal">Edit</a></div></td>
+    </tr>
+<tr data-service-row data-search="deep cleaning & re-paste arctic mx-4 laptop / notebook" data-category="laptop notebook" data-status="aktif">
+      <td><strong>Deep Cleaning & Re-paste Arctic MX-4</strong></td><td>Laptop / Notebook</td><td>Rp250.000</td><td>1–2 hari</td>
+      <td><span class="status status--success">AKTIF</span></td>
+      <td><div class="row-actions"><a href="detail-layanan.html?id=deep-cleaning-mx4">Lihat</a><a href="edit-layanan.html?id=deep-cleaning-mx4">Edit</a></div></td>
+    </tr>
+<tr data-service-row data-search="instalasi windows 11 & driver software" data-category="software" data-status="aktif">
+      <td><strong>Instalasi Windows 11 & Driver</strong></td><td>Software</td><td>Rp120.000</td><td>1 hari</td>
+      <td><span class="status status--success">AKTIF</span></td>
+      <td><div class="row-actions"><a href="detail-layanan.html?id=windows-driver">Lihat</a><a href="edit-layanan.html?id=windows-driver">Edit</a></div></td>
+    </tr>
+<tr data-service-row data-search="perbaikan keyboard & trackpad hardware" data-category="hardware" data-status="aktif">
+      <td><strong>Perbaikan Keyboard & Trackpad</strong></td><td>Hardware</td><td>Mulai Rp850.000</td><td>2–3 hari</td>
+      <td><span class="status status--success">AKTIF</span></td>
+      <td><div class="row-actions"><a href="detail-layanan.html?id=keyboard-trackpad">Lihat</a><a href="edit-layanan.html?id=keyboard-trackpad">Edit</a></div></td>
+    </tr>
+<tr data-service-row data-search="penggantian kipas pendingin hardware" data-category="hardware" data-status="aktif">
+      <td><strong>Penggantian Kipas Pendingin</strong></td><td>Hardware</td><td>Mulai Rp690.000</td><td>2–3 hari</td>
+      <td><span class="status status--success">AKTIF</span></td>
+      <td><div class="row-actions"><a href="detail-layanan.html?id=kipas-pendingin">Lihat</a><a href="edit-layanan.html?id=kipas-pendingin">Edit</a></div></td>
+    </tr>
+<tr data-service-row data-search="pemulihan data & penggantian ssd penyimpanan" data-category="penyimpanan" data-status="aktif">
+      <td><strong>Pemulihan Data & Penggantian SSD</strong></td><td>Penyimpanan</td><td>Mulai Rp1.250.000</td><td>3–5 hari</td>
+      <td><span class="status status--success">AKTIF</span></td>
+      <td><div class="row-actions"><a href="detail-layanan.html?id=data-ssd">Lihat</a><a href="edit-layanan.html?id=data-ssd">Edit</a></div></td>
+    </tr>
+              <tr id="serviceEmptyState" class="empty-row" hidden><td colspan="6">Tidak ada layanan yang sesuai.</td></tr>
             </tbody>
           </table>
         </div>

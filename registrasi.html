@@ -1,50 +1,3 @@
-<?php
-// Letakkan di baris paling atas registrasi.php
-session_start();
-require_once 'koneksi.php';
-
-$pesan_error = '';
-
-// Proses form jika ada request POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Mengambil dan membersihkan input dari form
-    $nama = $conn->real_escape_string($_POST['name']);
-    $email = $conn->real_escape_string($_POST['email']);
-    $phone = $conn->real_escape_string($_POST['phone']);
-    $password_raw = $_POST['password'];
-    $role = 'pelanggan'; // Pastikan role diset sebagai pelanggan
-
-    // Cek apakah email sudah terdaftar sebelumnya
-    $cek_email = $conn->query("SELECT id_user FROM users WHERE email = '$email'");
-    
-    if ($cek_email->num_rows > 0) {
-        $pesan_error = "Email sudah terdaftar! Silakan gunakan email lain atau masuk ke portal.";
-    } else {
-        // Enkripsi kata sandi (hashing) sebelum masuk ke database
-        $password_hash = password_hash($password_raw, PASSWORD_DEFAULT);
-
-        // Query untuk menyimpan data ke tabel users[cite: 1]
-        $sql_insert = "INSERT INTO users (nama, email, password, role, no_telp) 
-                       VALUES ('$nama', '$email', '$password_hash', '$role', '$phone')";
-
-        if ($conn->query($sql_insert) === TRUE) {
-            // Ambil ID user yang baru saja dibuat
-            $id_baru = $conn->insert_id;
-
-            // Buat sesi login otomatis agar tidak perlu login ulang
-            $_SESSION['id_user'] = $id_baru;
-            $_SESSION['nama'] = $nama;
-            $_SESSION['role'] = $role;
-
-            // Arahkan ke beranda pelanggan
-            header("Location: pelanggan/beranda-pelanggan.php");
-            exit;
-        } else {
-            $pesan_error = "Terjadi kesalahan sistem: " . $conn->error;
-        }
-    }
-}
-?>
 <!doctype html>
 <html lang="id">
   <head>
@@ -63,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="register-wrap">
       <main class="reg-card">
         <div class="reg-brand-header">
-          <a href="index.php">
+          <a href="index.html">
             <img src="image/logo-urt.svg" alt="URT Logo" class="reg-brand-logo" />
           </a>
           <div><span class="reg-role-badge">AKUN PELANGGAN</span></div>
@@ -73,14 +26,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </p>
         </div>
 
-        <?php if (!empty($pesan_error)): ?>
-        <div class="toast-error" role="alert" style="background-color: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
-            <strong>Gagal:</strong> <?= $pesan_error; ?>
+        <div id="toastSuccess" class="toast-success" role="alert">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+          <div>
+            <strong>Registrasi berhasil!</strong> Mengalihkan ke portal pelanggan...
+          </div>
         </div>
-        <?php endif; ?>
 
-        <!-- Perhatikan perubahan action dan method di sini -->
-        <form id="customerRegisterForm" class="reg-form" action="registrasi.php" method="POST" novalidate>
+        <form id="customerRegisterForm" class="reg-form" action="pelanggan/beranda-pelanggan.html" method="get" novalidate>
           <div class="form-group">
             <label class="form-label" for="regName">Nama Lengkap</label>
             <div class="input-container">
@@ -158,15 +114,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <div class="reg-link-row">
-          Sudah punya akun? <a href="masuk.php">Masuk ke Portal</a>
+          Sudah punya akun? <a href="masuk.html">Masuk ke Portal</a>
         </div>
 
-        <a href="index.php" class="back-home-link">
+        <a href="index.html" class="back-home-link">
           &larr; Kembali ke Beranda URT
         </a>
       </main>
     </div>
 
-    <!-- <script src="owner/js/owner-auth.js" defer></script> -->
+    <script src="owner/js/owner-auth.js" defer></script>
   </body>
 </html>
