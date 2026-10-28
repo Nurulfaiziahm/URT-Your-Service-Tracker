@@ -19,7 +19,15 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!('IntersectionObserver' in window)) return;
+    const handleScroll = () => {
+      if (window.scrollY < 120) {
+        setActiveSection('');
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    if (!('IntersectionObserver' in window)) {
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -31,7 +39,10 @@ export default function LandingPage() {
     root.current
       ?.querySelectorAll('main section[id]')
       .forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
   }, []);
 
   function handlePersonaKey(event: KeyboardEvent<HTMLButtonElement>, current: Persona) {
@@ -94,8 +105,16 @@ export default function LandingPage() {
           >
             <ul className="site-nav__list">
               <li>
-                <Link to="/" className="site-nav__link" aria-current="page">
-                  Beranda
+                <Link
+                  to="/"
+                  className={
+                    !activeSection || activeSection === 'dashboard'
+                      ? 'site-nav__link is-active'
+                      : 'site-nav__link'
+                  }
+                  aria-current={!activeSection || activeSection === 'dashboard' ? 'page' : undefined}
+                >
+                  Dashboard
                 </Link>
               </li>
               <li>
@@ -150,8 +169,8 @@ export default function LandingPage() {
               </li>
             </ul>
             <div className="site-nav__actions">
-              <Link to="/portal" className="btn btn--secondary btn--sm">
-                Masuk Portal
+              <Link to="/login" className="btn btn--secondary btn--sm">
+                Masuk
               </Link>
               <Link to="/owner/register" className="btn btn--primary btn--sm">
                 Daftar Tempat Servis
@@ -177,7 +196,7 @@ export default function LandingPage() {
               </p>
               <div className="hero__actions">
                 <Link to="/portal" className="btn btn--primary btn--lg">
-                  Masuk ke Portal
+                  Lihat Demo
                 </Link>
                 <a href="#alur-kerja" className="btn btn--secondary btn--lg">
                   Lihat Cara Kerja
@@ -511,9 +530,9 @@ export default function LandingPage() {
                     </ul>
                   </div>
                   <div className="persona-layout__action">
-                    <Link to="/portal" className="btn btn--primary">
+                    <a href="/demo/owner/beranda-owner.html" className="btn btn--primary">
                       Jelajahi Portal Owner
-                    </Link>
+                    </a>
                     <a href="#harga" className="btn btn--secondary">
                       Lihat Paket Langganan
                     </a>
@@ -623,9 +642,9 @@ export default function LandingPage() {
                     </ul>
                   </div>
                   <div className="persona-layout__action">
-                    <Link to="/portal" className="btn btn--primary">
+                    <a href="/demo/teknisi/beranda-teknisi.html" className="btn btn--primary">
                       Jelajahi Portal Teknisi
-                    </Link>
+                    </a>
                   </div>
                 </div>
                 <div className="persona-layout__visual">
@@ -713,8 +732,8 @@ export default function LandingPage() {
                     </ul>
                   </div>
                   <div className="persona-layout__action">
-                    <a href="#lacak-servis" className="btn btn--primary">
-                      Coba Lacak Servis Sekarang
+                    <a href="/demo/pelanggan/beranda-pelanggan.html" className="btn btn--primary">
+                      Jelajahi Portal Pelanggan
                     </a>
                   </div>
                 </div>
@@ -1275,7 +1294,7 @@ export default function LandingPage() {
                 </ul>
                 <div className="pricing-card__action">
                   <Link to="/register" className="btn btn--secondary btn--block">
-                    Pilih Paket Bulanan
+                    {billing === 'annual' ? 'Pilih Paket Tahunan' : 'Pilih Paket Bulanan'}
                   </Link>
                 </div>
               </article>
@@ -1342,8 +1361,8 @@ export default function LandingPage() {
               <Link to="/register" className="btn btn--white btn--lg">
                 Daftar Tempat Servis
               </Link>
-              <Link to="/portal" className="btn btn--outline-white btn--lg">
-                Masuk ke Portal
+              <Link to="/login" className="btn btn--outline-white btn--lg">
+                Masuk ke Akun Anda
               </Link>
             </div>
           </div>
@@ -1390,26 +1409,14 @@ export default function LandingPage() {
               </li>
             </ul>
           </nav>
-          <nav className="site-footer__col" aria-label="Portal Akses">
-            <h3 className="site-footer__heading">Akses Portal</h3>
-            <ul className="site-footer__links">
-              <li>
-                <Link to="/portal">Portal Owner</Link>
-              </li>
-              <li>
-                <Link to="/portal">Portal Teknisi</Link>
-              </li>
-              <li>
-                <Link to="/portal">Portal Pelanggan</Link>
-              </li>
-              <li>
-                <Link to="/register">Pendaftaran Akun Baru</Link>
-              </li>
-            </ul>
-          </nav>
           <div className="site-footer__col">
             <h3 className="site-footer__heading">Hubungi Kami</h3>
             <ul className="site-footer__links">
+              <li>
+                <a href="mailto:urtyourservicetracker@gmail.com">
+                  urtyourservicetracker@gmail.com
+                </a>
+              </li>
               <li>
                 <a href="https://web.whatsapp.com" target="_blank" rel="noopener noreferrer">
                   WhatsApp Support

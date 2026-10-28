@@ -77,6 +77,7 @@ export function AppRoutes() {
       <Routes>
         <Route index element={<LandingPage />} />
         <Route path="portal" element={<PortalSelectPage />} />
+        <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="owner/register" element={<RegisterPage />} />
         <Route path="tracking/:ticketCode?" element={<TrackingPage />} />
@@ -103,7 +104,6 @@ export function AppRoutes() {
         </Route>
         {/* Dedicated Auth Layout */}
         <Route element={<AuthLayout />}>
-          <Route path="login" element={<LoginPage />} />
           <Route path="verify-email" element={<VerifyEmailPage />} />
           <Route path="forgot-password" element={<ForgotPasswordPage />} />
           <Route path="reset-password" element={<ResetPasswordPage />} />

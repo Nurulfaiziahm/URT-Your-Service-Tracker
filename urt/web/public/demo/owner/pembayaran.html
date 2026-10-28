@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran — Your Service Tracker</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta http-equiv="refresh" content="0; url=payment.html" />
+    <link rel="stylesheet" href="css/owner-auth.css" />
+  </head>
+  <body>
+    <header>
+      <a href="../index.html">
+        <img src="../image/logo-urt.svg" alt="URT — Your Service Tracker" height="40">
+      </a>
+      <p>Untuk Pemilik Usaha</p>
+      <nav>
+        Step 1: Data Usaha &rarr; Step 2: Pilih Paket &rarr; Step 3:
+        <strong>Pembayaran</strong>
+        &nbsp;&nbsp;&nbsp; &#128274; Transaksi terenkripsi
+      </nav>
+    </header>
+
+    <hr>
+
+    <main>
+      <p><em>LANGKAH 3 DARI 3</em></p>
+      <h2>Selesaikan pembayaran</h2>
+      <p>
+        Aktifkan akun Pemilik Usaha ServisKita dan mulai kelola operasional hari
+        ini.
+      </p>
+
+      <section>
+        <h3>Pilih metode pembayaran</h3>
+        <p>Pembayaran diproses otomatis dan aman.</p>
+
+        <form action="instruksi-pembayaran.html" method="get">
+          <fieldset>
+            <legend>Metode Pembayaran</legend>
+
+            <p>
+              <label>
+                <input type="radio" name="metode" value="qris" checked>
+                <strong>QRIS</strong> — Scan dengan aplikasi bank atau e-wallet
+              </label>
+            </p>
+
+            <p>
+              <label>
+                <input type="radio" name="metode" value="virtual_account">
+                <strong>Virtual Account</strong> — BCA, BNI, BRI, Mandiri, dan
+                Permata
+              </label>
+            </p>
+
+            <p>
+              <label>
+                <input type="radio" name="metode" value="ewallet">
+                <strong>E-Wallet</strong> — GoPay, OVO, DANA, dan ShopeePay
+              </label>
+            </p>
+          </fieldset>
+
+          <p>
+            <small
+              >&#128737; Data pembayaran tidak disimpan oleh URT. Konfirmasi
+              dikirim ke email dan WhatsApp Pemilik Usaha.</small
+            >
+          </p>
+
+          <hr>
+
+          <section>
+            <h3>Ringkasan pesanan</h3>
+
+            <table>
+              <tr>
+                <th>Paket</th>
+                <td><strong>Paket Bulanan</strong></td>
+                <td><a href="pilih-langganan.html">Ubah</a></td>
+              </tr>
+              <tr>
+                <th>Untuk</th>
+                <td>ServisKita &bull; Pemilik Usaha</td>
+                <td></td>
+              </tr>
+              <tr>
+                <th>Masa aktif</th>
+                <td>30 Hari</td>
+                <td></td>
+              </tr>
+              <tr>
+                <th>Harga paket</th>
+                <td>Rp99.000</td>
+                <td></td>
+              </tr>
+              <tr>
+                <th>Biaya layanan</th>
+                <td><strong>Rp0</strong></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th>Pajak</th>
+                <td>Termasuk</td>
+                <td></td>
+              </tr>
+              <tr>
+                <th><strong>Total pembayaran</strong></th>
+                <td><strong>Rp99.000</strong></td>
+                <td></td>
+              </tr>
+            </table>
+
+            <p>
+              <button type="submit">Bayar dengan QRIS &rarr;</button>
+            </p>
+
+            <p>
+              <small
+                >Dengan membayar, Anda menyetujui ketentuan langganan
+                URT.</small
+              >
+            </p>
+          </section>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        <a href="beranda-owner.html">Kembali ke Beranda</a> |
+        <a href="/">Keluar</a>
+      </p>
+      <p>URT — Your Service Tracker | Kelompok 2</p>
+    </footer>
+  </body>
+</html>

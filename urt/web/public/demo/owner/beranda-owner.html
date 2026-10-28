@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Dashboard Pemilik Your Service Tracker" />
+    <title>Dashboard Pemilik — Your Service Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/owner.css" />
+    <script src="../js/data.js" defer></script>
+    <script src="js/owner.js" defer></script>
+  </head>
+  <body>
+    <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">URT</span>
+        <div class="brand-copy">
+          <strong>Your Service Tracker</strong>
+          <span>PORTAL PEMILIK</span>
+        </div>
+        <button
+          type="button"
+          class="sidebar-toggle"
+          id="sidebarToggle"
+          aria-label="Menu navigasi"
+          aria-expanded="false"
+        >
+          <svg class="icon-hamburger" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg class="icon-close" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Navigasi utama pemilik">
+        <a
+          class="nav-item is-active"
+          href="beranda-owner.html"
+          aria-current="page"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Beranda</span>
+        </a>
+
+        <a class="nav-item" href="tiket-servis.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z" />
+            <path d="M12 7v12" stroke-dasharray="2 2" />
+          </svg>
+          <span>Tiket Servis</span>
+        </a>
+
+        <a class="nav-item" href="teknisi.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M16 3.2a4 4 0 0 1 0 7.6M22 21v-2a4 4 0 0 0-3-3.87" />
+          </svg>
+          <span>Teknisi</span>
+        </a>
+
+        <a class="nav-item" href="pelanggan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="5" y="5" width="14" height="16" rx="2" />
+            <path d="M9 5V3h6v2" />
+            <circle cx="12" cy="11" r="2.5" />
+            <path d="M8.5 17c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4" />
+          </svg>
+          <span>Pelanggan</span>
+        </a>
+
+        <a class="nav-item" href="layanan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path
+              d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"
+            />
+          </svg>
+          <span>Layanan</span>
+        </a>
+
+        <a class="nav-item" href="laporan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M5 20v-6M10 20V9M15 20V4M20 20v-10" />
+          </svg>
+          <span>Laporan</span>
+        </a>
+
+        <a class="nav-item" href="langganan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="6" width="18" height="13" rx="2" />
+            <path d="M3 10h18" />
+          </svg>
+          <span>Langganan</span>
+        </a>
+
+        <a class="nav-item" href="pengaturan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H10.4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-3.2h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h3.2v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.35.34.55.8.6 1.3v.1h1v3.2h-1v.1c-.05.5-.25.96-.6 1.3Z"
+            />
+          </svg>
+          <span>Pengaturan</span>
+        </a>
+
+        <a class="nav-item" href="profil-owner.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2" />
+          </svg>
+          <span>Profil</span>
+        </a>
+
+        <a class="nav-item nav-item--logout" href="/" title="Keluar">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span>Keluar</span>
+        </a>
+      </nav>
+
+      <a
+        class="owner-mini-profile"
+        href="profil-owner.html"
+        aria-label="Buka profil Andi Ramadhan"
+      >
+        <span class="avatar avatar-solid" aria-hidden="true">AR</span>
+        <span class="owner-mini-profile__copy">
+          <strong>Andi Ramadhan</strong>
+          <small>Pemilik • ServisKita</small>
+        </span>
+      </a>
+    </aside>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="system-status">
+          <span class="owner-chip">PEMILIK USAHA</span>
+          <span class="online-dot" aria-hidden="true"></span>
+          <span>Sistem Online</span>
+        </div>
+
+        <div class="topbar-actions">
+          <button
+            class="icon-button"
+            id="notificationButton"
+            type="button"
+            aria-label="Buka notifikasi"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+              <path d="M10 21h4" />
+            </svg>
+          </button>
+          <a
+            class="avatar avatar-outline"
+            href="profil-owner.html"
+            aria-label="Buka profil pemilik"
+            >AR</a
+          >
+        </div>
+      </header>
+
+      <main class="owner-main">
+        <section class="page-heading" aria-labelledby="pageTitle">
+          <span class="eyebrow">PORTAL PEMILIK</span>
+          <h1 id="pageTitle">Dashboard Pemilik</h1>
+          <p>
+            Pantau performa usaha servis, tim teknisi, pelanggan, dan langganan
+            URT.
+          </p>
+        </section>
+
+        <section class="stats-grid" aria-label="Ringkasan operasional">
+          <article class="stat-card">
+            <div class="stat-card__head">
+              <span>Tiket Aktif</span>
+              <span class="stat-icon stat-icon--blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 7h14v3a2 2 0 0 0 0 4v3H5v-3a2 2 0 0 0 0-4V7Z" />
+                  <path d="M12 7v10" stroke-dasharray="2 2" />
+                </svg>
+              </span>
+            </div>
+            <div class="stat-value">
+              <span class="stat-accent stat-accent--blue"></span>28
+            </div>
+            <p>+8 minggu ini</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-card__head">
+              <span>Pelanggan</span>
+              <span class="stat-icon stat-icon--green" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="9" cy="8" r="3" />
+                  <path
+                    d="M3 20v-1a6 6 0 0 1 12 0v1M16 5a3 3 0 0 1 0 6M21 20v-1a6 6 0 0 0-4-5.7"
+                  />
+                </svg>
+              </span>
+            </div>
+            <div class="stat-value">
+              <span class="stat-accent stat-accent--green"></span>186
+            </div>
+            <p>+12 bulan ini</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-card__head">
+              <span>Teknisi Aktif</span>
+              <span class="stat-icon stat-icon--orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="9" cy="8" r="3" />
+                  <path d="M3 20v-1a6 6 0 0 1 12 0v1" />
+                  <circle cx="17" cy="14" r="2.2" />
+                  <path d="M20.8 20a4 4 0 0 0-7.6 0" />
+                </svg>
+              </span>
+            </div>
+            <div class="stat-value">
+              <span class="stat-accent stat-accent--orange"></span>8
+            </div>
+            <p>2 sedang bertugas</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-card__head">
+              <span>Langganan</span>
+              <span class="stat-icon stat-icon--blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 3 5 6v5c0 4.6 2.9 8.3 7 10 4.1-1.7 7-5.4 7-10V6l-7-3Z"
+                  />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+              </span>
+            </div>
+            <div class="stat-value">
+              <span class="stat-accent stat-accent--blue"></span>328 hari
+            </div>
+            <p>Paket Tahunan aktif</p>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="activity-panel">
+            <header class="panel-heading">
+              <div>
+                <h2>Tiket Terbaru</h2>
+                <p>Aktivitas servis terbaru di ServisKita</p>
+              </div>
+              <a class="table-action" href="tiket-servis.html"
+                >Lihat semua tiket <span aria-hidden="true">→</span></a
+              >
+            </header>
+
+            <div class="table-wrap">
+              <table>
+                <caption class="sr-only">
+                  Tiga tiket servis terbaru
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Nomor Tiket</th>
+                    <th scope="col">Perangkat</th>
+                    <th scope="col">Pelanggan</th>
+                    <th scope="col">Teknisi</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <a
+                        class="ticket-link"
+                        href="detail-tiket.html?id=URT-2026-0142"
+                        >#URT-2026-0142</a
+                      >
+                    </td>
+                    <td><strong>MacBook Air M2</strong></td>
+                    <td>Nadia Putri</td>
+                    <td>Sofia M. Adam</td>
+                    <td>
+                      <span class="status status--warning">DIAGNOSIS</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <a
+                        class="ticket-link"
+                        href="detail-tiket.html?id=URT-2026-0141"
+                        >#URT-2026-0141</a
+                      >
+                    </td>
+                    <td><strong>ASUS VivoBook 14</strong></td>
+                    <td>Rizky Fauzan</td>
+                    <td>Ardi Pratama</td>
+                    <td>
+                      <span class="status status--progress">PERBAIKAN</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <a
+                        class="ticket-link"
+                        href="detail-tiket.html?id=URT-2026-0140"
+                        >#URT-2026-0140</a
+                      >
+                    </td>
+                    <td><strong>Lenovo IdeaPad</strong></td>
+                    <td>Dewi Lestari</td>
+                    <td>Sofia M. Adam</td>
+                    <td><span class="status status--success">SELESAI</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <section
+              class="subscription-card"
+              aria-labelledby="subscriptionTitle"
+            >
+              <div class="subscription-head">
+                <h3 id="subscriptionTitle">Paket Tahunan</h3>
+                <span class="status status--success">AKTIF</span>
+              </div>
+              <p>Berakhir 24 Agustus 2027</p>
+              <div
+                class="progress-track"
+                role="progressbar"
+                aria-label="Sisa masa langganan"
+                aria-valuemin="0"
+                aria-valuemax="365"
+                aria-valuenow="328"
+              >
+                <span style="width: 89.86%"></span>
+              </div>
+              <small>328 hari tersisa</small>
+            </section>
+          </article>
+
+          <div class="portal-stack">
+            <article class="portal-card">
+              <span class="portal-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M14 3h7v7" />
+                  <path d="M10 14 21 3" />
+                  <path
+                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                  />
+                </svg>
+              </span>
+              <h2>Portal Teknisi</h2>
+              <p>
+                Bagikan tautan agar teknisi dapat menerima dan mengelola tiket
+                servis.
+              </p>
+
+              <div class="portal-link-box">
+                <span>urt.id/serviskita/teknisi</span>
+                <div class="portal-link-actions">
+                  <button
+                    class="mini-icon-button copy-link"
+                    type="button"
+                    data-copy="urt.id/serviskita/teknisi"
+                    aria-label="Salin tautan Portal Teknisi"
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                      <rect x="9" y="9" width="11" height="11" rx="2" />
+                      <path
+                        d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                      />
+                    </svg>
+                  </button>
+                  <a
+                    class="mini-icon-button"
+                    href="../teknisi/auth-teknisi.html"
+                    aria-label="Buka Portal Teknisi"
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                      <path d="M14 3h7v7" />
+                      <path d="M10 14 21 3" />
+                      <path
+                        d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                      />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <article class="portal-card">
+              <span class="portal-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M14 3h7v7" />
+                  <path d="M10 14 21 3" />
+                  <path
+                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                  />
+                </svg>
+              </span>
+              <h2>Portal Pelanggan</h2>
+              <p>
+                Bagikan tautan agar pelanggan dapat membuat dan memantau tiket
+                servis.
+              </p>
+
+              <div class="portal-link-box">
+                <span>urt.id/serviskita/pelanggan</span>
+                <div class="portal-link-actions">
+                  <button
+                    class="mini-icon-button copy-link"
+                    type="button"
+                    data-copy="urt.id/serviskita/pelanggan"
+                    aria-label="Salin tautan Portal Pelanggan"
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                      <rect x="9" y="9" width="11" height="11" rx="2" />
+                      <path
+                        d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                      />
+                    </svg>
+                  </button>
+                  <a
+                    class="mini-icon-button"
+                    href="../masuk.html?role=pelanggan"
+                    aria-label="Buka Portal Pelanggan"
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                      <path d="M14 3h7v7" />
+                      <path d="M10 14 21 3" />
+                      <path
+                        d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                      />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="sla-banner" aria-label="Status SLA">
+          <div class="sla-copy">
+            <span class="sla-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" />
+                <path d="m8 12 2.5 2.5L16 9" />
+              </svg>
+            </span>
+            <div>
+              <strong>Operasional berjalan baik</strong>
+              <p>
+                87% tiket bulan ini selesai tepat waktu. Pertahankan performa
+                tim Anda.
+              </p>
+            </div>
+          </div>
+          <p class="sla-score">
+            <strong>87%</strong> <span>SLA terpenuhi</span>
+          </p>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

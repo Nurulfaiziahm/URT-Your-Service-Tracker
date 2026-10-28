@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Import Data Pelanggan — Portal Pemilik — Your Service Tracker</title>
+  <link rel="stylesheet" href="css/owner.css">
+</head>
+<body>
+  <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">URT</span>
+      <div class="brand-copy">
+        <strong>Your Service Tracker</strong>
+        <span>PORTAL PEMILIK</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navigasi utama pemilik">
+      <a class="nav-item" href="beranda-owner.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+        <span>Beranda</span>
+      </a>
+      <a class="nav-item" href="tiket-servis.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z"></path><path d="M12 7v12" stroke-dasharray="2 2"></path></svg>
+        <span>Tiket Servis</span>
+      </a>
+      <a class="nav-item" href="teknisi.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 3.2a4 4 0 0 1 0 7.6M22 21v-2a4 4 0 0 0-3-3.87"></path></svg>
+        <span>Teknisi</span>
+      </a>
+      <a class="nav-item is-active" href="pelanggan.html" aria-current="page">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"></rect><path d="M9 5V3h6v2"></path><circle cx="12" cy="11" r="2.5"></circle><path d="M8.5 17c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"></path></svg>
+        <span>Pelanggan</span>
+      </a>
+      <a class="nav-item" href="layanan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"></path></svg>
+        <span>Layanan</span>
+      </a>
+      <a class="nav-item" href="laporan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20v-6M10 20V9M15 20V4M20 20v-10"></path></svg>
+        <span>Laporan</span>
+      </a>
+      <a class="nav-item" href="langganan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18"></path></svg>
+        <span>Langganan</span>
+      </a>
+      <a class="nav-item" href="pengaturan.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H10.4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-3.2h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h3.2v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.35.34.55.8.6 1.3v.1h1v3.2h-1v.1c-.05.5-.25.96-.6 1.3Z"></path></svg>
+        <span>Pengaturan</span>
+      </a>
+      <a class="nav-item" href="profil-owner.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"></path></svg>
+        <span>Profil</span>
+      </a>
+
+      <a class="nav-item nav-item--logout" href="/" title="Keluar">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        <span>Keluar</span>
+      </a>
+    </nav>
+
+    <a class="owner-mini-profile" href="profil-owner.html" aria-label="Buka profil Andi Ramadhan">
+      <span class="avatar avatar-solid" aria-hidden="true">AR</span>
+      <span class="owner-mini-profile__copy">
+        <strong>Andi Ramadhan</strong>
+        <small>Pemilik • ServisKita</small>
+      </span>
+    </a>
+  </aside>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="system-status">
+        <span class="owner-chip">PEMILIK USAHA</span>
+        <span class="online-dot" aria-hidden="true"></span>
+        <span>Sistem Online</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-button" id="notificationButton" type="button" aria-label="Buka notifikasi">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+            <path d="M10 21h4"></path>
+          </svg>
+        </button>
+        <a class="avatar avatar-outline" href="profil-owner.html" aria-label="Buka profil pemilik">AR</a>
+      </div>
+    </header>
+
+    <main class="owner-main">
+      <section class="page-heading">
+        <span class="eyebrow">PORTAL PEMILIK &bull; DATABASE PELANGGAN</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h1>Import Data Pelanggan</h1>
+            <p>Unggah file CSV atau Excel untuk menambahkan data pelanggan secara massal ke ServisKita.</p>
+          </div>
+          <a class="secondary-button" href="pelanggan.html">&larr; Kembali ke Daftar Pelanggan</a>
+        </div>
+      </section>
+
+      <div class="import-container">
+        <!-- LEFT: UPLOAD FORM -->
+        <div class="import-card">
+          <h2 style="font-size: var(--text-h3); margin-bottom: 8px; color: var(--text);">Unggah Berkas Kontak</h2>
+          <p style="font-size: var(--text-body-sm); color: var(--text-muted); line-height: 1.5;">
+            Format yang didukung: <strong>.csv, .xlsx, .xls</strong> (Maksimal 10 MB atau 5.000 kontak per berkas).
+          </p>
+
+          <div class="dropzone" id="dropzoneEl">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary); margin-bottom: 8px;">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;">Tarik &amp; lepas berkas Anda ke sini</div>
+            <div style="font-size: var(--text-caption); color: var(--text-muted); margin-bottom: 14px;">atau klik untuk memilih file dari komputer Anda</div>
+            <input type="file" id="fileInput" accept=".csv, .xlsx, .xls" style="display: none;">
+            <button class="secondary-button" type="button" onclick="document.getElementById('fileInput').click()">Pilih Berkas</button>
+            <div id="selectedFileName" style="margin-top: 10px; font-weight: 600; font-size: 13px; color: var(--primary);"></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-4);">
+            <button class="secondary-button" id="btnDownloadTemplate" type="button">
+              Unduh Template CSV
+            </button>
+            <button class="primary-button" id="btnStartImport" type="button">
+              Mulai Import Data
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT: SOP & GUIDELINES -->
+        <div class="import-card">
+          <h2 style="font-size: var(--text-h3); margin-bottom: var(--space-4); color: var(--text);">Petunjuk Import Kontak</h2>
+
+          <div class="instruction-step">
+            <div class="instruction-num">1</div>
+            <div>
+              <strong>Unduh Format Template</strong><br />
+              <span style="color: var(--text-muted);">Gunakan format kolom resmi agar nama, nomor telepon, dan email tidak tertukar.</span>
+            </div>
+          </div>
+
+          <div class="instruction-step">
+            <div class="instruction-num">2</div>
+            <div>
+              <strong>Format Nomor Telepon</strong><br />
+              <span style="color: var(--text-muted);">Gunakan awalan 08 atau 62 (contoh: 081234567890) tanpa spasi atau tanda hubung (-).</span>
+            </div>
+          </div>
+
+          <div class="instruction-step">
+            <div class="instruction-num">3</div>
+            <div>
+              <strong>Pencegahan Duplikasi</strong><br />
+              <span style="color: var(--text-muted);">Jika nomor telepon sudah terdaftar, sistem akan memperbarui data pelanggan tersebut.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../js/data.js"></script>
+  <script src="js/owner.js"></script>
+</body>
+</html>

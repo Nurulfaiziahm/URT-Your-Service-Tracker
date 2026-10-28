@@ -1,9 +1,4 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectIsAuthenticated } from '../auth/authSlice';
-import { useGetMyBusinessesQuery } from '../business/businessApi';
-import { selectBusiness } from '../business/businessSlice';
+import { Link } from 'react-router';
 import type { BusinessRole } from '../business/types';
 import logo from '../../assets/logo-urt.svg';
 import styles from './PortalSelectPage.module.css';
@@ -18,6 +13,7 @@ const roles = [
       'Pantau status perbaikan perangkat Anda, beri persetujuan biaya estimasi, dan ajukan tiket servis baru secara mandiri.',
     demo: 'Nino Rachimas (NR)',
     detail: 'Tiket: #URT-2026-001',
+    href: '/demo/pelanggan/beranda-pelanggan.html',
   },
   {
     role: 'technician',
@@ -28,6 +24,7 @@ const roles = [
       'Kelola antrean tiket penugasan, input hasil diagnosis kerusakan, buat rincian estimasi biaya, dan catat penyelesaian QC.',
     demo: 'Sofia Malvalena Adam',
     detail: 'Spesialis: Laptop • Hardware',
+    href: '/demo/teknisi/beranda-teknisi.html',
   },
   {
     role: 'owner',
@@ -38,6 +35,7 @@ const roles = [
       'Pusat kendali tempat servis: pantau pendapatan, beban kerja teknisi, database pelanggan, dan manajemen paket langganan.',
     demo: 'Andi Ramadhan (ServisKita)',
     detail: 'Status: Paket Tahunan Aktif',
+    href: '/demo/owner/beranda-owner.html',
   },
 ] as const;
 
@@ -71,24 +69,6 @@ function RoleIcon({ role }: { role: BusinessRole }) {
 }
 
 export default function PortalSelectPage() {
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  const [choices, setChoices] = useState<Partial<Record<BusinessRole, string>>>({});
-  const { data, isLoading, isFetching, isError, refetch } = useGetMyBusinessesQuery(undefined, {
-    skip: !isAuthenticated,
-  });
-  const businesses = data?.data?.businesses || [];
-
-  function openPortal(role: BusinessRole) {
-    const available = businesses.filter((business) => business.roles.includes(role));
-    const selected =
-      available.find((business) => business.businessId === choices[role]) || available[0];
-    if (selected) dispatch(selectBusiness({ businessId: selected.businessId, portal: role }));
-    // Existing route guards handle login, onboarding and role authorization.
-    navigate(`/${role}`);
-  }
-
   return (
     <div className={styles.page}>
       <a className="skip-link" href="#main-content">
@@ -99,130 +79,56 @@ export default function PortalSelectPage() {
           <Link to="/" className={styles['portal-header-logo']}>
             <img src={logo} alt="URT — Your Service Tracker" />
           </Link>
-          <nav className={styles['portal-header-links']} aria-label="Navigasi Halaman Masuk">
-            <Link to="/">← Kembali ke Landing Page</Link>
-            <Link to="/register" className={styles.accentLink}>
-              Daftar Akun Baru
-            </Link>
-          </nav>
         </header>
         <main id="main-content" tabIndex={-1} className={styles['portal-content']}>
           <div className={styles['portal-title-area']}>
             <div className={styles.eyebrow}>PORTAL AKSES TERINTEGRASI</div>
-            <h1>Pilih Portal Akses URT</h1>
+            <h1>Jelajahi Demo URT</h1>
             <p>
-              Masuk ke lingkungan kerja sesuai peran Anda: Pelanggan yang memantau servis, Teknisi
-              yang mengerjakan diagnosis, atau Pemilik Usaha yang memantau performa.
+              Lihat bagaimana URT bekerja dari sisi pemilik tempat servis, teknisi, dan pelanggan
+              melalui demo interaktif.
             </p>
           </div>
-          {isAuthenticated && isError && (
-            <div className={styles.notice} role="alert">
-              Informasi akses belum dapat dimuat.{' '}
-              <button type="button" onClick={() => refetch()} disabled={isFetching}>
-                Coba lagi
-              </button>
-            </div>
-          )}
           <div className={styles['portal-cards-grid']}>
-            {roles.map((portal) => {
-              const available = businesses.filter((business) =>
-                business.roles.includes(portal.role),
-              );
-              return (
-                <article className={styles['portal-card']} key={portal.role}>
-                  <div
-                    className={`${styles['portal-card__icon']} ${styles[`icon-${portal.theme}`]}`}
-                  >
-                    <RoleIcon role={portal.role} />
-                  </div>
-                  <div
-                    className={`${styles['portal-card__role']} ${styles[`role-${portal.theme}`]}`}
-                  >
-                    {portal.label}
-                  </div>
-                  <h2 className={styles['portal-card__title']}>{portal.title}</h2>
-                  <p className={styles['portal-card__desc']}>{portal.description}</p>
-                  <div className={styles['portal-card__demo-user']}>
-                    {!isAuthenticated ? (
-                      <>
-                        <strong>Demo:</strong> {portal.demo}
-                        <br />
-                        <span className={styles.dim}>{portal.detail}</span>
-                      </>
-                    ) : isLoading ? (
-                      <span role="status">Memuat tempat servis…</span>
-                    ) : isError ? (
-                      <span>Informasi akses belum tersedia.</span>
-                    ) : available.length > 1 ? (
-                      <>
-                        <label htmlFor={`business-${portal.role}`}>Pilih tempat servis</label>
-                        <select
-                          id={`business-${portal.role}`}
-                          value={
-                            available.some(
-                              (business) => business.businessId === choices[portal.role],
-                            )
-                              ? choices[portal.role]
-                              : available[0].businessId
-                          }
-                          onChange={(event) =>
-                            setChoices({ ...choices, [portal.role]: event.target.value })
-                          }
-                        >
-                          {available.map((business) => (
-                            <option key={business.businessId} value={business.businessId}>
-                              {business.name}
-                            </option>
-                          ))}
-                        </select>
-                      </>
-                    ) : available.length === 1 ? (
-                      <>
-                        <strong>{available[0].name}</strong>
-                        <br />
-                        <span className={styles.dim}>
-                          Akses {portal.label.toLowerCase()} terdaftar
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <strong>Belum terhubung</strong>
-                        <br />
-                        <span className={styles.dim}>
-                          {portal.role === 'owner'
-                            ? 'Daftarkan tempat servis Anda.'
-                            : 'Akses memerlukan hubungan dengan tempat servis.'}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    className={`${styles['portal-card__btn']} ${portal.role === 'customer' ? styles['portal-card__btn--green'] : portal.role === 'technician' ? styles['portal-card__btn--amber'] : ''}`}
-                    disabled={isAuthenticated && (isLoading || isError)}
-                    onClick={() => openPortal(portal.role)}
-                  >
-                    Masuk {portal.title} →
-                  </button>
-                </article>
-              );
-            })}
+            {roles.map((portal) => (
+              <article className={styles['portal-card']} key={portal.role}>
+                <div
+                  className={`${styles['portal-card__icon']} ${styles[`icon-${portal.theme}`]}`}
+                >
+                  <RoleIcon role={portal.role} />
+                </div>
+                <div
+                  className={`${styles['portal-card__role']} ${styles[`role-${portal.theme}`]}`}
+                >
+                  {portal.label}
+                </div>
+                <h2 className={styles['portal-card__title']}>{portal.title}</h2>
+                <p className={styles['portal-card__desc']}>{portal.description}</p>
+                <div className={styles['portal-card__demo-user']}>
+                  <strong>Demo:</strong> {portal.demo}
+                  <br />
+                  <span className={styles.dim}>{portal.detail}</span>
+                </div>
+                <a
+                  href={portal.href}
+                  className={`${styles['portal-card__btn']} ${
+                    portal.role === 'customer'
+                      ? styles['portal-card__btn--green']
+                      : portal.role === 'technician'
+                        ? styles['portal-card__btn--amber']
+                        : ''
+                  }`}
+                >
+                  Masuk {portal.title} →
+                </a>
+              </article>
+            ))}
           </div>
-          <div className={styles.manualLogin}>
-            Ingin login manual dengan kata sandi?{' '}
-            <Link to="/login" state={{ from: { pathname: '/owner' } }}>
-              Login Owner
-            </Link>{' '}
-            •{' '}
-            <Link to="/login" state={{ from: { pathname: '/technician' } }}>
-              Login Teknisi
+          <div className={styles.manualLogin} style={{ marginTop: '24px' }}>
+            <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '14px' }}>
+              ← Kembali ke Landing Page
             </Link>
           </div>
-          {isAuthenticated && (
-            <Link className={styles.onboardingLink} to="/owner/onboarding">
-              + Buka Tempat Servis Baru
-            </Link>
-          )}
         </main>
         <footer className={styles['portal-footer']}>
           © 2026 URT — Your Service Tracker | Kelompok 2 UT. Hak cipta dilindungi.
@@ -231,3 +137,4 @@ export default function PortalSelectPage() {
     </div>
   );
 }
+

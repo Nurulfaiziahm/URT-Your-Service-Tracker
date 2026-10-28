@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kelola langganan Your Service Tracker">
+  <title>Langganan — Portal Pemilik — Your Service Tracker</title>
+  <link rel="stylesheet" href="css/owner.css">
+  <script src="../js/data.js" defer></script>
+  <script src="js/owner.js" defer></script>
+</head>
+<body>
+
+  <aside class="sidebar" aria-label="Sidebar Portal Pemilik">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">URT</span>
+      <div class="brand-copy">
+        <strong>Your Service Tracker</strong>
+        <span>PORTAL PEMILIK</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navigasi utama pemilik">
+      <a class="nav-item" href="beranda-owner.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+          <span>Beranda</span>
+        </a><a class="nav-item" href="tiket-servis.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z"></path><path d="M12 7v12" stroke-dasharray="2 2"></path></svg>
+          <span>Tiket Servis</span>
+        </a><a class="nav-item" href="teknisi.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 3.2a4 4 0 0 1 0 7.6M22 21v-2a4 4 0 0 0-3-3.87"></path></svg>
+          <span>Teknisi</span>
+        </a><a class="nav-item" href="pelanggan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"></rect><path d="M9 5V3h6v2"></path><circle cx="12" cy="11" r="2.5"></circle><path d="M8.5 17c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"></path></svg>
+          <span>Pelanggan</span>
+        </a><a class="nav-item" href="layanan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"></path></svg>
+          <span>Layanan</span>
+        </a><a class="nav-item" href="laporan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20v-6M10 20V9M15 20V4M20 20v-10"></path></svg>
+          <span>Laporan</span>
+        </a><a class="nav-item is-active" href="langganan.html" aria-current="page">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18"></path></svg>
+          <span>Langganan</span>
+        </a><a class="nav-item" href="pengaturan.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H10.4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-3.2h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h3.2v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.35.34.55.8.6 1.3v.1h1v3.2h-1v.1c-.05.5-.25.96-.6 1.3Z"></path></svg>
+          <span>Pengaturan</span>
+        </a><a class="nav-item" href="profil-owner.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"></path></svg>
+          <span>Profil</span>
+        </a>
+        <a class="nav-item nav-item--logout" href="/" title="Keluar">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Keluar</span>
+        </a>
+      </nav>
+
+    <a class="owner-mini-profile" href="profil-owner.html" aria-label="Buka profil Andi Ramadhan">
+      <span class="avatar avatar-solid" aria-hidden="true">AR</span>
+      <span class="owner-mini-profile__copy">
+        <strong>Andi Ramadhan</strong>
+        <small>Pemilik • ServisKita</small>
+      </span>
+    </a>
+  </aside>
+  <div class="app-shell">
+
+    <header class="topbar">
+      <div class="system-status">
+        <span class="owner-chip">PEMILIK USAHA</span>
+        <span class="online-dot" aria-hidden="true"></span>
+        <span>Sistem Online</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-button" id="notificationButton" type="button" aria-label="Buka notifikasi">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+            <path d="M10 21h4"></path>
+          </svg>
+        </button>
+        <a class="avatar avatar-outline" href="profil-owner.html" aria-label="Buka profil pemilik">AR</a>
+      </div>
+    </header>
+
+    <main class="owner-main">
+      <section class="page-heading" aria-labelledby="pageTitle">
+        <span class="eyebrow">TAGIHAN &amp; LANGGANAN</span>
+        <h1 id="pageTitle">Langganan</h1>
+        <p>Kelola paket URT untuk akun Pemilik Usaha ServisKita.</p>
+      </section>
+
+      <section class="subscription-overview">
+        <article class="plan-card">
+          <header class="plan-card__header">
+            <div class="plan-title">
+              <span class="plan-icon" aria-hidden="true">♔</span>
+              <div><small>PAKET AKTIF</small><h2>Tahunan</h2></div>
+            </div>
+            <span class="status status--success">AKTIF</span>
+          </header>
+          <p>Akses penuh seluruh fitur URT untuk usaha servis, teknisi, pelanggan, dan layanan Anda.</p>
+          <div class="plan-meta">
+            <div><small>MULAI</small><strong>24 Agu 2026</strong></div>
+            <div><small>BERAKHIR</small><strong>24 Agu 2027</strong></div>
+            <div><small>HARGA</small><strong>Rp999.000</strong></div>
+          </div>
+        </article>
+
+        <article class="remaining-card">
+          <div class="remaining-card__head"><span>Sisa masa aktif</span><span aria-hidden="true">▦</span></div>
+          <p class="remaining-days"><strong>328</strong> hari</p>
+          <div class="progress-track"><span style="width:89.86%"></span></div>
+          <p>Perpanjang sebelum 24 Agustus 2027 agar layanan tetap aktif tanpa jeda.</p>
+          <a class="primary-link-button" href="perpanjang-langganan.html">Perpanjang Sekarang</a>
+        </article>
+      </section>
+
+      <section class="info-banner">
+        <span class="info-banner__icon" aria-hidden="true">◉</span>
+        <div><strong>Satu langganan untuk seluruh usaha</strong><p>Hanya Pemilik Usaha yang membayar langganan URT. Semua akun teknisi dan pelanggan Anda tidak dikenakan biaya langganan.</p></div>
+      </section>
+
+      <section class="invoice-section" aria-labelledby="invoiceTitle">
+        <header class="invoice-heading">
+          <div><h2 id="invoiceTitle">Riwayat Pembayaran</h2><p>Semua transaksi langganan URT untuk ServisKita</p></div>
+          <button class="text-action" id="downloadAllInvoices" type="button">Unduh semua invoice</button>
+        </header>
+
+        <div class="resource-table table-wrap">
+          <table>
+            <caption class="sr-only">Riwayat pembayaran langganan</caption>
+            <thead><tr><th>Invoice</th><th>Tanggal</th><th>Paket</th><th>Metode</th><th>Total</th><th>Status</th><th><span class="sr-only">Unduh</span></th></tr></thead>
+            <tbody>
+              <tr><td>INV-URT-2026-0824</td><td>24 Agu 2026</td><td><strong>Paket Tahunan</strong></td><td>QRIS</td><td>Rp999.000</td><td><span class="status status--success">BERHASIL</span></td><td><button class="download-icon invoice-download" type="button" data-invoice="INV-URT-2026-0824" data-date="24 Agu 2026" data-plan="Paket Tahunan" data-method="QRIS" data-total="Rp999.000" aria-label="Unduh invoice INV-URT-2026-0824">⇩</button></td></tr>
+              <tr><td>INV-URT-2026-0724</td><td>24 Jul 2026</td><td><strong>Paket Bulanan</strong></td><td>Virtual Account</td><td>Rp99.000</td><td><span class="status status--success">BERHASIL</span></td><td><button class="download-icon invoice-download" type="button" data-invoice="INV-URT-2026-0724" data-date="24 Jul 2026" data-plan="Paket Bulanan" data-method="Virtual Account" data-total="Rp99.000" aria-label="Unduh invoice INV-URT-2026-0724">⇩</button></td></tr>
+              <tr><td>INV-URT-2026-0624</td><td>24 Jun 2026</td><td><strong>Paket Bulanan</strong></td><td>E-Wallet</td><td>Rp99.000</td><td><span class="status status--success">BERHASIL</span></td><td><button class="download-icon invoice-download" type="button" data-invoice="INV-URT-2026-0624" data-date="24 Jun 2026" data-plan="Paket Bulanan" data-method="E-Wallet" data-total="Rp99.000" aria-label="Unduh invoice INV-URT-2026-0624">⇩</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

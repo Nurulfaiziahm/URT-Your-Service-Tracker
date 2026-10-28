@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal Pelanggan - URT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style-customer.css" />
+    <script src="../js/data.js" defer></script>
+    <script src="js/customer.js" defer></script>
+  </head>
+  <body>
+    <!-- SIDEBAR (UNTOUCHED) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="beranda-pelanggan.html">
+          <img
+            src="../image/logo-urt.svg"
+            alt="URT Your Service Tracker"
+            height="38"
+          />
+        </a>
+        <p>PORTAL PELANGGAN</p>
+        <button
+          type="button"
+          class="sidebar-toggle"
+          id="customerSidebarToggle"
+          aria-label="Menu navigasi"
+          aria-expanded="false"
+        >
+          <svg class="icon-hamburger" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg class="icon-close" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <nav class="nav-menu">
+        <a href="beranda-pelanggan.html" class="nav-item active">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Beranda</span>
+        </a>
+        <a href="riwayat-servis.html" class="nav-item">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span>Riwayat Servis</span>
+        </a>
+        <a href="profil-pelanggan.html" class="nav-item">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <span>Profil</span>
+        </a>
+        <a href="/" class="nav-item nav-item--logout" title="Keluar dari portal">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span>Keluar</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="avatar">NR</div>
+        <div class="user-info">
+          <p>Nino Rachimas</p>
+          <span>Pelanggan</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="main-wrapper dashboard-main-area">
+      <!-- TOPBAR -->
+      <header class="topbar-header">
+        <div class="topbar-left">
+          <span class="badge-role-blue">PELANGGAN</span>
+          <span class="status-online-text">Sistem Online</span>
+        </div>
+        <div class="topbar-right">
+          <button type="button" class="btn-icon-circle" aria-label="Buka notifikasi" onclick="alert('Tidak ada notifikasi baru.')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+              <path d="M10 21h4"></path>
+            </svg>
+          </button>
+          <div class="user-avatar-circle" aria-label="Nino Rachimas">NR</div>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <div class="dashboard-container">
+        <!-- HEADING -->
+        <div class="heading-row">
+          <div>
+            <div class="eyebrow-blue">PORTAL PELANGGAN</div>
+            <h1 class="page-title">Halo, Nino Rachimas</h1>
+            <p class="page-subtitle">Ajukan servis, cek tiket, dan pantau proses perbaikan laptopmu.</p>
+          </div>
+          <a href="pengajuan-servis.html" class="btn-primary-action">
+            + Ajukan Servis
+          </a>
+        </div>
+
+        <!-- 3 STAT CARDS -->
+        <div class="stats-cards-grid">
+          <div class="stat-box">
+            <div class="stat-box-header">
+              <span class="stat-box-title">Servis Aktif</span>
+              <div class="stat-icon-wrap stat-icon-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-box-value-row">
+              <span class="stat-accent-bar bar-blue"></span>
+              <span class="stat-big-number">1</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-box-header">
+              <span class="stat-box-title">Servis Selesai</span>
+              <div class="stat-icon-wrap stat-icon-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-box-value-row">
+              <span class="stat-accent-bar bar-green"></span>
+              <span class="stat-big-number">4</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-box-header">
+              <span class="stat-box-title">Riwayat Servis</span>
+              <div class="stat-icon-wrap stat-icon-orange">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-box-value-row">
+              <span class="stat-accent-bar bar-orange"></span>
+              <span class="stat-big-number">3</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MIDDLE 2-COLUMN SECTION -->
+        <div class="middle-columns-grid">
+          <!-- LEFT CARD: TIKET AKTIF -->
+          <section class="content-card">
+            <div class="ticket-card-top">
+              <div>
+                <div class="ticket-tag-label">TIKET AKTIF</div>
+                <h2 class="ticket-id-title">#URT-2026-001</h2>
+              </div>
+              <span class="badge-status-orange-pill">Persetujuan Biaya</span>
+            </div>
+
+            <div class="device-preview-box">
+              <div class="device-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="2" y1="20" x2="22" y2="20"></line>
+                </svg>
+              </div>
+              <div>
+                <div class="device-name-text">ASUS VivoBook 14</div>
+                <p class="device-complaint-text">&ldquo;Laptop mati tiba-tiba dan terasa panas.&rdquo;</p>
+              </div>
+            </div>
+
+            <!-- Segmented Progress Stepper -->
+            <div class="stepper-section">
+              <div class="stepper-label-heading">Tahapan Servis (Langkah 3)</div>
+              <div class="segmented-progress-bar">
+                <div class="progress-segment seg-green"></div>
+                <div class="progress-segment seg-green"></div>
+                <div class="progress-segment seg-orange"></div>
+                <div class="progress-segment seg-gray"></div>
+                <div class="progress-segment seg-gray"></div>
+              </div>
+              <div class="stepper-stages-labels">
+                <span class="stage-step-label">Diterima</span>
+                <span class="stage-step-label">Diagnosa</span>
+                <span class="stage-step-label is-active">Persetujuan</span>
+                <span class="stage-step-label">Perbaikan</span>
+                <span class="stage-step-label">Selesai</span>
+              </div>
+            </div>
+
+            <!-- Meta Box -->
+            <div class="ticket-meta-info-strip">
+              <div class="meta-info-item">
+                <span class="meta-info-tag">ESTIMASI SELESAI</span>
+                <span class="meta-info-data">3 Sep 2026</span>
+              </div>
+              <div class="meta-info-item">
+                <span class="meta-info-tag">TEKNISI</span>
+                <span class="meta-info-data">Sofia Malvalena Adam</span>
+              </div>
+              <div class="meta-info-item">
+                <span class="meta-info-tag">BIAYA SERVIS</span>
+                <span class="meta-info-data meta-price-val">Rp250.000</span>
+              </div>
+            </div>
+
+            <a href="persetujuan-servis.html" class="btn-view-detail-service">
+              Lihat Detail Service
+            </a>
+          </section>
+
+          <!-- RIGHT CARD: PERJALANAN SERVIS (TIMELINE) -->
+          <section class="content-card">
+            <h2 class="timeline-card-heading">Perjalanan Servis</h2>
+
+            <div class="timeline-flow">
+              <div class="timeline-step">
+                <div class="timeline-circle circle-blue"></div>
+                <div class="timeline-step-body">
+                  <div class="timeline-step-header">
+                    <span class="timeline-step-title">Konfirmasi Estimasi Biaya</span>
+                    <span class="timeline-step-time">Hari Ini</span>
+                  </div>
+                  <p class="timeline-step-desc">
+                    Teknisi mengajukan biaya Rp250.000 untuk penggantian thermal paste.
+                  </p>
+                </div>
+              </div>
+
+              <div class="timeline-step">
+                <div class="timeline-circle circle-gray"></div>
+                <div class="timeline-step-body">
+                  <div class="timeline-step-header">
+                    <span class="timeline-step-title">Proses Pemeriksaan/Diagnosis</span>
+                    <span class="timeline-step-time">Kemarin</span>
+                  </div>
+                  <p class="timeline-step-desc">
+                    Perangkat sedang diperiksa oleh teknisi Sofia Malvalena Adam.
+                  </p>
+                </div>
+              </div>
+
+              <div class="timeline-step">
+                <div class="timeline-circle circle-gray"></div>
+                <div class="timeline-step-body">
+                  <div class="timeline-step-header">
+                    <span class="timeline-step-title">Perangkat Diterima</span>
+                    <span class="timeline-step-time">24 Agu</span>
+                  </div>
+                  <p class="timeline-step-desc">
+                    Laptop sukses diserahkan ke hub servis pusat URT.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- BOTTOM CARD: SERVIS SEBELUMNYA -->
+        <section class="content-card">
+          <h2 class="prev-service-card-title">Servis Sebelumnya</h2>
+
+          <div class="table-responsive-wrapper">
+            <table class="clean-table">
+              <thead>
+                <tr>
+                  <th>NOMOR TIKET</th>
+                  <th>PERANGKAT</th>
+                  <th>JENIS SERVIS</th>
+                  <th>TANGGAL MASUK</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong class="table-ticket-code">#URT-2026-0004</strong></td>
+                  <td><strong class="table-device-bold">Lenovo IdeaPad</strong></td>
+                  <td>Cleaning &amp; Thermal Paste</td>
+                  <td>18 Agu 2026</td>
+                  <td><span class="status-pill-green">Selesai</span></td>
+                </tr>
+                <tr>
+                  <td><strong class="table-ticket-code">#URT-2026-0003</strong></td>
+                  <td><strong class="table-device-bold">Acer Aspire 5</strong></td>
+                  <td>Instalasi OS &amp; Driver</td>
+                  <td>7 Agu 2026</td>
+                  <td><span class="status-pill-green">Selesai</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+  </body>
+</html>

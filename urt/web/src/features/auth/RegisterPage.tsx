@@ -270,8 +270,24 @@ export default function RegisterPage() {
         disabled={isLoading}
         aria-busy={isLoading || undefined}
       >
-        {isLoading ? 'Mendaftarkan akun…' : 'Daftar akun sekarang →'}
+        {isLoading ? 'Mendaftarkan akun…' : 'Daftar akun sekarang'}
       </button>
+
+      <div className={styles['mobile-login-link']}>
+        Sudah punya akun?{' '}
+        <Link
+          to="/login"
+          state={isOwner ? { from: { pathname: '/owner' }, role: 'owner' } : location.state}
+        >
+          Masuk
+        </Link>
+      </div>
+
+      <nav className={styles['legal-links']} aria-label="Informasi layanan">
+        <Link to="/privacy">Privasi</Link>
+        <span> · </span>
+        <Link to="/terms">Ketentuan</Link>
+      </nav>
     </form>
   );
   if (!isOwner)
@@ -391,7 +407,7 @@ export default function RegisterPage() {
               </div>
             </nav>
             <div className={styles['login-link-wrap']}>
-              Sudah punya akun? <Link to="/login" state={location.state}>Masuk</Link>
+              Sudah punya akun? <Link to="/login" state={isOwner ? { from: { pathname: '/owner' }, role: 'owner' } : location.state}>Masuk</Link>
             </div>
           </header>
           <div className={styles['register-content']}>

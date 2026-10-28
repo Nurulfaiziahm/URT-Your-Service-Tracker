@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Riwayat Tiket - URT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style-teknisi.css" />
+    <script src="../js/data.js" defer></script>
+    <script src="js/teknisi.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <a href="beranda-teknisi.html">
+        <img
+          src="../image/logo-urt.svg"
+          alt="URT Your Service Tracker"
+          height="36"
+        />
+      </a>
+      <p>PORTAL TEKNISI</p>
+      <button
+        type="button"
+        class="sidebar-toggle"
+        id="teknisiSidebarToggle"
+        aria-label="Menu navigasi"
+        aria-expanded="false"
+      >
+        <svg class="icon-hamburger" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg class="icon-close" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <nav aria-label="Navigasi utama">
+        <ul>
+          <li>
+            <a href="beranda-teknisi.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              <span>Beranda</span>
+            </a>
+          </li>
+          <li>
+            <a href="antrean.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z" />
+                <path d="M12 7v12" stroke-dasharray="2 2" />
+              </svg>
+              <span>Antrean Servis</span>
+            </a>
+          </li>
+          <li>
+            <a href="riwayat.html" aria-current="page">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span>Riwayat Tiket</span>
+            </a>
+          </li>
+          <li>
+            <a href="profil.html">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="3.5" />
+                <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2" />
+              </svg>
+              <span>Profil</span>
+            </a>
+          </li>
+          <li>
+            <a href="/" class="nav-item--logout" title="Keluar">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <span>Keluar</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section aria-labelledby="judul-riwayat">
+        <h1 id="judul-riwayat">Riwayat Teknisi</h1>
+        <p>Pantau tiket aktif dan arsip servis selesai dalam satu tampilan.</p>
+
+        <section aria-labelledby="aktif">
+          <h2 id="aktif">Tiket Sedang Diproses</h2>
+          <ol>
+            <li>
+              <article>
+                <h3>#URT-2026-001 - ASUS VivoBook 14</h3>
+                <p>Nino Rachimas</p>
+                <p>Laptop mati tiba-tiba dan terasa panas.</p>
+                <p>Status: Menunggu Persetujuan</p>
+                <a href="detail-tiket.html">Lihat Detail</a>
+              </article>
+            </li>
+            <li>
+              <article>
+                <h3>#URT-2026-005 - Acer Swift 3</h3>
+                <p>Rani Kurnia</p>
+                <p>Kipas berbunyi keras dan performa menurun.</p>
+                <p>Status: Diagnosa</p>
+                <a href="detail-tiket.html">Lihat Detail</a>
+              </article>
+            </li>
+            <li>
+              <article>
+                <h3>#URT-2026-007 - Lenovo ThinkPad T14</h3>
+                <p>Dimas Pratama</p>
+                <p>Perangkat restart saat beban kerja tinggi.</p>
+                <p>Status: QC</p>
+                <a href="detail-tiket.html">Lihat Detail</a>
+              </article>
+            </li>
+          </ol>
+        </section>
+
+        <section aria-labelledby="selesai">
+          <h2 id="selesai">Tiket Selesai</h2>
+          <ol>
+            <li>
+              <article>
+                <h3>#URT-2026-004 - Lenovo IdeaPad 3</h3>
+                <p>Aulia Rahman</p>
+                <p>Pembersihan interior dan penggantian pasta termal.</p>
+                <p>Status: Selesai</p>
+                <p><a href="tiket-selesai.html">Lihat Detail</a></p>
+              </article>
+            </li>
+            <li>
+              <article>
+                <h3>#URT-2026-003 - Acer Aspire 5 Slim</h3>
+                <p>Maya Putri</p>
+                <p>Instalasi Windows 11 dan driver bersih.</p>
+                <p>Status: Selesai</p>
+                <p><a href="tiket-selesai.html">Lihat Detail</a></p>
+              </article>
+            </li>
+            <li>
+              <article>
+                <h3>#URT-2026-002 - MacBook Air M1</h3>
+                <p>Bagas Wicaksono</p>
+                <p>Perbaikan keyboard dan konektor trackpad.</p>
+                <p>Status: Selesai</p>
+                <p><a href="tiket-selesai.html">Lihat Detail</a></p>
+              </article>
+            </li>
+          </ol>
+        </section>
+      </section>
+    </main>
+
+    <footer>
+      <p><a href="beranda-teknisi.html">Kembali ke Beranda</a></p>
+    </footer>
+  </body>
+</html>

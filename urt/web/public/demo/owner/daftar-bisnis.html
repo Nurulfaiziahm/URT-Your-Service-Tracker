@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi Usaha — Your Service Tracker</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta http-equiv="refresh" content="0; url=register.html" />
+    <link rel="stylesheet" href="css/owner-auth.css" />
+  </head>
+  <body>
+    <header>
+      <a href="../index.html">
+        <img src="../image/logo-urt.svg" alt="URT — Your Service Tracker" height="40">
+      </a>
+      <p>Untuk Pemilik Usaha</p>
+      <nav>
+        Step 1: <strong>Data Usaha</strong> &rarr; Step 2: Pilih Paket &rarr;
+        Step 3: Pembayaran &nbsp;&nbsp;&nbsp; Sudah punya akun?
+        <a href="../masuk.html">Masuk</a>
+      </nav>
+    </header>
+
+    <hr>
+
+    <main>
+      <section>
+        <h2>Bangun operasi servis yang lebih rapi.</h2>
+        <p>
+          Daftarkan usaha Anda untuk mulai mengelola usaha servis, teknisi,
+          pelanggan, dan layanan dalam satu sistem.
+        </p>
+
+        <ul>
+          <li>
+            <strong>Kelola servis dari satu tempat</strong><br>
+            Pantau tiket, estimasi, dan progres pekerjaan secara real-time.
+          </li>
+          <li>
+            <strong>Hubungkan seluruh tim</strong><br>
+            Atur teknisi dan pelanggan tanpa biaya langganan tambahan.
+          </li>
+          <li>
+            <strong>Keputusan berbasis data</strong><br>
+            Lihat performa layanan dan kesehatan operasional usaha.
+          </li>
+        </ul>
+
+        <p>
+          <small
+            >Hanya Pemilik Usaha yang membayar langganan URT. Teknisi dan
+            pelanggan tidak dikenakan biaya.</small
+          >
+        </p>
+      </section>
+
+      <hr>
+
+      <section>
+        <p><em>LANGKAH 1 DARI 3</em></p>
+        <h2>Daftarkan usaha Anda</h2>
+        <p>
+          Buat akun khusus Pemilik Usaha. Setelah ini Anda akan memilih paket
+          langganan yang paling sesuai.
+        </p>
+
+        <form action="pilih-langganan.html" method="get">
+          <fieldset>
+            <legend>Informasi Usaha &amp; Akun</legend>
+
+            <p>
+              <label for="nama_usaha">Nama Usaha</label><br>
+              <input
+                type="text"
+                id="nama_usaha"
+                name="nama_usaha"
+                placeholder="Contoh: ServisKita"
+                required>
+            </p>
+
+            <p>
+              <label for="nama_pemilik">Nama Pemilik</label><br>
+              <input
+                type="text"
+                id="nama_pemilik"
+                name="nama_pemilik"
+                placeholder="Nama lengkap Anda"
+                required>
+            </p>
+
+            <p>
+              <label for="whatsapp">Nomor WhatsApp</label><br>
+              <input
+                type="tel"
+                id="whatsapp"
+                name="whatsapp"
+                placeholder="08xx xxxx xxxx"
+                required>
+            </p>
+
+            <p>
+              <label for="email">Email</label><br>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="nama@usaha.com"
+                required>
+            </p>
+
+            <p>
+              <label for="kata_sandi">Kata Sandi</label><br>
+              <input
+                type="password"
+                id="kata_sandi"
+                name="kata_sandi"
+                placeholder="••••••••••"
+                required>
+            </p>
+
+            <p>
+              <label for="konfirmasi_kata_sandi">Konfirmasi Kata Sandi</label
+              ><br>
+              <input
+                type="password"
+                id="konfirmasi_kata_sandi"
+                name="konfirmasi_kata_sandi"
+                placeholder="••••••••••"
+                required>
+            </p>
+
+            <p>
+              <label>
+                <input type="checkbox" name="setuju" value="ya" required>
+                Saya menyetujui Syarat Penggunaan dan Kebijakan Privasi URT.
+              </label>
+            </p>
+          </fieldset>
+
+          <p>
+            <button type="submit">Lanjut Pilih Langganan &rarr;</button>
+          </p>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        <a href="../index.html">Kembali ke Beranda</a> |
+        <a href="../masuk.html">Masuk</a>
+      </p>
+      <p>URT — Your Service Tracker | Kelompok 2</p>
+    </footer>
+  </body>
+</html>
