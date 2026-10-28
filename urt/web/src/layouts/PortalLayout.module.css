@@ -373,42 +373,92 @@
 }
 
 /* Owner shell follows the original owner portal. */
+.layout[data-role='owner'] .sidebar {
+  padding: 12px 10px 10px;
+}
+.layout[data-role='owner'] .brand {
+  gap: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 2px;
+}
+.layout[data-role='owner'] .brandLogo {
+  margin: 0 4px;
+}
 .layout[data-role='owner'] .brandLogo img {
   display: block;
+  width: 120px;
+  height: 30px;
 }
 .layout[data-role='owner'] .brandCopy strong {
   display: none;
 }
 .layout[data-role='owner'] .brandCopy {
   gap: 0;
+  padding-inline: 6px;
 }
 .layout[data-role='owner'] .brandCopy span {
   color: #aebbd3;
   font-weight: 800;
   letter-spacing: .13em;
+  font-size: 9.5px;
 }
 .layout[data-role='owner'] .nav {
-  gap: 3px;
+  gap: 2px;
   padding: 2px 0 0;
 }
 .layout[data-role='owner'] .nav a,
 .layout[data-role='owner'] .nav button {
-  gap: 11px;
-  padding: 0 12px;
+  min-height: 32px;
+  gap: 9px;
+  padding: 0 10px;
+  font-size: 12px;
   font-weight: 600;
 }
+.layout[data-role='owner'] .nav svg {
+  width: 16px;
+  height: 16px;
+}
 .layout[data-role='owner'] .nav .logout {
-  margin-top: 12px;
+  margin-top: 6px;
   padding-top: 4px;
   border-top: 1px solid rgb(255 255 255 / 12%);
 }
 .layout[data-role='owner'] .collapse {
-  margin-top: 10px;
+  min-height: 30px;
+  margin: 6px 0 4px;
+  padding: 0 10px;
+  font-size: 11px;
   font-weight: 600;
   flex-shrink: 0;
+  gap: 8px;
 }
 .layout[data-role='owner'] .collapse svg {
+  width: 15px;
+  height: 15px;
   transition: transform 180ms;
+}
+.layout[data-role='owner'] .identity {
+  padding: 8px 6px 0;
+  gap: 8px;
+}
+.layout[data-role='owner'] .identity .avatar {
+  width: 30px;
+  height: 30px;
+  font-size: 11px;
+}
+.layout[data-role='owner'] .identity strong {
+  font-size: 12px;
+}
+.layout[data-role='owner'] .identity small {
+  font-size: 10.5px;
+  margin-top: 2px;
+}
+.layout[data-role='owner'][data-collapsed='true'] .sidebar {
+  padding: 12px 8px 10px;
+}
+.layout[data-role='owner'][data-collapsed='true'] .brandLogo img {
+  width: 36px;
+  height: auto;
 }
 .layout[data-role='owner'][data-collapsed='true'] .collapse svg {
   transform: rotate(180deg);

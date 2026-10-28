@@ -158,7 +158,7 @@ a:focus-visible {
   overflow-y: auto;
   overflow-x: hidden;
   flex-direction: column;
-  padding: 18px 14px 16px;
+  padding: 12px 10px 10px;
   background: var(--surface-sidebar);
   color: var(--slate-400);
   scrollbar-width: thin;
@@ -187,17 +187,17 @@ a:focus-visible {
 .brand {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 0 0 10px 0;
-  margin-bottom: 4px;
+  gap: 8px;
+  padding: 0 0 8px 0;
+  margin-bottom: 2px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .brand-mark {
   display: block;
-  width: 135px;
-  height: 35px;
-  margin: 0 6px;
+  width: 120px;
+  height: 30px;
+  margin: 0 4px;
   flex: 0 0 auto;
   border-radius: 0;
   background-color: transparent;
@@ -216,7 +216,7 @@ a:focus-visible {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 0 8px;
+  padding: 0 6px;
 }
 
 .brand-copy strong {
@@ -226,7 +226,7 @@ a:focus-visible {
 .brand-copy span {
   display: block;
   color: #aebbd3;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -285,20 +285,20 @@ a:focus-visible {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   padding: 2px 0 0 0;
   margin: 0;
 }
 
 .nav-item {
   display: flex;
-  min-height: 38px;
+  min-height: 32px;
   align-items: center;
-  gap: 11px;
-  padding: 0 12px;
+  gap: 9px;
+  padding: 0 10px;
   border-radius: 8px;
   color: #94a3b8;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   transition:
     background var(--motion-fast),
@@ -307,9 +307,9 @@ a:focus-visible {
 }
 
 .nav-item svg {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -342,9 +342,9 @@ a:focus-visible {
 
 .nav-item--logout {
   color: #f87171;
-  margin-top: 8px;
+  margin-top: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  padding-top: 8px;
+  padding-top: 4px;
 }
 
 .nav-item--logout:hover {
@@ -363,17 +363,17 @@ a:focus-visible {
 .owner-mini-profile {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-top: auto;
-  padding: 10px 8px 2px;
+  padding: 8px 6px 0;
   color: #fff;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .owner-mini-profile .avatar {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
   border-radius: 50%;
   background: #2563eb;
   color: #fff;
@@ -381,7 +381,7 @@ a:focus-visible {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .owner-mini-profile__copy {
@@ -397,7 +397,7 @@ a:focus-visible {
 }
 
 .owner-mini-profile__copy strong {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #fff;
   line-height: 1.2;
@@ -406,7 +406,7 @@ a:focus-visible {
 .owner-mini-profile__copy small {
   margin-top: 2px;
   color: #94a3b8;
-  font-size: 11px;
+  font-size: 10.5px;
 }
 
 /* ----- App / topbar ----- */
@@ -438,17 +438,17 @@ a:focus-visible {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  min-height: 38px;
-  margin-top: 10px;
-  margin-bottom: 6px;
-  padding: 0 12px;
+  min-height: 30px;
+  margin-top: 6px;
+  margin-bottom: 4px;
+  padding: 0 10px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #94a3b8;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
@@ -461,8 +461,8 @@ a:focus-visible {
 }
 
 .desktop-collapse-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   stroke: currentColor;
   stroke-width: 2;
   fill: none;
@@ -474,7 +474,7 @@ a:focus-visible {
 @media (min-width: 861px) {
   body.sidebar-collapsed .sidebar {
     width: var(--sidebar-width-collapsed);
-    padding: 18px 8px 16px;
+    padding: 12px 8px 10px;
     align-items: center;
   }
 

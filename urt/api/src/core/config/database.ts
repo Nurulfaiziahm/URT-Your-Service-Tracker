@@ -1,3 +1,4 @@
+import dns from 'dns';
 import mongoose from 'mongoose';
 import { config } from './index.js';
 
@@ -19,6 +20,14 @@ const cache: ConnectionCache = { conn: null, promise: null };
  */
 export const connectDatabase = async (): Promise<void> => {
   if (cache.conn) return;
+
+  if (config.mongoUri.startsWith('mongodb+srv://')) {
+    try {
+      dns.setServers(['8.8.8.8', '1.1.1.1']);
+    } catch {
+      // Ignore if environment forbids custom DNS
+    }
+  }
 
   if (!cache.promise) {
     cache.promise = mongoose

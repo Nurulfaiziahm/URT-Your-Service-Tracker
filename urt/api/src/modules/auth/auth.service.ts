@@ -45,6 +45,7 @@ export class AuthService {
       }),
     ];
     if (otp) {
+      logger.info(`[OTP] Verification OTP for ${user.email}: ${otp}`);
       emails.push(
         mailService.sendTemplate({
           to: user.email,
@@ -534,6 +535,7 @@ export class AuthService {
     // Generate and store OTP
     const otp = this.generateOtp();
     await otpStore.setResetOtp(user.email, otp);
+    logger.info(`[OTP] Password reset OTP for ${user.email}: ${otp}`);
 
     // Send reset email
     mailService
@@ -682,6 +684,7 @@ export class AuthService {
     // Generate and store new OTP
     const otp = this.generateOtp();
     await otpStore.setEmailOtp(user.email, otp);
+    logger.info(`[OTP] Resent verification OTP for ${user.email}: ${otp}`);
 
     // Send verification email
     await mailService.sendTemplate({
