@@ -1,0 +1,12 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: urt-api:latest
+    container_name: urt-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '${PORT:-5000}:${PORT:-5000}'
