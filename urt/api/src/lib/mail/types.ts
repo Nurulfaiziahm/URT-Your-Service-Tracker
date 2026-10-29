@@ -55,6 +55,9 @@ export interface ResetPasswordTemplateData {
   preheader?: string;
   name: string;
   otp: string;
+  resetUrl: string;
+  portalLabel: string;
+  linkExpiresIn: string;
   expiresIn?: string;
 }
 

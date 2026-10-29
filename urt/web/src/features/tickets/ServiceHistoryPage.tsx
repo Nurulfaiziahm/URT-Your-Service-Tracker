@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
+import { useCustomerPortal } from '../customer/customer-portal';
 import { useGetTicketsQuery } from './ticketsApi';
 import { TicketTable } from './TicketTable';
 import { SummaryCard } from '../../components/ui/SummaryCard';
@@ -9,21 +10,24 @@ import { Button } from '../../components/ui/Button';
 import { PageLoader, EmptyState } from '../../components/feedback/Feedback';
 
 export default function ServiceHistoryPage({ role }: { role: 'technician' | 'customer' }) {
-  const businessId = useAppSelector(selectSelectedBusinessId);
+  const selectedBusinessId = useAppSelector(selectSelectedBusinessId);
+  const portal = useCustomerPortal();
+  const businessId = role === 'customer' ? portal.businessId : selectedBusinessId;
+  const canRead = Boolean(businessId) && (role !== 'customer' || (portal.hasMembership && portal.isAuthenticated));
   const [params, setParams] = useSearchParams();
   const page = Math.max(1, Number(params.get('page')) || 1);
   const status = params.get('status') === 'cancelled' ? 'cancelled' : 'completed';
-  const { data, isLoading, isError, refetch } = useGetTicketsQuery(
+  const { currentData: data, isLoading, isError, refetch } = useGetTicketsQuery(
     { businessId: businessId || '', params: { page, status } },
-    { skip: !businessId },
+    { skip: !canRead },
   );
-  const { data: completedCount } = useGetTicketsQuery(
+  const { currentData: completedCount } = useGetTicketsQuery(
     { businessId: businessId || '', params: { status: 'completed', limit: 1 } },
-    { skip: !businessId },
+    { skip: !canRead },
   );
-  const { data: cancelledCount } = useGetTicketsQuery(
+  const { currentData: cancelledCount } = useGetTicketsQuery(
     { businessId: businessId || '', params: { status: 'cancelled', limit: 1 } },
-    { skip: !businessId },
+    { skip: !canRead },
   );
   if (isLoading) return <PageLoader />;
   if (isError)
@@ -34,7 +38,7 @@ export default function ServiceHistoryPage({ role }: { role: 'technician' | 'cus
         action={<Button onClick={() => refetch()}>Coba lagi</Button>}
       />
     );
-  const tickets = data?.data || [];
+  const tickets = canRead ? data?.data || [] : [];
   return (
     <div className="reference-stack">
       <header className="reference-heading">
@@ -50,7 +54,7 @@ export default function ServiceHistoryPage({ role }: { role: 'technician' | 'cus
         <SummaryCard
           label="Total Riwayat"
           value={
-            completedCount && cancelledCount
+            !canRead ? 0 : completedCount && cancelledCount
               ? (completedCount.pagination?.total || 0) + (cancelledCount.pagination?.total || 0)
               : '—'
           }
@@ -58,13 +62,13 @@ export default function ServiceHistoryPage({ role }: { role: 'technician' | 'cus
         />
         <SummaryCard
           label="Servis Selesai"
-          value={completedCount?.pagination?.total ?? '—'}
+          value={canRead ? completedCount?.pagination?.total ?? '—' : 0}
           icon="check"
           tone="green"
         />
         <SummaryCard
           label="Servis Dibatalkan"
-          value={cancelledCount?.pagination?.total ?? '—'}
+          value={canRead ? cancelledCount?.pagination?.total ?? '—' : 0}
           icon="clock"
           tone="orange"
         />
@@ -80,7 +84,7 @@ export default function ServiceHistoryPage({ role }: { role: 'technician' | 'cus
             </select>
           </label>
         </div>
-        <TicketTable tickets={tickets} role={role} history />
+        <TicketTable tickets={tickets} role={role} customerBasePath={portal.basePath} history />
         <Pagination
           pagination={data?.pagination}
           onPageChange={(next) => {

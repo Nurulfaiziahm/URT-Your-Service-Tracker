@@ -1,7 +1,90 @@
 import redisClient from './client.js';
+import crypto from 'node:crypto';
+import { config } from '../../core/config/index.js';
+
+export interface PasswordResetGrant {
+  userId: string;
+  email: string;
+  portal: 'owner' | 'customer' | 'technician';
+  authVersion: number;
+}
+const digest = (value: string) => crypto.createHash('sha256').update(value).digest('hex');
+const resetPrefix = `${config.prefix}:password-reset:`;
 
 // Keep the existing prefixes so account locks and reset links survive cutover.
 class AccountSecurityStore {
+  async createPasswordReset(grant: PasswordResetGrant, token: string, code: string): Promise<boolean> {
+    const currentKey = `${resetPrefix}current:${grant.portal}:${digest(grant.email)}`;
+    const now = Math.floor(Date.now() / 1000);
+    const record = { ...grant, currentKey, requestedAt: now, codeExpiresAt: now + 300, codeHash: digest(code), attempts: 0 };
+    return Number(await redisClient.eval(`
+      local previous = redis.call('GET', KEYS[1])
+      if previous then
+        local value = redis.call('GET', ARGV[4] .. previous)
+        if value and tonumber(ARGV[3]) - cjson.decode(value).requestedAt < 60 then return 0 end
+        redis.call('DEL', ARGV[4] .. previous)
+      end
+      redis.call('SET', KEYS[2], ARGV[1], 'EX', 900)
+      redis.call('SET', KEYS[1], ARGV[2], 'EX', 900)
+      return 1
+    `, 2, currentKey, `${resetPrefix}grant:${digest(token)}`, JSON.stringify(record), digest(token), now, `${resetPrefix}grant:`)) === 1;
+  }
+
+  async exchangePasswordResetCode(email: string, portal: PasswordResetGrant['portal'], code: string, newToken: string): Promise<boolean> {
+    const currentKey = `${resetPrefix}current:${portal}:${digest(email)}`;
+    return Number(await redisClient.eval(`
+      local hash = redis.call('GET', KEYS[1])
+      if not hash then return 0 end
+      local key = ARGV[1] .. hash
+      local value = redis.call('GET', key)
+      if not value then return 0 end
+      local record = cjson.decode(value)
+      if not record.codeHash or record.codeExpiresAt <= tonumber(ARGV[4]) then return 0 end
+      if record.codeHash ~= ARGV[2] then
+        record.attempts = record.attempts + 1
+        if record.attempts >= 5 then redis.call('DEL', key, KEYS[1])
+        else
+          local remaining = redis.call('TTL', key)
+          if remaining > 0 then redis.call('SET', key, cjson.encode(record), 'EX', remaining) end
+        end
+        return 0
+      end
+      local ttl = redis.call('TTL', key)
+      if ttl <= 0 then return 0 end
+      record.codeHash = nil
+      redis.call('DEL', key)
+      redis.call('SET', ARGV[1] .. ARGV[3], cjson.encode(record), 'EX', ttl)
+      redis.call('SET', KEYS[1], ARGV[3], 'EX', ttl)
+      return 1
+    `, 1, currentKey, `${resetPrefix}grant:`, digest(code), digest(newToken), Math.floor(Date.now() / 1000))) === 1;
+  }
+
+  async consumePasswordReset(token: string, portal: PasswordResetGrant['portal']): Promise<PasswordResetGrant | null> {
+    const hash = digest(token);
+    const value = await redisClient.eval(`
+      local value = redis.call('GET', KEYS[1])
+      if not value then return nil end
+      local record = cjson.decode(value)
+      if record.portal ~= ARGV[1] then return nil end
+      if redis.call('GET', record.currentKey) ~= ARGV[2] then return nil end
+      redis.call('DEL', KEYS[1], record.currentKey)
+      return value
+    `, 1, `${resetPrefix}grant:${hash}`, portal, hash);
+    return typeof value === 'string' ? JSON.parse(value) as PasswordResetGrant : null;
+  }
+
+  async discardPasswordReset(token: string): Promise<void> {
+    const hash = digest(token);
+    await redisClient.eval(`
+      local value = redis.call('GET', KEYS[1])
+      if value then
+        local record = cjson.decode(value)
+        if redis.call('GET', record.currentKey) == ARGV[1] then redis.call('DEL', record.currentKey) end
+        redis.call('DEL', KEYS[1])
+      end
+      return 1
+    `, 1, `${resetPrefix}grant:${hash}`, hash);
+  }
   async incrementLoginAttempts(userId: string): Promise<number> {
     return Number(
       await redisClient.eval(

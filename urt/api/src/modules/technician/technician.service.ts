@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { Technician, ITechnician } from '../../models/Technician.model.js';
 import { ServiceTicket } from '../../models/ServiceTicket.model.js';
 import { Business } from '../../models/Business.model.js';
+import { User } from '../../models/User.model.js';
 import { AppError } from '../../middleware/error-handler.js';
 import { validateObjectId } from '../business/business.access.js';
 import { config } from '../../core/config/index.js';
@@ -16,6 +17,40 @@ import {
 } from './technician.schema.js';
 
 export class TechnicianService {
+  private static async pendingInvitation(rawToken: string) {
+    const technician = await Technician.findOne({
+      invitationTokenHash: crypto.createHash('sha256').update(rawToken.trim()).digest('hex'),
+      status: 'pending', invitationExpiresAt: { $gt: new Date() },
+    }).select('+invitationTokenHash');
+    if (!technician) throw new AppError('Invalid or expired invitation token', 400, 'INVALID_TOKEN');
+    const business = await Business.findById(technician.businessId);
+    if (!business?.isActive) throw new AppError('Business is unavailable', 403, 'BUSINESS_FORBIDDEN');
+    return { technician, business };
+  }
+
+  static async inspectInvitation(rawToken: string) {
+    const { technician, business } = await this.pendingInvitation(rawToken);
+    return {
+      name: technician.name, email: technician.email, businessName: business.name,
+      accountExists: Boolean(await User.exists({ email: technician.email.toLowerCase() })),
+    };
+  }
+
+  static async activateInvitation(rawToken: string, password: string) {
+    const { technician } = await this.pendingInvitation(rawToken);
+    if (await User.exists({ email: technician.email.toLowerCase() })) {
+      throw new AppError('Akun sudah tersedia. Masuk untuk menerima undangan.', 409, 'ACCOUNT_EXISTS');
+    }
+    await requireTechnicianSeat(technician.businessId.toString(), technician._id.toString());
+    const [first, ...rest] = technician.name.trim().split(/\s+/);
+    const user = await User.create({
+      firstName: first.slice(0, 50), lastName: (rest.join(' ') || 'Teknisi').slice(0, 50),
+      email: technician.email.toLowerCase(), password, registrationPortal: 'technician', isEmailVerified: true,
+    });
+    // The existing acceptance rules consume the token, enforce seats, and activate membership.
+    const activated = await this.acceptInvitation(user._id.toString(), user.email, true, rawToken);
+    return { email: user.email, membership: { businessId: activated.businessId.toString(), role: 'technician' as const } };
+  }
   /**
    * Invite a new technician to the business (owner only)
    */
@@ -83,9 +118,9 @@ export class TechnicianService {
     }
 
     const frontendBaseUrl = config.allowedOrigins[0] || 'http://localhost:5173';
-    const invitationUrl = `${frontendBaseUrl}/invitations/technician?token=${rawToken}`;
+    const invitationUrl = `${frontendBaseUrl}/technician/invite/accept#token=${rawToken}`;
 
-    logger.info(`[TECHNICIAN INVITATION] Token generated for ${normalizedEmail}: ${rawToken}`);
+    logger.info('Technician invitation generated');
 
     let mailSent = false;
     try {
@@ -149,9 +184,9 @@ export class TechnicianService {
     await technician.save();
 
     const frontendBaseUrl = config.allowedOrigins[0] || 'http://localhost:5173';
-    const invitationUrl = `${frontendBaseUrl}/invitations/technician?token=${rawToken}`;
+    const invitationUrl = `${frontendBaseUrl}/technician/invite/accept#token=${rawToken}`;
 
-    logger.info(`[TECHNICIAN RESEND] Token generated for ${technician.email}: ${rawToken}`);
+    logger.info('Technician invitation renewed');
 
     let mailSent = false;
     try {
@@ -374,17 +409,7 @@ export class TechnicianService {
     isEmailVerified: boolean,
     rawToken: string,
   ): Promise<ITechnician> {
-    const tokenHash = crypto.createHash('sha256').update(rawToken.trim()).digest('hex');
-
-    const technician = await Technician.findOne({
-      invitationTokenHash: tokenHash,
-      status: 'pending',
-      invitationExpiresAt: { $gt: new Date() },
-    }).select('+invitationTokenHash');
-
-    if (!technician) {
-      throw new AppError('Invalid or expired invitation token', 400, 'INVALID_TOKEN');
-    }
+    const { technician } = await this.pendingInvitation(rawToken);
 
     if (technician.email.toLowerCase() !== userEmail.toLowerCase()) {
       throw new AppError('Logged-in email does not match invitation email', 403, 'EMAIL_MISMATCH');

@@ -1,8 +1,7 @@
 import { Icon } from '../../components/ui/Icon';
 import { useState } from 'react';
 import { useParams } from 'react-router';
-import { useAppSelector } from '../../redux/hooks';
-import { selectSelectedBusinessId } from '../business/businessSlice';
+import { useCustomerPortal } from './customer-portal';
 import { useGetTicketByIdQuery, useTransitionTicketMutation } from '../tickets/ticketsApi';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { DeviceSummary } from '../tickets/DeviceSummary';
@@ -17,13 +16,13 @@ import styles from '../tickets/Tickets.module.css';
 
 export default function CustomerTicketDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const businessId = useAppSelector(selectSelectedBusinessId);
+  const { businessId, basePath } = useCustomerPortal();
 
   const [isCancelling, setIsCancelling] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [cancelError, setCancelError] = useState<string | null>(null);
 
-  const { data, isLoading, error, refetch } = useGetTicketByIdQuery(
+  const { currentData: data, isLoading, error, refetch } = useGetTicketByIdQuery(
     { businessId: businessId || '', ticketId: id || '' },
     { skip: !businessId || !id },
   );
@@ -43,7 +42,7 @@ export default function CustomerTicketDetailPage() {
           title="Tiket Tidak Ditemukan"
           description="Tiket servis ini tidak tersedia atau Anda tidak memiliki akses ke tiket ini."
           symbol="404"
-          action={<ButtonLink to="/customer">Kembali ke Beranda</ButtonLink>}
+          action={<ButtonLink to={basePath}>Kembali ke Beranda</ButtonLink>}
         />
       </main>
     );
@@ -108,7 +107,7 @@ export default function CustomerTicketDetailPage() {
               Batalkan Pengajuan
             </Button>
           )}
-          <ButtonLink to="/customer" variant="secondary">
+          <ButtonLink to={basePath} variant="secondary">
             ← Kembali ke Daftar Servis
           </ButtonLink>
         </div>
@@ -186,7 +185,7 @@ export default function CustomerTicketDetailPage() {
                 Teknisi telah mengirim rincian biaya. Tinjau estimasi sebelum pengerjaan
                 dilanjutkan.
               </p>
-              <ButtonLink to={`/customer/services/${ticket.id}/approval`}>
+              <ButtonLink to={`${basePath}/services/${ticket.id}/approval`}>
                 Tinjau & Setujui Biaya →
               </ButtonLink>
             </section>

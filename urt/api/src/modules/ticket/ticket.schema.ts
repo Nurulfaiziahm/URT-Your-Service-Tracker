@@ -3,7 +3,7 @@ import { z } from 'zod';
 const deviceSchema = z.object({
   category: z.string().trim().min(1, 'Category is required').max(50, 'Max 50 characters'),
   brand: z.string().trim().max(50, 'Max 50 characters').optional(),
-  model: z.string().trim().min(1, 'Model is required').max(100, 'Max 100 characters'),
+  model: z.string().trim().max(100, 'Max 100 characters').optional().default(''),
   serialNumber: z.string().trim().max(100, 'Max 100 characters').optional(),
   accessories: z.array(z.string().trim().max(50)).max(20).optional().default([]),
   condition: z.string().trim().max(200, 'Max 200 characters').optional(),
@@ -34,6 +34,21 @@ export const createTicketSchema = z.object({
     })
     .strict(),
 });
+
+export const serviceRequestSchema = z.object({
+  body: z.object({
+    customer: z.object({
+      name: z.string().trim().min(1, 'Nama lengkap wajib diisi').max(100),
+      phone: z.string().trim().max(30)
+        .transform((value) => value.replace(/[\s()-]/g, '').replace(/^0/, '+62'))
+        .pipe(z.string().regex(/^\+?[1-9]\d{7,14}$/, 'Nomor WhatsApp tidak valid')),
+      email: z.string().trim().toLowerCase().email().max(254).optional(),
+    }).strict(),
+    device: deviceSchema.extend({ brand: z.string().trim().min(1, 'Merek wajib diisi').max(50) }).strict(),
+    complaint: z.string().trim().min(3, 'Jelaskan keluhan perangkat').max(1000),
+  }).strict(),
+});
+export type ServiceRequestInput = z.infer<typeof serviceRequestSchema>['body'];
 
 export const updateIntakeSchema = z.object({
   body: z

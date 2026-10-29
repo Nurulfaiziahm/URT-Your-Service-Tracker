@@ -48,6 +48,15 @@ export const acceptTechnicianInvitationSchema = z.object({
 });
 
 export type InviteTechnicianInput = z.infer<typeof inviteTechnicianSchema>['body'];
+export const activateTechnicianInvitationSchema = z.object({
+  body: z.object({
+    token: z.string().trim().min(10).max(200),
+    password: z.string().min(6).max(128),
+    confirmPassword: z.string().min(6).max(128),
+  }).strict().refine((input) => input.password === input.confirmPassword, {
+    message: 'Konfirmasi kata sandi tidak cocok', path: ['confirmPassword'],
+  }),
+});
 export type UpdateTechnicianInput = z.infer<typeof updateTechnicianSchema>['body'];
 export type TechnicianQueryParams = z.infer<typeof technicianQuerySchema>['query'];
 export type AcceptTechnicianInvitationInput = z.infer<typeof acceptTechnicianInvitationSchema>['body'];

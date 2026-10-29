@@ -169,7 +169,7 @@ export default function LandingPage() {
               </li>
             </ul>
             <div className="site-nav__actions">
-              <Link to="/login" className="btn btn--secondary btn--sm">
+              <Link to="/owner/login" className="btn btn--secondary btn--sm">
                 Masuk
               </Link>
               <Link to="/owner/register" className="btn btn--primary btn--sm">
@@ -1358,10 +1358,10 @@ export default function LandingPage() {
               manual dan beralih ke alur kerja profesional.{' '}
             </p>
             <div className="cta-section__actions">
-              <Link to="/register" className="btn btn--white btn--lg">
+              <Link to="/owner/register" className="btn btn--white btn--lg">
                 Daftar Tempat Servis
               </Link>
-              <Link to="/login" className="btn btn--outline-white btn--lg">
+              <Link to="/owner/login" className="btn btn--outline-white btn--lg">
                 Masuk ke Akun Anda
               </Link>
             </div>

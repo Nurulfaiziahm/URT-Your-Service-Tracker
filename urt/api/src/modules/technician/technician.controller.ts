@@ -95,5 +95,13 @@ export const acceptTechnicianInvitation = asyncHandler(async (req: Request, res:
     input.token,
   );
 
-  ResponseHandler.success(res, { technician }, 'Technician invitation accepted successfully');
+  ResponseHandler.success(res, { technician, membership: { businessId: technician.businessId.toString(), role: 'technician' } }, 'Technician invitation accepted successfully');
+});
+
+export const inspectTechnicianInvitation = asyncHandler(async (req, res) => {
+  ResponseHandler.success(res, await TechnicianService.inspectInvitation(req.body.token));
+});
+
+export const activateTechnicianInvitation = asyncHandler(async (req, res) => {
+  ResponseHandler.created(res, await TechnicianService.activateInvitation(req.body.token, req.body.password));
 });

@@ -1,8 +1,8 @@
 import { Link } from 'react-router';
 import logo from '../../assets/logo-urt.svg';
 import { timelineActionLabel } from '../tickets/TicketTimeline';
-import { useState, type FormEvent } from 'react';
-import { useParams } from 'react-router';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useLocation, useParams } from 'react-router';
 import { useGetPublicTrackingMutation } from '../tickets/ticketsApi';
 import type { PublicTrackingResult } from '../tickets/types';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
@@ -16,14 +16,27 @@ import ticketStyles from '../tickets/Tickets.module.css';
 
 export default function TrackingPage() {
   const { ticketCode: routeTicketCode } = useParams<{ ticketCode?: string }>();
+  const { hash } = useLocation();
+  const [access] = useState(() => new URLSearchParams(hash.slice(1)));
+  const autoLookup = useRef(false);
 
   const [ticketCode, setTicketCode] = useState(routeTicketCode || '');
-  const [businessSlug, setBusinessSlug] = useState('');
-  const [trackingSecret, setTrackingSecret] = useState('');
+  const [businessSlug, setBusinessSlug] = useState(access.get('business') || '');
+  const [trackingSecret, setTrackingSecret] = useState(access.get('access') || '');
   const [trackingResult, setTrackingResult] = useState<PublicTrackingResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [fetchTracking, { isLoading }] = useGetPublicTrackingMutation();
+
+  useEffect(() => {
+    const slug = access.get('business');
+    const secret = access.get('access');
+    if (autoLookup.current || !routeTicketCode || !slug || !secret) return;
+    autoLookup.current = true;
+    void fetchTracking({ businessSlug: slug, ticketCode: routeTicketCode, trackingSecret: secret }).unwrap()
+      .then((response) => setTrackingResult(response.data))
+      .catch(() => setErrorMessage('Status belum dapat dimuat. Coba lagi menggunakan informasi pelacakan yang sudah terisi.'));
+  }, [access, fetchTracking, routeTicketCode]);
 
   const handleLookup = async (e: FormEvent) => {
     e.preventDefault();
@@ -66,7 +79,7 @@ export default function TrackingPage() {
         </Link>
         <div className="actions">
           <Link to="/">← Kembali ke Beranda</Link>
-          <ButtonLink to="/portal" size="small">
+          <ButtonLink to="/customer/login" size="small">
             Masuk Portal
           </ButtonLink>
         </div>

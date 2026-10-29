@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
+import type { AuthPortal } from './auth-routing';
 import { useForgotPasswordMutation } from './authApi';
 import { TextInput } from '../../components/ui/TextInput';
 import { Button } from '../../components/ui/Button';
@@ -7,7 +8,7 @@ import { InlineNotice } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from './Auth.module.css';
 
-export default function ForgotPasswordPage() {
+export default function ForgotPasswordPage({ portal }: { portal: AuthPortal }) {
   const navigate = useNavigate();
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
@@ -24,8 +25,8 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      await forgotPassword({ email: email.trim().toLowerCase() }).unwrap();
-      navigate('/reset-password', {
+      await forgotPassword({ portal, email: email.trim().toLowerCase() }).unwrap();
+      navigate(`/${portal}/reset-password`, {
         state: { email: email.trim().toLowerCase(), requested: true },
       });
     } catch (err: unknown) {
@@ -43,7 +44,7 @@ export default function ForgotPasswordPage() {
       <header className={styles.heading}>
         <span className="eyebrow">Pemulihan Akun</span>
         <h1>Lupa Kata Sandi</h1>
-        <p>Masukkan alamat email Anda untuk menerima kode verifikasi pengaturan ulang kata sandi.</p>
+        <p>Masukkan email akun {portal === 'owner' ? 'pemilik usaha' : portal === 'technician' ? 'teknisi aktif' : 'pelanggan'} untuk menerima kode dan tautan pemulihan.</p>
       </header>
 
       {errorMessage && <InlineNotice>{errorMessage}</InlineNotice>}
@@ -66,8 +67,8 @@ export default function ForgotPasswordPage() {
       <footer className={styles.links}>
         <span>
           Ingat kata sandi Anda?{' '}
-          <Link to="/login" className="text-link">
-            Masuk kembali
+          <Link to={`/${portal}/login`} className="text-link">
+            ← Kembali ke Login
           </Link>
         </span>
       </footer>

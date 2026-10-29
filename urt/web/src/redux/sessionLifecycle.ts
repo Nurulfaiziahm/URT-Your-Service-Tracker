@@ -24,6 +24,16 @@ import { errorMessages } from '../lib/api-messages';
 
 export const sessionListener = createListenerMiddleware();
 sessionListener.startListening({
+  actionCreator: credentialsReceived,
+  effect: (action, api) => {
+    const previous = api.getOriginalState() as ReturnType<AppStore['getState']>;
+    if (previous.auth.user?.id !== action.payload.user.id) {
+      api.dispatch(clearBusinessSelection());
+      api.dispatch(baseApi.util.resetApiState());
+    }
+  },
+});
+sessionListener.startListening({
   actionCreator: sessionEnded,
   effect: (_action, api) => {
     clearSessionState();

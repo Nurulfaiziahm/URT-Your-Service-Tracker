@@ -6,6 +6,7 @@ import { ResponseHandler, CookieHelper } from '../../utils/index.js';
 import { AuthService } from './auth.service.js';
 import { saveCsrfToken } from '../../core/security/csrf.js';
 import { config } from '../../core/config/index.js';
+import { getAuthPortals, type AuthPortal } from './portal-access.js';
 import { formatUserResponse } from '../../types/common.js';
 
 import {
@@ -46,7 +47,7 @@ export const getCsrfToken = asyncHandler(async (req: Request, res: Response) => 
  */
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as RegisterInput;
-  const result = await AuthService.register(input, req);
+  const result = await AuthService.register(input, req, req.params.portal === 'owner' ? 'owner' : 'customer');
 
   const csrfToken = await saveCsrfToken(req, true);
   CookieHelper.clearLegacyCookies(res);
@@ -71,7 +72,8 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
  */
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as LoginInput;
-  const result = await AuthService.login(input, req);
+  const portal = req.params.portal as AuthPortal | undefined;
+  const result = await AuthService.login(input, req, portal);
 
   const csrfToken = await saveCsrfToken(req, true);
   CookieHelper.clearLegacyCookies(res);
@@ -89,6 +91,11 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   );
 });
 
+export const getAvailablePortals = asyncHandler(async (req, res) => {
+  const user = await AuthService.getProfile(getAuthUser(req).id);
+  ResponseHandler.success(res, { portals: await getAuthPortals(user) });
+});
+
 /**
  * @route   POST /api/v1/auth/google
  * @desc    Sign up or log in with a Google ID token
@@ -96,7 +103,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
  */
 export const googleLogin = asyncHandler(async (req: Request, res: Response) => {
   const { idToken } = req.body as GoogleAuthInput;
-  const result = await AuthService.googleLogin(idToken, req);
+  const result = await AuthService.googleLogin(idToken, req, (req.params.portal as AuthPortal | undefined) || 'customer');
 
   const csrfToken = await saveCsrfToken(req, true);
   CookieHelper.clearLegacyCookies(res);
@@ -265,12 +272,12 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('Email is required', 400);
   }
 
-  await AuthService.forgotPassword(email);
+  await AuthService.forgotPassword(email, (req.params.portal as AuthPortal | undefined) || 'customer');
 
   ResponseHandler.success(
     res,
     null,
-    'If this account supports password recovery, a reset code has been sent.',
+    'Jika akun ini mendukung pemulihan pada portal yang dipilih, Anda akan menerima email berisi kode dan tautan pemulihan.',
   );
 });
 
@@ -286,7 +293,7 @@ export const verifyResetOtp = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('Email and OTP are required', 400);
   }
 
-  const resetToken = await AuthService.verifyResetOtp(email, otp);
+  const resetToken = await AuthService.verifyResetOtp(email, otp, (req.params.portal as AuthPortal | undefined) || 'customer');
 
   ResponseHandler.success(res, { resetToken }, 'OTP verified successfully');
 });
@@ -303,7 +310,7 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
     throw new AppError('Reset token and password are required', 400);
   }
 
-  await AuthService.resetPassword(resetToken, password);
+  await AuthService.resetPassword(resetToken, password, (req.params.portal as AuthPortal | undefined) || 'customer');
 
   ResponseHandler.success(
     res,

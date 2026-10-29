@@ -1,4 +1,5 @@
 import { baseApi } from '../../redux/baseApi';
+import type { ServiceRequestInput, ServiceRequestReceipt } from '../customer/service-request.types';
 import type { ApiResponse, PaginatedResponse } from '../../lib/api.types';
 import type {
   ApprovalInput,
@@ -20,6 +21,12 @@ import type {
 
 export const ticketsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    submitServiceRequest: builder.mutation<ApiResponse<ServiceRequestReceipt>, { slug: string; body: ServiceRequestInput }>({
+      query: ({ slug, body }) => ({
+        url: `/public/businesses/${encodeURIComponent(slug)}/service-requests`, method: 'POST', body,
+      }),
+      invalidatesTags: ['Tickets', 'Membership:ME', 'Dashboard'],
+    }),
     getTickets: builder.query<
       PaginatedResponse<ServiceTicket>,
       { businessId: string; params?: TicketQueryParams }
@@ -275,6 +282,7 @@ export const ticketsApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useSubmitServiceRequestMutation,
   useGetTicketsQuery,
   useGetTicketByIdQuery,
   useCreateTicketMutation,

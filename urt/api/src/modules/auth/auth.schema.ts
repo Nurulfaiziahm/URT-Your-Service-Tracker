@@ -44,6 +44,7 @@ export const registerSchema = z.object({
 const loginBodySchema = z.object({
   email: emailField,
   password: z.string().min(1, 'Password is required'),
+  invitationToken: z.string().trim().min(10).max(200).optional(),
 });
 
 export const loginSchema = z.object({
@@ -100,9 +101,13 @@ export const forgotPasswordSchema = z.object({
   body: forgotPasswordBodySchema,
 });
 
+export const verifyResetOtpSchema = z.object({
+  body: z.object({ email: emailField, otp: z.string().regex(/^\d{6}$/, 'Masukkan 6 digit kode pemulihan') }).strict(),
+});
+
 const resetPasswordBodySchema = z
   .object({
-    resetToken: z.string().min(1, 'Reset token is required'),
+    resetToken: z.string().regex(/^[a-f0-9]{64}$/, 'Invalid reset token'),
     password: passwordField,
     confirmPassword: z.string().min(1, 'Please confirm your password'),
   })

@@ -13,7 +13,7 @@ export interface TimelineEvent {
   id?: string;
   status: TicketStatus;
   action: string;
-  actorId: string;
+  actorId?: string;
   actorRole: 'owner' | 'technician' | 'customer' | 'system';
   actorName: string;
   note?: string;

@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { useAppSelector } from '../../redux/hooks';
 import { selectUser } from '../auth/authSlice';
-import { selectSelectedBusinessId } from '../business/businessSlice';
+import { useCustomerPortal } from './customer-portal';
 import { useGetCustomerDashboardQuery } from '../dashboard/dashboardApi';
 import { SummaryCard } from '../../components/ui/SummaryCard';
 import { ButtonLink } from '../../components/ui/Button';
@@ -11,14 +11,14 @@ import { ServiceStepper } from '../tickets/ServiceStepper';
 import { TicketTable } from '../tickets/TicketTable';
 
 export default function CustomerDashboardPage() {
-  const businessId = useAppSelector(selectSelectedBusinessId);
+  const { businessId, business, basePath, hasMembership, isAuthenticated } = useCustomerPortal();
   const user = useAppSelector(selectUser);
-  const { data, isLoading, isError, refetch } = useGetCustomerDashboardQuery(
+  const { currentData: data, isLoading, isError, refetch } = useGetCustomerDashboardQuery(
     { businessId: businessId || '' },
-    { skip: !businessId },
+    { skip: !businessId || !hasMembership || !isAuthenticated },
   );
   if (isLoading) return <PageLoader />;
-  if (isError || !data?.data)
+  if (hasMembership && isAuthenticated && (isError || !data?.data))
     return (
       <EmptyState
         title="Servis belum dapat dimuat"
@@ -26,7 +26,10 @@ export default function CustomerDashboardPage() {
         action={<button onClick={() => refetch()}>Coba lagi</button>}
       />
     );
-  const { stats, recentTickets } = data.data;
+  const { stats, recentTickets } = hasMembership && isAuthenticated && data?.data ? data.data : {
+    stats: { activeTickets: 0, completedTickets: 0, awaitingApproval: 0 },
+    recentTickets: [],
+  };
   const ticket = recentTickets.find((item) => !['completed', 'cancelled'].includes(item.status));
   const completed = recentTickets.filter((item) =>
     ['completed', 'cancelled'].includes(item.status),
@@ -36,11 +39,11 @@ export default function CustomerDashboardPage() {
       <header className="reference-heading">
         <div>
           <h1>
-            Halo, {user?.firstName} {user?.lastName}
+            {user ? `Halo, ${user.firstName} ${user.lastName}` : 'Selamat Datang di Portal Pelanggan'}
           </h1>
-          <p>Pantau perkembangan perangkat Anda dengan mudah.</p>
+          <p>{business?.name || 'Pantau perkembangan perangkat Anda dengan mudah.'}</p>
         </div>
-        <ButtonLink to="/customer/services/new">+ Ajukan Servis</ButtonLink>
+        <ButtonLink to={`${basePath}/services/new`}>+ Ajukan Servis</ButtonLink>
       </header>
       <section className="reference-stats reference-stats-three">
         <SummaryCard
@@ -81,13 +84,13 @@ export default function CustomerDashboardPage() {
               </div>
               <div>
                 <dt>Tempat Servis</dt>
-                <dd>{data.data.business.name}</dd>
+                <dd>{business?.name || data?.data.business.name}</dd>
               </div>
             </dl>
             <div className="actions" style={{ marginTop: 24 }}>
-              <ButtonLink to={`/customer/services/${ticket.id}`}>Lihat Detail Servis →</ButtonLink>
+              <ButtonLink to={`${basePath}/services/${ticket.id}`}>Lihat Detail Servis →</ButtonLink>
               {ticket.status === 'awaiting_approval' && (
-                <ButtonLink to={`/customer/services/${ticket.id}/approval`} variant="secondary">
+                <ButtonLink to={`${basePath}/services/${ticket.id}/approval`} variant="secondary">
                   Tinjau Estimasi
                 </ButtonLink>
               )}
@@ -102,18 +105,22 @@ export default function CustomerDashboardPage() {
       ) : (
         <EmptyState
           title="Belum ada servis aktif"
-          description="Ajukan perbaikan perangkat untuk mulai mengikuti perkembangannya."
-          action={<ButtonLink to="/customer/services/new">Ajukan Servis</ButtonLink>}
+          description={isAuthenticated
+            ? 'Ajukan servis di tempat ini. Nomor tiket akan muncul setelah pengajuan berhasil.'
+            : 'Ajukan servis tanpa membuat akun. Anda akan mendapat nomor tiket dan tautan pelacakan pribadi.'}
+          action={<div className="actions">
+            <ButtonLink to={`${basePath}/services/new`}>Ajukan Servis</ButtonLink>
+          </div>}
         />
       )}
       <section className="reference-panel">
         <div className="reference-panel-header">
           <h2>Servis Sebelumnya</h2>
-          <Link to="/customer/history" className="text-link">
+          <Link to={`${basePath}/history`} className="text-link">
             Lihat semua →
           </Link>
         </div>
-        <TicketTable tickets={completed} role="customer" history />
+        <TicketTable tickets={completed} role="customer" customerBasePath={basePath} history />
       </section>
     </div>
   );

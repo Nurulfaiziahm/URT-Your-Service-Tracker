@@ -3,6 +3,7 @@ import { useGetPublicBusinessQuery } from '../business/businessApi';
 import { ButtonLink } from '../../components/ui/Button';
 import { PageLoader, EmptyState } from '../../components/feedback/Feedback';
 import styles from './InfoPages.module.css';
+import { customerPortalPath } from '../customer/customer-portal';
 
 export default function PublicBusinessPage() {
   const { businessSlug } = useParams<{ businessSlug: string }>();
@@ -13,7 +14,6 @@ export default function PublicBusinessPage() {
   const business = data?.data?.business;
   const services = data?.data?.services ?? [];
 
-  console.log('business', business);
 
   if (isLoading) {
     return <PageLoader />;
@@ -83,7 +83,7 @@ export default function PublicBusinessPage() {
       </section>
 
       <div style={{ paddingTop: 24, textAlign: 'center' }}>
-        <ButtonLink to={`/tracking`}>Lacak Tiket Servis di Tempat Ini</ButtonLink>
+        <ButtonLink to={customerPortalPath(business.slug)}>Buka Portal Pelanggan & Ajukan Servis</ButtonLink>
       </div>
     </div>
   );

@@ -6,6 +6,9 @@ import { PortalLayout } from '../layouts/PortalLayout';
 import { RequireAuth } from '../features/auth/RequireAuth';
 import { BusinessGate } from '../features/business/BusinessGate';
 import { RequireBusinessRole } from '../features/business/RequireBusinessRole';
+import { CustomerPortalGate } from '../features/customer/CustomerPortalGate';
+import { LegacyAuthRedirect } from '../features/auth/LegacyAuthRedirect';
+import { LegacyRecoveryRedirect } from '../features/auth/LegacyRecoveryRedirect';
 import { PageLoader } from '../components/feedback/Feedback';
 
 const LandingPage = lazy(() => import('../features/public/LandingPage'));
@@ -77,23 +80,40 @@ export function AppRoutes() {
       <Routes>
         <Route index element={<LandingPage />} />
         <Route path="portal" element={<PortalSelectPage />} />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
-        <Route path="owner/register" element={<RegisterPage />} />
+        <Route path="login" element={<LegacyAuthRedirect mode="login" />} />
+        <Route path="register" element={<LegacyAuthRedirect mode="register" />} />
+        <Route path="forgot-password" element={<LegacyRecoveryRedirect action="forgot-password" />} />
+        <Route path="reset-password" element={<LegacyRecoveryRedirect action="reset-password" />} />
+        <Route path="owner/register" element={<RegisterPage portal="owner" />} />
+        <Route path="owner/login" element={<LoginPage portal="owner" />} />
+        <Route path="customer/register" element={<RegisterPage portal="customer" />} />
         <Route path="tracking/:ticketCode?" element={<TrackingPage />} />
         <Route path="privacy" element={<LegalPage document="privacy" />} />
         <Route path="terms" element={<LegalPage document="terms" />} />
+        <Route element={<CustomerPortalGate />}>
+          <Route path="b/:businessSlug/customer" element={<PortalLayout role="customer" />}>
+            <Route index element={<CustomerDashboardPage />} />
+            <Route path="history" element={<ServiceHistoryPage role="customer" />} />
+            <Route path="services/new" element={<CustomerNewServicePage />} />
+            <Route element={<RequireAuth />}>
+              <Route path="services/:id" element={<CustomerTicketDetailPage />} />
+              <Route path="services/:id/approval" element={<CustomerApprovalPage />} />
+              <Route path="profile" element={<AccountProfilePage />} />
+              <Route path="security" element={<AccountSecurityPage />} />
+            </Route>
+          </Route>
+        </Route>
         <Route element={<PublicLayout />}>
           <Route path="forbidden" element={<UnavailablePage kind="forbidden" />} />
           <Route path="b/:businessSlug" element={<PublicBusinessPage />} />
+          <Route path="b/:businessSlug/services/new" element={<CustomerNewServicePage />} />
+          <Route path="invitations/technician" element={<TechnicianAcceptInvitationPage />} />
 
           {/* Shared Account & Invitation Pages (works without business membership) */}
           <Route element={<RequireAuth />}>
             <Route path="account/profile" element={<AccountProfilePage />} />
             <Route path="account/security" element={<AccountSecurityPage />} />
-            <Route path="invitations/technician" element={<TechnicianAcceptInvitationPage />} />
             <Route path="invitations/customer" element={<CustomerAcceptInvitationPage />} />
-            <Route path="b/:businessSlug/services/new" element={<CustomerNewServicePage />} />
           </Route>
 
           <Route path="*" element={<UnavailablePage />} />
@@ -103,10 +123,17 @@ export function AppRoutes() {
           <Route path="owner/onboarding" element={<OwnerOnboardingPage />} />
         </Route>
         {/* Dedicated Auth Layout */}
+        <Route element={<AuthLayout showHomeLink={false} />}>
+          <Route path="customer/login" element={<LoginPage portal="customer" />} />
+          <Route path="technician/login" element={<LoginPage portal="technician" />} />
+          <Route path="technician/invite/accept/:token?" element={<TechnicianAcceptInvitationPage />} />
+          {(['owner', 'customer', 'technician'] as const).map((portal) => <Route key={portal}>
+            <Route path={`${portal}/forgot-password`} element={<ForgotPasswordPage key={portal} portal={portal} />} />
+            <Route path={`${portal}/reset-password`} element={<ResetPasswordPage key={portal} portal={portal} />} />
+          </Route>)}
+        </Route>
         <Route element={<AuthLayout />}>
           <Route path="verify-email" element={<VerifyEmailPage />} />
-          <Route path="forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="reset-password" element={<ResetPasswordPage />} />
         </Route>
 
         {/* Guarded Portal Routes */}

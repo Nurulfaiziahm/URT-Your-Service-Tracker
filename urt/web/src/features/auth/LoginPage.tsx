@@ -1,7 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { useLoginMutation } from './authApi';
-import { businessApi } from '../business/businessApi';
+import { clearBusinessSelection } from '../business/businessSlice';
+import { authDestination, type AuthPortal, type AuthReturnLocation } from './auth-routing';
+import { TextInput } from '../../components/ui/TextInput';
+import { Button } from '../../components/ui/Button';
+import authStyles from './Auth.module.css';
 import { useAppDispatch } from '../../redux/hooks';
 import { InlineNotice } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
@@ -61,61 +65,30 @@ function LoginIcon({ name, size = 18 }: { name: IconName; size?: number }) {
   );
 }
 
-export default function LoginPage() {
+export default function LoginPage({ portal }: { portal: AuthPortal }) {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState((location.state as { email?: string })?.email || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const fromLoc = (location.state as { from?: { pathname?: string; search?: string } })?.from;
-  const isOwnerFlow =
-    (location.state as { role?: string })?.role === 'owner' ||
-    fromLoc?.pathname?.startsWith('/owner');
+  const fromLoc = (location.state as { from?: AuthReturnLocation })?.from;
+  const isOwnerFlow = portal === 'owner';
+  const invitationToken = portal === 'technician' && (fromLoc?.pathname === '/invitations/technician' || fromLoc?.pathname?.startsWith('/technician/invite/accept'))
+    ? fromLoc.pathname?.match(/^\/technician\/invite\/accept\/([^/]+)$/)?.[1] || new URLSearchParams(fromLoc.hash?.slice(1)).get('token') || new URLSearchParams(fromLoc.search).get('token') || undefined : undefined;
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setErrorMessage(null);
 
     try {
-      await login({ email: email.trim(), password }).unwrap();
-
-      if (fromLoc) {
-        navigate(`${fromLoc.pathname || '/owner'}${fromLoc.search || ''}`, { replace: true });
-        return;
-      }
-
-      if (isOwnerFlow) {
-        navigate('/owner', { replace: true });
-        return;
-      }
-
-      try {
-        const busRes = await dispatch(
-          businessApi.endpoints.getMyBusinesses.initiate(undefined, { forceRefetch: true }),
-        ).unwrap();
-        const businesses = busRes?.data?.businesses || [];
-        if (businesses.some((b) => b.roles.includes('owner'))) {
-          navigate('/owner', { replace: true });
-          return;
-        }
-        if (businesses.some((b) => b.roles.includes('technician'))) {
-          navigate('/technician', { replace: true });
-          return;
-        }
-        if (businesses.some((b) => b.roles.includes('customer'))) {
-          navigate('/customer', { replace: true });
-          return;
-        }
-      } catch {
-        /* Fallback if business query fails */
-      }
-
-      navigate('/owner', { replace: true });
+      await login({ portal, email: email.trim(), password, invitationToken }).unwrap();
+      dispatch(clearBusinessSelection());
+      navigate(authDestination(portal, fromLoc), { replace: true });
     } catch (err: unknown) {
       const apiErr = err as { data?: ApiErrorBody; error?: string };
       setErrorMessage(
@@ -125,6 +98,20 @@ export default function LoginPage() {
       );
     }
   }
+
+  if (portal !== 'owner') return <form className={authStyles.form} onSubmit={handleSubmit}>
+    <header className={authStyles.heading}><span className="eyebrow">PORTAL {portal === 'customer' ? 'PELANGGAN' : 'TEKNISI'}</span>
+      <h1>Masuk {portal === 'customer' ? 'Pelanggan' : 'Teknisi'}</h1>
+      <p>{portal === 'customer' ? 'Lihat riwayat dan perkembangan servis Anda.' : 'Gunakan akun yang sudah diaktifkan melalui undangan pemilik tempat servis.'}</p></header>
+    {errorMessage && <InlineNotice>{errorMessage}</InlineNotice>}
+    {(location.state as { message?: string })?.message && <p role="status">{(location.state as { message: string }).message}</p>}
+    <TextInput label="Alamat email" name="email" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+    <TextInput label="Kata sandi" name="password" type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} />
+    <Button type="submit" pending={isLoading}>Masuk</Button>
+    <Link to={`/${portal}/forgot-password`} state={{ portal, from: fromLoc }}>Lupa kata sandi?</Link>
+    {portal === 'customer' && <p>Belum punya akun? <Link to="/customer/register" state={location.state}>Buat akun pelanggan</Link></p>}
+    {portal === 'technician' && <p>Akun teknisi hanya tersedia melalui undangan pemilik tempat servis.</p>}
+  </form>;
 
   return (
     <div className={styles.page}>
@@ -206,7 +193,7 @@ export default function LoginPage() {
             <div className={styles['topbar-link-wrap']}>
               Belum punya akun?{' '}
               <Link
-                to="/owner/register"
+                to={isOwnerFlow ? '/owner/register' : '/customer/register'}
                 state={location.state}
                 className={styles['topbar-link']}
               >
@@ -299,7 +286,7 @@ export default function LoginPage() {
                 </button>
 
                 <div className={styles['forgot-link-wrap']}>
-                  <Link to="/forgot-password" className={styles['forgot-link']}>
+                  <Link to={`/${portal}/forgot-password`} state={{ portal }} className={styles['forgot-link']}>
                     Lupa kata sandi?
                   </Link>
                 </div>
@@ -307,7 +294,7 @@ export default function LoginPage() {
                 <div className={styles['mobile-register-link']}>
                   Belum punya akun?{' '}
                   <Link
-                    to="/owner/register"
+                    to={isOwnerFlow ? '/owner/register' : '/customer/register'}
                     state={location.state}
                     className={styles['topbar-link']}
                   >

@@ -85,8 +85,8 @@ export class TicketService {
   static async createTicket(
     businessId: string,
     callerUser: {
-      id: string;
-      email: string;
+      id?: string;
+      email?: string;
       firstName?: string;
       lastName?: string;
       phone?: string;
@@ -94,6 +94,7 @@ export class TicketService {
     },
     isOwner: boolean,
     input: CreateTicketInput,
+    selfService?: { trackingSecret: string },
   ): Promise<IServiceTicket> {
     validateObjectId(businessId, 'Business');
 
@@ -103,10 +104,10 @@ export class TicketService {
     }
 
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
-    const callerObjectId = new mongoose.Types.ObjectId(callerUser.id);
+    const callerObjectId = callerUser.id ? new mongoose.Types.ObjectId(callerUser.id) : undefined;
 
     let customerId: mongoose.Types.ObjectId;
-    let customerName = `${callerUser.firstName || ''} ${callerUser.lastName || ''}`.trim() || callerUser.email;
+    let customerName = `${callerUser.firstName || ''} ${callerUser.lastName || ''}`.trim() || callerUser.email || 'Pelanggan';
     let assignedTechObjectId: mongoose.Types.ObjectId | undefined = undefined;
     let requestedServiceObjectId: mongoose.Types.ObjectId | undefined = undefined;
 
@@ -128,6 +129,7 @@ export class TicketService {
     const initialTimeline: IServiceTicket['timeline'] = [];
 
     if (isOwner) {
+      if (!callerObjectId) throw new AppError('Owner authentication is required', 401);
       if (!input.customerId) {
         throw new AppError('Customer ID is required for owner walk-in intake', 400, 'CUSTOMER_REQUIRED');
       }
@@ -183,10 +185,21 @@ export class TicketService {
         });
       }
     } else {
-      let customer = await Customer.findOne({
+      let customer = callerObjectId ? await Customer.findOne({
         businessId: businessObjectId,
         userId: callerObjectId,
-      });
+      }) : null;
+
+      if (customer?.status === 'archived') {
+        throw new AppError('Customer contact is archived', 403, 'CUSTOMER_ARCHIVED');
+      }
+
+      if (customer && selfService) {
+        customer.name = customerName;
+        customer.phone = callerUser.phone;
+        customer.email = callerUser.email;
+        await customer.save();
+      }
 
       if (!customer) {
         customer = await Customer.create({
@@ -236,6 +249,7 @@ export class TicketService {
       intakeMethod: isOwner ? input.intakeMethod || 'walk_in' : 'online',
       status: startingStatus,
       revision: 1,
+      ...(selfService && { trackingSecretHash: crypto.createHash('sha256').update(selfService.trackingSecret).digest('hex') }),
       intakeReceivedAt,
       timeline: initialTimeline,
     });

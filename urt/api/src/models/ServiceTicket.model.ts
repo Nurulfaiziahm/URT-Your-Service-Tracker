@@ -38,7 +38,7 @@ export interface ITimelineEvent {
   _id?: mongoose.Types.ObjectId;
   status: TicketStatus;
   action: string;
-  actorId: mongoose.Types.ObjectId;
+  actorId?: mongoose.Types.ObjectId;
   actorRole: TimelineActorRole;
   actorName: string;
   note?: string;
@@ -163,7 +163,9 @@ const timelineEventSchema = new Schema<ITimelineEvent>(
     actorId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: function (this: { actorRole: TimelineActorRole }) {
+        return this.actorRole === 'owner' || this.actorRole === 'technician';
+      },
     },
     actorRole: {
       type: String,
@@ -508,7 +510,7 @@ const serviceTicketSchema = new Schema<IServiceTicket>(
       },
       model: {
         type: String,
-        required: [true, 'Device model is required'],
+        default: '',
         trim: true,
         maxlength: [100, 'Model cannot exceed 100 characters'],
       },

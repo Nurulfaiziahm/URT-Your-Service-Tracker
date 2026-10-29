@@ -1,0 +1,29 @@
+.page { width: min(100%, 720px); margin: 0 auto; padding: 24px 0 48px; }
+.heading { margin-bottom: 24px; }
+.heading h1 { font-size: clamp(1.6rem, 4vw, 2rem); margin: 8px 0; color: var(--navy-950); }
+.heading p, .form header p, .note { color: var(--slate-500); line-height: 1.6; }
+.card { padding: clamp(20px, 4vw, 40px); border: 1px solid var(--border); border-radius: 20px; background: var(--card, #fff); box-shadow: 0 8px 32px rgb(15 23 42 / 4%); }
+.signIn { margin: 0 0 28px; text-align: right; color: var(--slate-500); font-size: .9rem; }
+.signIn a { color: var(--blue); font-weight: 600; }
+.steps { display: flex; gap: 12px; padding: 0 0 28px; margin: 0 0 28px; list-style: none; border-bottom: 1px solid var(--border); }
+.steps li { flex: 1; display: flex; align-items: center; gap: 8px; color: var(--slate-500); font-size: .85rem; }
+.steps span { width: 30px; height: 30px; flex-shrink: 0; display: grid; place-items: center; background: var(--canvas, #f1f5f9); border-radius: 50%; }
+.steps [aria-current="step"] { color: var(--blue); }
+.steps [aria-current="step"] span { background: var(--blue); color: white; }
+.steps [data-complete="true"] span { background: #dcfce7; color: #166534; }
+.form { display: grid; gap: 24px; }
+.form header h2 { margin: 6px 0; font-size: 1.5rem; color: var(--navy-950); }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.textarea { display: grid; gap: 8px; font-weight: 600; font-size: .9rem; }
+.textarea textarea { width: 100%; box-sizing: border-box; resize: vertical; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font: inherit; line-height: 1.6; background: var(--card, #fff); color: var(--navy-950); }
+.textarea textarea:focus { outline: 2px solid var(--blue); outline-offset: 2px; }
+.actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.summary { display: grid; gap: 20px; margin: 0; padding: 24px; background: var(--canvas, #f8fafc); border-radius: 12px; }
+.summary dt { color: var(--slate-500); font-size: .85rem; margin-bottom: 5px; }
+.summary dd { margin: 0; color: var(--navy-950); overflow-wrap: anywhere; white-space: pre-wrap; }
+.success { text-align: center; display: grid; gap: 20px; }
+.success h1, .success p { margin: 0; }
+.ticket { font-size: clamp(1.4rem, 6vw, 2rem); font-weight: 800; padding: 20px 12px; background: #eff6ff; color: var(--blue); border-radius: 12px; overflow-wrap: anywhere; }
+.optional { padding-top: 24px; border-top: 1px solid var(--border); display: grid; gap: 14px; }
+.optional .actions, .success .actions { justify-content: center; }
+@media (max-width: 520px) { .row { grid-template-columns: 1fr; } .steps li { flex-direction: column; text-align: center; font-size: .75rem; } .steps { gap: 6px; } .actions > * { flex: 1; } .card { border-radius: 14px; } }

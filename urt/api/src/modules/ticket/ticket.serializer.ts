@@ -25,7 +25,7 @@ export interface SerializedTimelineEvent {
   id?: string;
   status: TicketStatus;
   action: string;
-  actorId: string;
+  actorId?: string;
   actorRole: TimelineActorRole;
   actorName: string;
   note?: string;
@@ -202,7 +202,7 @@ export const serializeTicket = (
       id: event._id?.toString(),
       status: event.status,
       action: event.action,
-      actorId: event.actorId.toString(),
+      actorId: event.actorId?.toString(),
       actorRole: event.actorRole,
       actorName: event.actorName,
       note: event.note,

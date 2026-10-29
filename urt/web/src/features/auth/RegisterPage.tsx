@@ -5,6 +5,7 @@ import { InlineNotice } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import logo from '../../assets/logo-urt.svg';
 import styles from './RegisterPage.module.css';
+import { authDestination, type AuthReturnLocation } from './auth-routing';
 
 type IconName = 'user' | 'phone' | 'email' | 'lock' | 'eye' | 'team' | 'chart' | 'shield';
 
@@ -104,11 +105,11 @@ function RegisterField({
   );
 }
 
-export default function RegisterPage() {
+export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const isOwner = location.pathname.includes('owner');
+  const isOwner = portal === 'owner';
   const [registerUser, { isLoading }] = useRegisterMutation();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -138,6 +139,7 @@ export default function RegisterPage() {
           : '+' + formattedPhone;
       }
       await registerUser({
+        portal,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim().toLowerCase(),
@@ -145,22 +147,10 @@ export default function RegisterPage() {
         phone: formattedPhone || undefined,
       }).unwrap();
 
-      const fromLoc = (location.state as { from?: { pathname?: string; search?: string } })?.from;
-      const targetFrom = fromLoc ? `${fromLoc.pathname || ''}${fromLoc.search || ''}` : null;
-      const inviteToken = searchParams.get('token');
-      const inviteRole = searchParams.get('role');
-      let fallbackInvite: string | null = null;
-      if (inviteToken) {
-        fallbackInvite =
-          inviteRole === 'technician'
-            ? `/invitations/technician?token=${encodeURIComponent(inviteToken)}`
-            : `/invitations/customer?token=${encodeURIComponent(inviteToken)}`;
-      }
-      const returnUrl = searchParams.get('returnUrl') || searchParams.get('redirect');
-
-      const destination = isOwner
-        ? '/owner/onboarding'
-        : targetFrom || fallbackInvite || returnUrl || '/portal';
+      const fromLoc = (location.state as { from?: AuthReturnLocation })?.from;
+      const token = searchParams.get('role') !== 'technician' ? searchParams.get('token') : null;
+      const invitation = token ? { pathname: '/invitations/customer', search: `?token=${encodeURIComponent(token)}` } : undefined;
+      const destination = authDestination(portal, fromLoc || invitation, isOwner ? '/owner/onboarding' : '/customer');
 
       navigate(destination, { replace: true });
     } catch (err: unknown) {
@@ -276,7 +266,7 @@ export default function RegisterPage() {
       <div className={styles['mobile-login-link']}>
         Sudah punya akun?{' '}
         <Link
-          to="/login"
+          to={`/${portal}/login`}
           state={isOwner ? { from: { pathname: '/owner' }, role: 'owner' } : location.state}
         >
           Masuk
@@ -310,11 +300,8 @@ export default function RegisterPage() {
           {errorMessage && <InlineNotice>{errorMessage}</InlineNotice>}
           {form}
           <p className={styles.customerLinks}>
-            Sudah punya akun? <Link to="/login">Masuk di sini</Link>
+            Sudah punya akun? <Link to={`/${portal}/login`} state={location.state}>Masuk di sini</Link>
           </p>
-          <Link className={styles.customerBack} to="/">
-            ← Kembali ke Beranda
-          </Link>
         </main>
       </div>
     );
@@ -407,7 +394,7 @@ export default function RegisterPage() {
               </div>
             </nav>
             <div className={styles['login-link-wrap']}>
-              Sudah punya akun? <Link to="/login" state={isOwner ? { from: { pathname: '/owner' }, role: 'owner' } : location.state}>Masuk</Link>
+              Sudah punya akun? <Link to={`/${portal}/login`} state={isOwner ? { from: { pathname: '/owner' }, role: 'owner' } : location.state}>Masuk</Link>
             </div>
           </header>
           <div className={styles['register-content']}>

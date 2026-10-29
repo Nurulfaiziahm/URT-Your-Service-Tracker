@@ -4,6 +4,7 @@ import { config } from './core/config/index.js';
 import { connectDatabase, disconnectDatabase } from './core/config/database.js';
 import { connectRedis, disconnectRedis } from './lib/redis/index.js';
 import { logger } from './utils/index.js';
+import { passwordRecovery } from './modules/auth/password-recovery.service.js';
 
 const PORT = Number(config.port);
 let server: http.Server;
@@ -15,6 +16,7 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
 
   try {
     server?.close();
+    await passwordRecovery.waitForDeliveries();
     await disconnectRedis();
     await disconnectDatabase();
     clearTimeout(forceExit);

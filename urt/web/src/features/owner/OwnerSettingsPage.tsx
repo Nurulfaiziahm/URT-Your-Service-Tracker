@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
+import { customerPortalPath } from '../customer/customer-portal';
 import { useGetBusinessByIdQuery, useUpdateBusinessMutation } from '../business/businessApi';
 import type { Business } from '../business/types';
 import { TextInput } from '../../components/ui/TextInput';
@@ -29,7 +30,7 @@ function SettingsForm({ business }: SettingsFormProps) {
   } | null>(null);
 
   const [copied, setCopied] = useState(false);
-  const publicUrl = `${window.location.origin}/b/${business.slug}`;
+  const publicUrl = `${window.location.origin}${customerPortalPath(business.slug)}/services/new`;
 
   async function handleCopy() {
     try {
@@ -75,7 +76,7 @@ function SettingsForm({ business }: SettingsFormProps) {
     <>
       <div className={styles.publicLinkCard}>
         <div className={styles.publicLinkInfo}>
-          <strong>Tautan Publik Tempat Servis</strong>
+          <strong>Tautan Portal Pelanggan</strong>
           <span>{publicUrl}</span>
         </div>
         <Button variant="secondary" onClick={handleCopy}>

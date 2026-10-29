@@ -1,4 +1,5 @@
 import { baseApi } from '../../redux/baseApi';
+import type { AuthPortal } from './auth-routing';
 import type { ApiResponse } from '../../lib/api.types';
 import { setCsrfToken, setDeviceId } from '../../lib/session';
 import { credentialsReceived, profileUpdated, sessionEnded } from './authSlice';
@@ -20,9 +21,13 @@ import type {
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getAuthPortals: builder.query<ApiResponse<{ portals: AuthPortal[] }>, string>({
+      query: () => '/auth/portals',
+      providesTags: ['Membership:ME'],
+    }),
     login: builder.mutation<ApiResponse<AuthSuccessData>, LoginRequest>({
-      query: (body) => ({
-        url: '/auth/login',
+      query: ({ portal, ...body }) => ({
+        url: `/auth/${portal}/login`,
         method: 'POST',
         body,
       }),
@@ -46,8 +51,8 @@ export const authApi = baseApi.injectEndpoints({
     }),
 
     register: builder.mutation<ApiResponse<AuthSuccessData>, RegisterRequest>({
-      query: (body) => ({
-        url: '/auth/register',
+      query: ({ portal, ...body }) => ({
+        url: `/auth/${portal}/register`,
         method: 'POST',
         body,
       }),
@@ -71,8 +76,8 @@ export const authApi = baseApi.injectEndpoints({
     }),
 
     googleLogin: builder.mutation<ApiResponse<AuthSuccessData>, GoogleLoginRequest>({
-      query: (body) => ({
-        url: '/auth/google',
+      query: ({ portal = 'customer', ...body }) => ({
+        url: `/auth/${portal}/google`,
         method: 'POST',
         body,
       }),
@@ -187,24 +192,24 @@ export const authApi = baseApi.injectEndpoints({
     }),
 
     forgotPassword: builder.mutation<ApiResponse<null>, ForgotPasswordRequest>({
-      query: (body) => ({
-        url: '/auth/forgot-password',
+      query: ({ portal, ...body }) => ({
+        url: `/auth/${portal}/forgot-password`,
         method: 'POST',
         body,
       }),
     }),
 
     verifyResetOtp: builder.mutation<ApiResponse<{ resetToken: string }>, VerifyResetOtpRequest>({
-      query: (body) => ({
-        url: '/auth/verify-reset-otp',
+      query: ({ portal, ...body }) => ({
+        url: `/auth/${portal}/verify-reset-otp`,
         method: 'POST',
         body,
       }),
     }),
 
     resetPassword: builder.mutation<ApiResponse<null>, ResetPasswordRequest>({
-      query: (body) => ({
-        url: '/auth/reset-password',
+      query: ({ portal, ...body }) => ({
+        url: `/auth/${portal}/reset-password`,
         method: 'POST',
         body,
       }),
@@ -243,6 +248,7 @@ export const authApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetAuthPortalsQuery,
   useLoginMutation,
   useRegisterMutation,
   useGoogleLoginMutation,

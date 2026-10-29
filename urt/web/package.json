@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test:customer-portal": "node scripts/check-customer-portal.mjs",
+    "test:service-flow": "node scripts/check-service-flow.mjs",
+    "test:auth-routing": "node --test scripts/auth-routing.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

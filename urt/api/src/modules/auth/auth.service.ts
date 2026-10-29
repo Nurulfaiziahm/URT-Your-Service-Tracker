@@ -18,6 +18,9 @@ import { AuthSessionRecord } from '../../lib/redis/auth-session.store.js';
 import { DeviceInfo } from '../../lib/device/device.service.js';
 import { TokenService } from './token.service.js';
 import { formatUserResponse } from '../../types/common.js';
+import { requireAuthPortal, type AuthPortal } from './portal-access.js';
+import { Technician } from '../../models/Technician.model.js';
+import { passwordRecovery } from './password-recovery.service.js';
 import { verifyGoogleIdToken } from './google.service.js';
 
 /**
@@ -28,10 +31,6 @@ export class AuthService {
   private static readonly MAX_LOGIN_ATTEMPTS = 5;
   private static generateOtp(): string {
     return crypto.randomInt(100000, 1000000).toString();
-  }
-
-  private static generateResetToken(): string {
-    return crypto.randomBytes(32).toString('hex');
   }
 
   private static async sendRegistrationEmails(user: IUser, otp?: string): Promise<void> {
@@ -142,6 +141,7 @@ export class AuthService {
       address?: string;
     },
     req: Request,
+    portal: 'owner' | 'customer' = 'customer',
   ): Promise<AuthResponse> {
     const deviceInfo = deviceService.extractDeviceInfo(req);
     const { firstName, lastName, email, password, phone } = data;
@@ -158,6 +158,7 @@ export class AuthService {
       lastName,
       email: email.toLowerCase(),
       password,
+      registrationPortal: portal,
       ...(phone && { phone }),
     });
 
@@ -179,7 +180,7 @@ export class AuthService {
     return result;
   }
 
-  static async googleLogin(idToken: string, req: Request): Promise<GoogleAuthResponse> {
+  static async googleLogin(idToken: string, req: Request, portal: AuthPortal = 'customer'): Promise<GoogleAuthResponse> {
     if (!config.google.clientId) {
       throw new AppError('Google authentication is disabled', 503, 'GOOGLE_AUTH_DISABLED');
     }
@@ -201,9 +202,13 @@ export class AuthService {
         if (emailUser.googleId !== profile.googleId) throw linkRequired();
         user = emailUser;
       } else {
+        if (portal === 'technician') {
+          throw new AppError('Aktifkan akun melalui undangan pemilik terlebih dahulu.', 403, 'INVITATION_REQUIRED');
+        }
         try {
           user = await User.create({
             ...profile,
+            registrationPortal: portal,
             role: 'user',
             status: 'active',
             isEmailVerified: true,
@@ -223,6 +228,11 @@ export class AuthService {
     }
 
     this.checkAccountStatus(user);
+    await requireAuthPortal(user, portal);
+    if (!user.registrationPortal) {
+      user.registrationPortal = portal;
+      await user.save();
+    }
     const result = await this.startSession(user, deviceInfo);
 
     if (isNewUser) {
@@ -237,8 +247,9 @@ export class AuthService {
    * Login user
    */
   static async login(
-    data: { email: string; password: string },
+    data: { email: string; password: string; invitationToken?: string },
     req: Request,
+    portal?: AuthPortal,
   ): Promise<AuthResponse> {
     const deviceInfo = deviceService.extractDeviceInfo(req);
     const { email, password } = data;
@@ -288,6 +299,21 @@ export class AuthService {
 
     // Reset login attempts after successful login
     await accountSecurityStore.resetLoginAttempts(user._id.toString());
+
+    if (!portal) throw new AppError('Choose an authentication portal', 400, 'PORTAL_REQUIRED');
+    let invited = false;
+    if (portal === 'technician' && data.invitationToken) {
+      invited = Boolean(await Technician.exists({
+        email: user.email,
+        invitationTokenHash: crypto.createHash('sha256').update(data.invitationToken.trim()).digest('hex'),
+        status: 'pending', invitationExpiresAt: { $gt: new Date() },
+      }));
+    }
+    if (!invited) await requireAuthPortal(user, portal);
+    if (!user.registrationPortal) {
+      user.registrationPortal = portal;
+      await user.save();
+    }
 
     return this.startSession(user, deviceInfo);
   }
@@ -518,113 +544,16 @@ export class AuthService {
   /**
    * Request password reset - sends OTP via email
    */
-  static async forgotPassword(email: string): Promise<void> {
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
-    if (!user || !user.password) {
-      return; // Don't reveal user existence
-    }
-
-    // Check if OTP was recently sent (rate limiting)
-    const ttl = await otpStore.getResetOtpTTL(user.email);
-    if (ttl > 240) {
-      // If TTL > 4 minutes (sent less than 1 minute ago)
-      const waitTime = Math.ceil((ttl - 240) / 60);
-      throw new AppError(`Please wait ${waitTime} minute(s) before requesting another code`, 429);
-    }
-
-    // Generate and store OTP
-    const otp = this.generateOtp();
-    await otpStore.setResetOtp(user.email, otp);
-    logger.info(`[OTP] Password reset OTP for ${user.email}: ${otp}`);
-
-    // Send reset email
-    mailService
-      .sendTemplate({
-        to: user.email,
-        subject: 'Reset Your Password',
-        template: 'reset-password',
-        data: {
-          title: 'Reset Your Password',
-          preheader: 'Password reset code',
-          name: `${user.firstName} ${user.lastName}`,
-          otp,
-          expiresIn: '5 minutes',
-        },
-      })
-      .catch((error) => {
-        logger.error('Failed to send password reset email:', error);
-        // Don't throw error - OTP is still valid
-      });
-
-    logger.info(`Password reset OTP sent to: ${user.email}`);
-
-    return;
+  static async forgotPassword(email: string, portal: AuthPortal = 'customer'): Promise<void> {
+    await passwordRecovery.request(email, portal);
   }
 
-  /**
-   * Verify reset OTP and return reset token
-   */
-  static async verifyResetOtp(email: string, otp: string): Promise<string> {
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
-    if (!user) {
-      throw new AppError('User not found', 404);
-    }
-    if (!user.password) {
-      throw new AppError('Invalid or expired reset code', 400);
-    }
-
-    // Verify OTP from Redis
-    const storedOtp = await otpStore.getResetOtp(user.email);
-    if (!storedOtp) {
-      throw new AppError('OTP has expired or does not exist', 400);
-    }
-
-    if (storedOtp !== otp) {
-      throw new AppError('Invalid OTP', 400);
-    }
-
-    // Generate reset token
-    const resetToken = this.generateResetToken();
-    await accountSecurityStore.storeResetToken(user.email, resetToken);
-
-    // Delete OTP from Redis
-    await otpStore.deleteResetOtp(user.email);
-
-    logger.info(`Reset OTP verified for: ${user.email}`);
-
-    return resetToken;
+  static async verifyResetOtp(email: string, otp: string, portal: AuthPortal = 'customer'): Promise<string> {
+    return passwordRecovery.verifyCode(email, otp, portal);
   }
 
-  /**
-   * Reset password with reset token (logs out all devices)
-   */
-  static async resetPassword(resetToken: string, newPassword: string): Promise<void> {
-    // Verify reset token and get email
-    const email = await accountSecurityStore.getEmailByResetToken(resetToken);
-    if (!email) {
-      throw new AppError('Invalid or expired reset token', 400);
-    }
-
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
-    if (!user) {
-      throw new AppError('User not found', 404);
-    }
-
-    if (!user.password) {
-      throw new AppError('Invalid or expired reset token', 400);
-    }
-
-    // Update password
-    user.password = newPassword;
-    await user.save();
-
-    // Delete reset token from Redis
-    await accountSecurityStore.deleteResetToken(resetToken);
-
-    // Logout from all devices
-    await authSessionStore.revokeAll(user._id.toString());
-
-    logger.info(`Password reset completed for: ${user.email}`);
+  static async resetPassword(resetToken: string, newPassword: string, portal: AuthPortal = 'customer'): Promise<void> {
+    await passwordRecovery.reset(resetToken, newPassword, portal);
   }
 
   /**

@@ -2,11 +2,14 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../../middleware/async-handler.js';
 import { ResponseHandler } from '../../utils/response.js';
 import { getAuthUser } from '../../middleware/auth.guard.js';
+import { AuthService } from '../auth/auth.service.js';
+import { requireAuthPortal } from '../auth/portal-access.js';
 import { BusinessService } from './business.service.js';
 import { CreateBusinessInput, UpdateBusinessInput } from './business.schema.js';
 
 export const createBusiness = asyncHandler(async (req: Request, res: Response) => {
   const user = getAuthUser(req);
+  await requireAuthPortal(await AuthService.getProfile(user.id), 'owner');
   const input = req.body as CreateBusinessInput;
   const business = await BusinessService.createBusiness(user.id, input);
 

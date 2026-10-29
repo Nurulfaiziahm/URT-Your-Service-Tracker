@@ -5,6 +5,7 @@ import { selectUser } from '../features/auth/authSlice';
 import { useLogoutMutation } from '../features/auth/authApi';
 import { useGetMyBusinessesQuery } from '../features/business/businessApi';
 import { selectSelectedBusinessId } from '../features/business/businessSlice';
+import { useCustomerPortal } from '../features/customer/customer-portal';
 import { EmailVerificationBanner } from '../features/auth/EmailVerificationBanner';
 import { Icon, type IconName } from '../components/ui/Icon';
 import logo from '../assets/logo-urt.svg';
@@ -34,17 +35,20 @@ export function PortalLayout({ role }: { role: PortalRole }) {
   const portal = portals[role];
   const user = useAppSelector(selectUser);
   const businessId = useAppSelector(selectSelectedBusinessId);
-  const { data } = useGetMyBusinessesQuery();
-  const business = data?.data?.businesses.find((item) => item.businessId === businessId);
+  const customerPortal = useCustomerPortal();
+  const { data } = useGetMyBusinessesQuery(undefined, { skip: !user });
+  const business = (role === 'customer' && customerPortal.business)
+    || data?.data?.businesses.find((item) => item.businessId === businessId);
   const [logout, { isLoading }] = useLogoutMutation();
-  const initials = `${user?.firstName[0] || ''}${user?.lastName[0] || ''}`;
-  const profile = `/${role}/profile`;
+  const initials = user ? `${user.firstName[0] || ''}${user.lastName[0] || ''}` : 'P';
+  const portalPath = role === 'customer' ? customerPortal.basePath : `/${role}`;
+  const profile = `${portalPath}/profile`;
   const navigation = (
     <nav className={styles.nav} aria-label={`Navigasi ${portal.name}`}>
       {portal.items.map(([label, to]) => (
         <NavLink
           key={to}
-          to={to}
+          to={role === 'customer' ? to.replace('/customer', portalPath) : to}
           end={to === `/${role}`}
           title={collapsed ? label : undefined}
           onClick={() => dialog.current?.close()}
@@ -53,7 +57,7 @@ export function PortalLayout({ role }: { role: PortalRole }) {
           <span>{label}</span>
         </NavLink>
       ))}
-      <button
+      {user ? <button
         className={styles.logout}
         onClick={() => {
           dialog.current?.close();
@@ -63,7 +67,9 @@ export function PortalLayout({ role }: { role: PortalRole }) {
       >
         <Icon name="logout" />
         <span>Keluar</span>
-      </button>
+      </button> : <NavLink to={`/${role}/login`} state={{ from: { pathname: portalPath } }}>
+        <Icon name="user" /><span>Masuk / Daftar</span>
+      </NavLink>}
     </nav>
   );
   const brand = (
@@ -82,7 +88,7 @@ export function PortalLayout({ role }: { role: PortalRole }) {
       <span className={styles.avatar}>{initials}</span>
       <span>
         <strong>
-          {user?.firstName} {user?.lastName}
+          {user ? `${user.firstName} ${user.lastName}` : 'Pelanggan'}
         </strong>
         <small>
           {portal.label} {business && `• ${business.name}`}
@@ -141,7 +147,7 @@ export function PortalLayout({ role }: { role: PortalRole }) {
             <span>{role === 'owner' ? (business ? 'Sistem Online' : 'Menghubungkan…') : business?.name || portal.name}</span>
           </div>
           <div className={styles.topbarActions}>
-            <Link to="/portal" className={styles.switchPortal}>
+            <Link to="/portal?auth=login" className={styles.switchPortal}>
               Pilih portal
             </Link>
             <div className={styles.notification}>

@@ -34,11 +34,14 @@ export interface DeviceSession {
 }
 
 export interface LoginRequest {
+  portal: 'owner' | 'customer' | 'technician';
   email: string;
   password: string;
+  invitationToken?: string;
 }
 
 export interface RegisterRequest {
+  portal: 'owner' | 'customer';
   firstName: string;
   lastName: string;
   email: string;
@@ -48,6 +51,7 @@ export interface RegisterRequest {
 }
 
 export interface GoogleLoginRequest {
+  portal?: 'owner' | 'customer' | 'technician';
   idToken: string;
 }
 
@@ -66,15 +70,18 @@ export interface ChangePasswordRequest {
 }
 
 export interface ForgotPasswordRequest {
+  portal: 'owner' | 'customer' | 'technician';
   email: string;
 }
 
 export interface VerifyResetOtpRequest {
+  portal: 'owner' | 'customer' | 'technician';
   email: string;
   otp: string;
 }
 
 export interface ResetPasswordRequest {
+  portal: 'owner' | 'customer' | 'technician';
   resetToken: string;
   password: string;
   confirmPassword: string;

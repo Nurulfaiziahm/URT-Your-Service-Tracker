@@ -1,5 +1,13 @@
 import rateLimit from 'express-rate-limit';
 
+export const serviceRequestLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, code: 'RATE_LIMITED', error: 'Terlalu banyak pengajuan. Coba lagi nanti.' },
+});
+
 /**
  * General API Rate Limiter
  */

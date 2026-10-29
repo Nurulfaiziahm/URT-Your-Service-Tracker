@@ -9,12 +9,14 @@ export function TicketTable({
   tickets,
   role,
   history = false,
+  customerBasePath = '/customer',
 }: {
   tickets: ServiceTicket[];
   role: PortalRole;
   history?: boolean;
+  customerBasePath?: string;
 }) {
-  const path = role === 'customer' ? '/customer/services' : `/${role}/tickets`;
+  const path = role === 'customer' ? `${customerBasePath}/services` : `/${role}/tickets`;
   return (
     <div className={styles.tableWrapper}>
       <table className={styles.table}>

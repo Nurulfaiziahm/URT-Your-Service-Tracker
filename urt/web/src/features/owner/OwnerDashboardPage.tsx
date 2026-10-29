@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { useState } from 'react';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
+import { customerPortalPath } from '../customer/customer-portal';
 import { useGetOwnerDashboardQuery } from '../dashboard/dashboardApi';
 import { SummaryCard } from '../../components/ui/SummaryCard';
 import { Icon } from '../../components/ui/Icon';
@@ -100,7 +101,7 @@ export default function OwnerDashboardPage() {
         <div className={styles.portals}>
           {[
             { title: 'Portal Teknisi', path: '/technician', description: 'Bagikan tautan agar teknisi dapat menerima dan mengelola tiket servis.' },
-            { title: 'Portal Pelanggan', path: `/b/${business.slug}`, description: 'Bagikan tautan agar pelanggan dapat membuat dan memantau tiket servis.' },
+            { title: 'Portal Pelanggan', path: `${customerPortalPath(business.slug)}/services/new`, description: 'Bagikan tautan atau jadikan QR. Pelanggan mengisi formulir, mendapat nomor tiket, lalu melacak servis tanpa membuat akun.' },
           ].map((portal) => (
             <article key={portal.title} className={styles.portalCard}>
               <span className={styles.portalIcon}><Icon name="external" width="22" height="22" /></span>

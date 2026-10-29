@@ -15,6 +15,7 @@ export interface IUser extends Document {
   phone?: string;
   address?: string;
   role: 'user' | 'admin';
+  registrationPortal?: 'owner' | 'customer' | 'technician';
   status: 'active' | 'inactive' | 'suspended';
   isEmailVerified: boolean;
   authVersion: number;
@@ -90,6 +91,7 @@ const userSchema = new Schema<IUser>(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    registrationPortal: { type: String, enum: ['owner', 'customer', 'technician'] },
     status: {
       type: String,
       enum: ['active', 'inactive', 'suspended'],

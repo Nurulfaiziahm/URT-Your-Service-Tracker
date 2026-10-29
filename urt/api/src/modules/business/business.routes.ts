@@ -25,6 +25,9 @@ import invoiceRoutes from '../invoice/invoice.routes.js';
 import { subscriptionRouter } from '../subscription/subscription.routes.js';
 import { requireActiveSubscription } from '../subscription/subscription.access.js';
 import { asyncHandler } from '../../middleware/async-handler.js';
+import { serviceRequestLimiter } from '../../core/security/rate-limiter.js';
+import { serviceRequestSchema } from '../ticket/ticket.schema.js';
+import { submitServiceRequest } from '../ticket/service-request.controller.js';
 
 // Business router: /businesses
 export const businessRouter = express.Router();
@@ -100,5 +103,11 @@ publicBusinessRouter.use((_req, res, next) => {
 });
 
 publicBusinessRouter.get('/:slug', getPublicBusiness);
+publicBusinessRouter.post('/:slug/service-requests',
+  serviceRequestLimiter,
+  (req, res, next) => req.headers.authorization ? protect(req, res, next) : next(),
+  validate(serviceRequestSchema),
+  submitServiceRequest,
+);
 
 export default businessRouter;

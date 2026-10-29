@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import type { BusinessRole } from '../business/types';
 import logo from '../../assets/logo-urt.svg';
 import styles from './PortalSelectPage.module.css';
@@ -69,6 +69,10 @@ function RoleIcon({ role }: { role: BusinessRole }) {
 }
 
 export default function PortalSelectPage() {
+  const [params] = useSearchParams();
+  const location = useLocation();
+  const authMode = params.get('auth');
+  const choosingAuth = authMode === 'login' || authMode === 'register';
   return (
     <div className={styles.page}>
       <a className="skip-link" href="#main-content">
@@ -83,10 +87,9 @@ export default function PortalSelectPage() {
         <main id="main-content" tabIndex={-1} className={styles['portal-content']}>
           <div className={styles['portal-title-area']}>
             <div className={styles.eyebrow}>PORTAL AKSES TERINTEGRASI</div>
-            <h1>Jelajahi Demo URT</h1>
+            <h1>{choosingAuth ? 'Pilih Portal Anda' : 'Jelajahi Demo URT'}</h1>
             <p>
-              Lihat bagaimana URT bekerja dari sisi pemilik tempat servis, teknisi, dan pelanggan
-              melalui demo interaktif.
+              {choosingAuth ? 'Masuk melalui halaman khusus peran Anda. Akun teknisi diaktifkan melalui undangan pemilik tempat servis.' : 'Lihat bagaimana URT bekerja dari sisi pemilik tempat servis, teknisi, dan pelanggan melalui demo interaktif.'}
             </p>
           </div>
           <div className={styles['portal-cards-grid']}>
@@ -104,12 +107,15 @@ export default function PortalSelectPage() {
                 </div>
                 <h2 className={styles['portal-card__title']}>{portal.title}</h2>
                 <p className={styles['portal-card__desc']}>{portal.description}</p>
-                <div className={styles['portal-card__demo-user']}>
+                {!choosingAuth && <div className={styles['portal-card__demo-user']}>
                   <strong>Demo:</strong> {portal.demo}
                   <br />
                   <span className={styles.dim}>{portal.detail}</span>
-                </div>
-                <a
+                </div>}
+                {choosingAuth ? <Link className={styles['portal-card__btn']}
+                  state={location.state} to={`/${portal.role}/${authMode === 'register' && portal.role !== 'technician' ? 'register' : 'login'}`}>
+                  {authMode === 'register' && portal.role !== 'technician' ? 'Daftar' : 'Masuk'} {portal.title} →
+                </Link> : <a
                   href={portal.href}
                   className={`${styles['portal-card__btn']} ${
                     portal.role === 'customer'
@@ -120,7 +126,7 @@ export default function PortalSelectPage() {
                   }`}
                 >
                   Masuk {portal.title} →
-                </a>
+                </a>}
               </article>
             ))}
           </div>

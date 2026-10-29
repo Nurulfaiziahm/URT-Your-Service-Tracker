@@ -7,6 +7,8 @@ import {
   getTechnicianById,
   updateTechnician,
   acceptTechnicianInvitation,
+  inspectTechnicianInvitation,
+  activateTechnicianInvitation,
 } from './technician.controller.js';
 import { validate } from '../../middleware/validation.js';
 import { protect } from '../../middleware/auth.guard.js';
@@ -19,7 +21,9 @@ import {
   updateTechnicianSchema,
   technicianQuerySchema,
   acceptTechnicianInvitationSchema,
+  activateTechnicianInvitationSchema,
 } from './technician.schema.js';
+import { passwordResetLimiter } from '../../core/security/rate-limiter.js';
 
 // Business-scoped technician router: /businesses/:businessId/technicians
 export const technicianRouter = express.Router({ mergeParams: true });
@@ -80,6 +84,12 @@ technicianInvitationRouter.use((_req, res, next) => {
   next();
 });
 
+technicianInvitationRouter.post(
+  '/inspect', passwordResetLimiter, validate(acceptTechnicianInvitationSchema), inspectTechnicianInvitation,
+);
+technicianInvitationRouter.post(
+  '/activate', passwordResetLimiter, validate(activateTechnicianInvitationSchema), activateTechnicianInvitation,
+);
 technicianInvitationRouter.post(
   '/accept',
   protect,

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, useLocation } from 'react-router';
+import { authPortalFromPath } from '../features/auth/auth-routing';
 import { useAppSelector } from '../redux/hooks';
 import { selectUser, selectIsAuthenticated } from '../features/auth/authSlice';
 import { useLogoutMutation } from '../features/auth/authApi';
@@ -8,6 +9,8 @@ import { Button, ButtonLink } from '../components/ui/Button';
 import styles from './PublicLayout.module.css';
 
 export function PublicLayout() {
+  const location = useLocation();
+  const loginPortal = authPortalFromPath(location.pathname) || 'owner';
   const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -54,7 +57,7 @@ export function PublicLayout() {
             <div className="actions">
               {isAuthenticated && user ? (
                 <>
-                  <ButtonLink to="/portal" variant="secondary">
+                  <ButtonLink to="/portal?auth=login" variant="secondary">
                     Portal
                   </ButtonLink>
                   <ButtonLink to="/account/profile" variant="ghost">
@@ -70,12 +73,12 @@ export function PublicLayout() {
                 </>
               ) : (
                 <>
-                  <ButtonLink to="/login" variant="secondary">
+                  <ButtonLink to={`/${loginPortal}/login`} state={{ from: location }} variant="secondary">
                     Masuk portal
                   </ButtonLink>
-                  <ButtonLink to="/owner/register">
-                    Daftar tempat servis
-                  </ButtonLink>
+                  {loginPortal !== 'technician' && <ButtonLink to={`/${loginPortal}/register`} state={{ from: location }}>
+                    {loginPortal === 'owner' ? 'Daftar tempat servis' : 'Buat Akun Pelanggan'}
+                  </ButtonLink>}
                 </>
               )}
             </div>

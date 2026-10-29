@@ -23,10 +23,11 @@ export function BusinessGate() {
   useEffect(() => {
     if (businesses.length > 0) {
       const exists = businesses.find((b) => b.businessId === selectedBusinessId);
-      if (!exists) {
+      if (!exists || !exists.roles.includes(requestedRole)) {
         // Auto-select the first business matching the requested role or first available
         const matching =
-          businesses.find((b) => b.roles.includes(requestedRole)) || businesses[0];
+          businesses.find((b) => b.roles.includes(requestedRole));
+        if (!matching) return;
         dispatch(
           selectBusiness({
             businessId: matching.businessId,

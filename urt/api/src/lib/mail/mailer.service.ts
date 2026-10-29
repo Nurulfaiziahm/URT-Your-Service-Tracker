@@ -1,4 +1,4 @@
-import { transporter } from './config.js';
+import { transporter, verifyConnection } from './config.js';
 import { renderer } from './renderer.service.js';
 import { config } from '../../core/config/index.js';
 import { logger } from '../../utils/index.js';
@@ -9,6 +9,20 @@ import type { EmailOptions, SendTemplateOptions } from './types.js';
  * Handles sending emails with templates
  */
 class MailerService {
+  private verifiedAt = 0;
+  private verification: Promise<boolean> | undefined;
+
+  async available(): Promise<boolean> {
+    if (!config.smtp.enabled) return false;
+    if (Date.now() - this.verifiedAt < 60000) return true;
+    if (!this.verification) {
+      this.verification = verifyConnection().then((ready) => {
+        if (ready) this.verifiedAt = Date.now();
+        return ready;
+      }).finally(() => { this.verification = undefined; });
+    }
+    return this.verification;
+  }
   /**
    * Send an email with raw HTML
    */
@@ -29,7 +43,9 @@ class MailerService {
       logger.info(`Email sent successfully to: ${Array.isArray(to) ? to.join(', ') : to}`);
       return true;
     } catch (error) {
-      logger.error('Failed to send email:', error);
+      this.verifiedAt = 0;
+      const failure = error as { code?: string; responseCode?: number };
+      logger.error('Failed to send email', { code: failure.code, responseCode: failure.responseCode });
       return false;
     }
   }
@@ -45,7 +61,7 @@ class MailerService {
 
       return await this.send({ to, subject, html, attachments });
     } catch (error) {
-      logger.error('Failed to send template email:', error);
+      logger.error('Failed to render email template', { name: error instanceof Error ? error.name : 'Error' });
       return false;
     }
   }

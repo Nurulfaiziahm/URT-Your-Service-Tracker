@@ -46,16 +46,20 @@ function isCsrfError(error: FetchBaseQueryError): boolean {
 }
 
 function isAuthBypassUrl(url: string): boolean {
-     return (
-          url.includes("/auth/login") ||
-          url.includes("/auth/register") ||
-          url.includes("/auth/google") ||
-          url.includes("/auth/refresh-token") ||
-          url.includes("/auth/forgot-password") ||
-          url.includes("/auth/reset-password") ||
-          url.includes("/auth/verify-reset-otp") ||
-          url.includes("/auth/csrf-token")
-     );
+  return (
+    /^\/auth\/(?:owner|customer|technician)\/login$/.test(url) ||
+    /^\/auth\/(?:owner|customer|technician)\/(?:forgot-password|verify-reset-otp|reset-password)$/.test(url) ||
+    /^\/auth\/(?:owner|customer|technician)\/google$/.test(url) ||
+    /^\/auth\/(?:owner|customer)\/register$/.test(url) ||
+    url.includes('/auth/login') ||
+    url.includes('/auth/register') ||
+    url.includes('/auth/google') ||
+    url.includes('/auth/refresh-token') ||
+    url.includes('/auth/forgot-password') ||
+    url.includes('/auth/reset-password') ||
+    url.includes('/auth/verify-reset-otp') ||
+    url.includes('/auth/csrf-token')
+  );
 }
 
 export const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
