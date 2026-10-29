@@ -114,7 +114,7 @@ export default function LandingPage() {
                   }
                   aria-current={!activeSection || activeSection === 'dashboard' ? 'page' : undefined}
                 >
-                  Dashboard
+                  Beranda
                 </Link>
               </li>
               <li>
@@ -1293,7 +1293,7 @@ export default function LandingPage() {
                   <li>Penyimpanan Riwayat Servis Digital</li>
                 </ul>
                 <div className="pricing-card__action">
-                  <Link to="/register" className="btn btn--secondary btn--block">
+                  <Link to="/owner/register" className="btn btn--secondary btn--block">
                     {billing === 'annual' ? 'Pilih Paket Tahunan' : 'Pilih Paket Bulanan'}
                   </Link>
                 </div>
@@ -1337,7 +1337,7 @@ export default function LandingPage() {
                   <li>Struk Servis Digital dengan Branding Tempat Servis</li>
                 </ul>
                 <div className="pricing-card__action">
-                  <Link to="/register" className="btn btn--primary btn--block">
+                  <Link to="/owner/register" className="btn btn--primary btn--block">
                     Daftar Paket Tahunan
                   </Link>
                 </div>
