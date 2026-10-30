@@ -20,6 +20,7 @@ import { TokenService } from './token.service.js';
 import { formatUserResponse } from '../../types/common.js';
 import { requireAuthPortal, type AuthPortal } from './portal-access.js';
 import { Technician } from '../../models/Technician.model.js';
+import { Business } from '../../models/Business.model.js';
 import { passwordRecovery } from './password-recovery.service.js';
 import { verifyGoogleIdToken } from './google.service.js';
 
@@ -477,6 +478,40 @@ export class AuthService {
 
     await user.save();
     return user;
+  }
+
+  static async deleteAccount(
+    userId: string,
+    confirmEmail: string,
+    currentPassword?: string,
+  ): Promise<void> {
+    const user = await User.findById(userId).select('+password');
+    if (!user) throw new AppError('User not found', 404);
+    if (user.role === 'admin') {
+      throw new AppError('Administrator accounts cannot be deleted here.', 403);
+    }
+    if (confirmEmail.trim().toLowerCase() !== user.email) {
+      throw new AppError('Email confirmation does not match this account.', 400);
+    }
+    if (user.password) {
+      if (!currentPassword || !(await user.comparePassword(currentPassword))) {
+        throw new AppError('Current password is incorrect.', 401);
+      }
+    }
+
+    const now = new Date();
+    const anonymizedEmail = `deleted+${user.id}@deleted.invalid`;
+    await Business.updateOne({ ownerId: user._id }, { $set: { isActive: false } });
+    user.firstName = 'Akun';
+    user.lastName = 'Dihapus';
+    user.email = anonymizedEmail;
+    user.phone = undefined;
+    user.address = undefined;
+    user.status = 'inactive';
+    user.authVersion = (user.authVersion ?? 0) + 1;
+    user.updatedAt = now;
+    await user.save();
+    await authSessionStore.revokeAll(userId);
   }
 
   /**

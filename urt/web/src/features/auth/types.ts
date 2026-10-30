@@ -63,6 +63,11 @@ export interface UpdateProfileRequest {
   address?: string | null;
 }
 
+export interface DeleteAccountRequest {
+  confirmEmail: string;
+  currentPassword?: string;
+}
+
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;

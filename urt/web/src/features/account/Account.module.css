@@ -160,6 +160,24 @@
   gap: 24px;
   align-items: start;
 }
+
+.dangerZone {
+  border-color: #fecaca;
+}
+
+.dangerZone summary {
+  width: fit-content;
+  color: #b91c1c;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.deleteAccountForm {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 480px;
+  margin-top: var(--space-4);
+}
 .identity {
   display: grid;
   justify-items: center;

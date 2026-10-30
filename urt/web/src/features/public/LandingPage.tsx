@@ -519,9 +519,6 @@ export default function LandingPage() {
                     </ul>
                   </div>
                   <div className="persona-layout__action">
-                    <a href="/demo/owner/beranda-owner.html" className="btn btn--primary">
-                      Jelajahi Portal Owner
-                    </a>
                     <a href="#harga" className="btn btn--secondary">
                       Lihat Paket Langganan
                     </a>

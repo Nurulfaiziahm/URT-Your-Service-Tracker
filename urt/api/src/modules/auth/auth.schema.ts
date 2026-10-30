@@ -76,6 +76,15 @@ export const updateUserSchema = z.object({
   body: updateUserBodySchema.strict(),
 });
 
+const deleteAccountBodySchema = z.object({
+  confirmEmail: emailField,
+  currentPassword: z.string().min(1).max(128).optional(),
+}).strict();
+
+export const deleteAccountSchema = z.object({
+  body: deleteAccountBodySchema,
+});
+
 // ============ Password Schemas ============
 
 const changePasswordBodySchema = z
@@ -126,6 +135,7 @@ export type RegisterInput = z.infer<typeof registerBodySchema>;
 export type LoginInput = z.infer<typeof loginBodySchema>;
 export type GoogleAuthInput = z.infer<typeof googleAuthSchema>['body'];
 export type UpdateUserInput = z.infer<typeof updateUserBodySchema>;
+export type DeleteAccountInput = z.infer<typeof deleteAccountBodySchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordBodySchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordBodySchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordBodySchema>;

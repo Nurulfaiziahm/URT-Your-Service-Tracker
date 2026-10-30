@@ -16,6 +16,7 @@ import {
   ChangePasswordInput,
   ResetPasswordInput,
   UpdateUserInput,
+  DeleteAccountInput,
 } from './auth.schema.js';
 
 const destroyCsrfSession = async (req: Request, res: Response): Promise<void> => {
@@ -241,6 +242,21 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
   const user = await AuthService.updateProfile(userId, input);
 
   ResponseHandler.success(res, { user: formatUserResponse(user, true) }, 'Profile updated');
+});
+
+/**
+ * @route   DELETE /api/v1/auth/profile
+ * @desc    Deactivate and anonymize the current account
+ * @access  Private
+ */
+export const deleteAccount = asyncHandler(async (req: Request, res: Response) => {
+  const user = getAuthUser(req);
+  const { confirmEmail, currentPassword } = req.body as DeleteAccountInput;
+  await AuthService.deleteAccount(user.id, confirmEmail, currentPassword);
+  await destroyCsrfSession(req, res);
+  CookieHelper.clearRefreshToken(res);
+  CookieHelper.clearLegacyCookies(res);
+  ResponseHandler.success(res, null, 'Account deleted successfully');
 });
 
 /**

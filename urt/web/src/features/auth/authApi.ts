@@ -10,6 +10,7 @@ import type {
   RegisterRequest,
   GoogleLoginRequest,
   UpdateProfileRequest,
+  DeleteAccountRequest,
   ChangePasswordRequest,
   ForgotPasswordRequest,
   VerifyResetOtpRequest,
@@ -162,6 +163,22 @@ export const authApi = baseApi.injectEndpoints({
       },
     }),
 
+    deleteAccount: builder.mutation<ApiResponse<null>, DeleteAccountRequest>({
+      query: (body) => ({
+        url: '/auth/profile',
+        method: 'DELETE',
+        body,
+      }),
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(sessionEnded());
+        } catch {
+          // Keep the active session when account deletion is rejected.
+        }
+      },
+    }),
+
     changePassword: builder.mutation<
       ApiResponse<{ user: User; accessToken: string; deviceId: string; csrfToken: string }>,
       ChangePasswordRequest
@@ -256,6 +273,7 @@ export const {
   useLogoutAllMutation,
   useGetProfileQuery,
   useUpdateProfileMutation,
+  useDeleteAccountMutation,
   useChangePasswordMutation,
   useForgotPasswordMutation,
   useVerifyResetOtpMutation,

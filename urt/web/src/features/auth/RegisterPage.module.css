@@ -337,6 +337,18 @@
   box-sizing: border-box;
 }
 
+.page .onboarding-form-card {
+  padding: 24px;
+}
+
+.page .onboarding-form-card input {
+  padding: 11px 14px;
+}
+
+.page .onboarding-form-card button {
+  padding: 10px 18px;
+}
+
 .register-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -591,6 +603,10 @@
   .register-card {
     padding: 24px 20px 20px;
     box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  }
+
+  .page .onboarding-form-card {
+    padding: 20px;
   }
 
   .form-grid-2 {

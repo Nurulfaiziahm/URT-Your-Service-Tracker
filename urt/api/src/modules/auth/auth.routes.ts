@@ -19,6 +19,7 @@ import {
   revokeDevice,
   getCsrfToken,
   getAvailablePortals,
+  deleteAccount,
 } from './auth.controller.js';
 import {
   authLimiter,
@@ -38,6 +39,7 @@ import {
   forgotPasswordSchema,
   verifyResetOtpSchema,
   resetPasswordSchema,
+  deleteAccountSchema,
 } from './auth.schema.js';
 
 const router = express.Router();
@@ -130,6 +132,7 @@ router.get('/devices', protect, getDevices);
 
 // Update user profile
 router.put('/profile', protect, validate(updateUserSchema), updateProfile);
+router.delete('/profile', protect, validate(deleteAccountSchema), deleteAccount);
 
 // Change password
 router.put('/change-password', protect, validate(changePasswordSchema), changePassword);

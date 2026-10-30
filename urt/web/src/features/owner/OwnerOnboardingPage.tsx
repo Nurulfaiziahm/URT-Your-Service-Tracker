@@ -148,7 +148,6 @@ export default function OwnerOnboardingPage() {
               <span className={registrationStyles['stepper-line']} />
               <span className={registrationStyles['step-item']}>3 Akses Portal</span>
             </nav>
-            <Link to="/portal">Kembali ke Portal</Link>
           </header>
           <div className={registrationStyles['register-content']}>
             <div className={styles.container}>
@@ -162,7 +161,10 @@ export default function OwnerOnboardingPage() {
 
               {errorMessage && <InlineNotice>{errorMessage}</InlineNotice>}
 
-              <form className={styles.card} onSubmit={handleSubmit}>
+              <form
+                className={`${styles.card} ${registrationStyles['onboarding-form-card']}`}
+                onSubmit={handleSubmit}
+              >
                 <div className={styles.cardHeader}>
                   <h2>Identitas Bisnis</h2>
                   <p>

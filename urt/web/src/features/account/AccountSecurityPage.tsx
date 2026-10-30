@@ -1,6 +1,6 @@
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { useState, type FormEvent } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useAppSelector } from '../../redux/hooks';
 import { selectUser } from '../auth/authSlice';
 import {
@@ -8,6 +8,7 @@ import {
   useGetDevicesQuery,
   useRevokeDeviceMutation,
   useLogoutAllMutation,
+  useDeleteAccountMutation,
 } from '../auth/authApi';
 import { TextInput } from '../../components/ui/TextInput';
 import { Button } from '../../components/ui/Button';
@@ -17,6 +18,7 @@ import styles from './Account.module.css';
 
 export default function AccountSecurityPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const portal = location.pathname.split('/')[1];
   const profilePath = ['owner', 'technician', 'customer'].includes(portal)
     ? `/${portal}/profile`
@@ -38,10 +40,14 @@ export default function AccountSecurityPage() {
   const { data: devicesData, isLoading: isLoadingDevices } = useGetDevicesQuery();
   const [revokeDevice, { isLoading: isRevoking }] = useRevokeDeviceMutation();
   const [logoutAll, { isLoading: isLoggingOutAll }] = useLogoutAllMutation();
+  const [deleteAccount, { isLoading: isDeletingAccount }] = useDeleteAccountMutation();
 
   const devices = devicesData?.data?.devices || [];
   const [confirmAction, setConfirmAction] = useState<string | null>(null);
   const [sessionNotice, setSessionNotice] = useState('');
+  const [deleteEmail, setDeleteEmail] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteNotice, setDeleteNotice] = useState('');
 
   async function handleChangePassword(e: FormEvent) {
     e.preventDefault();
@@ -104,6 +110,23 @@ export default function AccountSecurityPage() {
     } catch {
       setConfirmAction(null);
       setSessionNotice('Gagal mengeluarkan sesi semua perangkat.');
+    }
+  }
+
+  async function handleDeleteAccount(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setDeleteNotice('');
+    try {
+      await deleteAccount({
+        confirmEmail: deleteEmail.trim().toLowerCase(),
+        ...(user?.canChangePassword ? { currentPassword: deletePassword } : {}),
+      }).unwrap();
+      navigate('/portal?auth=login', { replace: true });
+    } catch (err: unknown) {
+      const apiErr = err as { data?: ApiErrorBody; error?: string };
+      setDeleteNotice(
+        apiErr.data?.error || apiErr.error || 'Gagal menghapus akun. Silakan coba lagi.',
+      );
     }
   }
 
@@ -261,6 +284,47 @@ export default function AccountSecurityPage() {
           </div>
         )}
       </section>
+
+      {user && (
+        <section className={`${styles.card} ${styles.dangerZone}`}>
+          <div className={styles.cardHeader}>
+            <h2>Hapus Akun</h2>
+            <p>
+              Akun akan dinonaktifkan dan data profil akan dianonimkan. Usaha yang Anda miliki juga
+              akan dinonaktifkan; riwayat transaksi tetap disimpan.
+            </p>
+          </div>
+          <details>
+            <summary>Hapus akun saya</summary>
+            <form onSubmit={handleDeleteAccount} className={styles.deleteAccountForm}>
+              {deleteNotice && <InlineNotice>{deleteNotice}</InlineNotice>}
+              <TextInput
+                label={`Ketik email akun untuk konfirmasi (${user.email})`}
+                name="confirmEmail"
+                type="email"
+                autoComplete="email"
+                required
+                value={deleteEmail}
+                onChange={(event) => setDeleteEmail(event.target.value)}
+              />
+              {user.canChangePassword && (
+                <TextInput
+                  label="Kata sandi saat ini"
+                  name="currentPassword"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={deletePassword}
+                  onChange={(event) => setDeletePassword(event.target.value)}
+                />
+              )}
+              <Button type="submit" variant="danger" pending={isDeletingAccount}>
+                Hapus Akun Permanen
+              </Button>
+            </form>
+          </details>
+        </section>
+      )}
     </div>
   );
 }
