@@ -5,7 +5,11 @@ export const serviceRequestLimiter = rateLimit({
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { success: false, code: 'RATE_LIMITED', error: 'Terlalu banyak pengajuan. Coba lagi nanti.' },
+  message: {
+    success: false,
+    code: 'RATE_LIMITED',
+    error: 'Terlalu banyak pengajuan. Coba lagi nanti.',
+  },
 });
 
 /**
@@ -49,6 +53,19 @@ export const loginLimiter = rateLimit({
     success: false,
     code: 'RATE_LIMITED',
     error: 'Too many failed login attempts. Please try again in an hour.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+});
+
+export const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 100, // 100 registration attempts per hour
+  message: {
+    success: false,
+    code: 'RATE_LIMITED',
+    error: 'Too many registration attempts. Please try again later.',
   },
   standardHeaders: true,
   legacyHeaders: false,

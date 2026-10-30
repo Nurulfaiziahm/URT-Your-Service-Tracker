@@ -24,6 +24,7 @@ import {
   authLimiter,
   loginLimiter,
   passwordResetLimiter,
+  registerLimiter,
 } from '../../core/security/rate-limiter.js';
 import { validate } from '../../middleware/validation.js';
 import { protect } from '../../middleware/auth.guard.js';
@@ -47,20 +48,50 @@ router.use(authLimiter);
 // Bootstrap CSRF before browser writes.
 router.get('/csrf-token', createCsrfToken, getCsrfToken);
 
-router.post('/register', loginLimiter, validate(registerSchema), register);
-router.post('/:portal(owner|customer)/register', loginLimiter, validate(registerSchema), register);
-router.post('/:portal(owner|customer|technician)/login', loginLimiter, validate(loginSchema), login);
+router.post('/register', registerLimiter, validate(registerSchema), register);
+router.post(
+  '/:portal(owner|customer)/register',
+  registerLimiter,
+  validate(registerSchema),
+  register,
+);
+router.post(
+  '/:portal(owner|customer|technician)/login',
+  loginLimiter,
+  validate(loginSchema),
+  login,
+);
 router.post('/login', loginLimiter, validate(loginSchema), login);
 router.post('/google', loginLimiter, validate(googleAuthSchema), googleLogin);
-router.post('/:portal(owner|customer|technician)/google', loginLimiter, validate(googleAuthSchema), googleLogin);
+router.post(
+  '/:portal(owner|customer|technician)/google',
+  loginLimiter,
+  validate(googleAuthSchema),
+  googleLogin,
+);
 
 // Refresh access token (CSRF protected)
 router.post('/refresh-token', refreshToken);
 
 // Request password reset
-router.post('/:portal(owner|customer|technician)/forgot-password', passwordResetLimiter, validate(forgotPasswordSchema), forgotPassword);
-router.post('/:portal(owner|customer|technician)/verify-reset-otp', passwordResetLimiter, validate(verifyResetOtpSchema), verifyResetOtp);
-router.post('/:portal(owner|customer|technician)/reset-password', passwordResetLimiter, validate(resetPasswordSchema), resetPassword);
+router.post(
+  '/:portal(owner|customer|technician)/forgot-password',
+  passwordResetLimiter,
+  validate(forgotPasswordSchema),
+  forgotPassword,
+);
+router.post(
+  '/:portal(owner|customer|technician)/verify-reset-otp',
+  passwordResetLimiter,
+  validate(verifyResetOtpSchema),
+  verifyResetOtp,
+);
+router.post(
+  '/:portal(owner|customer|technician)/reset-password',
+  passwordResetLimiter,
+  validate(resetPasswordSchema),
+  resetPassword,
+);
 router.post(
   '/forgot-password',
   passwordResetLimiter,
@@ -69,7 +100,12 @@ router.post(
 );
 
 // Verify reset OTP and get reset token
-router.post('/verify-reset-otp', passwordResetLimiter, validate(verifyResetOtpSchema), verifyResetOtp);
+router.post(
+  '/verify-reset-otp',
+  passwordResetLimiter,
+  validate(verifyResetOtpSchema),
+  verifyResetOtp,
+);
 
 // Reset password with reset token
 router.post('/reset-password', passwordResetLimiter, validate(resetPasswordSchema), resetPassword);
