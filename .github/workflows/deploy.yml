@@ -1,52 +1,44 @@
 name: Deploy API to VPS
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'urt/api/**'
-      - '.github/workflows/deploy.yml'
+     push:
+          branches:
+               - main
+          paths:
+               - "urt/api/**"
+               - ".github/workflows/deploy.yml"
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+     deploy:
+          runs-on: ubuntu-latest
 
-    steps:
-      - name: Deploy to VPS and build
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script_stop: true
-          command_timeout: 30m
-          script: |
-            set -e
+          steps:
+               - name: Deploy to VPS and build
+                 uses: appleboy/ssh-action@v1.0.3
+                 with:
+                      host: ${{ secrets.VPS_HOST }}
+                      username: ${{ secrets.VPS_USER }}
+                      key: ${{ secrets.VPS_SSH_KEY }}
+                      script_stop: true
+                      command_timeout: 30m
+                      script: |
+                           set -e
 
-            REPO_DIR="/var/www/URT-Your-Service-Tracker"
-            APP_DIR="$REPO_DIR/urt/api"
+                           REPO_DIR="/var/www/URT-Your-Service-Tracker"
+                           APP_DIR="$REPO_DIR/urt/api"
 
-            # pull latest code
-            cd "$REPO_DIR"
-            git fetch
-            git reset --hard origin/main
+                           # pull latest code
+                           cd "$REPO_DIR"
+                           git fetch
+                           git reset --hard origin/main
 
-            # Build Docker image on VPS (.env is already in the directory)
-            cd "$APP_DIR"
-            docker build -t urt-api:latest .
+                           # Build Docker image on VPS (.env is already in the directory)
+                           cd "$APP_DIR"
 
-            # Stop and remove old container
-            docker stop urt-api || true
-            docker rm urt-api || true
+                           docker compose down
+                           docker compose up -d --build
 
-            # Run new container with runtime env; bound to localhost so only nginx can reach it
-            docker run -d \
-              --name urt-api \
-              --restart always \
-              --env-file "$APP_DIR/.env" \
-              -p 127.0.0.1:8167:5000 \
-              urt-api:latest
 
-            # Cleanup dangling images
-            docker image prune -f
+                           # Cleanup dangling images
+                           docker image prune -f
+                           docker builer prune -f
