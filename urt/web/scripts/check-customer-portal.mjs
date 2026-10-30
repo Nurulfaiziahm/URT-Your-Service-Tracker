@@ -8,7 +8,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { createServer } from 'vite';
 
 // Render the real routes against seeded API caches. No production data or network calls.
-const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', cacheDir: 'node_modules/.vite-portal-checks' });
+const vite = await createServer({ server: { middlewareMode: true, hmr: false }, appType: 'custom', cacheDir: 'node_modules/.vite-portal-checks' });
 const stores = [];
 try {
   const { AppRoutes } = await vite.ssrLoadModule('/src/app/router.tsx');

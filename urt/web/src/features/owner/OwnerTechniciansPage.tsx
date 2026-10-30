@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { Pagination } from '../../components/navigation/Pagination';
 import { SummaryCard } from '../../components/ui/SummaryCard';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 import { useState, type FormEvent } from 'react';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
@@ -12,6 +13,7 @@ import {
 } from '../technicians/techniciansApi';
 import { TextInput } from '../../components/ui/TextInput';
 import { Button } from '../../components/ui/Button';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { InlineNotice, PageLoader, EmptyState } from '../../components/feedback/Feedback';
 import styles from '../business/Business.module.css';
 
@@ -24,7 +26,8 @@ export default function OwnerTechniciansPage() {
   const setFilter = (status: string) => {
     const next = new URLSearchParams(params);
     next.delete('page');
-    status ? next.set('status', status) : next.delete('status');
+    if (status) next.set('status', status);
+    else next.delete('status');
     setParams(next);
   };
 
@@ -278,7 +281,7 @@ export default function OwnerTechniciansPage() {
               }
             />
           ) : (
-            <div className={styles.tableWrap}>
+            <ResponsiveTable className={styles.tableWrap} rowHeading="Teknisi">
               <table className={styles.table}>
                 <thead>
                   <tr>
@@ -309,21 +312,10 @@ export default function OwnerTechniciansPage() {
                         {tech.specializations.length > 0 ? tech.specializations.join(', ') : 'Umum'}
                       </td>
                       <td>
-                        <span
-                          className={
-                            tech.status === 'active'
-                              ? styles.statusActive
-                              : tech.status === 'pending'
-                                ? styles.statusPending
-                                : styles.statusInactive
-                          }
-                        >
-                          {tech.status === 'active'
-                            ? 'Aktif'
-                            : tech.status === 'pending'
-                              ? 'Menunggu Konfirmasi'
-                              : 'Nonaktif'}
-                        </span>
+                        <StatusBadge
+                          label={tech.status === 'active' ? 'Aktif' : tech.status === 'pending' ? 'Menunggu Konfirmasi' : 'Nonaktif'}
+                          tone={tech.status === 'active' ? 'success' : tech.status === 'pending' ? 'warning' : 'neutral'}
+                        />
                       </td>
                       <td>
                         <Link className="text-link" to={`/owner/technicians/${tech.id}/edit`}>
@@ -352,7 +344,7 @@ export default function OwnerTechniciansPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ResponsiveTable>
           )}
           <Pagination
             pagination={data?.pagination}

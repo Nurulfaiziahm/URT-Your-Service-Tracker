@@ -25,7 +25,7 @@ export function TechnicianWorkflowActions({
 
   const [transition, { isLoading }] = useTransitionTicketMutation();
 
-  const handleSimpleTransition = async (targetStatus: 'diagnosing' | 'repairing') => {
+  const handleSimpleTransition = async (targetStatus: 'waiting_diagnosis' | 'diagnosing' | 'repairing') => {
     setErrorMsg(null);
     try {
       await transition({
@@ -54,6 +54,7 @@ export function TechnicianWorkflowActions({
       {errorMsg && <InlineNotice type="error">{errorMsg}</InlineNotice>}
 
       <div className={styles.actionBar}>
+        {allowed.includes('accept_intake') && <Button disabled={isLoading} onClick={() => void handleSimpleTransition('waiting_diagnosis')}>Terima Perangkat</Button>}
         {allowed.includes('start_diagnosis') && (
           <Button
             type="button"
@@ -94,7 +95,7 @@ export function TechnicianWorkflowActions({
             onClick={() => setActiveModal('submit_qc')}
             disabled={isLoading}
           >
-            ✓ Selesai Diperbaiki & Ajukan QC
+            Pengerjaan Selesai, Mulai QC
           </Button>
         )}
 
@@ -105,7 +106,7 @@ export function TechnicianWorkflowActions({
             onClick={() => setActiveModal('pass_qc')}
             disabled={isLoading}
           >
-            ✓ Lolos Uji QC & Tandai Siap Diambil
+            QC Lulus, Siap Diambil
           </Button>
         )}
 

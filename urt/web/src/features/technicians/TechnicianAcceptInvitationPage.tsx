@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useAcceptTechnicianInvitationMutation, useInspectTechnicianInvitationMutation, useActivateTechnicianInvitationMutation } from './techniciansApi';
+import { useAcceptTechnicianInvitationMutation, useInspectTechnicianInvitationQuery, useActivateTechnicianInvitationMutation } from './techniciansApi';
 import { useVerifyEmailMutation, useResendVerificationMutation } from '../auth/authApi';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectUser, profileUpdated } from '../auth/authSlice';
@@ -11,6 +11,7 @@ import { TextInput } from '../../components/ui/TextInput';
 import { InlineNotice, PageLoader } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from '../business/Business.module.css';
+import authStyles from '../auth/Auth.module.css';
 
 function ExistingTechnicianInvitation({ token }: { token: string }) {
   const navigate = useNavigate();
@@ -177,22 +178,20 @@ function ExistingTechnicianInvitation({ token }: { token: string }) {
 export default function TechnicianAcceptInvitationPage() {
   const { token: routeToken } = useParams();
   const location = useLocation();
+  const token = routeToken || new URLSearchParams(location.hash.slice(1)).get('token') || new URLSearchParams(location.search).get('token') || '';
+  return <TechnicianInvitation token={token} key={token} />;
+}
+
+function TechnicianInvitation({ token }: { token: string }) {
+  const location = useLocation();
   const user = useAppSelector(selectUser);
-  const [token] = useState(() => routeToken || new URLSearchParams(location.hash.slice(1)).get('token') || new URLSearchParams(location.search).get('token') || '');
-  const requested = useRef(false);
-  const [inspect, inspection] = useInspectTechnicianInvitationMutation();
+  const inspection = useInspectTechnicianInvitationQuery({ token }, { skip: !token, refetchOnMountOrArgChange: true });
   const [activate, activation] = useActivateTechnicianInvitationMutation();
-  const [info, setInfo] = useState<{ name: string; email: string; businessName: string; accountExists: boolean } | null>(null);
+  const info = inspection.currentData?.data;
   const [failure, setFailure] = useState('');
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [activated, setActivated] = useState(false);
-  useEffect(() => {
-    if (!token || requested.current) return;
-    requested.current = true;
-    void inspect({ token }).unwrap().then((result) => setInfo(result.data))
-      .catch(() => setFailure('Undangan tidak valid, sudah digunakan, atau kedaluwarsa. Minta tautan baru dari pemilik tempat servis.'));
-  }, [inspect, token]);
   async function handleActivate(event: FormEvent) {
     event.preventDefault();
     if (activation.isLoading) return;
@@ -207,22 +206,32 @@ export default function TechnicianAcceptInvitationPage() {
   }
   if (activated) return <div className="container page-content stack"><h1>Akun Teknisi Berhasil Diaktifkan</h1>
     <p>Undangan telah diterima. Gunakan email dan kata sandi Anda untuk masuk.</p>
-    <ButtonLink to="/technician/login" state={{ email: info?.email, message: 'Akun teknisi aktif. Silakan masuk.' }}>Masuk Portal Teknisi</ButtonLink></div>;
+    <ButtonLink to="/technician/login" state={{ email: info?.email, message: 'Akun teknisi aktif. Silakan masuk.' }}>Login</ButtonLink></div>;
   if (!token) return <InlineNotice>Tautan undangan tidak lengkap. Hubungi pemilik tempat servis.</InlineNotice>;
-  if (!info && (inspection.isLoading || !failure)) return <PageLoader />;
-  if (!info) return <InlineNotice>{failure}</InlineNotice>;
+  if (inspection.isError) {
+    const error = inspection.error as { data?: ApiErrorBody };
+    const invalidToken = error.data?.code === 'INVALID_TOKEN';
+    return <div className={authStyles.form}>
+      <InlineNotice>{invalidToken
+        ? 'Undangan tidak valid, sudah digunakan, atau telah melewati masa berlaku 7 hari. Minta tautan baru dari pemilik tempat servis.'
+        : error.data?.error || 'Undangan belum dapat diperiksa. Periksa koneksi Anda dan coba lagi.'}</InlineNotice>
+      {!invalidToken && <Button onClick={() => void inspection.refetch()}>Coba lagi</Button>}
+    </div>;
+  }
+  if (!info) return <PageLoader />;
   if (info.accountExists && user) return <ExistingTechnicianInvitation token={token} />;
-  return <div className={`container page-content ${styles.container}`}>
-    <header className={styles.heading}><span className="eyebrow">Undangan Teknisi</span><h1>Aktifkan Akses Teknisi</h1>
-      <p>{info.name} ? {info.businessName}</p><p>{info.email}</p></header>
+  return <div className={authStyles.form}>
+    <header className={authStyles.heading}><span className="eyebrow">Undangan Teknisi</span><h1>{info.accountExists ? 'Terima Undangan Teknisi' : 'Daftar Akun Teknisi'}</h1>
+      <p>{info.name}, Anda diundang bergabung di {info.businessName}.</p></header>
     {failure && <InlineNotice>{failure}</InlineNotice>}
     {info.accountExists ? <section className={styles.card}><p>Akun Anda sudah tersedia. Masuk untuk menerima undangan ini.</p>
       <ButtonLink to="/technician/login" state={{ email: info.email, from: location }}>Masuk & Terima Undangan</ButtonLink></section>
-      : <form className={styles.card} onSubmit={handleActivate}>
-        <h2>Atur kata sandi akun teknisi</h2><p>Akun ini hanya diaktifkan melalui undangan dari pemilik tempat servis.</p>
-        <TextInput label="Kata sandi" type="password" name="password" required minLength={6} maxLength={128} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} />
+      : <form className={authStyles.form} onSubmit={handleActivate}>
+        <p>Buat kata sandi untuk mendaftarkan akun dan menerima undangan teknisi.</p>
+        <TextInput label="Alamat email" type="email" name="email" autoComplete="email" value={info.email} readOnly hint="Email sesuai undangan dari pemilik tempat servis dan tidak dapat diubah." />
+        <TextInput label="Kata sandi baru" type="password" name="password" required minLength={6} maxLength={128} autoComplete="new-password" hint="Gunakan minimal 6 karakter." value={password} onChange={(event) => setPassword(event.target.value)} />
         <TextInput label="Konfirmasi kata sandi" type="password" name="confirmPassword" required minLength={6} maxLength={128} autoComplete="new-password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />
-        <Button type="submit" pending={activation.isLoading}>Terima Undangan & Aktifkan Akun</Button>
+        <Button type="submit" pending={activation.isLoading}>Daftar & Terima Undangan</Button>
         <ButtonLink to="/technician/login" state={{ email: info.email, from: location }} variant="ghost">Sudah punya akun? Masuk</ButtonLink>
       </form>}
   </div>;

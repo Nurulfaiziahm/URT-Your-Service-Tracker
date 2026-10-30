@@ -1,6 +1,8 @@
 import express from 'express';
+import { z } from 'zod';
 import {
   createTicket,
+  deleteAnonymousTicket,
   getTickets,
   getTicketById,
   updateIntake,
@@ -19,6 +21,10 @@ import {
   getAttachmentDownload,
 } from './ticket.controller.js';
 import { validate } from '../../middleware/validation.js';
+import { TicketService } from './ticket.service.js';
+import { asyncHandler } from '../../middleware/async-handler.js';
+import { getAuthUser } from '../../middleware/auth.guard.js';
+import { ResponseHandler } from '../../utils/response.js';
 import { protect } from '../../middleware/auth.guard.js';
 import { trackingLimiter } from '../../core/security/rate-limiter.js';
 import {
@@ -29,6 +35,7 @@ import { issueInvoice } from '../invoice/invoice.controller.js';
 import { issueInvoiceSchema } from '../invoice/invoice.schema.js';
 import {
   createTicketSchema,
+  deleteAnonymousTicketSchema,
   updateIntakeSchema,
   assignTechnicianSchema,
   diagnosisSchema,
@@ -53,6 +60,9 @@ router.use((_req, res, next) => {
 });
 
 router.use(protect);
+router.post('/:ticketId/customer-approval-link', requireBusinessAccess('technician'), validate(z.object({ body: z.object({ estimateVersion: z.number().int().min(1) }).strict() })), asyncHandler(async (req, res) => {
+  ResponseHandler.success(res, await TicketService.createCustomerApprovalLink(req.params.businessId, req.params.ticketId, getAuthUser(req).id, req.body.estimateVersion));
+}));
 
 // Ticket Intake (Customer self-submission or Owner walk-in)
 router.post(
@@ -76,6 +86,8 @@ router.get(
   requireBusinessAccess('owner', 'technician', 'customer'),
   getTicketById,
 );
+
+router.delete('/:ticketId', requireBusinessAccess('owner'), validate(deleteAnonymousTicketSchema), deleteAnonymousTicket);
 
 // Owner intake corrections
 router.put(

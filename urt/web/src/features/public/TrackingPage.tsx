@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import logo from '../../assets/logo-urt.svg';
-import { timelineActionLabel } from '../tickets/TicketTimeline';
+import { TicketTimeline } from '../tickets/TicketTimeline';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useLocation, useParams } from 'react-router';
 import { useGetPublicTrackingMutation } from '../tickets/ticketsApi';
@@ -13,6 +13,7 @@ import { InlineNotice } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from './InfoPages.module.css';
 import ticketStyles from '../tickets/Tickets.module.css';
+import { customerPortalPath } from '../customer/customer-portal';
 
 export default function TrackingPage() {
   const { ticketCode: routeTicketCode } = useParams<{ ticketCode?: string }>();
@@ -27,6 +28,7 @@ export default function TrackingPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [fetchTracking, { isLoading }] = useGetPublicTrackingMutation();
+  const portalPath = businessSlug.trim() ? customerPortalPath(businessSlug.trim()) : '/customer';
 
   useEffect(() => {
     const slug = access.get('business');
@@ -74,13 +76,13 @@ export default function TrackingPage() {
         Lewati ke konten utama
       </a>
       <nav className={styles.trackingNav} aria-label="Navigasi pelacakan">
-        <Link to="/">
+        <Link to={portalPath}>
           <img src={logo} alt="URT" height="38" />
         </Link>
         <div className="actions">
-          <Link to="/">← Kembali ke Beranda</Link>
-          <ButtonLink to="/customer/login" size="small">
-            Masuk Portal
+          <Link to={portalPath}>Portal Pelanggan</Link>
+          <ButtonLink to="/customer/login" size="small" state={{ from: { pathname: portalPath } }}>
+            Login
           </ButtonLink>
         </div>
       </nav>
@@ -240,28 +242,15 @@ export default function TrackingPage() {
                   <h3 style={{ fontSize: '1.05rem', color: 'var(--navy-950)', marginBottom: 8 }}>
                     Perjalanan Pengerjaan Unit
                   </h3>
-                  <div className={ticketStyles.timeline}>
-                    {trackingResult.timeline.map((ev, idx) => (
-                      <div key={idx} className={ticketStyles.timelineItem}>
-                        <div className={ticketStyles.timelineDot} />
-                        <div className={ticketStyles.timelineAction}>
-                          {timelineActionLabel(ev.action)}
-                        </div>
-                        <div className={ticketStyles.timelineMeta}>
-                          {new Date(ev.timestamp).toLocaleString('id-ID')}
-                        </div>
-                        {ev.note && <div className={ticketStyles.timelineNote}>{ev.note}</div>}
-                      </div>
-                    ))}
-                  </div>
+                  <TicketTimeline timeline={trackingResult.timeline} />
                 </div>
               </div>
             </div>
           )}
 
           <div style={{ textAlign: 'center', marginTop: 12 }}>
-            <ButtonLink to="/" variant="secondary">
-              ← Kembali ke Beranda
+            <ButtonLink to={portalPath} variant="secondary">
+              Portal Pelanggan
             </ButtonLink>
           </div>
         </div>

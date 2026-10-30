@@ -4,6 +4,7 @@ import { selectSelectedBusinessId } from '../business/businessSlice';
 import { useGetTicketByIdQuery } from '../tickets/ticketsApi';
 import { EstimateEditor } from '../tickets/EstimateEditor';
 import { EstimateBreakdown } from '../tickets/EstimateBreakdown';
+import { CustomerWhatsAppUpdate } from '../tickets/CustomerWhatsAppUpdate';
 import { DeviceSummary } from '../tickets/DeviceSummary';
 import { ButtonLink } from '../../components/ui/Button';
 import { InlineNotice, PageLoader } from '../../components/feedback/Feedback';
@@ -28,7 +29,7 @@ export default function TechnicianEstimatePage() {
       <header className="reference-heading">
         <div>
           <ButtonLink to={`/technician/tickets/${id}`} variant="ghost" size="small">
-            ← Detail Tiket
+           Detail Tiket
           </ButtonLink>
           <h1>{sent ? 'Ringkasan Estimasi' : 'Estimasi Biaya Servis'}</h1>
           <p>
@@ -64,17 +65,18 @@ export default function TechnicianEstimatePage() {
           <section className="reference-panel">
             <EstimateBreakdown revision={revision} />
           </section>
+          <CustomerWhatsAppUpdate key={`${ticket.id}:${revision.version}`} ticket={ticket} />
         </>
       ) : canEdit ? (
-        <div className="reference-columns">
+        <>
           <EstimateEditor
             businessId={businessId}
             ticket={ticket}
             onSuccess={() => void refetch()}
             onSubmitted={() => navigate(`/technician/tickets/${id}/estimate/sent`)}
           />
-          <section className="reference-panel">
-            <h2>Ringkasan Perangkat</h2>
+          <details className="reference-panel">
+            <summary>Ringkasan Perangkat dan Diagnosis</summary>
             <DeviceSummary device={ticket.device} />
             <h3>Keluhan Pelanggan</h3>
             <p>{ticket.complaint}</p>
@@ -83,8 +85,8 @@ export default function TechnicianEstimatePage() {
               {ticket.diagnosis?.staffFindings ||
                 'Simpan hasil diagnosis melalui halaman detail tiket sebelum mengirim estimasi.'}
             </p>
-          </section>
-        </div>
+          </details>
+        </>
       ) : (
         <InlineNotice>
           Tidak ada estimasi yang dapat diedit pada status tiket saat ini.{' '}

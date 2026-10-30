@@ -8,6 +8,7 @@ import { ButtonLink } from '../../components/ui/Button';
 import { EmptyState, PageLoader } from '../../components/feedback/Feedback';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { ServiceStepper } from '../tickets/ServiceStepper';
+import { TicketTiming } from '../tickets/TicketTiming';
 import { TicketTable } from '../tickets/TicketTable';
 
 export default function CustomerDashboardPage() {
@@ -15,7 +16,7 @@ export default function CustomerDashboardPage() {
   const user = useAppSelector(selectUser);
   const { currentData: data, isLoading, isError, refetch } = useGetCustomerDashboardQuery(
     { businessId: businessId || '' },
-    { skip: !businessId || !hasMembership || !isAuthenticated },
+    { skip: !businessId || !hasMembership || !isAuthenticated, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true },
   );
   if (isLoading) return <PageLoader />;
   if (hasMembership && isAuthenticated && (isError || !data?.data))
@@ -43,7 +44,8 @@ export default function CustomerDashboardPage() {
           </h1>
           <p>{business?.name || 'Pantau perkembangan perangkat Anda dengan mudah.'}</p>
         </div>
-        <ButtonLink to={`${basePath}/services/new`}>+ Ajukan Servis</ButtonLink>
+        <div className="actions">{!isAuthenticated && <ButtonLink to="/customer/login" variant="secondary" state={{ from: { pathname: basePath } }}>Login Pelanggan</ButtonLink>}
+          <ButtonLink to={`${basePath}/services/new`}>+ Ajukan Servis</ButtonLink></div>
       </header>
       <section className="reference-stats reference-stats-three">
         <SummaryCard
@@ -88,7 +90,7 @@ export default function CustomerDashboardPage() {
               </div>
             </dl>
             <div className="actions" style={{ marginTop: 24 }}>
-              <ButtonLink to={`${basePath}/services/${ticket.id}`}>Lihat Detail Servis →</ButtonLink>
+              <ButtonLink to={`${basePath}/services/${ticket.id}`}>Lihat Detail Servis</ButtonLink>
               {ticket.status === 'awaiting_approval' && (
                 <ButtonLink to={`${basePath}/services/${ticket.id}/approval`} variant="secondary">
                   Tinjau Estimasi
@@ -96,9 +98,10 @@ export default function CustomerDashboardPage() {
               )}
             </div>
           </section>
-          <section className="reference-panel">
+          <section className="reference-panel customer-service-journey">
             <h2>Perjalanan Servis</h2>
-            <ServiceStepper status={ticket.status} />
+            <ServiceStepper status={ticket.status} className="customer-service-steps" />
+            <TicketTiming ticket={ticket} />
             <p>Setiap perubahan status dicatat oleh tempat servis.</p>
           </section>
         </div>
@@ -117,7 +120,7 @@ export default function CustomerDashboardPage() {
         <div className="reference-panel-header">
           <h2>Servis Sebelumnya</h2>
           <Link to={`${basePath}/history`} className="text-link">
-            Lihat semua →
+            Lihat semua
           </Link>
         </div>
         <TicketTable tickets={completed} role="customer" customerBasePath={basePath} history />

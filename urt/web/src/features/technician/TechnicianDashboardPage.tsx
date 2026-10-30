@@ -8,12 +8,13 @@ import { ButtonLink } from '../../components/ui/Button';
 import { TicketTable } from '../tickets/TicketTable';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { ServiceStepper } from '../tickets/ServiceStepper';
+import { DeadlineReminders } from '../tickets/DeadlineReminders';
 
 export default function TechnicianDashboardPage() {
   const businessId = useAppSelector(selectSelectedBusinessId);
   const { data, isLoading, isError, refetch } = useGetTechnicianDashboardQuery(
     { businessId: businessId || '' },
-    { skip: !businessId },
+    { skip: !businessId, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true },
   );
   if (isLoading) return <PageLoader />;
   if (isError || !data?.data)
@@ -37,7 +38,7 @@ export default function TechnicianDashboardPage() {
           <p>Ringkasan pekerjaan dan antrean servis Anda hari ini.</p>
         </div>
         <ButtonLink to="/technician/queue" variant="secondary">
-          Lihat Antrean →
+          Lihat Antrean
         </ButtonLink>
       </header>
       <section className="reference-stats reference-stats-three">
@@ -61,6 +62,7 @@ export default function TechnicianDashboardPage() {
           tone="green"
         />
       </section>
+      <DeadlineReminders tickets={data.data.deadlineTickets || []} total={stats.urgentCount || 0} />
       <div className="reference-columns">
         <section className="reference-panel">
           {ticket ? (
@@ -85,7 +87,7 @@ export default function TechnicianDashboardPage() {
               </dl>
               <div style={{ marginTop: 24 }}>
                 <ButtonLink to={`/technician/tickets/${ticket.id}`}>
-                  Buka Detail & Diagnosis →
+                  Buka Detail & Diagnosis
                 </ButtonLink>
               </div>
             </>
@@ -101,7 +103,7 @@ export default function TechnicianDashboardPage() {
             <p>Status pekerjaan akan tampil setelah ada penugasan.</p>
           )}
           <Link className="text-link" to="/technician/history">
-            Lihat riwayat pekerjaan →
+            Lihat riwayat pekerjaan
           </Link>
         </section>
       </div>
@@ -109,10 +111,10 @@ export default function TechnicianDashboardPage() {
         <div className="reference-panel-header">
           <h2>Antrean Servis Mendesak</h2>
           <Link to="/technician/queue" className="text-link">
-            Semua antrean →
+            Semua antrean
           </Link>
         </div>
-        <TicketTable role="technician" tickets={active} />
+        <TicketTable role="technician" tickets={data.data.deadlineTickets || []} />
       </section>
     </div>
   );

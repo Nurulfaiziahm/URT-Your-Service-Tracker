@@ -5,6 +5,8 @@ export interface RepairService {
   description?: string;
   category: string;
   basePrice: number;
+  entryType: 'service' | 'part' | 'difficulty';
+  difficultyLevel?: 'low' | 'medium' | 'high' | 'complex';
   estimatedDuration?: string;
   status: 'active' | 'archived';
   createdAt: string;
@@ -12,6 +14,8 @@ export interface RepairService {
 }
 
 export interface CreateServiceInput {
+  entryType?: RepairService['entryType'];
+  difficultyLevel?: RepairService['difficultyLevel'];
   name: string;
   category: string;
   basePrice: number;
@@ -20,6 +24,8 @@ export interface CreateServiceInput {
 }
 
 export interface UpdateServiceInput {
+  entryType?: RepairService['entryType'];
+  difficultyLevel?: RepairService['difficultyLevel'];
   name?: string;
   category?: string;
   basePrice?: number;

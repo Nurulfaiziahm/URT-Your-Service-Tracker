@@ -1,6 +1,7 @@
 import { Icon } from '../../components/ui/Icon';
 import type { ServiceInvoice } from './types';
 import { InvoiceStatusBadge } from './InvoiceStatusBadge';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { formatRupiah } from '../tickets/currency';
 import { Button } from '../../components/ui/Button';
 
@@ -166,6 +167,7 @@ export function PrintableInvoice({ invoice, onClose }: PrintableInvoiceProps) {
 
         {/* Line Items Table */}
         <div style={{ marginBottom: 20 }}>
+          <ResponsiveTable rowHeading="Item">
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
@@ -207,6 +209,7 @@ export function PrintableInvoice({ invoice, onClose }: PrintableInvoiceProps) {
               ))}
             </tbody>
           </table>
+          </ResponsiveTable>
         </div>
 
         {/* Totals Section */}
@@ -268,6 +271,7 @@ export function PrintableInvoice({ invoice, onClose }: PrintableInvoiceProps) {
             <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 8 }}>
               Riwayat Pembayaran Diterima
             </h3>
+            <ResponsiveTable rowHeading="Pembayaran">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
               <thead>
                 <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
@@ -299,6 +303,7 @@ export function PrintableInvoice({ invoice, onClose }: PrintableInvoiceProps) {
                 ))}
               </tbody>
             </table>
+            </ResponsiveTable>
           </div>
         )}
 

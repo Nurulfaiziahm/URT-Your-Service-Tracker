@@ -18,6 +18,7 @@ export interface ICustomer extends Document {
   invitationExpiresAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
 }
 
 export type ICustomerModel = Model<ICustomer>;
@@ -70,9 +71,11 @@ const customerSchema = new Schema<ICustomer>(
     invitationExpiresAt: {
       type: Date,
     },
+    deletedAt: { type: Date },
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
   },
 );
 

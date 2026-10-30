@@ -5,6 +5,7 @@ import { selectSelectedBusinessId } from '../business/businessSlice';
 import { useGetInvoicesQuery } from '../invoices/invoicesApi';
 import type { InvoiceStatus } from '../invoices/types';
 import { InvoiceStatusBadge } from '../invoices/InvoiceStatusBadge';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { formatRupiah } from '../tickets/currency';
 import { ButtonLink } from '../../components/ui/Button';
 import { PageLoader, EmptyState, InlineNotice } from '../../components/feedback/Feedback';
@@ -89,7 +90,7 @@ export default function OwnerInvoicesPage() {
           }
         />
       ) : (
-        <div className={styles.tableWrapper}>
+        <ResponsiveTable className={styles.tableWrapper} rowHeading="Invoice">
           <table className={styles.table}>
             <thead>
               <tr>
@@ -152,7 +153,7 @@ export default function OwnerInvoicesPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </ResponsiveTable>
       )}
       <Pagination
         pagination={data?.data.pagination}

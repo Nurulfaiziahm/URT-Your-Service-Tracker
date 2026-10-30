@@ -1,77 +1,25 @@
 import type { EstimateRevision } from './types';
 import { formatRupiah } from './currency';
 import styles from './Tickets.module.css';
+import { durationLabel } from './service-timing';
+import { difficultyLabels } from '../services/catalog';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 
 interface EstimateBreakdownProps {
   revision: EstimateRevision;
   title?: string;
+  customerView?: boolean;
 }
 
-export function EstimateBreakdown({ revision, title }: EstimateBreakdownProps) {
-  const getStatusBadge = () => {
-    switch (revision.status) {
-      case 'approved':
-        return (
-          <span
-            style={{
-              background: 'var(--success-bg, #ecfdf5)',
-              color: 'var(--success, #059669)',
-              padding: '2px 8px',
-              borderRadius: 4,
-              fontSize: '0.8rem',
-              fontWeight: 600,
-            }}
-          >
-            Disetujui Pelanggan
-          </span>
-        );
-      case 'rejected':
-        return (
-          <span
-            style={{
-              background: '#fef2f2',
-              color: '#dc2626',
-              padding: '2px 8px',
-              borderRadius: 4,
-              fontSize: '0.8rem',
-              fontWeight: 600,
-            }}
-          >
-            Ditolak
-          </span>
-        );
-      case 'pending':
-        return (
-          <span
-            style={{
-              background: '#eff6ff',
-              color: '#2563eb',
-              padding: '2px 8px',
-              borderRadius: 4,
-              fontSize: '0.8rem',
-              fontWeight: 600,
-            }}
-          >
-            Menunggu Persetujuan
-          </span>
-        );
-      case 'superseded':
-        return (
-          <span
-            style={{
-              background: '#f1f5f9',
-              color: '#64748b',
-              padding: '2px 8px',
-              borderRadius: 4,
-              fontSize: '0.8rem',
-              fontWeight: 600,
-            }}
-          >
-            Digantikan Revisi Baru
-          </span>
-        );
-    }
-  };
+export function EstimateBreakdown({ revision, title, customerView = false }: EstimateBreakdownProps) {
+  const estimateStatus = {
+    approved: { label: 'Disetujui Pelanggan', tone: 'success' },
+    rejected: { label: 'Ditolak', tone: 'danger' },
+    pending: { label: 'Menunggu Persetujuan', tone: 'info' },
+    superseded: { label: 'Digantikan Revisi Baru', tone: 'neutral' },
+  } as const;
+  const status = estimateStatus[revision.status];
 
   return (
     <div className={styles.estimateBox}>
@@ -88,7 +36,7 @@ export function EstimateBreakdown({ revision, title }: EstimateBreakdownProps) {
           <strong style={{ fontSize: '1rem', color: 'var(--navy-950)' }}>
             {title || `Estimasi Biaya (Revisi #${revision.version})`}
           </strong>
-          {getStatusBadge()}
+          <StatusBadge label={status.label} tone={status.tone} />
         </div>
         <span style={{ fontSize: '0.82rem', color: 'var(--slate-500)' }}>
           Diajukan: {new Date(revision.submittedAt).toLocaleDateString('id-ID')}
@@ -110,7 +58,7 @@ export function EstimateBreakdown({ revision, title }: EstimateBreakdownProps) {
         </div>
       )}
 
-      <div className={styles.tableWrapper}>
+      <ResponsiveTable className={styles.tableWrapper} rowHeading="Item">
         <table className={styles.table}>
           <thead>
             <tr>
@@ -143,7 +91,7 @@ export function EstimateBreakdown({ revision, title }: EstimateBreakdownProps) {
                       {line.type === 'part' ? 'Suku Cadang' : 'Jasa / Biaya'}
                     </span>
                   </td>
-                  <td>{line.description}</td>
+                  <td>{customerView && line.catalogEntryType === 'difficulty' ? 'Jasa Servis' : line.description}{line.difficultyLevel && <div>Tingkat kesulitan: {difficultyLabels[line.difficultyLevel]}</div>}</td>
                   <td className={styles.textRight}>{line.quantity}</td>
                   <td className={styles.textRight}>{formatRupiah(line.unitPrice)}</td>
                   <td className={styles.textRight}>
@@ -154,7 +102,7 @@ export function EstimateBreakdown({ revision, title }: EstimateBreakdownProps) {
             })}
           </tbody>
         </table>
-      </div>
+      </ResponsiveTable>
 
       <div
         style={{
@@ -165,12 +113,14 @@ export function EstimateBreakdown({ revision, title }: EstimateBreakdownProps) {
           gap: 12,
         }}
       >
-        <div>
+        <div style={{ display: 'grid', gap: 6 }}>
+          {revision.repairDurationMinutes && <span>Pengerjaan: {durationLabel(revision.repairDurationMinutes)}</span>}
+          {revision.qcDurationMinutes && <span>QC: {durationLabel(revision.qcDurationMinutes)}</span>}
           {revision.targetCompletionDate && (
             <span style={{ fontSize: '0.85rem', color: 'var(--slate-600)' }}>
               Target Selesai:{' '}
               <strong>
-                {new Date(revision.targetCompletionDate).toLocaleDateString('id-ID')}
+                {new Date(revision.targetCompletionDate).toLocaleString('id-ID')}
               </strong>
             </span>
           )}

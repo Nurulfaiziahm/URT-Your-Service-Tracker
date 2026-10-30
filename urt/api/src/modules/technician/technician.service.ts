@@ -38,6 +38,21 @@ export class TechnicianService {
 
   static async activateInvitation(rawToken: string, password: string) {
     const { technician } = await this.pendingInvitation(rawToken);
+    return this.createInvitedAccount(technician, password);
+  }
+
+  static async activateInvitationFromRecovery(technicianId: string, email: string, tokenHash: string, password: string) {
+    const technician = await Technician.findOne({
+      _id: technicianId, email, invitationTokenHash: tokenHash,
+      status: 'pending', invitationExpiresAt: { $gt: new Date() },
+    }).select('+invitationTokenHash');
+    if (!technician) throw new AppError('Kode atau tautan pemulihan tidak valid atau sudah kedaluwarsa.', 400, 'INVALID_RESET');
+    return this.createInvitedAccount(technician, password);
+  }
+
+  private static async createInvitedAccount(technician: ITechnician, password: string) {
+    const business = await Business.findById(technician.businessId);
+    if (!business?.isActive) throw new AppError('Business is unavailable', 403, 'BUSINESS_FORBIDDEN');
     if (await User.exists({ email: technician.email.toLowerCase() })) {
       throw new AppError('Akun sudah tersedia. Masuk untuk menerima undangan.', 409, 'ACCOUNT_EXISTS');
     }
@@ -48,7 +63,7 @@ export class TechnicianService {
       email: technician.email.toLowerCase(), password, registrationPortal: 'technician', isEmailVerified: true,
     });
     // The existing acceptance rules consume the token, enforce seats, and activate membership.
-    const activated = await this.acceptInvitation(user._id.toString(), user.email, true, rawToken);
+    const activated = await this.linkInvitation(technician, user._id.toString());
     return { email: user.email, membership: { businessId: activated.businessId.toString(), role: 'technician' as const } };
   }
   /**
@@ -118,7 +133,7 @@ export class TechnicianService {
     }
 
     const frontendBaseUrl = config.allowedOrigins[0] || 'http://localhost:5173';
-    const invitationUrl = `${frontendBaseUrl}/technician/invite/accept#token=${rawToken}`;
+    const invitationUrl = `${frontendBaseUrl}/technician/register#token=${rawToken}`;
 
     logger.info('Technician invitation generated');
 
@@ -159,6 +174,9 @@ export class TechnicianService {
     if (!business) {
       throw new AppError('Business not found', 404);
     }
+    if (!business.isActive) {
+      throw new AppError('Business is unavailable', 403, 'BUSINESS_FORBIDDEN');
+    }
 
     const rawToken = crypto.randomBytes(32).toString('hex');
     const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
@@ -184,7 +202,7 @@ export class TechnicianService {
     await technician.save();
 
     const frontendBaseUrl = config.allowedOrigins[0] || 'http://localhost:5173';
-    const invitationUrl = `${frontendBaseUrl}/technician/invite/accept#token=${rawToken}`;
+    const invitationUrl = `${frontendBaseUrl}/technician/register#token=${rawToken}`;
 
     logger.info('Technician invitation renewed');
 
@@ -233,7 +251,7 @@ export class TechnicianService {
       await technician.save();
     }
 
-    const hasTickets = await ServiceTicket.exists({
+    const hasTickets = await ServiceTicket.exists({ deletedAt: { $exists: false },
       businessId: technician.businessId,
       assignedTechnicianId: technician._id,
     });
@@ -378,7 +396,7 @@ export class TechnicianService {
       if (input.status !== undefined) {
         if (input.status === 'inactive' && technician.status !== 'inactive') {
           // Reject deactivation if technician still has active assigned tickets
-          const activeTicketsCount = await ServiceTicket.countDocuments({
+          const activeTicketsCount = await ServiceTicket.countDocuments({ deletedAt: { $exists: false },
             businessId: technician.businessId,
             assignedTechnicianId: technician._id,
             status: { $nin: ['completed', 'cancelled'] },
@@ -419,6 +437,10 @@ export class TechnicianService {
       throw new AppError('Please verify your email before accepting this invitation', 400, 'EMAIL_NOT_VERIFIED');
     }
 
+    return this.linkInvitation(technician, userId);
+  }
+
+  private static async linkInvitation(technician: ITechnician, userId: string): Promise<ITechnician> {
     // Check if user is already an active technician in this business
     const existing = await Technician.findOne({
       businessId: technician.businessId,

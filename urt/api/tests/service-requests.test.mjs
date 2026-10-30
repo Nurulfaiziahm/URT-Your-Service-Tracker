@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { serviceRequestFixture } from './helpers/service-request-fixture.mjs';
+import { serviceRequestLimiter } from '../dist/core/security/rate-limiter.js';
 
 test('public intake creates trackable guest tickets and preserves authenticated ownership', async () => {
   const fixture = serviceRequestFixture();
@@ -70,5 +71,49 @@ test('public intake creates trackable guest tickets and preserves authenticated 
     server.closeAllConnections();
     await new Promise((resolve) => server.close(resolve));
     fixture.restore();
+  }
+});
+
+test('customer tickets are assigned to active technicians and fictitious contacts can be removed without losing tickets', async () => {
+  serviceRequestLimiter.resetKey('127.0.0.1');
+  const fixture = serviceRequestFixture();
+  const first = fixture.addTechnician({ name: 'Technician A', userId: fixture.user.id, createdAt: new Date(0) });
+  const second = fixture.addTechnician({ name: 'Technician B' });
+  fixture.addTechnician({ status: 'inactive', createdAt: new Date(0) });
+  fixture.addTechnician({ userId: undefined, createdAt: new Date(0) });
+  const server = fixture.app.listen(0, '127.0.0.1');
+  await new Promise((resolve) => server.once('listening', resolve));
+  const base = `http://127.0.0.1:${server.address().port}/api/v1`;
+  const headers = { 'Content-Type': 'application/json', 'X-CSRF-Token': fixture.csrf };
+  const staffHeaders = { ...headers, Authorization: 'Bearer fixture-token' };
+  const input = { customer: { name: 'Guest Customer', phone: '081234567890' }, device: { category: 'Laptop', brand: 'Asus' }, complaint: 'Screen is broken' };
+  const submit = () => fetch(`${base}/public/businesses/repair-a/service-requests`, { method: 'POST', headers, body: JSON.stringify(input) });
+  try {
+    assert.equal((await submit()).status, 201);
+    assert.equal(String(fixture.tickets[0].assignedTechnicianId), String(first._id), 'A customer ticket must reach an active linked technician immediately');
+    assert.equal((await submit()).status, 201);
+    assert.equal(String(fixture.tickets[1].assignedTechnicianId), String(second._id), 'Choose the technician with fewer open tickets');
+    const queue = await fetch(`${base}/businesses/${fixture.shop._id}/tickets`, { headers: staffHeaders });
+    assert.equal(queue.status, 200);
+    const assigned = (await queue.json()).data;
+    assert.equal(assigned.length, 1);
+    assert.equal(assigned[0].complaint, input.complaint);
+    assert.equal(assigned[0].technician.name, 'Technician A');
+    const dashboard = await fetch(`${base}/businesses/${fixture.shop._id}/dashboard?role=technician`, { headers: staffHeaders });
+    assert.equal(dashboard.status, 200);
+    assert.equal((await dashboard.json()).data.stats.myActiveTickets, 1);
+    fixture.signIn(true, 'owner');
+    const contactPath = `${base}/businesses/${fixture.shop._id}/customers/${fixture.contacts[0]._id}`;
+    const contact = await fetch(contactPath, { headers: staffHeaders });
+    assert.equal((await contact.json()).data.customer.id, String(fixture.contacts[0]._id));
+    assert.equal((await fetch(contactPath, { method: 'PUT', headers: staffHeaders, body: JSON.stringify({ name: 'Changed' }) })).status, 403);
+    assert.equal((await fetch(contactPath, { method: 'DELETE', headers: staffHeaders })).status, 204);
+    assert.equal(fixture.tickets.length, 2, 'Removing a fictitious contact must preserve service history');
+    const directory = await fetch(`${base}/businesses/${fixture.shop._id}/customers`, { headers: staffHeaders });
+    assert.equal((await directory.json()).data.length, 1);
+    fixture.contacts[1].userId = fixture.user.id;
+    assert.equal((await fetch(`${base}/businesses/${fixture.shop._id}/customers/${fixture.contacts[1]._id}`, { method: 'DELETE', headers: staffHeaders })).status, 409, 'An account-linked customer cannot be deleted');
+  } finally {
+    server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); fixture.restore();
   }
 });

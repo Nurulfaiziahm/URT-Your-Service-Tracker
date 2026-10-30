@@ -2,6 +2,9 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import logo from '../../assets/logo-urt.svg';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
+import { ServiceStepper } from '../tickets/ServiceStepper';
 import './landing.css';
 
 type Persona = 'owner' | 'technician' | 'customer';
@@ -237,13 +240,7 @@ export default function LandingPage() {
                     <span className="app-screen__tab"> Tiket Aktif (24) </span>
                   </div>
                   <div className="app-screen__meta">
-                    <span className="status-badge status-badge--success">
-                      <span
-                        className="badge-dot badge-dot--success"
-                        style={{ animation: 'urt-landing-pulse 2s infinite' }}
-                      ></span>{' '}
-                      Live Sync{' '}
-                    </span>
+                    <StatusBadge label="Live Sync" tone="success" />
                   </div>
                 </div>
                 <div className="app-screen__body">
@@ -293,7 +290,7 @@ export default function LandingPage() {
                         <h3 className="table-card__title">Tiket Servis Terbaru</h3>
                         <span className="table-card__counter">3 dari 24 tiket</span>
                       </div>
-                      <div className="table-responsive">
+                      <ResponsiveTable className="table-responsive" rowHeading="Tiket">
                         <table className="ui-table">
                           <thead>
                             <tr>
@@ -313,10 +310,7 @@ export default function LandingPage() {
                               <td>Ahmad Fauzi</td>
                               <td>Rizky Pratama</td>
                               <td>
-                                <span className="status-badge status-badge--warning">
-                                  <span className="badge-dot badge-dot--warning"></span> Menunggu
-                                  Persetujuan{' '}
-                                </span>
+                                <StatusBadge label="Menunggu Persetujuan" tone="warning" />
                               </td>
                             </tr>
                             <tr>
@@ -327,9 +321,7 @@ export default function LandingPage() {
                               <td>Rina Putri</td>
                               <td>Budi Santoso</td>
                               <td>
-                                <span className="status-badge status-badge--info">
-                                  <span className="badge-dot badge-dot--info"></span> Diagnosis{' '}
-                                </span>
+                                <StatusBadge label="Diagnosis" tone="info" />
                               </td>
                             </tr>
                             <tr>
@@ -340,15 +332,12 @@ export default function LandingPage() {
                               <td>Hendra Wijaya</td>
                               <td>Andi Saputra</td>
                               <td>
-                                <span className="status-badge status-badge--active">
-                                  <span className="badge-dot badge-dot--active"></span> Dalam
-                                  Pengerjaan{' '}
-                                </span>
+                                <StatusBadge label="Dalam Pengerjaan" tone="info" />
                               </td>
                             </tr>
                           </tbody>
                         </table>
-                      </div>
+                      </ResponsiveTable>
                     </div>
                   </div>
                 </div>
@@ -542,7 +531,7 @@ export default function LandingPage() {
                   <div className="ui-mockup">
                     <div className="ui-mockup__header">
                       <span className="ui-mockup__title">Owner Dashboard — Operasional Toko</span>
-                      <span className="status-badge status-badge--active">Aktif</span>
+                      <StatusBadge label="Aktif" tone="success" />
                     </div>
                     <div className="ui-mockup__body">
                       <div className="mini-metrics">
@@ -651,10 +640,7 @@ export default function LandingPage() {
                   <div className="ui-mockup">
                     <div className="ui-mockup__header">
                       <span className="ui-mockup__title">Kartu Kerja Teknisi: #URT-1024</span>
-                      <span className="status-badge status-badge--warning">
-                        <span className="badge-dot badge-dot--warning"></span> Menunggu
-                        Approval{' '}
-                      </span>
+                      <StatusBadge label="Menunggu Approval" tone="warning" />
                     </div>
                     <div className="ui-mockup__body">
                       <div className="ticket-detail-grid">
@@ -741,7 +727,7 @@ export default function LandingPage() {
                   <div className="ui-mockup">
                     <div className="ui-mockup__header">
                       <span className="ui-mockup__title">Pelacakan Mandiri: #URT-1024</span>
-                      <span className="status-badge status-badge--active">Pengerjaan</span>
+                      <StatusBadge label="Pengerjaan" tone="info" />
                     </div>
                     <div className="ui-mockup__body">
                       <div className="tracking-device-card">
@@ -751,52 +737,7 @@ export default function LandingPage() {
                         </div>
                         <span className="tag tag--blue">Est. Siap: Hari ini, 16:00</span>
                       </div>
-                      <div className="timeline">
-                        <div className="timeline__item is-done">
-                          <div className="timeline__marker">✓</div>
-                          <div className="timeline__content">
-                            <strong>Pengajuan Servis Diterima</strong>
-                            <span className="timeline__time">14 Okt 2026, 09:30</span>
-                          </div>
-                        </div>
-                        <div className="timeline__item is-done">
-                          <div className="timeline__marker">✓</div>
-                          <div className="timeline__content">
-                            <strong>Diagnosis Selesai</strong>
-                            <span className="timeline__time">14 Okt 2026, 11:15</span>
-                          </div>
-                        </div>
-                        <div className="timeline__item is-done">
-                          <div className="timeline__marker">✓</div>
-                          <div className="timeline__content">
-                            <strong>Estimasi Disetujui Pelanggan (Rp 850.000)</strong>
-                            <span className="timeline__time">14 Okt 2026, 11:40</span>
-                          </div>
-                        </div>
-                        <div className="timeline__item is-active">
-                          <div className="timeline__marker">●</div>
-                          <div className="timeline__content">
-                            <strong>Dalam Pengerjaan Servis</strong>
-                            <span className="timeline__time">Pemasangan IC Power berlangsung</span>
-                          </div>
-                        </div>
-                        <div className="timeline__item is-pending">
-                          <div className="timeline__marker">○</div>
-                          <div className="timeline__content">
-                            <strong>Quality Check (QC)</strong>
-                            <span className="timeline__time">Pemeriksaan fungsi perangkat</span>
-                          </div>
-                        </div>
-                        <div className="timeline__item is-pending">
-                          <div className="timeline__marker">○</div>
-                          <div className="timeline__content">
-                            <strong>Selesai &amp; Siap Diambil</strong>
-                            <span className="timeline__time">
-                              Pengambilan di kasir tempat servis
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+                      <ServiceStepper status="repairing" />
                     </div>
                   </div>
                 </div>
@@ -878,7 +819,7 @@ export default function LandingPage() {
             <div className="journey-grid">
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 1</span>
-                <span className="status-badge status-badge--neutral">Pengajuan</span>
+                <StatusBadge label="Pengajuan" tone="neutral" />
                 <h3 className="journey-card__title">Registrasi Masuk</h3>
                 <p className="journey-card__desc">
                   {' '}
@@ -887,7 +828,7 @@ export default function LandingPage() {
               </div>
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 2</span>
-                <span className="status-badge status-badge--neutral">Menunggu Diagnosis</span>
+                <StatusBadge label="Menunggu Diagnosis" tone="neutral" />
                 <h3 className="journey-card__title">Antrean Meja</h3>
                 <p className="journey-card__desc">
                   {' '}
@@ -896,7 +837,7 @@ export default function LandingPage() {
               </div>
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 3</span>
-                <span className="status-badge status-badge--info">Diagnosis</span>
+                <StatusBadge label="Diagnosis" tone="info" />
                 <h3 className="journey-card__title">Pemeriksaan Fisik</h3>
                 <p className="journey-card__desc">
                   {' '}
@@ -905,7 +846,7 @@ export default function LandingPage() {
               </div>
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 4</span>
-                <span className="status-badge status-badge--warning">Menunggu Persetujuan</span>
+                <StatusBadge label="Menunggu Persetujuan" tone="warning" />
                 <h3 className="journey-card__title">Pengajuan Estimasi</h3>
                 <p className="journey-card__desc">
                   {' '}
@@ -914,7 +855,7 @@ export default function LandingPage() {
               </div>
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 5</span>
-                <span className="status-badge status-badge--success">Disetujui</span>
+                <StatusBadge label="Disetujui" tone="success" />
                 <h3 className="journey-card__title">Konfirmasi Pelanggan</h3>
                 <p className="journey-card__desc">
                   {' '}
@@ -923,7 +864,7 @@ export default function LandingPage() {
               </div>
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 6</span>
-                <span className="status-badge status-badge--active">Dalam Pengerjaan</span>
+                <StatusBadge label="Dalam Pengerjaan" tone="info" />
                 <h3 className="journey-card__title">Proses Servis</h3>
                 <p className="journey-card__desc">
                   {' '}
@@ -932,7 +873,7 @@ export default function LandingPage() {
               </div>
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 7</span>
-                <span className="status-badge status-badge--info">QC (Quality Check)</span>
+                <StatusBadge label="QC (Quality Check)" tone="info" />
                 <h3 className="journey-card__title">Uji Kualitas</h3>
                 <p className="journey-card__desc">
                   {' '}
@@ -941,7 +882,7 @@ export default function LandingPage() {
               </div>
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 8</span>
-                <span className="status-badge status-badge--success">Selesai</span>
+                <StatusBadge label="Selesai" tone="success" />
                 <h3 className="journey-card__title">Siap Diambil</h3>
                 <p className="journey-card__desc">
                   {' '}
@@ -950,7 +891,7 @@ export default function LandingPage() {
               </div>
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 9</span>
-                <span className="status-badge status-badge--neutral">Riwayat Servis</span>
+                <StatusBadge label="Riwayat Servis" tone="neutral" />
                 <h3 className="journey-card__title">Arsip &amp; Garansi</h3>
                 <p className="journey-card__desc">
                   {' '}

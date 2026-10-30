@@ -24,4 +24,11 @@ test('technician invitation returns preserve invitation proof without requiring 
   assert.equal(authPortalFromPath('/invitations/technician'), 'technician');
   assert.equal(authDestination('technician', { pathname: '/invitations/technician', hash: '#token=fixture' }), '/invitations/technician#token=fixture');
   assert.equal(authDestination('customer', { pathname: '/invitations/technician' }), '/customer');
+  for (const proof of [{ hash: '#token=fixture' }, { search: '?token=fixture' }]) {
+    const from = { pathname: '/technician/register', ...proof };
+    assert.equal(authDestination('technician', from), `/technician/register${proof.hash || proof.search}`);
+    assert.equal(authDestination('owner', from), '/owner');
+    assert.equal(authDestination('customer', from), '/customer');
+  }
+  assert.equal(authDestination('technician', { pathname: '/technician/register' }), '/technician');
 });

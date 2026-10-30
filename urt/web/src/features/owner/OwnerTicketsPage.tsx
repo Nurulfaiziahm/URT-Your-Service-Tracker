@@ -2,13 +2,14 @@ import { SummaryCard } from '../../components/ui/SummaryCard';
 import { Pagination } from '../../components/navigation/Pagination';
 import { useGetOwnerDashboardQuery } from '../dashboard/dashboardApi';
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
 import { useGetTicketsQuery } from '../tickets/ticketsApi';
 import type { TicketStatus } from '../tickets/status';
 import { ticketStatuses } from '../tickets/status';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { TextInput } from '../../components/ui/TextInput';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { PageLoader, EmptyState, InlineNotice } from '../../components/feedback/Feedback';
@@ -17,6 +18,7 @@ import styles from '../tickets/Tickets.module.css';
 export default function OwnerTicketsPage() {
   const businessId = useAppSelector(selectSelectedBusinessId);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { state } = useLocation();
 
   const search = searchParams.get('q') || '';
   const statusFilter = (searchParams.get('status') as TicketStatus) || '';
@@ -99,6 +101,7 @@ export default function OwnerTicketsPage() {
         />
       </div>
       {isError && <InlineNotice>Daftar tiket gagal dimuat. Silakan coba lagi.</InlineNotice>}
+      {state?.notice && <InlineNotice type="success">{state.notice}</InlineNotice>}
       <div className={styles.filters}>
         <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: 8, flex: 1 }}>
           <TextInput
@@ -150,21 +153,8 @@ export default function OwnerTicketsPage() {
           }
         />
       ) : (
-        <div
-          style={{
-            overflowX: 'auto',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-md)',
-          }}
-        >
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              textAlign: 'left',
-              fontSize: '0.9rem',
-            }}
-          >
+        <ResponsiveTable className={styles.tableWrapper} rowHeading="Tiket">
+          <table className={styles.table}>
             <thead>
               <tr style={{ background: 'var(--canvas)', borderBottom: '1px solid var(--border)' }}>
                 <th style={{ padding: '12px 16px' }}>Kode Tiket</th>
@@ -221,7 +211,7 @@ export default function OwnerTicketsPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </ResponsiveTable>
       )}
       <Pagination
         pagination={data?.pagination}

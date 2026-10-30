@@ -82,6 +82,8 @@ export interface SerializedTicket {
     diagnosedAt?: Date;
   };
   estimateDraft?: {
+    repairDurationMinutes?: number;
+    qcDurationMinutes?: number;
     lines: IEstimateLine[];
     currency: string;
     totalAmount: number;
@@ -94,6 +96,10 @@ export interface SerializedTicket {
   workSummary?: string;
   repairStartedAt?: Date;
   repairCompletedAt?: Date;
+  repairDueAt?: Date;
+  qcStartedAt?: Date;
+  qcDueAt?: Date;
+  nextDeadlineAt?: Date;
   qualityCheck?: {
     passed: boolean;
     notes?: string;
@@ -116,6 +122,8 @@ export const computeAllowedActions = (
   const actions: string[] = [];
 
   if (callerRole === 'owner') {
+    const customer = ticket.customerId as unknown as { name?: string; userId?: unknown };
+    if (customer?.name && !customer.userId && !ticket.deletedAt) actions.push('delete_ticket');
     switch (ticket.status) {
       case 'submitted':
         actions.push('accept_intake', 'assign_technician', 'correct_intake', 'cancel');
@@ -147,6 +155,9 @@ export const computeAllowedActions = (
       switch (ticket.status) {
         case 'waiting_diagnosis':
           actions.push('start_diagnosis');
+          break;
+        case 'submitted':
+          actions.push('accept_intake');
           break;
         case 'diagnosing':
           actions.push('save_diagnosis', 'save_estimate_draft', 'submit_estimate');
@@ -240,6 +251,8 @@ export const serializeTicket = (
           currency: ticket.estimateDraft.currency,
           totalAmount: ticket.estimateDraft.totalAmount,
           targetCompletionDate: ticket.estimateDraft.targetCompletionDate,
+          repairDurationMinutes: ticket.estimateDraft.repairDurationMinutes,
+          qcDurationMinutes: ticket.estimateDraft.qcDurationMinutes,
           notes: ticket.estimateDraft.notes,
           updatedAt: ticket.estimateDraft.updatedAt,
         };
@@ -308,6 +321,10 @@ export const serializeTicket = (
     workSummary: ticket.workSummary,
     repairStartedAt: ticket.repairStartedAt,
     repairCompletedAt: ticket.repairCompletedAt,
+    repairDueAt: ticket.repairDueAt,
+    qcStartedAt: ticket.qcStartedAt,
+    qcDueAt: ticket.qcDueAt,
+    nextDeadlineAt: ticket.nextDeadlineAt,
     qualityCheck: ticket.qualityCheck
       ? {
           passed: ticket.qualityCheck.passed,

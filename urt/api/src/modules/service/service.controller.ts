@@ -3,10 +3,12 @@ import { asyncHandler } from '../../middleware/async-handler.js';
 import { ResponseHandler } from '../../utils/response.js';
 import { ServiceService } from './service.service.js';
 import { CreateServiceInput, UpdateServiceInput, ServiceQueryParams } from './service.schema.js';
+import { AppError } from '../../middleware/error-handler.js';
 
 export const createService = asyncHandler(async (req: Request, res: Response) => {
   const businessId = req.params.businessId;
   const input = req.body as CreateServiceInput;
+  if (input.entryType === 'difficulty' && !req.businessContext?.isOwner) throw new AppError('Tarif tingkat kesulitan hanya dapat ditetapkan owner.', 403, 'FORBIDDEN');
   const service = await ServiceService.createService(businessId, input);
 
   ResponseHandler.created(res, { service }, 'Service created successfully');
@@ -47,4 +49,9 @@ export const updateService = asyncHandler(async (req: Request, res: Response) =>
   const service = await ServiceService.updateService(businessId, serviceId, input);
 
   ResponseHandler.success(res, { service }, 'Service updated successfully');
+});
+
+export const deleteService = asyncHandler(async (req: Request, res: Response) => {
+  await ServiceService.deleteService(req.params.businessId, req.params.serviceId);
+  ResponseHandler.success(res, null, 'Item katalog berhasil dihapus.');
 });

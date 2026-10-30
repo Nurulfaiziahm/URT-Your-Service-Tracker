@@ -2,7 +2,9 @@ import { Link } from 'react-router';
 import type { ServiceTicket } from './types';
 import type { PortalRole } from '../../layouts/portal-navigation';
 import { TicketStatusBadge } from './TicketStatusBadge';
+import { DeadlineBadge } from './TicketTiming';
 import { formatRupiah } from './currency';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import styles from './Tickets.module.css';
 
 export function TicketTable({
@@ -18,7 +20,7 @@ export function TicketTable({
 }) {
   const path = role === 'customer' ? `${customerBasePath}/services` : `/${role}/tickets`;
   return (
-    <div className={styles.tableWrapper}>
+    <ResponsiveTable role={history && role === 'customer' ? 'region' : undefined} className={styles.tableWrapper} aria-label={history && role === 'customer' ? 'Riwayat servis' : undefined} tabIndex={history && role === 'customer' ? 0 : undefined} rowHeading={tickets.length ? 'Tiket' : undefined}>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -26,11 +28,12 @@ export function TicketTable({
             {!history && <th>Perangkat</th>}
             {role !== 'customer' && <th>Pelanggan</th>}
             {role === 'owner' && <th>Teknisi</th>}
-            {role === 'technician' && !history && <th>Keluhan</th>}
+            {role !== 'customer' && !history && <th>Keluhan</th>}
             {role === 'customer' && <th>Jenis Servis</th>}
             {(role !== 'owner' || history) && <th>Tanggal Masuk</th>}
             {history && <th>Total Biaya</th>}
             <th>Status</th>
+            {role === 'technician' && !history && <th>Prioritas & Tenggat</th>}
             {role !== 'owner' && <th>Aksi</th>}
           </tr>
         </thead>
@@ -55,7 +58,7 @@ export function TicketTable({
                 )}
                 {role !== 'customer' && <td>{ticket.customer?.name || '—'}</td>}
                 {role === 'owner' && <td>{ticket.technician?.name || 'Belum ditugaskan'}</td>}
-                {role === 'technician' && !history && <td>{ticket.complaint}</td>}
+                {role !== 'customer' && !history && <td>{ticket.complaint}</td>}
                 {role === 'customer' && <td>{ticket.service?.name || ticket.device.category}</td>}
                 {(role !== 'owner' || history) && (
                   <td>{new Date(ticket.createdAt).toLocaleDateString('id-ID')}</td>
@@ -70,10 +73,11 @@ export function TicketTable({
                 <td>
                   <TicketStatusBadge status={ticket.status} />
                 </td>
+                {role === 'technician' && !history && <td><DeadlineBadge ticket={ticket} /></td>}
                 {role !== 'owner' && (
                   <td>
                     <Link to={`${path}/${ticket.id}`} className="text-link">
-                      Lihat Detail →
+                      Lihat Detail
                     </Link>
                   </td>
                 )}
@@ -86,6 +90,6 @@ export function TicketTable({
           )}
         </tbody>
       </table>
-    </div>
+    </ResponsiveTable>
   );
 }

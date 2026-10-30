@@ -58,26 +58,6 @@
 .plan button {
   width: 100%;
 }
-.badge {
-  display: inline-block;
-  white-space: nowrap;
-  padding: 4px 10px;
-  font-size: 12px;
-  border-radius: 999px;
-  background: #fef3c7;
-  color: #92400e;
-  font-weight: 600;
-}
-.badge[data-status='active'],
-.badge[data-status='paid'] {
-  background: #ecfdf5;
-  color: #047857;
-}
-.badge[data-status='failed'],
-.badge[data-status='expired'] {
-  background: #fef2f2;
-  color: #b91c1c;
-}
 .total {
   display: flex;
   justify-content: space-between;

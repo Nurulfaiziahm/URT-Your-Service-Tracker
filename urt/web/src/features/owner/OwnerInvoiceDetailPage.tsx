@@ -12,6 +12,7 @@ import { PrintableInvoice } from '../invoices/PrintableInvoice';
 import { formatRupiah } from '../tickets/currency';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { PageLoader, EmptyState } from '../../components/feedback/Feedback';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import styles from '../tickets/Tickets.module.css';
 
 export default function OwnerInvoiceDetailPage() {
@@ -67,7 +68,7 @@ export default function OwnerInvoiceDetailPage() {
             <Icon name="print" /> Cetak Invoice
           </Button>
           <ButtonLink to="/owner/transactions" variant="secondary">
-            ← Kembali ke Transaksi
+           Kembali ke Transaksi
           </ButtonLink>
         </div>
       </header>
@@ -176,7 +177,7 @@ export default function OwnerInvoiceDetailPage() {
       {/* Line Items Table */}
       <div className={styles.ticketCard}>
         <h2>Rincian Tagihan Perbaikan</h2>
-        <div className={styles.tableWrapper}>
+        <ResponsiveTable className={styles.tableWrapper} rowHeading="Item">
           <table className={styles.table}>
             <thead>
               <tr>
@@ -215,7 +216,7 @@ export default function OwnerInvoiceDetailPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </ResponsiveTable>
 
         {/* Totals Summary */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
@@ -269,7 +270,7 @@ export default function OwnerInvoiceDetailPage() {
       {invoice.payments.length > 0 && (
         <div className={styles.ticketCard}>
           <h2>Riwayat Pembayaran</h2>
-          <div className={styles.tableWrapper}>
+          <ResponsiveTable className={styles.tableWrapper} rowHeading="Pembayaran">
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -300,7 +301,7 @@ export default function OwnerInvoiceDetailPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ResponsiveTable>
         </div>
       )}
 

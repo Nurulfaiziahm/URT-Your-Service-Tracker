@@ -1,7 +1,7 @@
 import { ticketStatuses, type TicketStatus } from './status';
-import styles from './TicketStatusBadge.module.css';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 
 export function TicketStatusBadge({ status }: { status: TicketStatus }) {
   const { label, tone } = ticketStatuses[status];
-  return <span className={`${styles.badge} ${styles[tone]}`}>{label}</span>;
+  return <StatusBadge label={label} tone={tone} />;
 }

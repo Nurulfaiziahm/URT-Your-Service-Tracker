@@ -2,6 +2,7 @@ import { Modal } from '../../components/ui/Modal';
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useCreateCustomerMutation } from './customersApi';
 import { Button } from '../../components/ui/Button';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { InlineNotice } from '../../components/feedback/Feedback';
 import styles from '../tickets/Tickets.module.css';
 
@@ -255,7 +256,7 @@ export function CustomerImportModal({ businessId, onClose, onSuccess }: Customer
                 </span>
               </div>
 
-              <div className={styles.tableWrapper} style={{ maxHeight: 220, overflowY: 'auto' }}>
+              <ResponsiveTable className={styles.tableWrapper} style={{ maxHeight: 220, overflowY: 'auto' }} rowHeading="Baris">
                 <table className={styles.table} style={{ fontSize: '0.82rem' }}>
                   <thead>
                     <tr>
@@ -292,7 +293,7 @@ export function CustomerImportModal({ businessId, onClose, onSuccess }: Customer
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </ResponsiveTable>
               {rows.length > 15 && (
                 <span style={{ fontSize: '0.78rem', color: 'var(--slate-500)' }}>
                   Menampilkan 15 baris pertama dari total {rows.length} baris.

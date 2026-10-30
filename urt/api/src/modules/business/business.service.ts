@@ -178,6 +178,8 @@ export class BusinessService {
     const services = await Service.find({
       businessId: business._id,
       status: 'active',
+      entryType: { $in: ['service', null] },
+      deletedAt: { $exists: false },
     }).select('name description category basePrice estimatedDuration');
 
     return {

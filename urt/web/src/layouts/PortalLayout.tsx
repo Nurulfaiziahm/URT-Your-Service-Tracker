@@ -11,6 +11,9 @@ import { Icon, type IconName } from '../components/ui/Icon';
 import logo from '../assets/logo-urt.svg';
 import { portals, type PortalRole } from './portal-navigation';
 import styles from './PortalLayout.module.css';
+import { useGetTechnicianDashboardQuery } from '../features/dashboard/dashboardApi';
+import { DeadlineBadge } from '../features/tickets/TicketTiming';
+import timingStyles from '../features/tickets/TicketTiming.module.css';
 
 const icons: Record<string, IconName> = {
   Beranda: 'home',
@@ -35,6 +38,8 @@ export function PortalLayout({ role }: { role: PortalRole }) {
   const portal = portals[role];
   const user = useAppSelector(selectUser);
   const businessId = useAppSelector(selectSelectedBusinessId);
+  const { data: deadlines } = useGetTechnicianDashboardQuery({ businessId: businessId || '' }, { skip: role !== 'technician' || !businessId, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true });
+  const urgentCount = deadlines?.data.stats.urgentCount || 0;
   const customerPortal = useCustomerPortal();
   const { data } = useGetMyBusinessesQuery(undefined, { skip: !user });
   const business = (role === 'customer' && customerPortal.business)
@@ -74,7 +79,7 @@ export function PortalLayout({ role }: { role: PortalRole }) {
   );
   const brand = (
     <>
-      <Link className={styles.brandLogo} to="/" aria-label="URT Beranda">
+      <Link className={styles.brandLogo} to={portalPath} aria-label="URT Beranda Portal">
         <img src={logo} alt="URT — Your Service Tracker" />
       </Link>
       <div className={styles.brandCopy}>
@@ -159,10 +164,11 @@ export function PortalLayout({ role }: { role: PortalRole }) {
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
               >
                 <Icon name="bell" />
+                {role === 'technician' && urgentCount > 0 && <span className={timingStyles.count}>{urgentCount}</span>}
               </button>
               {notificationsOpen && (
-                <div className={styles.notificationPanel} role="status">
-                  Perkembangan servis dapat dilihat melalui halaman tiket Anda.
+                <div className={role === 'technician' ? timingStyles.panel : styles.notificationPanel}>
+                  {role === 'technician' ? <><strong>Pengingat Tenggat ({urgentCount})</strong>{deadlines?.data.deadlineTickets?.length ? <ul className={timingStyles.deadlines}>{deadlines.data.deadlineTickets.map((ticket) => <li key={ticket.id}><Link className="text-link" onClick={() => setNotificationsOpen(false)} to={`/technician/tickets/${ticket.id}`}>{ticket.ticketCode}</Link><DeadlineBadge ticket={ticket} /></li>)}</ul> : <p>Belum ada tiket yang mendekati tenggat.</p>}</> : 'Perkembangan servis dapat dilihat melalui halaman tiket Anda.'}
                 </div>
               )}
             </div>

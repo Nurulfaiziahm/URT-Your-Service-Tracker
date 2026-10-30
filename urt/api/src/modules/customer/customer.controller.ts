@@ -56,6 +56,11 @@ export const updateCustomer = asyncHandler(async (req: Request, res: Response) =
   ResponseHandler.success(res, { customer }, 'Customer updated successfully');
 });
 
+export const deleteCustomer = asyncHandler(async (req: Request, res: Response) => {
+  await CustomerService.deleteCustomer(req.params.businessId, req.params.customerId);
+  ResponseHandler.noContent(res);
+});
+
 export const sendCustomerInvitation = asyncHandler(async (req: Request, res: Response) => {
   const businessId = req.params.businessId;
   const customerId = req.params.customerId;

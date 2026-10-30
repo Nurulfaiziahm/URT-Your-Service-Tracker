@@ -4,7 +4,7 @@ import type { InviteTechnicianInput, Technician, UpdateTechnicianInput } from '.
 
 export const techniciansApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    inspectTechnicianInvitation: builder.mutation<ApiResponse<{ name: string; email: string; businessName: string; accountExists: boolean }>, { token: string }>({
+    inspectTechnicianInvitation: builder.query<ApiResponse<{ name: string; email: string; businessName: string; accountExists: boolean }>, { token: string }>({
       query: (body) => ({ url: '/technician-invitations/inspect', method: 'POST', body }),
     }),
     activateTechnicianInvitation: builder.mutation<ApiResponse<{ email: string; membership: { businessId: string; role: 'technician' } }>, { token: string; password: string; confirmPassword: string }>({
@@ -97,7 +97,7 @@ export const techniciansApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useInspectTechnicianInvitationMutation,
+  useInspectTechnicianInvitationQuery,
   useActivateTechnicianInvitationMutation,
   useGetTechnicianQuery,
   useGetTechniciansQuery,

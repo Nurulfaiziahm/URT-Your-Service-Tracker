@@ -13,6 +13,8 @@ import { TicketAttachments } from '../tickets/TicketAttachments';
 import { ButtonLink } from '../../components/ui/Button';
 import { PageLoader, EmptyState } from '../../components/feedback/Feedback';
 import styles from '../tickets/Tickets.module.css';
+import { CustomerWhatsAppUpdate } from '../tickets/CustomerWhatsAppUpdate';
+import { TicketTiming, DeadlineBadge } from '../tickets/TicketTiming';
 
 export default function TechnicianTicketDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +23,7 @@ export default function TechnicianTicketDetailPage() {
 
   const { data, isLoading, error, refetch } = useGetTicketByIdQuery(
     { businessId: businessId || '', ticketId: id || '' },
-    { skip: !businessId || !id },
+    { skip: !businessId || !id, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true },
   );
 
   const ticket = data?.data?.ticket;
@@ -60,14 +62,16 @@ export default function TechnicianTicketDetailPage() {
           </div>
         </div>
         <ButtonLink to="/technician/queue" variant="secondary">
-          ← Kembali ke Antrean
+         Kembali ke Antrean
         </ButtonLink>
       </header>
 
       {/* Stepper */}
       <div className={styles.ticketCard}>
         <ServiceStepper status={ticket.status} />
+        <DeadlineBadge ticket={ticket} />
       </div>
+      <TicketTiming ticket={ticket} />
 
       <div className="reference-columns">
         <div className="reference-stack">
@@ -104,7 +108,7 @@ export default function TechnicianTicketDetailPage() {
                   pelanggan.
                 </p>
                 <ButtonLink to={`/technician/tickets/${id}/estimate`}>
-                  Buat Estimasi Biaya →
+                  Buat Estimasi Biaya
                 </ButtonLink>
               </section>
             </>
@@ -213,6 +217,7 @@ export default function TechnicianTicketDetailPage() {
           />
 
           {/* Customer Info */}
+          <CustomerWhatsAppUpdate key={`${ticket.id}:${ticket.status}:${ticket.estimateRevisions?.at(-1)?.version}`} ticket={ticket} />
           <div className={styles.ticketCard}>
             <h2>Data Pelanggan</h2>
             <div style={{ display: 'grid', gap: 4, fontSize: '0.92rem' }}>

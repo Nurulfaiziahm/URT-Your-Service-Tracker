@@ -5,11 +5,22 @@ import { validateObjectId } from '../business/business.access.js';
 import { CreateServiceInput, UpdateServiceInput, ServiceQueryParams } from './service.schema.js';
 
 export class ServiceService {
+  private static async checkDifficulty(businessId: string, level: string, excludeId?: string) {
+    const found = await Service.findOne({ businessId: new mongoose.Types.ObjectId(businessId), entryType: 'difficulty', difficultyLevel: level, status: 'active', deletedAt: { $exists: false }, ...(excludeId ? { _id: { $ne: new mongoose.Types.ObjectId(excludeId) } } : {}) });
+    if (found) throw new AppError('Tarif aktif untuk tingkat kesulitan ini sudah tersedia. Edit tarif yang ada.', 409, 'DUPLICATE_DIFFICULTY');
+  }
+
+  static async deleteService(businessId: string, serviceId: string) {
+    validateObjectId(businessId, 'Business'); validateObjectId(serviceId, 'Service');
+    const item = await Service.findOneAndUpdate({ _id: new mongoose.Types.ObjectId(serviceId), businessId: new mongoose.Types.ObjectId(businessId), deletedAt: { $exists: false } }, { $set: { status: 'archived', deletedAt: new Date() } }, { new: true, runValidators: true });
+    if (!item) throw new AppError('Item katalog tidak ditemukan.', 404);
+  }
   /**
-   * Create a new repair service in business catalog (owner only)
+   * Create a catalog item. Routes authorize owners and technicians.
    */
   static async createService(businessId: string, input: CreateServiceInput): Promise<IService> {
     validateObjectId(businessId, 'Business');
+    if (input.entryType === 'difficulty' && input.difficultyLevel) await this.checkDifficulty(businessId, input.difficultyLevel);
 
     const service = await Service.create({
       businessId: new mongoose.Types.ObjectId(businessId),
@@ -17,6 +28,8 @@ export class ServiceService {
       description: input.description,
       category: input.category,
       basePrice: input.basePrice,
+      entryType: input.entryType,
+      difficultyLevel: input.entryType === 'difficulty' ? input.difficultyLevel : undefined,
       estimatedDuration: input.estimatedDuration,
       status: 'active',
     });
@@ -42,6 +55,7 @@ export class ServiceService {
 
     const filter: Record<string, unknown> = {
       businessId: new mongoose.Types.ObjectId(businessId),
+      deletedAt: { $exists: false },
     };
 
     if (isOwner) {
@@ -56,6 +70,8 @@ export class ServiceService {
     if (query?.category) {
       filter.category = query.category;
     }
+    if (query?.entryType) filter.entryType = query.entryType === 'service' ? { $in: ['service', null] } : query.entryType;
+    if (query?.scope === 'catalog') filter.entryType = { $in: ['service', 'part', null] };
 
     if (query?.q) {
       const escaped = query.q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -91,6 +107,7 @@ export class ServiceService {
     const service = await Service.findOne({
       _id: new mongoose.Types.ObjectId(serviceId),
       businessId: new mongoose.Types.ObjectId(businessId),
+      deletedAt: { $exists: false },
     });
 
     if (!service) {
@@ -115,12 +132,20 @@ export class ServiceService {
     validateObjectId(businessId, 'Business');
     validateObjectId(serviceId, 'Service');
 
+    const current = await Service.findOne({ _id: new mongoose.Types.ObjectId(serviceId), businessId: new mongoose.Types.ObjectId(businessId), deletedAt: { $exists: false } });
+    if (!current) throw new AppError('Service not found', 404);
+    const nextType = input.entryType ?? current.entryType ?? 'service';
+    const nextLevel = input.difficultyLevel ?? current.difficultyLevel;
+    if (nextType === 'difficulty' && !nextLevel) throw new AppError('Pilih tingkat kesulitan.', 400, 'DIFFICULTY_REQUIRED');
+    if (nextType === 'difficulty' && (input.status ?? current.status) === 'active' && nextLevel) await this.checkDifficulty(businessId, nextLevel, serviceId);
+
     const service = await Service.findOneAndUpdate(
       {
         _id: new mongoose.Types.ObjectId(serviceId),
         businessId: new mongoose.Types.ObjectId(businessId),
+        deletedAt: { $exists: false },
       },
-      { $set: input },
+      { $set: { ...input, entryType: nextType, ...(nextType === 'difficulty' ? { difficultyLevel: nextLevel } : {}) }, ...(nextType !== 'difficulty' ? { $unset: { difficultyLevel: 1 } } : {}) },
       { new: true, runValidators: true },
     );
 

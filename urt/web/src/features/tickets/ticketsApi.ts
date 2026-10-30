@@ -3,6 +3,7 @@ import type { ServiceRequestInput, ServiceRequestReceipt } from '../customer/ser
 import type { ApiResponse, PaginatedResponse } from '../../lib/api.types';
 import type {
   ApprovalInput,
+  PublicServiceApproval,
   AssignTechnicianInput,
   CreateTicketInput,
   DiagnosisInput,
@@ -21,6 +22,22 @@ import type {
 
 export const ticketsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    deleteAnonymousTicket: builder.mutation<ApiResponse<null>, { businessId: string; ticketId: string; expectedRevision: number }>({
+      query: ({ businessId, ticketId, expectedRevision }) => ({ url: `/businesses/${encodeURIComponent(businessId)}/tickets/${encodeURIComponent(ticketId)}`, method: 'DELETE', body: { expectedRevision } }),
+      invalidatesTags: ['Tickets', 'Dashboard'],
+    }),
+    getCustomerApprovalLink: builder.query<ApiResponse<{ approvalUrl: string; expiresAt: string }>, { businessId: string; ticketId: string; estimateVersion: number }>({
+      query: ({ businessId, ticketId, estimateVersion }) => ({ url: `/businesses/${encodeURIComponent(businessId)}/tickets/${encodeURIComponent(ticketId)}/customer-approval-link`, method: 'POST', body: { estimateVersion } }),
+      keepUnusedDataFor: 0,
+    }),
+    inspectServiceApproval: builder.query<ApiResponse<PublicServiceApproval>, string>({
+      query: (token) => ({ url: '/public/service-approvals/inspect', method: 'POST', body: { token } }),
+      keepUnusedDataFor: 0,
+    }),
+    respondServiceApproval: builder.mutation<ApiResponse<{ decision: 'approved' | 'rejected' }>, { token: string; expectedRevision: number; decision: 'approved' | 'rejected'; reason?: string }>({
+      query: (body) => ({ url: '/public/service-approvals/respond', method: 'POST', body }),
+      invalidatesTags: ['Tickets', 'Dashboard'],
+    }),
     submitServiceRequest: builder.mutation<ApiResponse<ServiceRequestReceipt>, { slug: string; body: ServiceRequestInput }>({
       query: ({ slug, body }) => ({
         url: `/public/businesses/${encodeURIComponent(slug)}/service-requests`, method: 'POST', body,
@@ -282,6 +299,10 @@ export const ticketsApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useDeleteAnonymousTicketMutation,
+  useGetCustomerApprovalLinkQuery,
+  useInspectServiceApprovalQuery,
+  useRespondServiceApprovalMutation,
   useSubmitServiceRequestMutation,
   useGetTicketsQuery,
   useGetTicketByIdQuery,

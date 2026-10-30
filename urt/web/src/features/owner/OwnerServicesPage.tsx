@@ -8,11 +8,18 @@ import {
   useGetServicesQuery,
   useCreateServiceMutation,
   useUpdateServiceMutation,
+  useDeleteServiceMutation,
 } from '../services/servicesApi';
 import { TextInput } from '../../components/ui/TextInput';
 import { Button } from '../../components/ui/Button';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { InlineNotice, PageLoader, EmptyState } from '../../components/feedback/Feedback';
 import styles from '../business/Business.module.css';
+import { DifficultyPricingSettings } from '../services/DifficultyPricingSettings';
+import catalogStyles from '../services/Catalog.module.css';
+import type { RepairService } from '../services/types';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 export default function OwnerServicesPage() {
   const navigate = useNavigate();
@@ -23,7 +30,8 @@ export default function OwnerServicesPage() {
   const setFilter = (status: string) => {
     const next = new URLSearchParams(params);
     next.delete('page');
-    status ? next.set('status', status) : next.delete('status');
+    if (status) next.set('status', status);
+    else next.delete('status');
     setParams(next);
   };
 
@@ -39,6 +47,8 @@ export default function OwnerServicesPage() {
   const [estimatedDuration, setEstimatedDuration] = useState('');
   const [description, setDescription] = useState('');
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<RepairService | null>(null);
+  const [deleteItem, deletion] = useDeleteServiceMutation();
 
   const { data, isLoading, isError } = useGetServicesQuery(
     {
@@ -46,16 +56,17 @@ export default function OwnerServicesPage() {
       page,
       q: search.trim() || undefined,
       status: filter || undefined,
+      scope: 'catalog',
     },
     { skip: !businessId },
   );
 
   const { data: allCount } = useGetServicesQuery(
-    { businessId: businessId || '', limit: 1 },
+    { businessId: businessId || '', limit: 1, scope: 'catalog' },
     { skip: !businessId },
   );
   const { data: activeCount } = useGetServicesQuery(
-    { businessId: businessId || '', limit: 1, status: 'active' },
+    { businessId: businessId || '', limit: 1, status: 'active', scope: 'catalog' },
     { skip: !businessId },
   );
   const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
@@ -78,6 +89,7 @@ export default function OwnerServicesPage() {
           name: name.trim(),
           category: category.trim(),
           basePrice: parsedPrice,
+          entryType: 'service',
           estimatedDuration: estimatedDuration.trim() || undefined,
           description: description.trim() || undefined,
         },
@@ -90,8 +102,8 @@ export default function OwnerServicesPage() {
       setBasePrice('');
       setEstimatedDuration('');
       setDescription('');
-    } catch {
-      setFeedback('Gagal menambahkan layanan servis.');
+    } catch (error) {
+      setFeedback((error as { data?: { error?: string } }).data?.error || 'Gagal menambahkan item katalog.');
     }
   }
 
@@ -127,28 +139,31 @@ export default function OwnerServicesPage() {
         >
           <div>
             <span className="eyebrow">Katalog Layanan</span>
-            <h1>{showAddForm ? 'Tambah Layanan' : 'Daftar Layanan'}</h1>
-            <p>Daftar jenis perbaikan dan estimasi biaya standar untuk tempat servis Anda.</p>
+            <h1>{showAddForm ? 'Tambah Item Katalog' : 'Katalog Harga Servis'}</h1>
+            <p>Tetapkan harga layanan, suku cadang, dan tingkat kesulitan untuk estimasi teknisi.</p>
           </div>
           <Button onClick={() => setShowAddForm(!showAddForm)}>
-            {showAddForm ? 'Tutup Formulir' : '+ Tambah Layanan Servis'}
+            {showAddForm ? 'Tutup Formulir' : '+ tambahkan item'}
           </Button>
         </div>
       </header>
 
       {feedback && <InlineNotice>{feedback}</InlineNotice>}
+      {location.state?.notice && <InlineNotice type="success">{location.state.notice}</InlineNotice>}
+      {deleting && <ConfirmDialog title="Hapus Item Katalog?" description={`Hapus ${deleting.name}? Estimasi yang sudah dikirim tetap menyimpan harga sebelumnya.`} pending={deletion.isLoading} onClose={() => setDeleting(null)} onConfirm={() => { if (businessId) void deleteItem({ businessId, serviceId: deleting.id }).unwrap().then(() => { setDeleting(null); setFeedback('Item katalog berhasil dihapus.'); }).catch(() => { setDeleting(null); setFeedback('Item belum dapat dihapus.'); }); }} />}
       {isError && <InlineNotice>Data gagal dimuat. Silakan coba lagi.</InlineNotice>}
 
       {showAddForm && (
         <form className={styles.card} onSubmit={handleAddService}>
           <div className={styles.cardHeader}>
-            <h2>Tambah Layanan Baru</h2>
-            <p>Layanan ini akan menjadi pilihan saat pembuatan tiket dan estimasi biaya.</p>
+            <h2>Tambah Item Katalog</h2>
+            <p>Teknisi menggunakan harga ini saat menyusun estimasi. Tarif tingkat kesulitan dihitung sekali per tiket.</p>
           </div>
 
           <div className={styles.row}>
             <TextInput
-              label="Nama Layanan"
+              label="Nama Item"
+              name="catalogName"
               placeholder="Contoh: Ganti Baterai, Service Mesin, Instalasi OS"
               required
               value={name}
@@ -156,6 +171,7 @@ export default function OwnerServicesPage() {
             />
             <TextInput
               label="Kategori"
+              name="catalogCategory"
               placeholder="Contoh: Hardware, Software, Pembersihan"
               required
               value={category}
@@ -166,6 +182,7 @@ export default function OwnerServicesPage() {
           <div className={styles.row}>
             <TextInput
               label="Tarif Dasar (Rp)"
+              name="catalogPrice"
               type="text"
               placeholder="Contoh: 150000"
               required
@@ -201,14 +218,15 @@ export default function OwnerServicesPage() {
 
       {!showAddForm && (
         <>
+          {businessId && <DifficultyPricingSettings key={businessId} businessId={businessId} />}
           <div className="reference-stats reference-stats-three">
             <SummaryCard
-              label="Total Layanan"
+              label="Total Item Katalog"
               value={allCount?.pagination?.total ?? '—'}
               icon="tool"
             />
             <SummaryCard
-              label="Layanan Aktif"
+              label="Item Aktif"
               value={activeCount?.pagination?.total ?? '—'}
               icon="check"
               tone="green"
@@ -221,8 +239,8 @@ export default function OwnerServicesPage() {
           </div>
           <div className="reference-toolbar">
             <TextInput
-              label="Cari Layanan"
-              placeholder="Cari nama atau kontak…"
+              label="Cari Item Katalog"
+              placeholder="Cari nama item atau kategori..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -249,8 +267,8 @@ export default function OwnerServicesPage() {
               }
             />
           ) : (
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
+            <ResponsiveTable className={styles.tableWrap} rowHeading="Layanan">
+              <table className={`${styles.table} ${catalogStyles.catalogTable}`}>
                 <thead>
                   <tr>
                     <th>Layanan</th>
@@ -264,7 +282,7 @@ export default function OwnerServicesPage() {
                 <tbody>
                   {services.map((srv) => (
                     <tr key={srv.id}>
-                      <td>
+                      <td data-label="Item">
                         <Link className="text-link" to={`/owner/services/${srv.id}`}>
                           {srv.name}
                         </Link>
@@ -274,8 +292,8 @@ export default function OwnerServicesPage() {
                           </div>
                         )}
                       </td>
-                      <td>{srv.category}</td>
-                      <td>
+                      <td data-label="Kategori">{srv.category}</td>
+                      <td data-label="Tarif Dasar">
                         <strong>
                           {new Intl.NumberFormat('id-ID', {
                             style: 'currency',
@@ -284,17 +302,11 @@ export default function OwnerServicesPage() {
                           }).format(srv.basePrice)}
                         </strong>
                       </td>
-                      <td>{srv.estimatedDuration || '-'}</td>
-                      <td>
-                        <span
-                          className={
-                            srv.status === 'active' ? styles.statusActive : styles.statusInactive
-                          }
-                        >
-                          {srv.status === 'active' ? 'Aktif' : 'Diarsipkan'}
-                        </span>
+                      <td data-label="Durasi">{srv.estimatedDuration || '-'}</td>
+                      <td data-label="Status">
+                        <StatusBadge label={srv.status === 'active' ? 'Aktif' : 'Diarsipkan'} tone={srv.status === 'active' ? 'success' : 'neutral'} />
                       </td>
-                      <td>
+                      <td data-label="Aksi">
                         <Link className="text-link" to={`/owner/services/${srv.id}/edit`}>
                           Edit
                         </Link>
@@ -306,12 +318,13 @@ export default function OwnerServicesPage() {
                         >
                           {srv.status === 'active' ? 'Arsipkan' : 'Aktifkan'}
                         </Button>
+                        <Button variant="ghost" onClick={() => setDeleting(srv)}>Hapus</Button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ResponsiveTable>
           )}
           <Pagination
             pagination={data?.pagination}

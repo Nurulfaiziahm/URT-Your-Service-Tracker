@@ -23,7 +23,7 @@ export function CustomerPortalGate() {
       title={missing ? 'Tempat servis tidak ditemukan' : 'Portal belum dapat dimuat'}
       description="Periksa tautan dari tempat servis Anda atau coba kembali."
       action={missing
-        ? <ButtonLink to="/">Kembali ke Beranda</ButtonLink>
+        ? <ButtonLink to="/customer">Portal Pelanggan</ButtonLink>
         : <Button onClick={() => refetch()}>Coba lagi</Button>}
     /></main>;
   }

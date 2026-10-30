@@ -3,7 +3,6 @@ import crypto from 'crypto';
 import {
   ServiceTicket,
   IServiceTicket,
-  IEstimateLine,
   IEstimateRevision,
 } from '../../models/ServiceTicket.model.js';
 import { Customer } from '../../models/Customer.model.js';
@@ -12,10 +11,14 @@ import { Service } from '../../models/Service.model.js';
 import { Business } from '../../models/Business.model.js';
 import { File } from '../../models/File.model.js';
 import { AppError } from '../../middleware/error-handler.js';
+import { TicketApprovalAccess } from '../../models/TicketApprovalAccess.model.js';
+import { config } from '../../core/config/index.js';
+import { requireActiveSubscription } from '../subscription/subscription.access.js';
 import { validateObjectId } from '../business/business.access.js';
 import { signDownload } from '../../lib/storage/r2.js';
 import { mailService } from '../../lib/mail/index.js';
 import { logger } from '../../utils/logger.js';
+import { resolveEstimatePricing } from './estimate-pricing.js';
 import {
   CreateTicketInput,
   UpdateIntakeInput,
@@ -32,6 +35,90 @@ import {
 } from './ticket.schema.js';
 
 export class TicketService {
+  static async deleteAnonymousTicket(businessId: string, ticketId: string, ownerUserId: string, expectedRevision: number) {
+    validateObjectId(businessId, 'Business');
+    validateObjectId(ticketId, 'ServiceTicket');
+    const business = await Business.findById(businessId);
+    if (!business || !business.isActive || business.ownerId.toString() !== ownerUserId) {
+      throw new AppError('Hanya pemilik usaha yang dapat menghapus tiket.', 403, 'FORBIDDEN');
+    }
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false }, _id: ticketId, businessId });
+    if (!ticket) throw new AppError('Tiket tidak ditemukan.', 404, 'NOT_FOUND');
+    if (ticket.revision !== expectedRevision) throw new AppError('Tiket telah berubah. Muat ulang sebelum menghapus.', 409, 'TICKET_CHANGED');
+    const customer = await Customer.findOne({ _id: ticket.customerId, businessId });
+    if (!customer || customer.userId) {
+      throw new AppError('Hanya tiket pelanggan anonim tanpa akun yang dapat dihapus.', 403, 'REGISTERED_CUSTOMER_TICKET');
+    }
+    ticket.deletedAt = new Date();
+    ticket.deletedBy = new mongoose.Types.ObjectId(ownerUserId);
+    ticket.nextDeadlineAt = undefined;
+    ticket.revision += 1;
+    ticket.timeline.push({ status: ticket.status, action: 'ticket_deleted', actorId: ticket.deletedBy,
+      actorRole: 'owner', actorName: 'Owner', note: 'Tiket pelanggan anonim dihapus dari portal.', isPublic: false, timestamp: ticket.deletedAt });
+    try { await ticket.save(); } catch (error) {
+      if (error instanceof mongoose.Error.VersionError) throw new AppError('Tiket telah berubah. Muat ulang sebelum menghapus.', 409, 'TICKET_CHANGED');
+      throw error;
+    }
+  }
+
+  static async createCustomerApprovalLink(businessId: string, ticketId: string, userId: string, estimateVersion: number) {
+    validateObjectId(businessId, 'Business'); validateObjectId(ticketId, 'ServiceTicket');
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false }, _id: ticketId, businessId });
+    if (!ticket) throw new AppError('Ticket not found', 404);
+    await this.verifyAssignedTechnician(new mongoose.Types.ObjectId(businessId), ticket, userId);
+    const estimate = ticket.estimateRevisions.at(-1);
+    if (ticket.status !== 'awaiting_approval' || estimate?.status !== 'pending') throw new AppError('Belum ada estimasi yang menunggu persetujuan.', 400, 'ESTIMATE_NOT_APPROVABLE');
+    if (estimate.version !== estimateVersion) throw new AppError('Estimasi telah diperbarui. Muat ulang tiket.', 409, 'ESTIMATE_CHANGED');
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 7 * 86400000);
+    await TicketApprovalAccess.create({ businessId, ticketId, estimateVersion: estimate.version,
+      tokenHash: crypto.createHash('sha256').update(token).digest('hex'), expiresAt });
+    return { approvalUrl: `${config.allowedOrigins[0]}/service-approval#token=${token}`, expiresAt };
+  }
+
+  private static async customerApprovalAccess(token: string) {
+    const access = await TicketApprovalAccess.findOne({ tokenHash: crypto.createHash('sha256').update(token).digest('hex'), expiresAt: { $gt: new Date() } });
+    if (!access) throw new AppError('Tautan persetujuan tidak valid atau sudah kedaluwarsa.', 400, 'INVALID_APPROVAL');
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false }, _id: access.ticketId, businessId: access.businessId });
+    const business = await Business.findById(access.businessId);
+    if (!ticket || !business?.isActive || ticket.estimateRevisions.at(-1)?.version !== access.estimateVersion) throw new AppError('Estimasi telah diperbarui atau tidak tersedia.', 400, 'ESTIMATE_CHANGED');
+    return { ticket, business, access };
+  }
+
+  static async inspectCustomerApproval(token: string) {
+    const { ticket, business } = await this.customerApprovalAccess(token);
+    const estimate = ticket.estimateRevisions.at(-1)!;
+    return { ticketCode: ticket.ticketCode, revision: ticket.revision, businessName: business.name, businessSlug: business.slug,
+      device: { category: ticket.device.category, brand: ticket.device.brand, model: ticket.device.model },
+      estimate: { version: estimate.version, lines: estimate.lines, currency: estimate.currency, totalAmount: estimate.totalAmount,
+        customerExplanation: estimate.customerExplanation, submittedAt: estimate.submittedAt, status: estimate.status,
+        targetCompletionDate: estimate.targetCompletionDate, repairDurationMinutes: estimate.repairDurationMinutes, qcDurationMinutes: estimate.qcDurationMinutes } };
+  }
+
+  static async respondToCustomerApproval(token: string, input: Omit<ApprovalInput, 'estimateVersion'>) {
+    const { ticket, access } = await this.customerApprovalAccess(token);
+    await requireActiveSubscription(access.businessId.toString());
+    await this.applyEstimateDecision(ticket, { ...input, estimateVersion: access.estimateVersion }, 'Pelanggan (tautan persetujuan)');
+    return { decision: input.decision };
+  }
+
+  private static earliestDeadline(...dates: (Date | undefined)[]): Date | undefined {
+    const values = dates.filter((date): date is Date => Boolean(date));
+    return values.length ? new Date(Math.min(...values.map((date) => date.getTime()))) : undefined;
+  }
+  private static async selectAvailableTechnician(businessId: mongoose.Types.ObjectId) {
+    const technicians = await Technician.find({ businessId, status: 'active', userId: { $ne: null } })
+      .sort({ createdAt: 1, _id: 1 });
+    if (!technicians.length) return undefined;
+    const workload = await ServiceTicket.aggregate<{ _id: mongoose.Types.ObjectId; total: number }>([
+      { $match: { deletedAt: { $exists: false }, businessId, status: { $nin: ['completed', 'cancelled'] }, assignedTechnicianId: { $in: technicians.map((tech) => tech._id) } } },
+      { $group: { _id: '$assignedTechnicianId', total: { $sum: 1 } } },
+    ]);
+    const counts = new Map(workload.map((item) => [item._id.toString(), item.total]));
+    return technicians.reduce((selected, tech) =>
+      (counts.get(tech._id.toString()) || 0) < (counts.get(selected._id.toString()) || 0) ? tech : selected);
+  }
+
   /**
    * Generate a readable random ticket code: URT-YYYY-XXXX (e.g. URT-2026-X8F2)
    */
@@ -117,6 +204,8 @@ export class TicketService {
         _id: new mongoose.Types.ObjectId(input.requestedServiceId),
         businessId: businessObjectId,
         status: 'active',
+        entryType: { $in: ['service', null] },
+        deletedAt: { $exists: false },
       });
       if (!service) {
         throw new AppError('Requested service not found or archived', 400, 'INVALID_SERVICE');
@@ -229,6 +318,15 @@ export class TicketService {
       });
     }
 
+    if (!isOwner) {
+      const technician = await this.selectAvailableTechnician(businessObjectId);
+      if (technician) {
+        assignedTechObjectId = technician._id;
+        initialTimeline.push({ status: startingStatus, action: 'assigned', actorRole: 'system', actorName: 'URT',
+          note: `Ditugaskan otomatis kepada ${technician.name}`, isPublic: true, timestamp: new Date() });
+      }
+    }
+
     const ticketCode = await this.generateUniqueTicketCode(businessObjectId);
 
     const ticket = await ServiceTicket.create({
@@ -255,7 +353,7 @@ export class TicketService {
     });
 
     const populated = (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -303,7 +401,7 @@ export class TicketService {
 
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const callerObjectId = new mongoose.Types.ObjectId(callerUserId);
-    const filter: Record<string, unknown> = { businessId: businessObjectId };
+    const filter: Record<string, unknown> = { businessId: businessObjectId, deletedAt: { $exists: false } };
 
     if (callerRole === 'owner') {
       if (query?.customerId) {
@@ -355,11 +453,18 @@ export class TicketService {
     const skip = (page - 1) * limit;
 
     const [tickets, total] = await Promise.all([
-      ServiceTicket.find(filter)
+      callerRole === 'technician' ? ServiceTicket.aggregate<IServiceTicket>([
+        { $match: filter },
+        { $addFields: { _deadlineOrder: { $ifNull: ['$nextDeadlineAt', new Date('9999-12-31T00:00:00Z')] } } },
+        { $sort: { _deadlineOrder: 1, createdAt: 1, _id: 1 } }, { $skip: skip }, { $limit: limit },
+      ]).then((docs) => ServiceTicket.populate(docs, [
+        { path: 'customerId', select: 'name email phone userId' }, { path: 'assignedTechnicianId', select: 'name email phone specializations' },
+        { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
+      ])) : ServiceTicket.find(filter)
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1, _id: -1 })
-        .populate('customerId', 'name email phone')
+        .populate('customerId', 'name email phone userId')
         .populate('assignedTechnicianId', 'name email phone specializations')
         .populate('requestedServiceId', 'name category basePrice estimatedDuration'),
       ServiceTicket.countDocuments(filter),
@@ -383,7 +488,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: ticketObjectId,
       businessId: businessObjectId,
     })
@@ -434,7 +539,7 @@ export class TicketService {
     validateObjectId(businessId, 'Business');
     validateObjectId(ticketId, 'ServiceTicket');
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: new mongoose.Types.ObjectId(ticketId),
       businessId: new mongoose.Types.ObjectId(businessId),
     });
@@ -492,7 +597,7 @@ export class TicketService {
     await ticket.save();
 
     return (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -516,7 +621,7 @@ export class TicketService {
     const techObjectId = new mongoose.Types.ObjectId(input.assignedTechnicianId);
 
     const [ticket, technician] = await Promise.all([
-      ServiceTicket.findOne({ _id: ticketObjectId, businessId: businessObjectId }),
+      ServiceTicket.findOne({ deletedAt: { $exists: false }, _id: ticketObjectId, businessId: businessObjectId }),
       Technician.findOne({ _id: techObjectId, businessId: businessObjectId, status: 'active' }),
     ]);
 
@@ -562,7 +667,7 @@ export class TicketService {
     await ticket.save();
 
     return (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -583,7 +688,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({ _id: ticketObjectId, businessId: businessObjectId });
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false }, _id: ticketObjectId, businessId: businessObjectId });
     if (!ticket) {
       throw new AppError('Ticket not found', 404);
     }
@@ -624,7 +729,7 @@ export class TicketService {
     await ticket.save();
 
     return (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -645,7 +750,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({ _id: ticketObjectId, businessId: businessObjectId });
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false }, _id: ticketObjectId, businessId: businessObjectId });
     if (!ticket) {
       throw new AppError('Ticket not found', 404);
     }
@@ -660,24 +765,11 @@ export class TicketService {
       throw new AppError('Ticket has been modified by another action. Please refresh.', 409, 'TICKET_CHANGED');
     }
 
-    let calculatedTotal = 0;
-    const lines: IEstimateLine[] = input.lines.map((line) => {
-      const lineTotal = line.quantity * line.unitPrice;
-      calculatedTotal += lineTotal;
-      return {
-        description: line.description,
-        type: line.type,
-        quantity: line.quantity,
-        unitPrice: line.unitPrice,
-        total: lineTotal,
-      };
-    });
-
-    if (!Number.isSafeInteger(calculatedTotal)) {
-      throw new AppError('Calculated total exceeds safe integer amount', 400, 'INVALID_AMOUNT');
-    }
+    const { lines, totalAmount: calculatedTotal } = await resolveEstimatePricing(businessObjectId, input.lines);
 
     ticket.estimateDraft = {
+      repairDurationMinutes: input.repairDurationMinutes,
+      qcDurationMinutes: input.qcDurationMinutes,
       lines,
       currency: 'IDR',
       totalAmount: calculatedTotal,
@@ -690,7 +782,7 @@ export class TicketService {
     await ticket.save();
 
     return (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -711,7 +803,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({ _id: ticketObjectId, businessId: businessObjectId });
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false }, _id: ticketObjectId, businessId: businessObjectId });
     if (!ticket) {
       throw new AppError('Ticket not found', 404);
     }
@@ -751,37 +843,17 @@ export class TicketService {
     }
 
     // Determine estimate lines
-    let lines: IEstimateLine[];
-    let totalAmount = 0;
-
-    if (input.lines && input.lines.length > 0) {
-      lines = input.lines.map((line) => {
-        const lineTotal = line.quantity * line.unitPrice;
-        totalAmount += lineTotal;
-        return {
-          description: line.description,
-          type: line.type,
-          quantity: line.quantity,
-          unitPrice: line.unitPrice,
-          total: lineTotal,
-        };
-      });
-    } else if (ticket.estimateDraft && ticket.estimateDraft.lines.length > 0) {
-      lines = ticket.estimateDraft.lines;
-      totalAmount = ticket.estimateDraft.totalAmount;
-    } else {
-      throw new AppError('Estimate must contain at least one line item', 400, 'ESTIMATE_LINES_REQUIRED');
-    }
-
-    if (!Number.isSafeInteger(totalAmount)) {
-      throw new AppError('Calculated total exceeds safe integer amount', 400, 'INVALID_AMOUNT');
-    }
+    const sourceLines = input.lines?.length ? input.lines : ticket.estimateDraft?.lines;
+    if (!sourceLines?.length) throw new AppError('Estimate must contain at least one line item', 400, 'ESTIMATE_LINES_REQUIRED');
+    const { lines, totalAmount } = await resolveEstimatePricing(businessObjectId, sourceLines);
 
     const nextVersion = (ticket.estimateRevisions?.length || 0) + 1;
     const targetCompletionDate =
       input.targetCompletionDate || ticket.estimateDraft?.targetCompletionDate;
 
     const newRevision: IEstimateRevision = {
+      repairDurationMinutes: input.repairDurationMinutes ?? ticket.estimateDraft?.repairDurationMinutes,
+      qcDurationMinutes: input.qcDurationMinutes ?? ticket.estimateDraft?.qcDurationMinutes,
       version: nextVersion,
       lines,
       currency: 'IDR',
@@ -796,6 +868,7 @@ export class TicketService {
 
     ticket.estimateRevisions.push(newRevision);
     ticket.status = 'awaiting_approval';
+    ticket.nextDeadlineAt = targetCompletionDate;
     ticket.revision += 1;
 
     ticket.timeline.push({
@@ -812,7 +885,7 @@ export class TicketService {
     await ticket.save();
 
     const populated = (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -864,7 +937,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: ticketObjectId,
       businessId: businessObjectId,
     }).populate('customerId');
@@ -878,6 +951,11 @@ export class TicketService {
     if (!customer || customer.userId?.toString() !== callerUserId) {
       throw new AppError('Only the customer who owns this ticket may approve or reject the estimate', 403, 'FORBIDDEN');
     }
+
+    return this.applyEstimateDecision(ticket, input, customer.name, callerUserId);
+  }
+
+  private static async applyEstimateDecision(ticket: IServiceTicket, input: ApprovalInput, customerName: string, customerUserId?: string): Promise<IServiceTicket> {
 
     if (ticket.status !== 'awaiting_approval') {
       throw new AppError('Ticket is not currently awaiting estimate approval', 400, 'ESTIMATE_NOT_APPROVABLE');
@@ -899,13 +977,14 @@ export class TicketService {
       );
     }
 
-    const callerObjectId = new mongoose.Types.ObjectId(callerUserId);
+    const callerObjectId = customerUserId ? new mongoose.Types.ObjectId(customerUserId) : undefined;
 
     if (input.decision === 'approved') {
       pendingRevision.status = 'approved';
       pendingRevision.decisionAt = new Date();
       ticket.approvedEstimate = pendingRevision;
       ticket.status = 'approved';
+      ticket.nextDeadlineAt = pendingRevision.targetCompletionDate;
       ticket.revision += 1;
 
       ticket.timeline.push({
@@ -913,7 +992,7 @@ export class TicketService {
         action: 'estimate_approved',
         actorId: callerObjectId,
         actorRole: 'customer',
-        actorName: customer.name,
+        actorName: customerName,
         note: `Customer approved estimate revision #${pendingRevision.version} (Rp ${pendingRevision.totalAmount.toLocaleString('id-ID')})`,
         isPublic: true,
         timestamp: new Date(),
@@ -923,6 +1002,7 @@ export class TicketService {
       pendingRevision.decisionAt = new Date();
       pendingRevision.decisionReason = input.reason;
       ticket.status = 'rejected';
+      ticket.nextDeadlineAt = undefined;
       ticket.revision += 1;
 
       ticket.timeline.push({
@@ -930,7 +1010,7 @@ export class TicketService {
         action: 'estimate_rejected',
         actorId: callerObjectId,
         actorRole: 'customer',
-        actorName: customer.name,
+        actorName: customerName,
         note: input.reason || `Customer declined estimate revision #${pendingRevision.version}`,
         isPublic: true,
         timestamp: new Date(),
@@ -940,7 +1020,7 @@ export class TicketService {
     await ticket.save();
 
     return (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -962,7 +1042,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: ticketObjectId,
       businessId: businessObjectId,
     }).populate('customerId');
@@ -979,10 +1059,7 @@ export class TicketService {
 
     switch (input.targetStatus) {
       case 'waiting_diagnosis': {
-        // Physical intake accepted at shop by owner
-        if (callerRole !== 'owner') {
-          throw new AppError('Only the business owner can accept physical device intake', 403, 'FORBIDDEN');
-        }
+        if (callerRole !== 'owner') await this.verifyAssignedTechnician(businessObjectId, ticket, callerUserId);
         if (ticket.status !== 'submitted') {
           throw new AppError(
             'Only online submitted tickets can transition to waiting diagnosis via intake acceptance',
@@ -997,8 +1074,8 @@ export class TicketService {
           status: 'waiting_diagnosis',
           action: 'intake_accepted',
           actorId: callerObjectId,
-          actorRole: 'owner',
-          actorName: 'Owner',
+          actorRole: callerRole === 'owner' ? 'owner' : 'technician',
+          actorName: callerRole === 'owner' ? 'Owner' : 'Technician',
           note: input.reason || 'Device physically received at repair shop',
           isPublic: true,
           timestamp: new Date(),
@@ -1059,6 +1136,8 @@ export class TicketService {
         if (ticket.status === 'approved') {
           ticket.status = 'repairing';
           ticket.repairStartedAt = new Date();
+          ticket.repairDueAt = ticket.approvedEstimate?.repairDurationMinutes ? new Date(Date.now() + ticket.approvedEstimate.repairDurationMinutes * 60000) : undefined;
+          ticket.nextDeadlineAt = this.earliestDeadline(ticket.repairDueAt, ticket.approvedEstimate?.targetCompletionDate);
           ticket.revision += 1;
           ticket.timeline.push({
             status: 'repairing',
@@ -1082,6 +1161,10 @@ export class TicketService {
             checkedAt: new Date(),
             checkedBy: callerObjectId,
           };
+          ticket.repairDueAt = ticket.approvedEstimate?.repairDurationMinutes ? new Date(Date.now() + ticket.approvedEstimate.repairDurationMinutes * 60000) : undefined;
+          ticket.qcDueAt = undefined;
+          ticket.qcStartedAt = undefined;
+          ticket.nextDeadlineAt = this.earliestDeadline(ticket.repairDueAt, ticket.approvedEstimate?.targetCompletionDate);
           ticket.revision += 1;
           ticket.timeline.push({
             status: 'repairing',
@@ -1118,6 +1201,9 @@ export class TicketService {
         ticket.workSummary = input.workSummary;
         ticket.repairCompletedAt = new Date();
         ticket.status = 'quality_check';
+        ticket.qcStartedAt = new Date();
+        ticket.qcDueAt = ticket.approvedEstimate?.qcDurationMinutes ? new Date(Date.now() + ticket.approvedEstimate.qcDurationMinutes * 60000) : undefined;
+        ticket.nextDeadlineAt = this.earliestDeadline(ticket.qcDueAt, ticket.approvedEstimate?.targetCompletionDate);
         ticket.revision += 1;
         ticket.timeline.push({
           status: 'quality_check',
@@ -1147,6 +1233,7 @@ export class TicketService {
         }
 
         ticket.status = 'completed';
+        ticket.nextDeadlineAt = undefined;
         ticket.readyAt = new Date();
         ticket.qualityCheck = {
           passed: true,
@@ -1206,6 +1293,7 @@ export class TicketService {
         }
 
         ticket.status = 'cancelled';
+        ticket.nextDeadlineAt = undefined;
         ticket.cancellationReason = input.reason;
         ticket.revision += 1;
         ticket.timeline.push({
@@ -1228,7 +1316,7 @@ export class TicketService {
     await ticket.save();
 
     const populated = (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -1281,7 +1369,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: ticketObjectId,
       businessId: businessObjectId,
     });
@@ -1301,7 +1389,7 @@ export class TicketService {
     // Repeated handover check (idempotent result)
     if (ticket.handover?.handedOverAt) {
       return (await ticket.populate([
-        { path: 'customerId', select: 'name email phone' },
+        { path: 'customerId', select: 'name email phone userId' },
         { path: 'assignedTechnicianId', select: 'name email phone specializations' },
         { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
       ])) as IServiceTicket;
@@ -1333,7 +1421,7 @@ export class TicketService {
     await ticket.save();
 
     return (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -1355,7 +1443,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: ticketObjectId,
       businessId: businessObjectId,
     });
@@ -1413,7 +1501,7 @@ export class TicketService {
       throw new AppError('Tiket servis tidak ditemukan atau kode rahasia salah', 404, 'TRACKING_NOT_FOUND');
     }
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       businessId: business._id,
       ticketCode: input.ticketCode.trim().toUpperCase(),
     }).select('+trackingSecretHash');
@@ -1447,8 +1535,9 @@ export class TicketService {
     if (['submitted', 'waiting_diagnosis'].includes(ticket.status)) currentStep = 1;
     else if (ticket.status === 'diagnosing') currentStep = 2;
     else if (['awaiting_approval', 'approved', 'rejected'].includes(ticket.status)) currentStep = 3;
-    else if (['repairing', 'quality_check'].includes(ticket.status)) currentStep = 4;
-    else if (ticket.status === 'completed') currentStep = 5;
+    else if (ticket.status === 'repairing') currentStep = 4;
+    else if (ticket.status === 'quality_check') currentStep = 5;
+    else if (ticket.status === 'completed') currentStep = 6;
 
     return {
       ticketCode: ticket.ticketCode,
@@ -1497,7 +1586,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: ticketObjectId,
       businessId: businessObjectId,
     });
@@ -1591,7 +1680,7 @@ export class TicketService {
     await ticket.save();
 
     return (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -1614,7 +1703,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: ticketObjectId,
       businessId: businessObjectId,
     });
@@ -1678,7 +1767,7 @@ export class TicketService {
     await ticket.save();
 
     return (await ticket.populate([
-      { path: 'customerId', select: 'name email phone' },
+      { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
@@ -1700,7 +1789,7 @@ export class TicketService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: ticketObjectId,
       businessId: businessObjectId,
     });

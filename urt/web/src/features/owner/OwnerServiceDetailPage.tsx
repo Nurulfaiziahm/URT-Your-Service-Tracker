@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router';
-import { useGetServiceQuery, useUpdateServiceMutation } from '../services/servicesApi';
+import { useGetServiceQuery, useUpdateServiceMutation, useDeleteServiceMutation } from '../services/servicesApi';
 import type { RepairService } from '../services/types';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
@@ -8,6 +8,8 @@ import { TextInput } from '../../components/ui/TextInput';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { InlineNotice, PageLoader } from '../../components/feedback/Feedback';
 import styles from '../business/Business.module.css';
+import { difficultyLabels } from '../services/catalog';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 function EditForm({ item, businessId }: { item: RepairService; businessId: string }) {
   const navigate = useNavigate();
@@ -35,18 +37,20 @@ function EditForm({ item, businessId }: { item: RepairService; businessId: strin
           status,
         },
       }).unwrap();
-      navigate(`/owner/services/${item.id}`);
-    } catch {
-      setError('Perubahan gagal disimpan. Periksa data dan coba lagi.');
+      navigate(`/owner/services/${item.id}`, { state: { notice: 'Perubahan katalog berhasil disimpan.' } });
+    } catch (error) {
+      setError((error as { data?: { error?: string } }).data?.error || 'Perubahan gagal disimpan. Periksa data dan coba lagi.');
     }
   }
   return (
     <form className={styles.card} onSubmit={submit}>
-      <h2>Informasi Layanan</h2>
+      <h2>Informasi Item Katalog</h2>
       {error && <InlineNotice>{error}</InlineNotice>}
+      {item.difficultyLevel && <p>Tingkat Kesulitan: {difficultyLabels[item.difficultyLevel]}</p>}
       <div className={styles.row}>
         <TextInput
-          label="Nama layanan"
+          label="Nama Item"
+          name="catalogName"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -54,6 +58,7 @@ function EditForm({ item, businessId }: { item: RepairService; businessId: strin
         />
         <TextInput
           label="Kategori"
+          name="catalogCategory"
           type="text"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -61,6 +66,7 @@ function EditForm({ item, businessId }: { item: RepairService; businessId: strin
         />
         <TextInput
           label="Tarif dasar (Rp)"
+          name="catalogPrice"
           type="number"
           value={basePrice}
           onChange={(e) => setBasePrice(e.target.value)}
@@ -102,12 +108,21 @@ function EditForm({ item, businessId }: { item: RepairService; businessId: strin
 export default function OwnerServiceDetailPage() {
   const businessId = useAppSelector(selectSelectedBusinessId);
   const { id = '' } = useParams();
-  const editing = useLocation().pathname.endsWith('/edit');
+  const location = useLocation();
+  const editing = location.pathname.endsWith('/edit');
+  const navigate = useNavigate();
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleteItem, deletion] = useDeleteServiceMutation();
   const { data, isLoading, isError } = useGetServiceQuery(
     { businessId: businessId || '', id },
     { skip: !businessId || !id },
   );
   const item = data?.data.service;
+  async function removeItem() {
+    if (!businessId || !item) return;
+    try { await deleteItem({ businessId, serviceId: item.id }).unwrap(); navigate('/owner/services', { state: { notice: 'Item katalog berhasil dihapus.' } }); }
+    catch { setShowDelete(false); }
+  }
   if (isLoading) return <PageLoader />;
   if (isError || !item)
     return (
@@ -123,13 +138,16 @@ export default function OwnerServiceDetailPage() {
       <header className="reference-heading">
         <div>
           <ButtonLink to="/owner/services" variant="ghost" size="small">
-            ← Daftar Layanan
+           Daftar Katalog
           </ButtonLink>
-          <h1>{editing ? 'Edit Layanan' : item.name}</h1>
-          <p>{editing ? 'Perbarui informasi layanan.' : 'Detail layanan dan informasi kontak.'}</p>
+          <h1>{editing ? 'Edit Item Katalog' : item.name}</h1>
+          <p>{editing ? 'Perbarui rincian dan harga item katalog.' : 'Rincian item dan tarif pada katalog servis.'}</p>
         </div>
-        {!editing && <ButtonLink to={`/owner/services/${id}/edit`}>Edit Layanan</ButtonLink>}
+        {!editing && <div className="actions"><ButtonLink to={`/owner/services/${id}/edit`}>Edit Layanan</ButtonLink><Button variant="danger" onClick={() => setShowDelete(true)}>Hapus Item Katalog</Button></div>}
       </header>
+      {location.state?.notice && <InlineNotice type="success">{location.state.notice}</InlineNotice>}
+      {deletion.isError && <InlineNotice type="error">Item belum dapat dihapus. Coba lagi.</InlineNotice>}
+      {showDelete && item && <ConfirmDialog title="Hapus Item Katalog?" description={`Hapus ${item.name} dari katalog? Estimasi yang sudah dikirim tetap menyimpan rincian harga sebelumnya.`} pending={deletion.isLoading} onClose={() => setShowDelete(false)} onConfirm={() => void removeItem()} />}
       {editing ? (
         <EditForm key={item.id + item.updatedAt} item={item} businessId={businessId!} />
       ) : (
@@ -142,6 +160,7 @@ export default function OwnerServiceDetailPage() {
             </div>
           </div>
           <dl className="reference-dl">
+            {item.difficultyLevel && <div><dt>Tingkat Kesulitan</dt><dd>{difficultyLabels[item.difficultyLevel]}</dd></div>}
             <div>
               <dt>Nama layanan</dt>
               <dd>{item.name || '—'}</dd>

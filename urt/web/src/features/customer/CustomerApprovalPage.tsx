@@ -13,7 +13,7 @@ export default function CustomerApprovalPage() {
   const { businessId, basePath } = useCustomerPortal();
   const { currentData: data, isLoading, isError, refetch } = useGetTicketByIdQuery(
     { businessId: businessId || '', ticketId: id },
-    { skip: !businessId || !id },
+    { skip: !businessId || !id, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true },
   );
   const [decision, setDecision] = useState<'approved' | 'rejected' | null>(null);
   const ticket = data?.data.ticket;
@@ -28,7 +28,7 @@ export default function CustomerApprovalPage() {
       <header className="reference-heading">
         <div>
           <ButtonLink to={`${basePath}/services/${id}`} variant="ghost" size="small">
-            ← Detail Servis
+           Detail Servis
           </ButtonLink>
           <h1>Persetujuan Servis</h1>
           <p>{ticket.ticketCode} · Tinjau hasil diagnosis dan rincian biaya perbaikan.</p>
@@ -82,7 +82,7 @@ export default function CustomerApprovalPage() {
       {result && revision && (
         <section className="reference-panel">
           <h2>Rincian Estimasi</h2>
-          <EstimateBreakdown revision={revision} />
+          <EstimateBreakdown revision={revision} customerView />
         </section>
       )}
     </div>

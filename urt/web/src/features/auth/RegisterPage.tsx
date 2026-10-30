@@ -6,6 +6,8 @@ import type { ApiErrorBody } from '../../lib/api.types';
 import logo from '../../assets/logo-urt.svg';
 import styles from './RegisterPage.module.css';
 import { authDestination, type AuthReturnLocation } from './auth-routing';
+import { customerPortalReturn } from '../customer/customer-return';
+import authStyles from './Auth.module.css';
 
 type IconName = 'user' | 'phone' | 'email' | 'lock' | 'eye' | 'team' | 'chart' | 'shield';
 
@@ -263,7 +265,7 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
         {isLoading ? 'Mendaftarkan akun…' : 'Daftar akun sekarang'}
       </button>
 
-      <div className={styles['mobile-login-link']}>
+      {isOwner && <div className={styles['mobile-login-link']}>
         Sudah punya akun?{' '}
         <Link
           to={`/${portal}/login`}
@@ -271,7 +273,7 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
         >
           Masuk
         </Link>
-      </div>
+      </div>}
 
       <nav className={styles['legal-links']} aria-label="Informasi layanan">
         <Link to="/privacy">Privasi</Link>
@@ -288,7 +290,7 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
         </a>
         <main id="main-content" className={styles.customerCard} tabIndex={-1}>
           <header className={styles.customerHeader}>
-            <Link to="/">
+            <Link to={customerPortalReturn((location.state as { from?: AuthReturnLocation } | null)?.from)}>
               <img src={logo} alt="URT" />
             </Link>
             <div>
@@ -299,7 +301,7 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
           </header>
           {errorMessage && <InlineNotice>{errorMessage}</InlineNotice>}
           {form}
-          <p className={styles.customerLinks}>
+          <p className={authStyles.accountPrompt}>
             Sudah punya akun? <Link to={`/${portal}/login`} state={location.state}>Masuk di sini</Link>
           </p>
         </main>

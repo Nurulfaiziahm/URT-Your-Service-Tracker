@@ -90,36 +90,6 @@
   background-color: var(--canvas);
 }
 
-.statusActive {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  background-color: var(--success-soft);
-  color: var(--success);
-  font-weight: 600;
-  font-size: 0.75rem;
-}
-
-.statusPending {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  background-color: var(--warning-soft);
-  color: var(--warning);
-  font-weight: 600;
-  font-size: 0.75rem;
-}
-
-.statusInactive {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  background-color: var(--canvas);
-  color: var(--slate-500);
-  font-weight: 600;
-  font-size: 0.75rem;
-}
-
 .publicLinkCard {
   background-color: var(--blue-soft);
   border: 1px solid #bfdbfe;

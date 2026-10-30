@@ -13,6 +13,9 @@
     "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/auth.test.js .test-build/tests/config.test.js",
     "test:browser": "tsc -p tsconfig.test.json && node --test .test-build/tests/browser.test.js",
     "test:service-requests": "node --test tests/service-requests.test.mjs",
+    "test:ticket-workflow": "node --test tests/ticket-workflow.test.mjs",
+    "test:ticket-deletion": "node --test tests/ticket-deletion.test.mjs",
+    "test:catalog-pricing": "node --test tests/catalog-pricing.test.mjs",
     "test:auth-portals": "node --test tests/auth-portals.test.mjs",
     "test:password-recovery": "node --test tests/password-recovery.test.mjs"
   },

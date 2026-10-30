@@ -11,6 +11,9 @@ export interface IService extends Document {
   description?: string;
   category: string;
   basePrice: number;
+  entryType: 'service' | 'part' | 'difficulty';
+  difficultyLevel?: 'low' | 'medium' | 'high' | 'complex';
+  deletedAt?: Date;
   estimatedDuration?: string;
   status: 'active' | 'archived';
   createdAt: Date;
@@ -53,6 +56,9 @@ const serviceSchema = new Schema<IService>(
         message: 'Base price must be a whole integer amount (IDR rupiah)',
       },
     },
+    entryType: { type: String, enum: ['service', 'part', 'difficulty'], default: 'service', required: true },
+    difficultyLevel: { type: String, enum: ['low', 'medium', 'high', 'complex'] },
+    deletedAt: { type: Date },
     estimatedDuration: {
       type: String,
       trim: true,
@@ -67,10 +73,12 @@ const serviceSchema = new Schema<IService>(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
   },
 );
 
 serviceSchema.index({ businessId: 1, status: 1 });
 serviceSchema.index({ businessId: 1, name: 1 });
+serviceSchema.index({ businessId: 1, difficultyLevel: 1 }, { unique: true, partialFilterExpression: { entryType: 'difficulty', status: 'active' } });
 
 export const Service = (mongoose.models.Service as IServiceModel) || mongoose.model<IService, IServiceModel>('Service', serviceSchema);

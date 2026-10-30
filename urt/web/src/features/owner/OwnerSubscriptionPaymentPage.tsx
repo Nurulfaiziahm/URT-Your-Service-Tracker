@@ -5,6 +5,7 @@ import { selectSelectedBusinessId } from '../business/businessSlice';
 import { useGetSubscriptionPaymentQuery, useConfirmDemoSubscriptionPaymentMutation } from '../subscription/subscriptionApi';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Icon';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 import { EmptyState, InlineNotice, PageLoader } from '../../components/feedback/Feedback';
 import { toastAdded } from '../../components/feedback/toastSlice';
 import type { ApiErrorBody } from '../../lib/api.types';
@@ -61,7 +62,7 @@ export default function OwnerSubscriptionPaymentPage() {
     <div className={styles.page}>
       <header className={styles.heading}>
         <div>
-          <ButtonLink to="/owner/subscription" variant="ghost" size="small">← Langganan Saya</ButtonLink>
+          <ButtonLink to="/owner/subscription" variant="ghost" size="small">Langganan Saya</ButtonLink>
           <h1>Invoice Langganan</h1>
           <p>Rincian paket, pembayaran, dan aktivasi langganan URT.</p>
         </div>
@@ -71,14 +72,14 @@ export default function OwnerSubscriptionPaymentPage() {
       {paid && <section className={styles.success} role="status">
         <Icon name="circleCheck" width="28" height="28" />
         <div><strong>Pembayaran berhasil dikonfirmasi</strong><p>Invoice ini sudah lunas. Lihat paket dan masa aktif terbaru di halaman langganan.</p></div>
-        <ButtonLink to="/owner/subscription" variant="success" size="small">Lihat Langganan →</ButtonLink>
+        <ButtonLink to="/owner/subscription" variant="success" size="small">Lihat Langganan</ButtonLink>
       </section>}
 
       <div className={styles.grid}>
         <article className={styles.invoice}>
           <div className={styles.invoiceHeader}>
             <div className={styles.brand}><span>URT</span><div><strong>Your Service Tracker</strong><small>INVOICE LANGGANAN</small></div></div>
-            <span className={styles.badge} data-status={payment.status}>{statusLabels[payment.status]}</span>
+            <StatusBadge label={statusLabels[payment.status]} tone={payment.status === 'paid' ? 'success' : payment.status === 'failed' || payment.status === 'expired' ? 'danger' : 'warning'} />
           </div>
           <div className={styles.reference}>
             <span>Nomor referensi</span>
@@ -117,7 +118,7 @@ export default function OwnerSubscriptionPaymentPage() {
               <Button full pending={confirming} onClick={() => void confirm()}><span className={styles.buttonLabel}><Icon name="check" /> Konfirmasi Pembayaran Demo</span></Button>
             </>}
             {pending && !demoAvailable && <InlineNotice>Gunakan instruksi pembayaran manual. Konfirmasi demo tidak tersedia di lingkungan ini.</InlineNotice>}
-            {paid && <ButtonLink full to="/owner">Buka Dashboard →</ButtonLink>}
+            {paid && <ButtonLink full to="/owner">Buka Dashboard</ButtonLink>}
             {!paid && !pending && <ButtonLink full to="/owner/subscription/plans">Pilih Paket Kembali</ButtonLink>}
             {confirmationError && <InlineNotice type="error">{confirmationError}</InlineNotice>}
             <Button variant="ghost" full pending={isFetching} disabled={confirming} onClick={() => void refetch()}>Periksa Status</Button>

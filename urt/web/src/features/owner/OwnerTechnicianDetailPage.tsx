@@ -119,7 +119,7 @@ export default function OwnerTechnicianDetailPage() {
       <header className="reference-heading">
         <div>
           <ButtonLink to="/owner/technicians" variant="ghost" size="small">
-            ← Daftar Teknisi
+           Daftar Teknisi
           </ButtonLink>
           <h1>{editing ? 'Edit Teknisi' : item.name}</h1>
           <p>{editing ? 'Perbarui informasi teknisi.' : 'Detail teknisi dan informasi kontak.'}</p>

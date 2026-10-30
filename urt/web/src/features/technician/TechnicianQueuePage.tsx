@@ -5,6 +5,7 @@ import { useGetTicketsQuery } from '../tickets/ticketsApi';
 import { useGetTechnicianDashboardQuery } from '../dashboard/dashboardApi';
 import { ticketStatuses, type TicketStatus } from '../tickets/status';
 import { TicketTable } from '../tickets/TicketTable';
+import { DeadlineReminders } from '../tickets/DeadlineReminders';
 import { SummaryCard } from '../../components/ui/SummaryCard';
 import { Pagination } from '../../components/navigation/Pagination';
 import { Button } from '../../components/ui/Button';
@@ -18,11 +19,11 @@ export default function TechnicianQueuePage() {
   const q = params.get('q') || undefined;
   const { data: dashboard } = useGetTechnicianDashboardQuery(
     { businessId: businessId || '' },
-    { skip: !businessId },
+    { skip: !businessId, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true },
   );
   const { data, isLoading, isError, refetch } = useGetTicketsQuery(
     { businessId: businessId || '', params: { page, status, q } },
-    { skip: !businessId },
+    { skip: !businessId, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true },
   );
   const stats = dashboard?.data?.stats;
   function filter(key: string, value: string) {
@@ -59,6 +60,7 @@ export default function TechnicianQueuePage() {
         />
         <SummaryCard label="Selesai" value={stats?.completed ?? '—'} icon="check" tone="green" />
       </section>
+      <DeadlineReminders tickets={dashboard?.data.deadlineTickets || []} total={stats?.urgentCount || 0} />
       <section className="reference-panel">
         <h2>Semua Tiket Aktif</h2>
         <div className="reference-toolbar">

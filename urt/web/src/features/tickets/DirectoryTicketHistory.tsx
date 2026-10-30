@@ -16,7 +16,7 @@ export function DirectoryTicketHistory({
   const { data, isLoading, isError } = useGetTicketsQuery({
     businessId,
     params: { customerId, technicianId, page },
-  });
+  }, { pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true });
   return (
     <section className="reference-panel">
       <div className="reference-panel-header">

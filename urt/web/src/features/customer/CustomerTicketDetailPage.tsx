@@ -6,6 +6,7 @@ import { useGetTicketByIdQuery, useTransitionTicketMutation } from '../tickets/t
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { DeviceSummary } from '../tickets/DeviceSummary';
 import { ServiceStepper } from '../tickets/ServiceStepper';
+import { TicketTiming } from '../tickets/TicketTiming';
 import { TicketTimeline } from '../tickets/TicketTimeline';
 import { EstimateBreakdown } from '../tickets/EstimateBreakdown';
 import { TicketAttachments } from '../tickets/TicketAttachments';
@@ -24,7 +25,7 @@ export default function CustomerTicketDetailPage() {
 
   const { currentData: data, isLoading, error, refetch } = useGetTicketByIdQuery(
     { businessId: businessId || '', ticketId: id || '' },
-    { skip: !businessId || !id },
+    { skip: !businessId || !id, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true },
   );
 
   const [transition, { isLoading: isSubmittingCancel }] = useTransitionTicketMutation();
@@ -108,7 +109,7 @@ export default function CustomerTicketDetailPage() {
             </Button>
           )}
           <ButtonLink to={basePath} variant="secondary">
-            ← Kembali ke Daftar Servis
+           Kembali ke Daftar Servis
           </ButtonLink>
         </div>
       </header>
@@ -173,6 +174,7 @@ export default function CustomerTicketDetailPage() {
       {/* Stepper */}
       <div className={styles.ticketCard}>
         <ServiceStepper status={ticket.status} />
+        <TicketTiming ticket={ticket} />
       </div>
 
       <div className="reference-columns">
@@ -186,7 +188,7 @@ export default function CustomerTicketDetailPage() {
                 dilanjutkan.
               </p>
               <ButtonLink to={`${basePath}/services/${ticket.id}/approval`}>
-                Tinjau & Setujui Biaya →
+                Tinjau & Setujui Biaya
               </ButtonLink>
             </section>
           )}
@@ -237,7 +239,7 @@ export default function CustomerTicketDetailPage() {
           {approvedEstimate && ticket.status !== 'awaiting_approval' && (
             <div className={styles.ticketCard}>
               <h2>Estimasi Biaya yang Disetujui</h2>
-              <EstimateBreakdown revision={approvedEstimate} />
+              <EstimateBreakdown revision={approvedEstimate} customerView />
             </div>
           )}
 

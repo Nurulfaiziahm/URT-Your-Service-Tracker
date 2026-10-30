@@ -1,0 +1,91 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import mongoose from 'mongoose';
+import { serviceRequestFixture } from './helpers/service-request-fixture.mjs';
+import { Customer } from '../dist/models/Customer.model.js';
+import { ServiceTicket } from '../dist/models/ServiceTicket.model.js';
+import { TicketService } from '../dist/modules/ticket/ticket.service.js';
+import { BusinessService } from '../dist/modules/business/business.service.js';
+
+test('owner catalog CRUD, technician additions, authoritative difficulty totals and immutable quotes', async () => {
+  const fixture = serviceRequestFixture();
+  const tech = fixture.addTechnician({ userId: fixture.user.id });
+  const businessId = String(fixture.shop._id);
+  const server = fixture.app.listen(0, '127.0.0.1'); await new Promise((resolve) => server.once('listening', resolve));
+  const base = `http://127.0.0.1:${server.address().port}/api/v1/businesses/${businessId}/services`;
+  async function request(path = '', method = 'GET', body) {
+    const response = await fetch(`${base}${path}`, { method, headers: { Authorization: 'Bearer fixture-token', 'X-CSRF-Token': fixture.csrf, 'Content-Type': 'application/json' }, ...(body && { body: JSON.stringify(body) }) });
+    return { status: response.status, body: await response.json() };
+  }
+  const line = (item, quantity = 1) => ({ catalogItemId: item.id, description: item.name, type: item.entryType === 'part' ? 'part' : 'labor', quantity, unitPrice: item.basePrice });
+  try {
+    fixture.signIn(true, 'owner');
+    const partResult = await request('', 'POST', { entryType: 'part', name: 'Keyboard replacement', category: 'Hardware', basePrice: 150000 });
+    assert.equal(partResult.status, 201);
+    const part = partResult.body.data.service;
+    assert.match(part.id, /^[a-f0-9]{24}$/);
+    const low = (await request('', 'POST', { entryType: 'difficulty', difficultyLevel: 'low', name: 'Jasa Perbaikan Rendah', category: 'Jasa', basePrice: 20000 })).body.data.service;
+    const complex = (await request('', 'POST', { entryType: 'difficulty', difficultyLevel: 'complex', name: 'Jasa Perbaikan Rumit', category: 'Jasa', basePrice: 80000 })).body.data.service;
+    assert.equal((await request('', 'POST', { entryType: 'difficulty', name: 'Incomplete', category: 'Jasa', basePrice: 20000 })).status, 400);
+    assert.equal((await request('', 'POST', { entryType: 'difficulty', difficultyLevel: 'low', name: 'Duplicate', category: 'Jasa', basePrice: 20000 })).status, 409);
+    fixture.signIn(true, 'technician');
+    const added = await request('', 'POST', { entryType: 'service', name: 'Pembersihan konektor', category: 'Perawatan', basePrice: 10000 });
+    assert.equal(added.status, 201);
+    assert.equal((await request('', 'POST', { entryType: 'difficulty', difficultyLevel: 'medium', name: 'Unauthorized tariff', category: 'Jasa', basePrice: 30000 })).status, 403);
+    assert.equal((await request(`/${part.id}`, 'PUT', { basePrice: 1 })).status, 403);
+    assert.equal((await request(`/${part.id}`, 'DELETE')).status, 403);
+    assert.equal((await request('?entryType=part&status=active')).body.data.length, 1);
+    const catalogItems = await request('?scope=catalog&status=active&limit=1');
+    assert.equal(catalogItems.body.pagination.total, 2, 'Catalog pagination excludes difficulty tariffs');
+    assert.equal(catalogItems.body.data.length, 1);
+    assert.notEqual(catalogItems.body.data[0].entryType, 'difficulty');
+    assert.equal((await request('?scope=catalog&q=Keyboard')).body.data[0].id, part.id);
+    const publicShop = await BusinessService.getPublicBusinessBySlug('repair-a');
+    assert.deepEqual(publicShop.services.map((item) => item.name), ['Pembersihan konektor']);
+
+    const contact = await Customer.create({ businessId, name: 'Customer', phone: '+6281234567890' });
+    const ticket = await ServiceTicket.create({ businessId, customerId: contact._id, assignedTechnicianId: tech._id, ticketCode: 'URT-CATALOG', device: { category: 'Laptop', model: 'X' }, complaint: 'Keyboard rusak', intakeMethod: 'online', status: 'diagnosing', revision: 1, diagnosis: { customerExplanation: 'Keyboard perlu diganti.' } });
+    const ticketId = String(ticket._id);
+    const submit = (lines) => TicketService.submitEstimate(businessId, ticketId, fixture.user.id, { expectedRevision: ticket.revision, ...(lines && { lines }) });
+    await assert.rejects(submit([{ ...line(part), unitPrice: 1 }, line(low)]), /berubah/);
+    await assert.rejects(submit([{ ...line(part), catalogItemId: new mongoose.Types.ObjectId().toString() }]), /tidak tersedia/);
+    const originalBusiness = fixture.catalog[0].businessId; fixture.catalog[0].businessId = new mongoose.Types.ObjectId();
+    await assert.rejects(submit([line(part)]), /tidak tersedia/); fixture.catalog[0].businessId = originalBusiness;
+    await assert.rejects(submit([line(part), line(part)]), /satu kali/);
+    await assert.rejects(submit([line(low), line(complex)]), /satu tingkat/);
+    await assert.rejects(submit([line(low, 2)]), /jumlah satu/);
+    await assert.rejects(submit([line(part)]), (error) => error.statusCode === 400 && error.publicCode === 'DIFFICULTY_REQUIRED');
+    await assert.rejects(submit([{ description: 'Manual repair', type: 'labor', quantity: 1, unitPrice: 10000, difficultyLevel: 'low', catalogEntryType: 'difficulty' }]), /Pilih tingkat kesulitan/);
+    await assert.rejects(TicketService.saveEstimateDraft(businessId, ticketId, fixture.user.id, { expectedRevision: ticket.revision, lines: [line(part)] }), /Pilih tingkat kesulitan/);
+    await TicketService.saveEstimateDraft(businessId, ticketId, fixture.user.id, { expectedRevision: ticket.revision, lines: [line(part, 2), line(low)] });
+    assert.equal(ticket.estimateDraft.totalAmount, 320000);
+    assert.equal(ticket.estimateDraft.lines[1].difficultyLevel, 'low');
+    fixture.signIn(true, 'owner');
+    assert.equal((await request(`/${part.id}`, 'PUT', { basePrice: 160000 })).status, 200);
+    await assert.rejects(submit(), /berubah/, 'Sending a saved draft must recheck the current owner tariff');
+    fixture.signIn(true, 'technician');
+    await submit([line({ ...part, basePrice: 160000 }, 2), line(low)]);
+    assert.equal(ticket.estimateRevisions[0].totalAmount, 340000);
+    assert.equal(ticket.estimateRevisions[0].customerExplanation, 'Keyboard perlu diganti.');
+    const approval = await TicketService.createCustomerApprovalLink(businessId, ticketId, fixture.user.id, 1);
+    const token = new URLSearchParams(new URL(approval.approvalUrl).hash.slice(1)).get('token');
+    fixture.signIn(true, 'owner');
+    assert.equal((await request(`/${part.id}`, 'DELETE')).status, 200);
+    assert.equal((await request(`/${part.id}`)).status, 404);
+    assert.equal((await request(`/${part.id}`, 'PUT', { basePrice: 1 })).status, 404);
+    assert.equal((await request('?entryType=part')).body.data.length, 0);
+    const inspected = await TicketService.inspectCustomerApproval(token);
+    assert.equal(inspected.estimate.totalAmount, 340000, 'Deleting catalog data must not rewrite the customer quote');
+    await TicketService.respondToCustomerApproval(token, { expectedRevision: ticket.revision, decision: 'approved' });
+    assert.equal(ticket.approvedEstimate.totalAmount, 340000);
+    assert.equal((await request(`/${low.id}`, 'DELETE')).status, 200);
+    assert.equal((await request('', 'POST', { entryType: 'difficulty', difficultyLevel: 'low', name: 'New low rate', category: 'Jasa', basePrice: 25000 })).status, 201);
+    fixture.signIn(true, 'customer');
+    tech.userId = new mongoose.Types.ObjectId();
+    contact.userId = new mongoose.Types.ObjectId(fixture.user.id);
+    assert.equal((await request('', 'POST', { name: 'No permission', category: 'Jasa', basePrice: 1 })).status, 403);
+    // Simulate an authenticated user with no relationship to this shop.
+    contact.userId = undefined;
+    assert.equal((await request()).status, 403);
+  } finally { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); fixture.restore(); }
+});

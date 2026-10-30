@@ -63,6 +63,9 @@ export interface IDiagnosis {
 }
 
 export interface IEstimateLine {
+  catalogItemId?: mongoose.Types.ObjectId;
+  catalogEntryType?: 'service' | 'part' | 'difficulty';
+  difficultyLevel?: 'low' | 'medium' | 'high' | 'complex';
   description: string;
   type: EstimateItemType;
   quantity: number;
@@ -71,6 +74,8 @@ export interface IEstimateLine {
 }
 
 export interface IEstimateDraft {
+  repairDurationMinutes?: number;
+  qcDurationMinutes?: number;
   lines: IEstimateLine[];
   currency: string;
   totalAmount: number;
@@ -80,6 +85,8 @@ export interface IEstimateDraft {
 }
 
 export interface IEstimateRevision {
+  repairDurationMinutes?: number;
+  qcDurationMinutes?: number;
   version: number;
   lines: IEstimateLine[];
   currency: string;
@@ -137,6 +144,12 @@ export interface IServiceTicket extends Document {
   workSummary?: string;
   repairStartedAt?: Date;
   repairCompletedAt?: Date;
+  repairDueAt?: Date;
+  qcStartedAt?: Date;
+  qcDueAt?: Date;
+  nextDeadlineAt?: Date;
+  deletedAt?: Date;
+  deletedBy?: mongoose.Types.ObjectId;
   qualityCheck?: IQualityCheck;
   warranty?: IWarranty;
   handover?: IHandover;
@@ -195,6 +208,9 @@ const timelineEventSchema = new Schema<ITimelineEvent>(
 
 const estimateLineSchema = new Schema<IEstimateLine>(
   {
+    catalogItemId: { type: Schema.Types.ObjectId, ref: 'Service' },
+    catalogEntryType: { type: String, enum: ['service', 'part', 'difficulty'] },
+    difficultyLevel: { type: String, enum: ['low', 'medium', 'high', 'complex'] },
     description: {
       type: String,
       required: true,
@@ -235,6 +251,8 @@ const estimateLineSchema = new Schema<IEstimateLine>(
 
 const estimateDraftSchema = new Schema<IEstimateDraft>(
   {
+    repairDurationMinutes: { type: Number, min: 1, max: 525600, validate: Number.isInteger },
+    qcDurationMinutes: { type: Number, min: 1, max: 525600, validate: Number.isInteger },
     lines: {
       type: [estimateLineSchema],
       default: [],
@@ -266,6 +284,8 @@ const estimateDraftSchema = new Schema<IEstimateDraft>(
 
 const estimateRevisionSchema = new Schema<IEstimateRevision>(
   {
+    repairDurationMinutes: { type: Number, min: 1, max: 525600, validate: Number.isInteger },
+    qcDurationMinutes: { type: Number, min: 1, max: 525600, validate: Number.isInteger },
     version: {
       type: Number,
       required: true,
@@ -603,6 +623,12 @@ const serviceTicketSchema = new Schema<IServiceTicket>(
     repairCompletedAt: {
       type: Date,
     },
+    repairDueAt: { type: Date },
+    qcStartedAt: { type: Date },
+    qcDueAt: { type: Date },
+    nextDeadlineAt: { type: Date },
+    deletedAt: { type: Date },
+    deletedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     qualityCheck: {
       type: qualityCheckSchema,
       default: undefined,
@@ -630,6 +656,7 @@ const serviceTicketSchema = new Schema<IServiceTicket>(
   },
   {
     timestamps: true,
+    optimisticConcurrency: true,
   },
 );
 
@@ -641,6 +668,7 @@ serviceTicketSchema.index({ businessId: 1, status: 1, createdAt: -1 });
 serviceTicketSchema.index({ businessId: 1, customerId: 1, createdAt: -1 });
 serviceTicketSchema.index({ businessId: 1, assignedTechnicianId: 1, status: 1, createdAt: -1 });
 serviceTicketSchema.index({ 'attachments.key': 1 });
+serviceTicketSchema.index({ businessId: 1, assignedTechnicianId: 1, nextDeadlineAt: 1 });
 
 export const ServiceTicket =
   (mongoose.models.ServiceTicket as IServiceTicketModel) ||

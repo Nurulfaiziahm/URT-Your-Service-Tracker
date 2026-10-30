@@ -643,6 +643,7 @@
 
 /* Fallback customer page styles (preserved) */
 .customerPage {
+  position: relative;
   min-height: 100dvh;
   display: grid;
   place-items: center;
@@ -657,7 +658,7 @@
   box-shadow: 0 4px 6px #0f172a0a;
   width: 100%;
   max-width: 480px;
-  padding: 40px 36px;
+  padding: 36px 32px;
 }
 
 .customerHeader {
@@ -696,8 +697,11 @@
 
 .customerCard .form-grid-2 {
   grid-template-columns: 1fr;
-  gap: 0;
+  gap: 16px;
+  margin: 0;
 }
+.customerCard form { display: grid; gap: 16px; }
+.customerCard > p { margin-top: 20px; }
 
 .customerCard .input-icon-left {
   display: none;
@@ -708,12 +712,18 @@
 }
 
 .customerCard .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .customerCard .btn-primary {
   background: #2563eb;
   min-height: 44px;
+  margin-top: 0;
+}
+
+@media (max-width: 480px) {
+  .customerPage { padding: 24px 16px; }
+  .customerCard { padding: 28px 24px; }
 }
 
 .customerLinks {

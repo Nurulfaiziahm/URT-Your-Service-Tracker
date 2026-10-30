@@ -14,6 +14,7 @@ import { PageLoader } from '../components/feedback/Feedback';
 const LandingPage = lazy(() => import('../features/public/LandingPage'));
 const PortalSelectPage = lazy(() => import('../features/public/PortalSelectPage'));
 const TrackingPage = lazy(() => import('../features/public/TrackingPage'));
+const ServiceApprovalPage = lazy(() => import('../features/public/ServiceApprovalPage'));
 const LegalPage = lazy(() => import('../features/public/LegalPage'));
 const UnavailablePage = lazy(() => import('../features/public/UnavailablePage'));
 const FoundationPage = lazy(() => import('../features/public/FoundationPage'));
@@ -88,6 +89,7 @@ export function AppRoutes() {
         <Route path="owner/login" element={<LoginPage portal="owner" />} />
         <Route path="customer/register" element={<RegisterPage portal="customer" />} />
         <Route path="tracking/:ticketCode?" element={<TrackingPage />} />
+        <Route path="service-approval" element={<ServiceApprovalPage />} />
         <Route path="privacy" element={<LegalPage document="privacy" />} />
         <Route path="terms" element={<LegalPage document="terms" />} />
         <Route element={<CustomerPortalGate />}>
@@ -126,6 +128,7 @@ export function AppRoutes() {
         <Route element={<AuthLayout showHomeLink={false} />}>
           <Route path="customer/login" element={<LoginPage portal="customer" />} />
           <Route path="technician/login" element={<LoginPage portal="technician" />} />
+          <Route path="technician/register" element={<TechnicianAcceptInvitationPage />} />
           <Route path="technician/invite/accept/:token?" element={<TechnicianAcceptInvitationPage />} />
           {(['owner', 'customer', 'technician'] as const).map((portal) => <Route key={portal}>
             <Route path={`${portal}/forgot-password`} element={<ForgotPasswordPage key={portal} portal={portal} />} />

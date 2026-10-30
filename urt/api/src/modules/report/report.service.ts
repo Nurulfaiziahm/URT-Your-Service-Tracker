@@ -64,28 +64,28 @@ export class ReportService {
         unpaidInvoices,
         completedTicketsInMonth,
       ] = await Promise.all([
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           status: { $nin: ['completed', 'cancelled'] },
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           status: 'awaiting_approval',
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           status: 'repairing',
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           status: 'completed',
           $or: [{ handedOverAt: { $exists: false } }, { handedOverAt: null }],
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           status: 'completed',
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           status: 'rejected',
         }),
@@ -97,11 +97,11 @@ export class ReportService {
           businessId: businessObjectId,
           status: 'active',
         }),
-        ServiceTicket.find({ businessId: businessObjectId })
+        ServiceTicket.find({ deletedAt: { $exists: false }, businessId: businessObjectId })
           .sort({ createdAt: -1 })
           .limit(5)
           .populate([
-            { path: 'customerId', select: 'name email phone' },
+            { path: 'customerId', select: 'name email phone userId' },
             { path: 'assignedTechnicianId', select: 'name email phone specializations' },
             { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
           ]),
@@ -118,7 +118,7 @@ export class ReportService {
           status: { $in: ['issued', 'partially_paid'] },
         }),
         // Completed in current month for MTD SLA
-        ServiceTicket.find({
+        ServiceTicket.find({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           status: 'completed',
           readyAt: { $gte: startOfMonth, $lte: endOfMonth },
@@ -192,53 +192,60 @@ export class ReportService {
         qualityCheck,
         completed,
         recentDocs,
+        deadlineDocs,
+        urgentCount,
       ] = await Promise.all([
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           assignedTechnicianId: technician._id,
           status: { $nin: ['completed', 'cancelled'] },
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           assignedTechnicianId: technician._id,
           status: { $in: ['submitted', 'waiting_diagnosis'] },
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           assignedTechnicianId: technician._id,
           status: 'diagnosing',
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           assignedTechnicianId: technician._id,
           status: 'awaiting_approval',
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           assignedTechnicianId: technician._id,
           status: 'repairing',
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           assignedTechnicianId: technician._id,
           status: 'quality_check',
         }),
-        ServiceTicket.countDocuments({
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           assignedTechnicianId: technician._id,
           status: 'completed',
         }),
-        ServiceTicket.find({
+        ServiceTicket.find({ deletedAt: { $exists: false },
           businessId: businessObjectId,
           assignedTechnicianId: technician._id,
         })
           .sort({ createdAt: -1 })
           .limit(5)
           .populate([
-            { path: 'customerId', select: 'name email phone' },
+            { path: 'customerId', select: 'name email phone userId' },
             { path: 'assignedTechnicianId', select: 'name email phone specializations' },
             { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
           ]),
+        ServiceTicket.find({ deletedAt: { $exists: false }, businessId: businessObjectId, assignedTechnicianId: technician._id,
+          status: { $nin: ['completed', 'cancelled', 'rejected'] }, nextDeadlineAt: { $lte: new Date(Date.now() + 86400000) } })
+          .sort({ nextDeadlineAt: 1, _id: 1 }).limit(20).populate('customerId', 'name email phone userId'),
+        ServiceTicket.countDocuments({ deletedAt: { $exists: false }, businessId: businessObjectId, assignedTechnicianId: technician._id,
+          status: { $nin: ['completed', 'cancelled', 'rejected'] }, nextDeadlineAt: { $lte: new Date(Date.now() + 86400000) } }),
       ]);
 
       const recentTickets = recentDocs.map((ticket) =>
@@ -261,7 +268,9 @@ export class ReportService {
           repairing,
           qualityCheck,
           completed,
+          urgentCount,
         },
+        deadlineTickets: deadlineDocs.map((ticket) => serializeTicket(ticket, 'technician', true)),
         recentTickets,
       };
     }
@@ -284,35 +293,35 @@ export class ReportService {
       completedTickets,
       recentDocs,
     ] = await Promise.all([
-      ServiceTicket.countDocuments({
+      ServiceTicket.countDocuments({ deletedAt: { $exists: false },
         businessId: businessObjectId,
         customerId: customer._id,
         status: { $nin: ['completed', 'cancelled'] },
       }),
-      ServiceTicket.countDocuments({
+      ServiceTicket.countDocuments({ deletedAt: { $exists: false },
         businessId: businessObjectId,
         customerId: customer._id,
         status: 'awaiting_approval',
       }),
-      ServiceTicket.countDocuments({
+      ServiceTicket.countDocuments({ deletedAt: { $exists: false },
         businessId: businessObjectId,
         customerId: customer._id,
         status: 'completed',
         $or: [{ handedOverAt: { $exists: false } }, { handedOverAt: null }],
       }),
-      ServiceTicket.countDocuments({
+      ServiceTicket.countDocuments({ deletedAt: { $exists: false },
         businessId: businessObjectId,
         customerId: customer._id,
         status: { $in: ['completed', 'cancelled'] },
       }),
-      ServiceTicket.find({
+      ServiceTicket.find({ deletedAt: { $exists: false },
         businessId: businessObjectId,
         customerId: customer._id,
       })
         .sort({ createdAt: -1 })
         .limit(5)
         .populate([
-          { path: 'customerId', select: 'name email phone' },
+          { path: 'customerId', select: 'name email phone userId' },
           { path: 'assignedTechnicianId', select: 'name email phone specializations' },
           { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
         ]),
@@ -419,19 +428,19 @@ export class ReportService {
         },
       ]),
       // 3. Completed tickets in period (for volume and SLA)
-      ServiceTicket.find({
+      ServiceTicket.find({ deletedAt: { $exists: false },
         businessId: businessObjectId,
         status: 'completed',
         readyAt: { $gte: startDate, $lte: endDate },
       }),
       // 4. Incoming tickets in period
-      ServiceTicket.countDocuments({
+      ServiceTicket.countDocuments({ deletedAt: { $exists: false },
         businessId: businessObjectId,
         createdAt: { $gte: startDate, $lte: endDate },
       }),
       // 5. Status distribution across all business tickets
       ServiceTicket.aggregate([
-        { $match: { businessId: businessObjectId } },
+        { $match: { deletedAt: { $exists: false }, businessId: businessObjectId } },
         { $group: { _id: '$status', count: { $sum: 1 } } },
       ]),
       // 6. Active technicians
@@ -502,12 +511,12 @@ export class ReportService {
     const technicianPerformance = await Promise.all(
       technicians.map(async (tech) => {
         const [activeCount, techCompletedDocs] = await Promise.all([
-          ServiceTicket.countDocuments({
+          ServiceTicket.countDocuments({ deletedAt: { $exists: false },
             businessId: businessObjectId,
             assignedTechnicianId: tech._id,
             status: { $nin: ['completed', 'cancelled'] },
           }),
-          ServiceTicket.find({
+          ServiceTicket.find({ deletedAt: { $exists: false },
             businessId: businessObjectId,
             assignedTechnicianId: tech._id,
             status: 'completed',

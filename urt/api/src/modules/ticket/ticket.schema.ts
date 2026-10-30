@@ -10,6 +10,7 @@ const deviceSchema = z.object({
 });
 
 const estimateLineInputSchema = z.object({
+  catalogItemId: z.string().regex(/^[a-f0-9]{24}$/i).optional(),
   description: z.string().trim().min(1, 'Description is required').max(200, 'Max 200 characters'),
   type: z.enum(['part', 'labor']),
   quantity: z
@@ -21,6 +22,11 @@ const estimateLineInputSchema = z.object({
     .int('Unit price must be a whole integer in rupiah')
     .min(0, 'Unit price cannot be negative'),
 });
+
+const serviceTimingFields = {
+  repairDurationMinutes: z.number().int().min(1).max(525600).optional(),
+  qcDurationMinutes: z.number().int().min(1).max(525600).optional(),
+};
 
 export const createTicketSchema = z.object({
   body: z
@@ -88,6 +94,7 @@ export const diagnosisSchema = z.object({
 export const estimateDraftSchema = z.object({
   body: z
     .object({
+      ...serviceTimingFields,
       expectedRevision: z.number().int().min(1, 'expectedRevision is required'),
       lines: z.array(estimateLineInputSchema).min(1, 'At least one line item is required'),
       targetCompletionDate: z.coerce.date().optional(),
@@ -99,6 +106,7 @@ export const estimateDraftSchema = z.object({
 export const submitEstimateSchema = z.object({
   body: z
     .object({
+      ...serviceTimingFields,
       expectedRevision: z.number().int().min(1, 'expectedRevision is required'),
       customerExplanation: z.string().trim().min(3).max(1000).optional(),
       lines: z.array(estimateLineInputSchema).min(1).optional(),
@@ -180,6 +188,10 @@ export const issueTrackingAccessSchema = z.object({
   body: z.object({
     expectedRevision: z.number().int().min(1, 'expectedRevision must be an integer >= 1'),
   }),
+});
+
+export const deleteAnonymousTicketSchema = z.object({
+  body: z.object({ expectedRevision: z.number().int().min(1) }).strict(),
 });
 
 export const publicTrackingSchema = z.object({

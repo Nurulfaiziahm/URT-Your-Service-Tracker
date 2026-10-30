@@ -1,4 +1,3 @@
-import type { TimelineEvent } from './types';
 import styles from './Tickets.module.css';
 
 const actions: Record<string, string> = {
@@ -22,35 +21,42 @@ const actions: Record<string, string> = {
   attachment_added: 'Lampiran ditambahkan',
   attachment_removed: 'Lampiran dihapus',
 };
-export function timelineActionLabel(action: string) {
-  return actions[action] || 'Status servis diperbarui';
-}
+
 const roles: Record<string, string> = {
   owner: 'Pemilik',
   technician: 'Teknisi',
   customer: 'Pelanggan',
   system: 'Sistem',
 };
-export function TicketTimeline({ timeline }: { timeline: TimelineEvent[] }) {
-  if (!timeline || timeline.length === 0) {
-    return (
-      <p style={{ fontSize: '0.88rem', color: 'var(--slate-500)' }}>Belum ada catatan aktivitas.</p>
-    );
-  }
 
+function timelineActionLabel(action: string) {
+  return actions[action] || 'Status servis diperbarui';
+}
+
+export interface TicketTimelineEntry {
+  id?: string;
+  action: string;
+  actorName?: string;
+  actorRole: string;
+  note?: string;
+  timestamp: string;
+}
+
+export function TicketTimeline({ timeline }: { timeline: TicketTimelineEntry[] }) {
+  if (!timeline?.length) return <p className={styles.timelineEmpty}>Belum ada catatan aktivitas.</p>;
   return (
-    <div className={styles.timeline}>
+    <ol className={styles.timeline} aria-label="Riwayat perubahan status servis">
       {timeline.map((event, index) => (
-        <div key={event.id || index} className={styles.timelineItem}>
-          <div className={styles.timelineDot} />
-          <div className={styles.timelineAction}>{timelineActionLabel(event.action)}</div>
-          <div className={styles.timelineMeta}>
-            {event.actorName} ({roles[event.actorRole] || event.actorRole}) •{' '}
-            {new Date(event.timestamp).toLocaleString('id-ID')}
-          </div>
-          {event.note && <div className={styles.timelineNote}>{event.note}</div>}
-        </div>
+        <li key={event.id || index} className={styles.timelineItem}>
+          <span className={styles.timelineDot} aria-hidden="true" />
+          <strong className={styles.timelineAction}>{timelineActionLabel(event.action)}</strong>
+          <span className={styles.timelineMeta}>
+            {event.actorName ? `${event.actorName} (${roles[event.actorRole] || event.actorRole})` : roles[event.actorRole] || event.actorRole}
+            {' \u00b7 '}{new Date(event.timestamp).toLocaleString('id-ID')}
+          </span>
+          {event.note && <span className={styles.timelineNote}>{event.note}</span>}
+        </li>
       ))}
-    </div>
+    </ol>
   );
 }

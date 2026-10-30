@@ -22,9 +22,13 @@ import { technicianInvitationRouter } from '../dist/modules/technician/technicia
 import { verifyCsrfToken } from '../dist/core/security/csrf.js';
 import { loginLimiter, authLimiter } from '../dist/core/security/rate-limiter.js';
 import { AppError } from '../dist/middleware/error-handler.js';
+import { passwordRecovery } from '../dist/modules/auth/password-recovery.service.js';
 
-test('role-specific signup/login and owner-issued technician activation preserve authorization', async () => {
+test('role-specific signup/login and owner-issued technician activation preserve authorization', async (t) => {
+  const initialTime = Date.now();
+  t.mock.timers.enable({ apis: ['Date'], now: initialTime });
   const users = [], technicians = [], businesses = [];
+  const mailTemplates = [], resetGrants = [];
   const tokens = new Map();
   let subscriptionActive = true;
   const restorers = [];
@@ -69,7 +73,9 @@ test('role-specific signup/login and owner-issued technician activation preserve
   replace(accountSecurityStore, 'resetLoginAttempts', async () => {});
   replace(accountSecurityStore, 'incrementLoginAttempts', async () => 1);
   replace(otpStore, 'setEmailOtp', async () => {});
-  replace(mailService, 'sendTemplate', async () => true);
+  replace(mailService, 'available', async () => true);
+  replace(mailService, 'sendTemplate', async (options) => { mailTemplates.push(options); return true; });
+  replace(accountSecurityStore, 'createPasswordReset', async (grant) => { resetGrants.push(grant); return true; });
   replace(AuthService, 'sendRegistrationEmails', async () => {});
   replace(deviceService, 'extractDeviceInfo', () => ({ deviceId: 'fixture-device' }));
   replace(AuthService, 'startSession', async (user) => {
@@ -136,12 +142,33 @@ test('role-specific signup/login and owner-issued technician activation preserve
     const invitePath = `/businesses/${shop._id}/technicians/invitations`;
     const invited = await request(invitePath, { name: 'Invited Technician', email: 'technician@example.test' }, owner.data.accessToken);
     assert.equal(invited.status, 201);
+    assert.equal(users.length, 2, 'Adding a technician as owner must not create a login account before registration');
     const rawToken = invited.data.token;
     assert.ok(rawToken);
-    const expiresAt = technicians[0].invitationExpiresAt;
-    technicians[0].invitationExpiresAt = new Date(0);
+    const invitationExpiry = technicians[0].invitationExpiresAt.getTime();
+    assert.equal(invitationExpiry, initialTime + 7 * 86400000, 'Invitation expiry must be exactly seven days after issue');
+    const invitationUrl = new URL(invited.data.invitationUrl);
+    assert.equal(invitationUrl.pathname, '/technician/register');
+    assert.equal(new URLSearchParams(invitationUrl.hash.slice(1)).get('token'), rawToken);
+    const inspected = await request('/technician-invitations/inspect', { token: rawToken });
+    assert.equal(inspected.status, 200);
+    assert.equal(inspected.data.email, 'technician@example.test');
+    assert.equal(inspected.data.accountExists, false);
+    assert.equal((await request('/auth/technician/login', { email: 'technician@example.test', password: 'not-created-yet' })).status, 401);
+    assert.equal((await request('/auth/technician/forgot-password', { email: 'technician@example.test' })).status, 200);
+    await passwordRecovery.waitForDeliveries();
+    const setupEmail = mailTemplates.at(-1);
+    assert.equal(setupEmail.template, 'reset-password', 'Pending technicians must receive a usable six-digit recovery code');
+    assert.match(setupEmail.data.otp, /^\d{6}$/);
+    assert.equal((await request('/technician-invitations/inspect', { token: rawToken })).status, 200, 'Recovery must not invalidate an invitation before its seven-day expiry');
+    assert.equal(technicians[0].invitationExpiresAt.getTime(), invitationExpiry);
+    assert.equal(users.length, 2, 'Requesting first-password setup must not create an account until the invitation is activated');
+    assert.equal(resetGrants.length, 1);
+    t.mock.timers.setTime(invitationExpiry - 1);
+    assert.equal((await request('/technician-invitations/inspect', { token: rawToken })).status, 200, 'Invitation must work immediately before the seven-day deadline');
+    t.mock.timers.setTime(invitationExpiry);
     assert.equal((await request('/technician-invitations/inspect', { token: rawToken })).status, 400);
-    technicians[0].invitationExpiresAt = expiresAt;
+    t.mock.timers.setTime(initialTime);
     assert.equal((await request('/technician-invitations/activate', { token: 'invalid-token-value', password: 'fixture-password', confirmPassword: 'fixture-password' })).status, 400);
     assert.equal((await request('/technician-invitations/activate', { token: rawToken, password: 'fixture-password', confirmPassword: 'different' })).status, 400);
     subscriptionActive = false;
@@ -159,6 +186,11 @@ test('role-specific signup/login and owner-issued technician activation preserve
     assert.equal((await request('/technician-invitations/activate', { token: rawToken, password: 'technician-password', confirmPassword: 'technician-password' })).status, 400);
     const techLogin = await request('/auth/technician/login', { email: techUser.email, password: 'technician-password' });
     assert.equal(techLogin.status, 200);
+    assert.equal((await request('/auth/technician/forgot-password', { email: techUser.email })).status, 200);
+    await passwordRecovery.waitForDeliveries();
+    assert.equal(mailTemplates.at(-1).template, 'reset-password');
+    assert.match(mailTemplates.at(-1).data.otp, /^\d{6}$/);
+    assert.equal(resetGrants.at(-1).userId, techUser.id);
     assert.equal((await request('/auth/owner/login', { email: techUser.email, password: 'technician-password' })).status, 403);
     assert.equal((await request('/auth/customer/login', { email: techUser.email, password: 'technician-password' })).status, 403);
     loginLimiter.resetKey('127.0.0.1'); authLimiter.resetKey('127.0.0.1');

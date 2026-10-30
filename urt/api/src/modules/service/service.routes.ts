@@ -4,6 +4,7 @@ import {
   getServices,
   getServiceById,
   updateService,
+  deleteService,
 } from './service.controller.js';
 import { validate } from '../../middleware/validation.js';
 import { protect } from '../../middleware/auth.guard.js';
@@ -27,13 +28,15 @@ router.use((_req, res, next) => {
 // Require user to be authenticated
 router.use(protect);
 router.use(attachBusinessContext);
+router.use(requireBusinessAccess('owner', 'technician', 'customer'));
 
 // Read services: available to authorized users in the business
 router.get('/', validate(serviceQuerySchema), getServices);
 router.get('/:serviceId', getServiceById);
 
-// Owner-only modifications
-router.post('/', requireBusinessAccess('owner'), validate(createServiceSchema), createService);
+// Technicians can add missing items; tariff levels and edits remain owner-managed.
+router.post('/', requireBusinessAccess('owner', 'technician'), validate(createServiceSchema), createService);
 router.put('/:serviceId', requireBusinessAccess('owner'), validate(updateServiceSchema), updateService);
+router.delete('/:serviceId', requireBusinessAccess('owner'), deleteService);
 
 export default router;

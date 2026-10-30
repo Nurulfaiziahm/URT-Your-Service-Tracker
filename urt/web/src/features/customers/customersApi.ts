@@ -4,6 +4,10 @@ import type { CreateCustomerInput, Customer, UpdateCustomerInput } from './types
 
 export const customersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    deleteCustomer: builder.mutation<void, { businessId: string; customerId: string }>({
+      query: ({ businessId, customerId }) => ({ url: `/businesses/${encodeURIComponent(businessId)}/customers/${encodeURIComponent(customerId)}`, method: 'DELETE' }),
+      invalidatesTags: ['Customers'],
+    }),
     getCustomer: builder.query<
       ApiResponse<{ customer: Customer }>,
       { businessId: string; id: string }
@@ -75,6 +79,7 @@ export const customersApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useDeleteCustomerMutation,
   useGetCustomerQuery,
   useGetCustomersQuery,
   useCreateCustomerMutation,

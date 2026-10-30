@@ -44,16 +44,20 @@ export default function ResetPasswordPage({ portal }: { portal: AuthPortal }) {
       await resetPassword({ portal, resetToken, password, confirmPassword }).unwrap();
       dispatch(sessionEnded());
       setPassword(''); setConfirmPassword(''); setVerifiedToken(null); setComplete(true);
-      navigate(location.pathname, { replace: true });
+      navigate(location.pathname, { replace: true, state: location.state });
     } catch (error) { setFailure((error as { data?: ApiErrorBody }).data?.error || 'Tautan tidak valid atau sudah kedaluwarsa. Minta email pemulihan baru.'); }
   }
   if (complete && !resetToken) return <section className={styles.form} aria-live="polite"><h1>Kata Sandi Berhasil Diperbarui</h1>
     <p>Silakan masuk menggunakan kata sandi baru Anda. Sesi sebelumnya sudah dinonaktifkan.</p>
-    <ButtonLink to={loginPath}>Kembali ke Login</ButtonLink></section>;
+    <ButtonLink to={loginPath} state={location.state}>Login</ButtonLink></section>;
   return <div className={styles.form}>
     <header className={styles.heading}><span className="eyebrow">Pemulihan {portal === 'owner' ? 'Pemilik Usaha' : portal === 'technician' ? 'Teknisi' : 'Pelanggan'}</span>
       <h1>{step === 'otp' ? 'Masukkan Kode Pemulihan' : 'Buat Kata Sandi Baru'}</h1>
-      <p>{step === 'otp' ? 'Jika akun mendukung pemulihan pada portal ini, email berisi kode dan tautan akan dikirim. Masukkan kode 6 digit atau buka tautan di email Anda.' : 'Gunakan kata sandi baru untuk akun Anda. Tautan pemulihan hanya dapat dipakai sekali.'}</p></header>
+      <p>{step === 'otp'
+        ? portal === 'technician'
+          ? 'Periksa email Anda dan masukkan kode pemulihan 6 digit atau buka tautan pemulihan. Jika akun belum aktif, verifikasi kode lalu buat kata sandi pertama Anda.'
+          : 'Jika akun mendukung pemulihan pada portal ini, email berisi kode dan tautan akan dikirim. Masukkan kode 6 digit atau buka tautan di email Anda.'
+        : 'Gunakan kata sandi baru untuk akun Anda. Tautan pemulihan hanya dapat dipakai sekali.'}</p></header>
     {failure && <InlineNotice type="error">{failure}</InlineNotice>}
     {step === 'otp' ? <form className={styles.form} onSubmit={verify}>
       <TextInput label="Alamat email" name="email" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
@@ -64,6 +68,6 @@ export default function ResetPasswordPage({ portal }: { portal: AuthPortal }) {
       <TextInput label="Konfirmasi kata sandi" name="confirmPassword" type="password" minLength={6} maxLength={128} required autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
       <Button type="submit" pending={resetting.isLoading}>Simpan Kata Sandi Baru</Button>
     </form>}
-    <footer className={styles.links}><Link to={loginPath}>&larr; Kembali ke Login</Link><Link to={`/${portal}/forgot-password`}>Kirim kode dan tautan baru</Link></footer>
+    <footer className={styles.links}><Link to={loginPath} state={location.state}>Kembali ke Login</Link><Link to={`/${portal}/forgot-password`} state={location.state}>Kirim kode dan tautan baru</Link></footer>
   </div>;
 }

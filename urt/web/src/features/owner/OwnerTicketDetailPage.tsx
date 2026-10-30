@@ -1,7 +1,7 @@
 import { Icon } from '../../components/ui/Icon';
 import { Modal } from '../../components/ui/Modal';
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
 import { useGetBusinessByIdQuery } from '../business/businessApi';
@@ -9,6 +9,7 @@ import {
   useGetTicketByIdQuery,
   useTransitionTicketMutation,
   useIssueTrackingAccessMutation,
+  useDeleteAnonymousTicketMutation,
 } from '../tickets/ticketsApi';
 import { useIssueInvoiceMutation } from '../invoices/invoicesApi';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
@@ -25,14 +26,17 @@ import { Button, ButtonLink } from '../../components/ui/Button';
 import { PageLoader, EmptyState, InlineNotice } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from '../tickets/Tickets.module.css';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 export default function OwnerTicketDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const businessId = useAppSelector(selectSelectedBusinessId);
 
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showHandoverModal, setShowHandoverModal] = useState(false);
   const [showPrintReceipt, setShowPrintReceipt] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [activeQCModal, setActiveQCModal] = useState<QCOperation | null>(null);
   const [copyNotice, setCopyNotice] = useState('');
   const [actionError, setActionError] = useState<string | null>(null);
@@ -49,6 +53,7 @@ export default function OwnerTicketDetailPage() {
   );
 
   const [transition, { isLoading: isTransitioning }] = useTransitionTicketMutation();
+  const [deleteTicket, { isLoading: isDeleting }] = useDeleteAnonymousTicketMutation();
   const [issueTracking, { isLoading: isIssuingTracking }] = useIssueTrackingAccessMutation();
   const [issueInvoice, { isLoading: isIssuingInvoice }] = useIssueInvoiceMutation();
   const [issuedInvoiceId, setIssuedInvoiceId] = useState<string | null>(null);
@@ -100,6 +105,19 @@ export default function OwnerTicketDetailPage() {
     } catch (err) {
       const apiErr = err as { data?: ApiErrorBody };
       setActionError(apiErr.data?.error || apiErr.data?.message || 'Gagal menerima intake fisik.');
+    }
+  };
+
+  const handleDeleteTicket = async () => {
+    setActionError(null);
+    try {
+      await deleteTicket({ businessId, ticketId: ticket.id, expectedRevision: ticket.revision }).unwrap();
+      navigate('/owner/tickets', { replace: true, state: { notice: 'Tiket anonim berhasil dihapus.' } });
+    } catch (err) {
+      const body = (err as { data?: ApiErrorBody }).data;
+      setShowDeleteDialog(false);
+      setActionError(body?.error || body?.message || 'Tiket belum dapat dihapus. Muat ulang dan coba lagi.');
+      void refetch();
     }
   };
 
@@ -181,6 +199,7 @@ export default function OwnerTicketDetailPage() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {ticket.allowedActions.includes('delete_ticket') && <Button type="button" variant="danger" onClick={() => setShowDeleteDialog(true)}>Hapus Tiket Anonim</Button>}
           <Button type="button" variant="secondary" onClick={() => setShowPrintReceipt(true)}>
             <Icon name="print" /> Cetak Tanda Terima
           </Button>
@@ -193,7 +212,7 @@ export default function OwnerTicketDetailPage() {
             {isIssuingTracking ? 'Membuat...' : 'Buat Kode Lacak'}
           </Button>
           <ButtonLink to="/owner/tickets" variant="secondary">
-            ← Kembali ke Daftar Tiket
+           Kembali ke Daftar Tiket
           </ButtonLink>
         </div>
       </header>
@@ -599,6 +618,8 @@ export default function OwnerTicketDetailPage() {
           }}
         />
       )}
+
+      {showDeleteDialog && <ConfirmDialog title="Hapus Tiket Anonim?" description={`Hapus ${ticket.ticketCode} dari portal dan antrean teknisi? Hanya tiket pelanggan tanpa akun yang dapat dihapus.`} pending={isDeleting} onConfirm={() => void handleDeleteTicket()} onClose={() => setShowDeleteDialog(false)} />}
 
       {showHandoverModal && (
         <HandoverModal

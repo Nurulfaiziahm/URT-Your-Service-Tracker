@@ -178,7 +178,7 @@ export function OwnerOnboardingChecklist({ data }: OwnerOnboardingChecklistProps
               <h3 className={styles.itemTitle}>{step.title}</h3>
               <p className={styles.itemDesc}>{step.desc}</p>
               <Link to={step.actionTo} className={styles.itemAction}>
-                {step.actionText} →
+                {step.actionText}
               </Link>
             </div>
           </div>

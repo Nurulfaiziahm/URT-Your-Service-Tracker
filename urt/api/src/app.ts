@@ -22,6 +22,7 @@ import { customerInvitationRouter } from './modules/customer/index.js';
 import { technicianInvitationRouter } from './modules/technician/index.js';
 import { publicTrackingRouter } from './modules/ticket/index.js';
 import { packageRouter } from './modules/subscription/subscription.routes.js';
+import { publicApprovalRouter } from './modules/ticket/approval-access.routes.js';
 
 const app: Application = express();
 
@@ -73,6 +74,7 @@ apiRouter.use('/me/businesses', meBusinessesRouter);
 apiRouter.use('/businesses', businessRoutes);
 apiRouter.use('/public/businesses', publicBusinessRouter);
 apiRouter.use('/public/tracking', publicTrackingRouter);
+apiRouter.use('/public/service-approvals', publicApprovalRouter);
 apiRouter.use('/customer-invitations', customerInvitationRouter);
 apiRouter.use('/technician-invitations', technicianInvitationRouter);
 

@@ -34,6 +34,9 @@ export interface SerializedAttachment {
 }
 
 export interface EstimateLine {
+  catalogItemId?: string;
+  catalogEntryType?: 'service' | 'part' | 'difficulty';
+  difficultyLevel?: 'low' | 'medium' | 'high' | 'complex';
   id?: string;
   description: string;
   type: 'part' | 'labor';
@@ -43,6 +46,8 @@ export interface EstimateLine {
 }
 
 export interface EstimateRevision {
+  repairDurationMinutes?: number;
+  qcDurationMinutes?: number;
   version: number;
   lines: EstimateLine[];
   currency: string;
@@ -57,6 +62,15 @@ export interface EstimateRevision {
     reason?: string;
     decidedAt: string;
   };
+}
+
+export interface PublicServiceApproval {
+  ticketCode: string;
+  revision: number;
+  businessName: string;
+  businessSlug: string;
+  device: Pick<DeviceInfo, 'category' | 'brand' | 'model'>;
+  estimate: EstimateRevision;
 }
 
 export interface ServiceTicket {
@@ -101,6 +115,8 @@ export interface ServiceTicket {
     diagnosedAt?: string;
   };
   estimateDraft?: {
+    repairDurationMinutes?: number;
+    qcDurationMinutes?: number;
     lines: EstimateLine[];
     currency: string;
     totalAmount: number;
@@ -113,6 +129,10 @@ export interface ServiceTicket {
   workSummary?: string;
   repairStartedAt?: string;
   repairCompletedAt?: string;
+  repairDueAt?: string;
+  qcStartedAt?: string;
+  qcDueAt?: string;
+  nextDeadlineAt?: string;
   qualityCheck?: {
     passed: boolean;
     notes?: string;
@@ -166,6 +186,8 @@ export interface DiagnosisInput {
 }
 
 export interface EstimateDraftInput {
+  repairDurationMinutes?: number;
+  qcDurationMinutes?: number;
   expectedRevision: number;
   lines: EstimateLine[];
   targetCompletionDate?: string;
@@ -173,6 +195,8 @@ export interface EstimateDraftInput {
 }
 
 export interface SubmitEstimateInput {
+  repairDurationMinutes?: number;
+  qcDurationMinutes?: number;
   expectedRevision: number;
   customerExplanation?: string;
   lines?: EstimateLine[];

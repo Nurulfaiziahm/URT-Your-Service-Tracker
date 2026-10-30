@@ -12,6 +12,8 @@ import { Button, ButtonLink } from '../../components/ui/Button';
 import { Pagination } from '../../components/navigation/Pagination';
 import { InlineNotice, PageLoader } from '../../components/feedback/Feedback';
 import { SummaryCard } from '../../components/ui/SummaryCard';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { formatRupiah } from '../tickets/currency';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from '../subscription/Subscription.module.css';
@@ -77,7 +79,7 @@ export default function OwnerSubscriptionPage() {
         </div>
         {choosing ? (
           <ButtonLink to="/owner/subscription" variant="secondary">
-            ← Langganan Saya
+           Langganan Saya
           </ButtonLink>
         ) : (
           <ButtonLink to="/owner/subscription/plans">Perpanjang / Pilih Paket</ButtonLink>
@@ -107,13 +109,7 @@ export default function OwnerSubscriptionPage() {
           <section className="reference-panel">
             <div className="reference-panel-header">
               <h2>Status Langganan</h2>
-              <span className={styles.badge} data-status={subscription.status}>
-                {subscription.status === 'active'
-                  ? 'Aktif'
-                  : subscription.status === 'expired'
-                    ? 'Kedaluwarsa'
-                    : 'Belum Aktif'}
-              </span>
+              <StatusBadge label={subscription.status === 'active' ? 'Aktif' : subscription.status === 'expired' ? 'Kedaluwarsa' : 'Belum Aktif'} tone={subscription.status === 'active' ? 'success' : subscription.status === 'expired' ? 'danger' : 'warning'} />
             </div>
             <dl className="reference-dl">
               <div>
@@ -152,7 +148,7 @@ export default function OwnerSubscriptionPage() {
             ) : loadingPayments ? (
               <PageLoader />
             ) : (
-              <div className={styles.tableWrap}>
+              <ResponsiveTable className={styles.tableWrap} rowHeading="Pembayaran">
                 <table className={styles.table}>
                   <thead>
                     <tr>
@@ -172,9 +168,7 @@ export default function OwnerSubscriptionPage() {
                         <td>{p.package.name}</td>
                         <td>{formatRupiah(p.amount)}</td>
                         <td>
-                          <span className={styles.badge} data-status={p.status}>
-                            {paymentLabels[p.status]}
-                          </span>
+                          <StatusBadge label={paymentLabels[p.status]} tone={p.status === 'paid' ? 'success' : p.status === 'failed' || p.status === 'expired' ? 'danger' : 'warning'} />
                         </td>
                         <td>
                           <ButtonLink
@@ -194,7 +188,7 @@ export default function OwnerSubscriptionPage() {
                     )}
                   </tbody>
                 </table>
-              </div>
+              </ResponsiveTable>
             )}
             <Pagination
               pagination={payments?.pagination}

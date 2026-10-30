@@ -75,7 +75,7 @@ export function CustomerApprovalCard({ businessId, ticket, onSuccess }: Customer
       {errorMsg && <InlineNotice type="error">{errorMsg}</InlineNotice>}
       {successMsg && <InlineNotice type="success">{successMsg}</InlineNotice>}
 
-      <EstimateBreakdown revision={pendingRevision} />
+      <EstimateBreakdown revision={pendingRevision} customerView />
 
       {!isRejecting ? (
         <div

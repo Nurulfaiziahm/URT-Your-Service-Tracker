@@ -7,10 +7,12 @@ import { useLogoutMutation } from '../features/auth/authApi';
 import { Brand } from '../components/ui/Brand';
 import { Button, ButtonLink } from '../components/ui/Button';
 import styles from './PublicLayout.module.css';
+import { customerPortalReturn } from '../features/customer/customer-return';
 
 export function PublicLayout() {
   const location = useLocation();
   const loginPortal = authPortalFromPath(location.pathname) || 'owner';
+  const homePath = loginPortal === 'customer' ? customerPortalReturn(location) : '/';
   const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -32,7 +34,7 @@ export function PublicLayout() {
         }}
       >
         <div className={`container ${styles.headerInner}`}>
-          <Brand />
+          <Brand to={homePath} />
           <button
             ref={toggle}
             type="button"
@@ -92,7 +94,7 @@ export function PublicLayout() {
         <div className="container">
           <div className={styles.footerTop}>
             <div>
-              <Brand />
+              <Brand to={homePath} />
               <p>Satu alur yang jelas untuk setiap perjalanan servis.</p>
             </div>
             <nav className={styles.footerLinks} aria-label="Navigasi footer">

@@ -37,6 +37,7 @@ export interface OwnerDashboardData {
 }
 
 export interface TechnicianDashboardStats {
+  urgentCount: number;
   myActiveTickets: number;
   waitingDiagnosis: number;
   diagnosing: number;
@@ -47,6 +48,7 @@ export interface TechnicianDashboardStats {
 }
 
 export interface TechnicianDashboardData {
+  deadlineTickets: ServiceTicket[];
   role: 'technician';
   technicianId: string;
   business: {

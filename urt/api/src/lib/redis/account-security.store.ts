@@ -2,12 +2,13 @@ import redisClient from './client.js';
 import crypto from 'node:crypto';
 import { config } from '../../core/config/index.js';
 
-export interface PasswordResetGrant {
-  userId: string;
+export type PasswordResetGrant = {
   email: string;
   portal: 'owner' | 'customer' | 'technician';
-  authVersion: number;
-}
+} & (
+  | { userId: string; authVersion: number; technicianInvitation?: never }
+  | { technicianInvitation: { technicianId: string; tokenHash: string }; userId?: never; authVersion?: never }
+);
 const digest = (value: string) => crypto.createHash('sha256').update(value).digest('hex');
 const resetPrefix = `${config.prefix}:password-reset:`;
 

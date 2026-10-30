@@ -49,6 +49,21 @@
   color: var(--slate-600);
 }
 
+.accountPrompt {
+  text-align: center;
+}
+
+.accountPrompt a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.accountPrompt a:hover {
+  color: #1d4ed8;
+}
+
 .divider {
   display: flex;
   align-items: center;

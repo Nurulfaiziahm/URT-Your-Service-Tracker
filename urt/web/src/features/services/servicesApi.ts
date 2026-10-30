@@ -4,6 +4,10 @@ import type { CreateServiceInput, RepairService, UpdateServiceInput } from './ty
 
 export const servicesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    deleteService: builder.mutation<ApiResponse<null>, { businessId: string; serviceId: string }>({
+      query: ({ businessId, serviceId }) => ({ url: `/businesses/${encodeURIComponent(businessId)}/services/${encodeURIComponent(serviceId)}`, method: 'DELETE' }),
+      invalidatesTags: ['Services'],
+    }),
     getService: builder.query<
       ApiResponse<{ service: RepairService }>,
       { businessId: string; id: string }
@@ -20,14 +24,18 @@ export const servicesApi = baseApi.injectEndpoints({
         limit?: number;
         q?: string;
         category?: string;
+        scope?: 'catalog';
         status?: string;
+        entryType?: 'service' | 'part' | 'difficulty';
       }
     >({
-      query: ({ businessId, page = 1, limit = 20, q, category, status }) => {
+      query: ({ businessId, page = 1, limit = 20, q, category, status, entryType, scope }) => {
         const params = new URLSearchParams({ page: String(page), limit: String(limit) });
         if (q) params.set('q', q);
         if (category) params.set('category', category);
         if (status) params.set('status', status);
+        if (entryType) params.set('entryType', entryType);
+        if (scope) params.set('scope', scope);
         return `/businesses/${encodeURIComponent(businessId)}/services?${params.toString()}`;
       },
       providesTags: ['Services'],
@@ -60,6 +68,7 @@ export const servicesApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useDeleteServiceMutation,
   useGetServiceQuery,
   useGetServicesQuery,
   useCreateServiceMutation,

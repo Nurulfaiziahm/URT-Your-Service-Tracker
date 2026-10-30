@@ -58,17 +58,30 @@ are reused. New links put the token in a fragment; existing query-token links al
 work. Invitation tokens are no longer printed by invitation creation/resend logs.
 
 1. Owner creates an invitation using the existing protected technician route.
-2. `/technician/invite/accept#token=...` inspects the token via
+2. `/technician/register#token=...` opens the invitation-only registration form and inspects the token via
    `POST /api/v1/technician-invitations/inspect`.
-   `/technician/invite/accept/:token` and existing `/invitations/technician` links
+   `/technician/invite/accept#token=...`, `/technician/invite/accept/:token` and existing `/invitations/technician` links
    also work. Generated links use fragments to keep tokens out of HTTP URL logs.
-3. A new recipient sets a password using
+3. A new recipient sees their invited email in a read-only field and sets a new password with confirmation using
    `POST /api/v1/technician-invitations/activate` with token/password/confirmation.
    Email comes from the valid invitation, never from a caller-supplied identity.
 4. The User is created through the existing password-hashing model. Possession of
    the emailed invitation verifies this new account's email. Existing acceptance
    rules link and activate the Technician record and consume the invitation.
 5. The recipient signs in normally at `/technician/login`.
+
+Technician login also links to first-password email setup through
+`/technician/forgot-password`. For an email with a pending invitation and no User,
+recovery sends the same six-digit code and 15-minute recovery link used for active
+accounts. Its grant is bound to that pending technician and the invitation hash.
+Verifying the code allows creation of the first password and activates membership
+through the normal business/subscription/seat checks. Revoked, used, replaced or
+expired invitations cannot be activated through recovery. Recovery never changes
+the original invitation token or its seven-day expiry. Both recovery paths use the
+same 60-second cooldown and single-use grant storage.
+
+Invitation inspection follows token changes in the browser URL. Network and API
+errors offer a retry instead of being reported as an expired invitation.
 
 For an existing account, activation never overwrites its password. The recipient
 signs in with existing credentials and invitation proof, then uses the existing

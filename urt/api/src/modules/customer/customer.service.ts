@@ -44,6 +44,7 @@ export class CustomerService {
 
     const filter: Record<string, unknown> = {
       businessId: new mongoose.Types.ObjectId(businessId),
+      deletedAt: { $exists: false },
     };
 
     if (query?.status) {
@@ -85,6 +86,7 @@ export class CustomerService {
     const customer = await Customer.findOne({
       _id: new mongoose.Types.ObjectId(customerId),
       businessId: new mongoose.Types.ObjectId(businessId),
+      deletedAt: { $exists: false },
     });
 
     if (!customer) {
@@ -97,6 +99,20 @@ export class CustomerService {
     }
 
     return customer;
+  }
+
+  static async deleteCustomer(businessId: string, customerId: string): Promise<void> {
+    validateObjectId(businessId, 'Business');
+    validateObjectId(customerId, 'Customer');
+    const filter = { _id: new mongoose.Types.ObjectId(customerId), businessId: new mongoose.Types.ObjectId(businessId), deletedAt: { $exists: false } };
+    const customer = await Customer.findOne(filter);
+    if (!customer) throw new AppError('Customer not found', 404);
+    if (customer.userId) throw new AppError('Pelanggan yang memiliki akun tidak dapat dihapus.', 409, 'CUSTOMER_HAS_ACCOUNT');
+    const removed = await Customer.findOneAndUpdate({ ...filter, userId: null }, {
+      $set: { status: 'archived', deletedAt: new Date() },
+      $unset: { invitationTokenHash: 1, invitationExpiresAt: 1 },
+    }, { new: true });
+    if (!removed) throw new AppError('Pelanggan tidak dapat dihapus karena datanya telah berubah.', 409, 'CUSTOMER_CHANGED');
   }
 
   /**

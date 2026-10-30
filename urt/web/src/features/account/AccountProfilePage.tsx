@@ -9,6 +9,7 @@ import { useGetProfileQuery, useUpdateProfileMutation } from '../auth/authApi';
 import type { User } from '../auth/types';
 import { TextInput } from '../../components/ui/TextInput';
 import { Button, ButtonLink } from '../../components/ui/Button';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 import { InlineNotice, PageLoader } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from './Account.module.css';
@@ -213,9 +214,7 @@ export default function AccountProfilePage() {
               </h2>
               <span>{roleLabel}</span>
               <p>{user.email}</p>
-              <span className={user.isEmailVerified ? styles.badgeSuccess : styles.badgeWarning}>
-                {user.isEmailVerified ? 'Email Terverifikasi' : 'Email Belum Terverifikasi'}
-              </span>
+              <StatusBadge label={user.isEmailVerified ? 'Email Terverifikasi' : 'Email Belum Terverifikasi'} tone={user.isEmailVerified ? 'success' : 'warning'} />
             </div>
             <dl className="reference-dl">
               <div>

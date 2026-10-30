@@ -78,7 +78,7 @@ export default function LoginPage({ portal }: { portal: AuthPortal }) {
 
   const fromLoc = (location.state as { from?: AuthReturnLocation })?.from;
   const isOwnerFlow = portal === 'owner';
-  const invitationToken = portal === 'technician' && (fromLoc?.pathname === '/invitations/technician' || fromLoc?.pathname?.startsWith('/technician/invite/accept'))
+  const invitationToken = portal === 'technician' && (fromLoc?.pathname === '/technician/register' || fromLoc?.pathname === '/invitations/technician' || fromLoc?.pathname?.startsWith('/technician/invite/accept'))
     ? fromLoc.pathname?.match(/^\/technician\/invite\/accept\/([^/]+)$/)?.[1] || new URLSearchParams(fromLoc.hash?.slice(1)).get('token') || new URLSearchParams(fromLoc.search).get('token') || undefined : undefined;
 
   async function handleSubmit(event: FormEvent) {
@@ -108,9 +108,9 @@ export default function LoginPage({ portal }: { portal: AuthPortal }) {
     <TextInput label="Alamat email" name="email" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
     <TextInput label="Kata sandi" name="password" type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} />
     <Button type="submit" pending={isLoading}>Masuk</Button>
-    <Link to={`/${portal}/forgot-password`} state={{ portal, from: fromLoc }}>Lupa kata sandi?</Link>
-    {portal === 'customer' && <p>Belum punya akun? <Link to="/customer/register" state={location.state}>Buat akun pelanggan</Link></p>}
-    {portal === 'technician' && <p>Akun teknisi hanya tersedia melalui undangan pemilik tempat servis.</p>}
+    <div className={authStyles.links}><Link to={`/${portal}/forgot-password`} state={{ portal, from: fromLoc }}>Lupa kata sandi?</Link></div>
+    {portal === 'customer' && <p className={authStyles.accountPrompt}>Belum punya akun? <Link to="/customer/register" state={location.state}>Buat akun pelanggan</Link></p>}
+    {portal === 'technician' && <p>Pertama kali masuk? <Link to="/technician/forgot-password">Kirim tautan untuk membuat kata sandi</Link>. Gunakan email yang diundang pemilik tempat servis.</p>}
   </form>;
 
   return (

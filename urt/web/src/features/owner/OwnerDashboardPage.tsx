@@ -5,6 +5,7 @@ import { selectSelectedBusinessId } from '../business/businessSlice';
 import { customerPortalPath } from '../customer/customer-portal';
 import { useGetOwnerDashboardQuery } from '../dashboard/dashboardApi';
 import { SummaryCard } from '../../components/ui/SummaryCard';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 import { Icon } from '../../components/ui/Icon';
 import { TicketTable } from '../tickets/TicketTable';
 import { OwnerOnboardingChecklist } from './OwnerOnboardingChecklist';
@@ -72,7 +73,7 @@ export default function OwnerDashboardPage() {
               <h2>Tiket Terbaru</h2>
               <p>Aktivitas servis terbaru di {business.name}</p>
             </div>
-            <Link to="/owner/tickets" className={styles.tableAction}>Lihat semua tiket →</Link>
+            <Link to="/owner/tickets" className={styles.tableAction}>Lihat semua tiket</Link>
           </header>
           <div className={styles.tickets}>
             <TicketTable tickets={recentTickets.slice(0, 3)} role="owner" />
@@ -81,9 +82,7 @@ export default function OwnerDashboardPage() {
           <section className={styles.subscription} aria-labelledby="subscription-title">
             <div className={styles.subscriptionHeading}>
               <h3 id="subscription-title">{subscription?.planName || 'Langganan'}</h3>
-              <span className={styles.status} data-active={isActive}>
-                {isActive ? 'AKTIF' : subscription?.status === 'expired' ? 'BERAKHIR' : 'BELUM AKTIF'}
-              </span>
+              <StatusBadge label={isActive ? 'Aktif' : subscription?.status === 'expired' ? 'Berakhir' : 'Belum aktif'} tone={isActive ? 'success' : subscription?.status === 'expired' ? 'danger' : 'warning'} />
             </div>
             <p>
               {end ? `Berakhir ${new Date(end).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: business.timezone })}` : 'Pilih paket untuk mengaktifkan layanan tempat servis.'}
@@ -93,7 +92,7 @@ export default function OwnerDashboardPage() {
             </div>
             <div className={styles.subscriptionFooter}>
               <small>{isActive ? `${subscription.daysRemaining} hari tersisa` : 'Belum ada masa aktif'}</small>
-              <Link to="/owner/subscription">Kelola langganan →</Link>
+              <Link to="/owner/subscription">Kelola langganan</Link>
             </div>
           </section>
         </article>

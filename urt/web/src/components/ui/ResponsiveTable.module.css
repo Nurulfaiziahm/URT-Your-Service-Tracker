@@ -1,0 +1,96 @@
+.responsiveTable {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .responsiveTable {
+    overflow-x: visible !important;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .responsiveTable :global(table) {
+    display: block;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .responsiveTable :global(thead) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .responsiveTable :global(tbody) {
+    display: grid;
+    gap: 12px;
+  }
+
+  .responsiveTable :global(tbody tr) {
+    display: block;
+    min-width: 0;
+    border: 1px solid var(--border, #dbe3ec);
+    border-radius: 10px;
+    background: var(--card, #fff);
+  }
+
+  .responsiveTable :global(tbody tr[data-row-label]::before) {
+    display: block;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border, #dbe3ec);
+    color: var(--navy-900, #172554);
+    font-size: 0.85rem;
+    font-weight: 700;
+    content: attr(data-row-label);
+  }
+
+  .responsiveTable :global(tbody td) {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border, #dbe3ec);
+    color: var(--navy-950, #0f172a);
+    text-align: left !important;
+    overflow-wrap: anywhere;
+  }
+
+  .responsiveTable :global(tbody td::before) {
+    min-width: 0;
+    color: var(--slate-600, #475569);
+    font-weight: 700;
+    content: attr(data-label);
+    overflow-wrap: anywhere;
+  }
+
+  .responsiveTable :global(tbody td[data-full-row]) {
+    display: block;
+  }
+
+  .responsiveTable :global(tbody td[data-full-row]::before) {
+    display: none;
+  }
+
+  .responsiveTable :global(tbody td:last-child) {
+    border-bottom: 0 !important;
+  }
+
+  .responsiveTable :global(tbody tr:last-child td) {
+    border-bottom: 1px solid var(--border, #dbe3ec) !important;
+  }
+
+  .responsiveTable :global(tbody tr:last-child td:last-child) {
+    border-bottom: 0 !important;
+  }
+}

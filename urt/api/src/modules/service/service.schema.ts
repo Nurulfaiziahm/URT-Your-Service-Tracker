@@ -10,9 +10,11 @@ export const createServiceSchema = z.object({
         .number({ invalid_type_error: 'Base price must be a number' })
         .int('Base price must be a whole integer amount in rupiah')
         .min(0, 'Base price cannot be negative'),
+      entryType: z.enum(['service', 'part', 'difficulty']).default('service'),
+      difficultyLevel: z.enum(['low', 'medium', 'high', 'complex']).optional(),
       estimatedDuration: z.string().trim().max(50, 'Max 50 characters').optional(),
     })
-    .strict(),
+    .strict().refine((value) => value.entryType !== 'difficulty' || Boolean(value.difficultyLevel), { message: 'Pilih tingkat kesulitan.', path: ['difficultyLevel'] }),
 });
 
 export const updateServiceSchema = z.object({
@@ -28,6 +30,8 @@ export const updateServiceSchema = z.object({
         .optional(),
       estimatedDuration: z.string().trim().max(50, 'Max 50 characters').optional(),
       status: z.enum(['active', 'archived']).optional(),
+      entryType: z.enum(['service', 'part', 'difficulty']).optional(),
+      difficultyLevel: z.enum(['low', 'medium', 'high', 'complex']).optional(),
     })
     .strict(),
 });
@@ -39,7 +43,9 @@ export const serviceQuerySchema = z.object({
       limit: z.coerce.number().int().min(1).max(100).default(20),
       q: z.string().trim().max(100).optional(),
       category: z.string().trim().max(50).optional(),
+      scope: z.enum(['catalog']).optional(),
       status: z.enum(['active', 'archived']).optional(),
+      entryType: z.enum(['service', 'part', 'difficulty']).optional(),
     })
     .optional(),
 });

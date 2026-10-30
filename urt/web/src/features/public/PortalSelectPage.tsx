@@ -114,7 +114,7 @@ export default function PortalSelectPage() {
                 </div>}
                 {choosingAuth ? <Link className={styles['portal-card__btn']}
                   state={location.state} to={`/${portal.role}/${authMode === 'register' && portal.role !== 'technician' ? 'register' : 'login'}`}>
-                  {authMode === 'register' && portal.role !== 'technician' ? 'Daftar' : 'Masuk'} {portal.title} →
+                  {authMode === 'register' && portal.role !== 'technician' ? 'Daftar' : 'Masuk'} {portal.title}
                 </Link> : <a
                   href={portal.href}
                   className={`${styles['portal-card__btn']} ${
@@ -125,14 +125,14 @@ export default function PortalSelectPage() {
                         : ''
                   }`}
                 >
-                  Masuk {portal.title} →
+                  Masuk {portal.title}
                 </a>}
               </article>
             ))}
           </div>
           <div className={styles.manualLogin} style={{ marginTop: '24px' }}>
             <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '14px' }}>
-              ← Kembali ke Landing Page
+             Kembali ke Landing Page
             </Link>
           </div>
         </main>

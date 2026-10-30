@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { InlineNotice } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from './Tickets.module.css';
+import { diagnosisExplanation } from './diagnosis-explanation';
 
 interface DiagnosisFormProps {
   businessId: string;
@@ -14,9 +15,10 @@ interface DiagnosisFormProps {
 
 export function DiagnosisForm({ businessId, ticket, onSuccess }: DiagnosisFormProps) {
   const [staffFindings, setStaffFindings] = useState(ticket.diagnosis?.staffFindings || '');
-  const [customerExplanation, setCustomerExplanation] = useState(
-    ticket.diagnosis?.customerExplanation || '',
+  const [manualExplanation, setManualExplanation] = useState<string | null>(
+    ticket.diagnosis?.customerExplanation || null,
   );
+  const customerExplanation = manualExplanation ?? diagnosisExplanation(staffFindings);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -71,7 +73,9 @@ export function DiagnosisForm({ businessId, ticket, onSuccess }: DiagnosisFormPr
         </label>
         <textarea
           id="staffFindings"
+          name="staffFindings"
           rows={3}
+          maxLength={1000}
           value={staffFindings}
           onChange={(e) => setStaffFindings(e.target.value)}
           placeholder="Catatan hasil pengukuran tegangan, jalur korsleting, IC rusak, atau kondisi internal..."
@@ -91,9 +95,12 @@ export function DiagnosisForm({ businessId, ticket, onSuccess }: DiagnosisFormPr
         </label>
         <textarea
           id="customerExplanation"
+          name="customerExplanation"
+          aria-describedby="customerExplanationHint"
           rows={3}
+          maxLength={1000}
           value={customerExplanation}
-          onChange={(e) => setCustomerExplanation(e.target.value)}
+          onChange={(e) => setManualExplanation(e.target.value)}
           placeholder="Jelaskan komponen yang bermasalah dan rekomendasi penanganan dengan bahasa yang ramah..."
           style={{
             padding: '10px 12px',
@@ -104,6 +111,14 @@ export function DiagnosisForm({ businessId, ticket, onSuccess }: DiagnosisFormPr
           }}
           required
         />
+        <p id="customerExplanationHint" style={{ fontSize: '0.82rem', color: 'var(--slate-600)', lineHeight: 1.5 }}>
+          {manualExplanation === null
+            ? 'Draf ringkasan terisi otomatis dari temuan teknis yang dikenali. Periksa dan lengkapi sebelum disimpan. Catatan internal asli tetap hanya terlihat oleh staf dan pemilik.'
+            : 'Penjelasan Anda dipertahankan saat catatan teknis berubah. Hanya penjelasan ini yang ditampilkan kepada pelanggan.'}
+        </p>
+        {manualExplanation !== null && (
+          <div><Button type="button" variant="ghost" size="small" onClick={() => setManualExplanation(null)} disabled={isLoading}>Gunakan Draf Otomatis</Button></div>
+        )}
       </div>
 
       <div className={styles.actionBar} style={{ justifyContent: 'flex-end' }}>

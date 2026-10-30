@@ -6,6 +6,9 @@ import { AppError } from '../../middleware/error-handler.js';
 import { config } from '../../core/config/index.js';
 import { logger } from '../../utils/logger.js';
 import { getAuthPortals, type AuthPortal } from './portal-access.js';
+import { Technician } from '../../models/Technician.model.js';
+import { TechnicianService } from '../technician/technician.service.js';
+import type { PasswordResetGrant } from '../../lib/redis/account-security.store.js';
 
 const invalidReset = () => new AppError('Kode atau tautan pemulihan tidak valid atau sudah kedaluwarsa.', 400, 'INVALID_RESET');
 const pendingDeliveries = new Set<Promise<void>>();
@@ -27,18 +30,30 @@ export const passwordRecovery = {
 
   async deliver(email: string, portal: AuthPortal): Promise<void> {
     const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
-    if (!user?.password || user.status !== 'active' || !(await getAuthPortals(user)).includes(portal)) return;
+    let grant: PasswordResetGrant;
+    let name: string;
+    if (!user && portal === 'technician') {
+      const technician = await Technician.findOne({
+        email: email.trim().toLowerCase(), status: 'pending', invitationExpiresAt: { $gt: new Date() },
+      }).select('+invitationTokenHash');
+      if (!technician?.invitationTokenHash) return;
+      grant = { email: technician.email, portal, technicianInvitation: {
+        technicianId: technician._id.toString(), tokenHash: technician.invitationTokenHash,
+      } };
+      name = technician.name;
+    } else {
+      if (!user?.password || user.status !== 'active' || !(await getAuthPortals(user)).includes(portal)) return;
+      grant = { userId: user._id.toString(), email: user.email, portal, authVersion: user.authVersion ?? 0 };
+      name = `${user.firstName} ${user.lastName}`;
+    }
     const token = crypto.randomBytes(32).toString('hex');
     const code = crypto.randomInt(100000, 1000000).toString();
-    logger.info(`[OTP] Password reset OTP for ${user.email}: ${code}`);
-    const created = await accountSecurityStore.createPasswordReset({
-      userId: user._id.toString(), email: user.email, portal, authVersion: user.authVersion ?? 0,
-    }, token, code);
+    const created = await accountSecurityStore.createPasswordReset(grant, token, code);
     if (!created) return; // Same public response for cooldown, unknown email, or unsupported role.
     const resetUrl = `${config.allowedOrigins[0]}/${portal}/reset-password#token=${token}`;
     const sent = await mailService.sendTemplate({
-      to: user.email, subject: 'Kode & Tautan Pemulihan Akun URT', template: 'reset-password',
-      data: { title: 'Atur Ulang Kata Sandi', name: `${user.firstName} ${user.lastName}`, otp: code,
+      to: grant.email, subject: 'Kode & Tautan Pemulihan Akun URT', template: 'reset-password',
+      data: { title: 'Atur Ulang Kata Sandi', name, otp: code,
         resetUrl, portalLabel: { owner: 'Pemilik Usaha', customer: 'Pelanggan', technician: 'Teknisi' }[portal], expiresIn: '5 menit', linkExpiresIn: '15 menit' },
     });
     if (!sent) {
@@ -57,6 +72,13 @@ export const passwordRecovery = {
   async reset(token: string, password: string, portal: AuthPortal): Promise<void> {
     const grant = await accountSecurityStore.consumePasswordReset(token, portal);
     if (!grant) throw invalidReset();
+    if (grant.technicianInvitation) {
+      if (portal !== 'technician') throw invalidReset();
+      await TechnicianService.activateInvitationFromRecovery(
+        grant.technicianInvitation.technicianId, grant.email, grant.technicianInvitation.tokenHash, password,
+      );
+      return;
+    }
     const user = await User.findById(grant.userId).select('+password');
     if (!user?.password || user.status !== 'active' || (user.authVersion ?? 0) !== grant.authVersion || !(await getAuthPortals(user)).includes(portal)) throw invalidReset();
     user.password = password;

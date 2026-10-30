@@ -24,8 +24,8 @@ export function CustomerWelcomeOnboarding() {
     let cleanSlug = businessSlug.trim().toLowerCase();
     if (!cleanSlug) return;
     // Strip leading /b/ or https domain if user pasted full url
-    cleanSlug = cleanSlug.replace(/^.*\/b\//, '').replace(/^\/+/, '');
-    navigate(`/b/${encodeURIComponent(cleanSlug)}`);
+    cleanSlug = cleanSlug.replace(/^.*\/b\//, '').replace(/^\/+/, '').split(/[/?#]/)[0];
+    navigate(`/b/${encodeURIComponent(cleanSlug)}/customer`);
   }
 
   return (
@@ -60,7 +60,7 @@ export function CustomerWelcomeOnboarding() {
               required
             />
             <button type="submit" className={styles.submitBtn}>
-              Lacak Tiket →
+              Lacak Tiket
             </button>
           </form>
         </article>
@@ -86,7 +86,7 @@ export function CustomerWelcomeOnboarding() {
               required
             />
             <button type="submit" className={`${styles.submitBtn} ${styles.submitBtnGreen}`}>
-              Buka Halaman →
+              Buka Halaman
             </button>
           </form>
         </article>
@@ -94,11 +94,11 @@ export function CustomerWelcomeOnboarding() {
 
       <div className={styles.footerActions}>
         <Link to="/portal" className="text-link" style={{ fontSize: '0.9rem' }}>
-          ← Pilih Portal Akses Lain
+         Pilih Portal Akses Lain
         </Link>
         <span style={{ color: '#cbd5e1' }}>•</span>
-        <Link to="/" className="text-link" style={{ fontSize: '0.9rem' }}>
-          Kembali ke Beranda
+        <Link to="/customer/login" className="text-link" style={{ fontSize: '0.9rem' }}>
+          Login Pelanggan
         </Link>
       </div>
     </main>

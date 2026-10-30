@@ -277,7 +277,7 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
   ResponseHandler.success(
     res,
     null,
-    'Jika akun ini mendukung pemulihan pada portal yang dipilih, Anda akan menerima email berisi kode dan tautan pemulihan.',
+    'Jika email ini terdaftar pada portal yang dipilih, Anda akan menerima kode pemulihan atau tautan aktivasi akun melalui email.',
   );
 });
 

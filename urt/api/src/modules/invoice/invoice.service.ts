@@ -58,7 +58,7 @@ export class InvoiceService {
     const businessObjectId = new mongoose.Types.ObjectId(businessId);
     const ticketObjectId = new mongoose.Types.ObjectId(ticketId);
 
-    const ticket = await ServiceTicket.findOne({
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
       _id: ticketObjectId,
       businessId: businessObjectId,
     });

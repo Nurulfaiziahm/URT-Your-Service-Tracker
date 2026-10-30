@@ -72,73 +72,18 @@
   font-size: 0.95rem;
 }
 
-/* Stepper */
-.stepper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  margin-block: var(--space-4);
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-
-.step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  min-width: 90px;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
-
-.stepDot {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--card);
-  border: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--slate-500);
-}
-
-.stepActive .stepDot {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: #fff;
-}
-
-.stepPassed .stepDot {
-  background: var(--success);
-  border-color: var(--success);
-  color: #fff;
-}
-
-.stepLabel {
-  font-size: 0.78rem;
-  color: var(--slate-600);
-  font-weight: 500;
-}
-
-.stepActive .stepLabel {
-  color: var(--blue);
-  font-weight: 700;
-}
-
 /* Timeline */
 .timeline {
+  list-style: none;
   display: grid;
   gap: var(--space-4);
   position: relative;
   padding-left: var(--space-5);
   margin-top: var(--space-3);
+  min-width: 0;
 }
+
+.timelineEmpty { margin: 0; color: var(--slate-500); font-size: 0.88rem; }
 
 .timeline::before {
   content: '';
@@ -153,6 +98,7 @@
 .timelineItem {
   position: relative;
   display: grid;
+  min-width: 0;
   gap: 2px;
 }
 
@@ -168,17 +114,23 @@
 }
 
 .timelineAction {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-weight: 600;
   color: var(--navy-950);
   font-size: 0.92rem;
 }
 
 .timelineMeta {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 0.8rem;
   color: var(--slate-500);
 }
 
 .timelineNote {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 0.88rem;
   color: var(--navy-800);
   background-color: var(--canvas);
@@ -206,6 +158,8 @@
 /* Tables & Lists */
 .tableWrapper {
   overflow-x: auto;
+  min-width: 0;
+  overscroll-behavior-inline: contain;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--card);
@@ -217,6 +171,8 @@
   text-align: left;
   font-size: 0.9rem;
 }
+
+.tableWrapper:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 
 .table th {
   background-color: var(--canvas);
@@ -342,32 +298,97 @@
   padding: 6px 10px;
   font-size: 12px;
 }
+.serviceStatus {
+  min-width: 0;
+  container-type: inline-size;
+}
 .stepper {
   list-style: none;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: start;
+  min-width: 0;
   padding: 12px 0;
   margin: 0;
   gap: 0;
 }
 .step {
-  flex: 1;
-  min-width: 100px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
 }
-.step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 18px;
-  left: calc(50% + 19px);
-  width: calc(100% - 38px);
-  height: 2px;
-  background: #e2e8f0;
-  z-index: -1;
-}
-.stepPassed::after {
-  background: #16a34a !important;
-}
-.stepper .stepDot {
+.stepDot {
+  display: grid;
+  flex: 0 0 36px;
+  place-items: center;
   width: 36px;
   height: 36px;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  color: var(--slate-600);
+  background: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+.stepLabel {
+  min-width: 0;
+  color: var(--slate-600);
+  font-size: 12px;
+  line-height: 1.35;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.step[data-state='completed'] .stepDot {
+  border-color: #16a34a;
+  color: white;
+  background: #16a34a;
+}
+.step[data-state='completed'] .stepLabel { color: #166534; }
+.step[data-state='current'] .stepDot {
+  border-color: var(--blue);
+  color: white;
+  background: var(--blue);
+  box-shadow: 0 0 0 4px var(--blue-soft);
+}
+.step[data-state='current'] .stepLabel { color: var(--blue); font-weight: 700; }
+.step[data-state='rejected'] .stepDot { border-color: #dc2626; color: white; background: #dc2626; }
+.step[data-state='rejected'] .stepLabel { color: #b91c1c; font-weight: 700; }
+.step[data-state='cancelled'] .stepDot { border-color: #cbd5e1; color: #94a3b8; background: #f8fafc; }
+.step[data-state='cancelled'] .stepLabel { color: #94a3b8; }
+.step:not(:last-child)::after {
+  position: absolute;
+  top: 17px;
+  left: calc(50% + 18px);
+  z-index: -1;
+  width: calc(100% - 36px);
+  height: 2px;
+  background: #cbd5e1;
+  content: '';
+}
+.step[data-state='completed']:not(:last-child)::after { background: #16a34a; }
+.stepNotice {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: var(--slate-700);
+  background: #f8fafc;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.stepNoticeDanger { border-color: #fecaca; color: #991b1b; background: #fef2f2; }
+
+@container (max-width: 620px) {
+  .stepper { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .step { min-height: 44px; flex-direction: row; justify-content: flex-start; gap: 12px; text-align: left; }
+  .stepDot { flex-basis: 36px; }
+  .stepLabel { text-wrap: wrap; }
+  .step:not(:last-child)::after { top: 36px; left: 17px; width: 2px; height: calc(100% - 10px); }
 }
 
 .ticketCard h2 {
@@ -391,4 +412,57 @@
 }
 .heading > div:last-child {
   flex-wrap: wrap;
+}
+
+.estimateHeader { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.estimateButtons { display: flex; flex-wrap: wrap; gap: 8px; }
+.estimateHint { font-size: 13px; color: var(--slate-600); line-height: 1.6; }
+.estimateItems { display: grid; gap: 16px; min-width: 0; }
+.estimateCatalog { display: grid; gap: 14px; min-width: 0; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--canvas); }
+.estimateItem { display: grid; gap: 16px; min-width: 0; margin: 0; padding: 16px; border: 1px solid var(--border); border-radius: 10px; }
+.estimateItem legend { padding-inline: 6px; font-weight: 600; font-size: 14px; color: var(--navy-950); }
+.estimateField { display: grid; gap: 8px; min-width: 0; font-size: 14px; font-weight: 600; color: var(--navy-950); }
+.estimateField textarea, .estimateField select { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-weight: 400; background: var(--card); color: var(--navy-950); }
+.estimateField textarea { resize: vertical; line-height: 1.6; min-height: 88px; }
+.estimateAmounts { display: grid; grid-template-columns: minmax(70px, .7fr) minmax(110px, 1fr) minmax(100px, 1fr); gap: 12px; align-items: end; }
+.estimateAmounts > * { min-width: 0; }
+.estimateSubtotal { display: grid; gap: 8px; padding-bottom: 10px; font-size: 13px; }
+.estimateSubtotal output { font-size: 16px; font-weight: 600; color: var(--blue); overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .estimateAmounts { grid-template-columns: minmax(70px, .6fr) minmax(110px, 1fr); }
+  .estimateSubtotal { grid-column: 1 / -1; padding: 12px; border-radius: 8px; background: var(--canvas); }
+  .estimateItem { padding: 12px; }
+}
+
+.estimateWorkspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); align-items: start; gap: 24px; min-width: 0; }
+.estimateMain { display: grid; gap: 20px; min-width: 0; }
+.estimateSchedule { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.estimateActions { justify-content: flex-end; }
+.estimateReceipt { position: sticky; top: 88px; display: grid; gap: 18px; min-width: 0; padding: 22px; border: 1px solid var(--border); border-radius: 12px; background: var(--canvas); }
+.receiptHeading { display: grid; gap: 4px; padding-bottom: 16px; border-bottom: 1px dashed var(--border); }
+.receiptHeading h3 { font-size: 17px; }
+.receiptHeading p { font-size: 13px; color: var(--slate-600); overflow-wrap: anywhere; }
+.receiptLines { display: grid; gap: 16px; }
+.receiptLine { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 12px; font-size: 13px; }
+.receiptLine > div { display: grid; gap: 5px; min-width: 0; overflow-wrap: anywhere; }
+.receiptLine span { color: var(--slate-600); font-size: 12px; }
+.receiptSummary { display: grid; gap: 12px; padding-top: 16px; border-top: 1px dashed var(--border); font-size: 13px; }
+.receiptSummary > div { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+.receiptSummary output { text-align: right; flex-shrink: 0; }
+.receiptTotal { display: grid; gap: 6px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 14px; font-weight: 600; }
+.receiptTotal output { color: var(--blue); font-size: 26px; font-weight: 700; overflow-wrap: anywhere; }
+.receiptWarning { color: var(--warning); font-size: 13px; line-height: 1.6; }
+@media (max-width: 1100px) {
+  .estimateWorkspace { grid-template-columns: minmax(0, 1fr); }
+  .estimateReceipt { position: static; }
+}
+@media (max-width: 640px) {
+  .estimateWorkspace { gap: 20px; }
+  .estimateMain .estimateButtons, .estimateActions { width: 100%; }
+  .estimateMain .estimateButtons button, .estimateActions button { flex: 1 1 100%; }
+  .estimateCatalog, .estimateReceipt { padding: 14px; }
+  .estimateMain .totalBox { width: 100%; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+  .receiptLine { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+  .receiptLine > output { font-weight: 600; }
+  .estimateSchedule { grid-template-columns: minmax(0, 1fr); }
 }

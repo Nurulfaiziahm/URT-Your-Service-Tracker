@@ -91,6 +91,11 @@ export const getTicketById = asyncHandler(async (req: Request, res: Response) =>
   ResponseHandler.success(res, { ticket: serialized }, 'Ticket details retrieved successfully');
 });
 
+export const deleteAnonymousTicket = asyncHandler(async (req: Request, res: Response) => {
+  await TicketService.deleteAnonymousTicket(req.params.businessId, req.params.ticketId, getAuthUser(req).id, req.body.expectedRevision);
+  ResponseHandler.success(res, null, 'Tiket anonim berhasil dihapus.');
+});
+
 export const updateIntake = asyncHandler(async (req: Request, res: Response) => {
   const businessId = req.params.businessId;
   const ticketId = req.params.ticketId;

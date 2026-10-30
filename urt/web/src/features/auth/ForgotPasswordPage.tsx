@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import type { AuthPortal } from './auth-routing';
 import { useForgotPasswordMutation } from './authApi';
 import { TextInput } from '../../components/ui/TextInput';
@@ -10,6 +10,7 @@ import styles from './Auth.module.css';
 
 export default function ForgotPasswordPage({ portal }: { portal: AuthPortal }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ export default function ForgotPasswordPage({ portal }: { portal: AuthPortal }) {
     try {
       await forgotPassword({ portal, email: email.trim().toLowerCase() }).unwrap();
       navigate(`/${portal}/reset-password`, {
-        state: { email: email.trim().toLowerCase(), requested: true },
+        state: { ...location.state, email: email.trim().toLowerCase(), requested: true },
       });
     } catch (err: unknown) {
       const apiErr = err as { data?: ApiErrorBody; error?: string };
@@ -44,7 +45,9 @@ export default function ForgotPasswordPage({ portal }: { portal: AuthPortal }) {
       <header className={styles.heading}>
         <span className="eyebrow">Pemulihan Akun</span>
         <h1>Lupa Kata Sandi</h1>
-        <p>Masukkan email akun {portal === 'owner' ? 'pemilik usaha' : portal === 'technician' ? 'teknisi aktif' : 'pelanggan'} untuk menerima kode dan tautan pemulihan.</p>
+        <p>{portal === 'technician'
+          ? 'Masukkan email yang diundang pemilik tempat servis untuk menerima kode pemulihan 6 digit dan tautan membuat kata sandi. Jika akun belum aktif, kode ini juga dapat digunakan untuk membuat kata sandi pertama.'
+          : `Masukkan email akun ${portal === 'owner' ? 'pemilik usaha' : 'pelanggan'} untuk menerima kode dan tautan pemulihan.`}</p>
       </header>
 
       {errorMessage && <InlineNotice>{errorMessage}</InlineNotice>}
@@ -67,8 +70,8 @@ export default function ForgotPasswordPage({ portal }: { portal: AuthPortal }) {
       <footer className={styles.links}>
         <span>
           Ingat kata sandi Anda?{' '}
-          <Link to={`/${portal}/login`} className="text-link">
-            ← Kembali ke Login
+          <Link to={`/${portal}/login`} state={location.state} className="text-link">
+           Kembali ke Login
           </Link>
         </span>
       </footer>

@@ -12,6 +12,7 @@ import { User } from '../dist/models/User.model.js';
 import { Business } from '../dist/models/Business.model.js';
 import { Customer } from '../dist/models/Customer.model.js';
 import { Technician } from '../dist/models/Technician.model.js';
+import { BusinessSubscription } from '../dist/models/BusinessSubscription.model.js';
 import { accountSecurityStore, authSessionStore } from '../dist/lib/redis/index.js';
 import { config } from '../dist/core/config/index.js';
 import { transporter } from '../dist/lib/mail/config.js';
@@ -26,6 +27,10 @@ test('all roles receive SMTP email codes/links and can reset once with role-boun
   const localTransport = nodemailer.createTransport({ host: '127.0.0.1', port: smtp.port, secure: false, ignoreTLS: true });
   const restorers = [], captured = [], revoked = [];
   let now = 100000, technicianActive = false;
+  const invitationBusinessId = new mongoose.Types.ObjectId();
+  const originalInvitationHash = crypto.createHash('sha256').update('original-fixture-invitation').digest('hex');
+  const pendingTechnician = Technician.hydrate({ _id: new mongoose.Types.ObjectId(), businessId: invitationBusinessId, name: 'Pending Technician', email: 'pending@example.test', status: 'pending', invitationTokenHash: originalInvitationHash, invitationExpiresAt: new Date(Date.now() + 7 * 86400000) });
+  pendingTechnician.save = async () => pendingTechnician;
   const grants = new Map(), current = new Map();
   const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
   function replace(target, key, value) { const old = target[key]; target[key] = value; restorers.push(() => { target[key] = old; }); }
@@ -37,9 +42,26 @@ test('all roles receive SMTP email codes/links and can reset once with role-boun
   const query = (user) => ({ select: async () => user });
   replace(User, 'findOne', ({ email }) => query(users.find((user) => user.email === email) || null));
   replace(User, 'findById', (id) => query(users.find((user) => user.id === id) || null));
+  replace(User, 'exists', async ({ email }) => users.some((user) => user.email === email));
+  replace(User, 'create', async (data) => {
+    const user = new User(data);
+    assert.equal(user.validateSync(), undefined);
+    user.password = await bcrypt.hash(data.password, 4);
+    users.push(user);
+    return user;
+  });
   replace(Business, 'exists', async () => false);
   replace(Customer, 'exists', async () => false);
-  replace(Technician, 'exists', async ({ userId }) => technicianActive && String(userId) === users[2].id);
+  replace(Technician, 'exists', async ({ userId }) => technicianActive && String(userId) === users[2].id || pendingTechnician.status === 'active' && String(userId) === String(pendingTechnician.userId));
+  replace(Technician, 'findOne', (filter) => {
+    const matches = Object.entries(filter).every(([key, value]) =>
+      value && typeof value === 'object' && '$gt' in value ? pendingTechnician[key] > value.$gt : String(pendingTechnician[key]) === String(value));
+    const doc = matches ? pendingTechnician : null;
+    return { select: async () => doc, then: (ok, fail) => Promise.resolve(doc).then(ok, fail) };
+  });
+  replace(Technician, 'countDocuments', async () => 0);
+  replace(Business, 'findById', async () => ({ _id: invitationBusinessId, name: 'Fixture Shop', isActive: true }));
+  replace(BusinessSubscription, 'findOne', async () => ({ packageSnapshot: { maxTechnicians: 10 } }));
   replace(authSessionStore, 'revokeAll', async (id) => { revoked.push(id); });
   // Isolate Redis persistence; expiry, consumption, and identity checks are exercised through actual API/service calls.
   replace(accountSecurityStore, 'createPasswordReset', async (grant, token, code) => {
@@ -131,6 +153,38 @@ test('all roles receive SMTP email codes/links and can reset once with role-boun
       assert.equal(await users[index].comparePassword('previous-password'), false);
       assert.notEqual(users[index].password, 'replacement-password'); assert.ok(revoked.includes(users[index].id));
     }
+    // Pending technicians receive a code that can create their first password without replacing the invitation.
+    resetLimits();
+    const beforeInvitation = smtp.messages.length;
+    const pendingResponse = await request('technician', 'forgot-password', { email: pendingTechnician.email });
+    assert.deepEqual(pendingResponse, unknown, 'Pending invitations must not expose account existence');
+    assert.equal(smtp.messages.length, beforeInvitation + 1, 'A technician without an account must receive an email to create their first password');
+    const invitationEmail = captured.at(-1);
+    assert.equal(invitationEmail.template, 'reset-password');
+    assert.match(invitationEmail.data.otp, /^\d{6}$/);
+    assert.ok(smtp.messages.at(-1).includes(invitationEmail.data.otp), 'The pending technician code must be present in the delivered SMTP message');
+    assert.equal(pendingTechnician.invitationTokenHash, originalInvitationHash, 'Recovery must preserve the original seven-day invitation');
+    assert.deepEqual(await request('technician', 'forgot-password', { email: pendingTechnician.email }), unknown);
+    assert.equal(smtp.messages.length, beforeInvitation + 1, 'Repeated requests must respect the invitation email cooldown');
+    const codeResult = await request('technician', 'verify-reset-otp', { email: pendingTechnician.email, otp: invitationEmail.data.otp });
+    assert.equal(codeResult.status, 200);
+    const beforeActivation = users.length;
+    pendingTechnician.status = 'inactive';
+    assert.equal((await request('technician', 'reset-password', resetBody(codeResult.body.data.resetToken))).status, 400, 'Revoked invitations cannot create a new account');
+    assert.equal(users.length, beforeActivation);
+    pendingTechnician.status = 'pending';
+    now += 61;
+    await request('technician', 'forgot-password', { email: pendingTechnician.email });
+    const newCode = captured.at(-1).data.otp;
+    const verifiedSetup = await request('technician', 'verify-reset-otp', { email: pendingTechnician.email, otp: newCode });
+    assert.equal(verifiedSetup.status, 200);
+    assert.equal((await request('technician', 'reset-password', resetBody(verifiedSetup.body.data.resetToken))).status, 200);
+    assert.equal(users.length, beforeActivation + 1);
+    assert.equal(pendingTechnician.status, 'active');
+    const activatedUser = users.find((user) => user.email === pendingTechnician.email);
+    assert.equal(activatedUser.id, String(pendingTechnician.userId));
+    assert.equal(await activatedUser.comparePassword('replacement-password'), true);
+    assert.equal((await request('technician', 'reset-password', resetBody(verifiedSetup.body.data.resetToken))).status, 400);
     resetLimits();
     const expired = await start('owner'); now += 901;
     assert.equal((await request('owner', 'reset-password', resetBody(expired.token))).status, 400);

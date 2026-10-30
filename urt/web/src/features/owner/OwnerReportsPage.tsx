@@ -5,11 +5,27 @@ import { selectSelectedBusinessId } from '../business/businessSlice';
 import { useGetReportOverviewQuery } from '../reports/reportsApi';
 import { formatRupiah } from '../tickets/currency';
 import { ticketStatuses, type TicketStatus } from '../tickets/status';
+import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
+import type { StatusTone } from '../../components/ui/StatusBadge';
 import { TextInput } from '../../components/ui/TextInput';
 import { Button } from '../../components/ui/Button';
+import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { PageLoader, EmptyState } from '../../components/feedback/Feedback';
 import styles from './OwnerDashboard.module.css';
 import ticketStyles from '../tickets/Tickets.module.css';
+
+const statusColors: Record<StatusTone, string> = {
+  neutral: '#64748b',
+  info: '#2563eb',
+  warning: '#d97706',
+  success: '#059669',
+  danger: '#dc2626',
+};
+
+function statusColor(status: string) {
+  const definition = ticketStatuses[status as TicketStatus];
+  return definition ? statusColors[definition.tone] : statusColors.neutral;
+}
 
 export default function OwnerReportsPage() {
   const businessId = useAppSelector(selectSelectedBusinessId);
@@ -205,17 +221,17 @@ export default function OwnerReportsPage() {
           <h2>Distribusi Status Tiket</h2>
           <div className={styles.distribution}>
             {hasTickets ? (
-              statusDistribution.map((item, index) => (
+              statusDistribution.map((item) => (
                 <div key={item.status}>
                   <div className={styles.chartLabel}>
-                    <span>{ticketStatuses[item.status as TicketStatus]?.label || item.status}</span>
+                    {ticketStatuses[item.status as TicketStatus] ? <TicketStatusBadge status={item.status as TicketStatus} /> : item.status}
                     <strong>{item.count}</strong>
                   </div>
                   <div className={styles.chartTrack}>
                     <div
                       style={{
                         width: `${(item.count / Math.max(1, ...statusDistribution.map((s) => s.count))) * 100}%`,
-                        background: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6'][index % 4],
+                        background: statusColor(item.status),
                       }}
                     />
                   </div>
@@ -252,7 +268,7 @@ export default function OwnerReportsPage() {
               Belum ada transaksi pembayaran pada rentang tanggal ini.
             </p>
           ) : (
-            <div className={ticketStyles.tableWrapper}>
+            <ResponsiveTable className={ticketStyles.tableWrapper}>
               <table className={ticketStyles.table}>
                 <thead>
                   <tr>
@@ -271,14 +287,14 @@ export default function OwnerReportsPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ResponsiveTable>
           )}
         </div>
 
         {/* Status Distribution */}
         <div className={ticketStyles.ticketCard}>
           <h2>Distribusi Status Tiket Servis</h2>
-          <div className={ticketStyles.tableWrapper}>
+          <ResponsiveTable className={ticketStyles.tableWrapper}>
             <table className={ticketStyles.table}>
               <thead>
                 <tr>
@@ -287,9 +303,9 @@ export default function OwnerReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {statusDistribution.map((s, idx) => (
-                  <tr key={idx}>
-                    <td>{ticketStatuses[s.status as TicketStatus]?.label || s.status}</td>
+                {statusDistribution.map((s) => (
+                  <tr key={s.status}>
+                    <td>{ticketStatuses[s.status as TicketStatus] ? <TicketStatusBadge status={s.status as TicketStatus} /> : s.status}</td>
                     <td className={ticketStyles.textRight}>
                       <strong>{s.count}</strong>
                     </td>
@@ -297,7 +313,7 @@ export default function OwnerReportsPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ResponsiveTable>
         </div>
       </div>
 
@@ -309,7 +325,7 @@ export default function OwnerReportsPage() {
             Belum ada teknisi aktif terdaftar.
           </p>
         ) : (
-          <div className={ticketStyles.tableWrapper}>
+          <ResponsiveTable className={ticketStyles.tableWrapper}>
             <table className={ticketStyles.table}>
               <thead>
                 <tr>
@@ -341,7 +357,7 @@ export default function OwnerReportsPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ResponsiveTable>
         )}
       </div>
     </div>

@@ -60,6 +60,15 @@ input:disabled {
 .skip-link:focus {
   transform: translateY(0);
 }
+.skip-link:not(:focus) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 .eyebrow {
   color: var(--blue);
   font-size: 0.78rem;
@@ -409,8 +418,36 @@ form[class] > label select {
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
 }
 [data-dashboard='customer'] > .reference-columns {
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 1fr) minmax(0, 1.7fr);
 }
+.customer-service-journey {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: 8px 20px;
+}
+.customer-service-journey > h2,
+.customer-service-journey > p {
+  grid-column: 1 / -1;
+}
+.customer-service-journey > .customer-service-steps {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+.customer-service-journey > .reference-panel {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  padding: 16px;
+}
+.customer-service-journey > .reference-panel > h2 {
+  font-size: 1rem;
+}
+.customer-service-journey .reference-dl {
+  grid-template-columns: minmax(0, 1fr);
+}
+.customer-service-journey > p { margin: 0; }
 [data-role='customer'] .reference-stats,
 [data-role='technician'] .reference-stats {
   gap: 20px;
@@ -418,5 +455,64 @@ form[class] > label select {
 @media (max-width: 1000px) {
   [data-dashboard] > .reference-columns {
     grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  [data-dashboard='customer'] {
+    gap: 16px;
+  }
+  [data-dashboard='customer'] > .reference-heading .actions {
+    width: 100%;
+  }
+  [data-dashboard='customer'] > .reference-heading .actions > * {
+    flex: 1 1 auto;
+  }
+  [data-dashboard='customer'] > .reference-stats-three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  [data-dashboard='customer'] > .reference-stats-three > :last-child {
+    grid-column: 1 / -1;
+  }
+  [data-dashboard='customer'] > .reference-columns > .reference-panel {
+    padding: 16px;
+  }
+  [data-dashboard='customer'] .customer-service-journey {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 8px 10px;
+    padding: 14px;
+  }
+  [data-dashboard='customer'] .customer-service-journey > .reference-panel {
+    padding: 10px;
+  }
+  [data-dashboard='customer'] .customer-service-journey > .reference-panel > h2 {
+    margin-bottom: 12px;
+    font-size: 0.92rem;
+  }
+  [data-dashboard='customer'] .customer-service-journey .reference-dl {
+    gap: 10px;
+  }
+  [data-dashboard='customer'] > .reference-panel:last-child {
+    padding: 16px;
+  }
+  [data-dashboard='customer'] .tableWrapper {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+@media (max-width: 400px) {
+  [data-dashboard='customer'] > .reference-stats-three > * {
+    padding: 12px;
+  }
+  [data-dashboard='customer'] > .reference-stats-three .value {
+    font-size: 24px;
+  }
+  [data-dashboard='customer'] .customer-service-journey {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 8px;
+    padding: 12px;
+  }
+  [data-dashboard='customer'] .customer-service-journey > .reference-panel {
+    padding: 8px;
   }
 }
