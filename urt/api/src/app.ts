@@ -6,7 +6,6 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler.js';
 import corsConfig from './core/config/cors.js';
 import sessionMiddleware from './core/config/session.js';
 import { config } from './core/config/index.js';
-import { verifyCsrfToken } from './core/security/csrf.js';
 import mongoose from 'mongoose';
 import { apiLimiter } from './core/security/rate-limiter.js';
 
@@ -46,7 +45,6 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(cookieParser()); // Parse cookies
 app.use('/api/v1', apiLimiter);
 app.use(sessionMiddleware);
-app.use('/api/v1', verifyCsrfToken);
 
 /**
  * API Routes

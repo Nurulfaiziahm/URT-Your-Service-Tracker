@@ -47,7 +47,11 @@ export const getCsrfToken = asyncHandler(async (req: Request, res: Response) => 
  */
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as RegisterInput;
-  const result = await AuthService.register(input, req, req.params.portal === 'owner' ? 'owner' : 'customer');
+  const result = await AuthService.register(
+    input,
+    req,
+    req.params.portal === 'owner' ? 'owner' : 'customer',
+  );
 
   const csrfToken = await saveCsrfToken(req, true);
   CookieHelper.clearLegacyCookies(res);
@@ -103,7 +107,11 @@ export const getAvailablePortals = asyncHandler(async (req, res) => {
  */
 export const googleLogin = asyncHandler(async (req: Request, res: Response) => {
   const { idToken } = req.body as GoogleAuthInput;
-  const result = await AuthService.googleLogin(idToken, req, (req.params.portal as AuthPortal | undefined) || 'customer');
+  const result = await AuthService.googleLogin(
+    idToken,
+    req,
+    (req.params.portal as AuthPortal | undefined) || 'customer',
+  );
 
   const csrfToken = await saveCsrfToken(req, true);
   CookieHelper.clearLegacyCookies(res);
@@ -272,7 +280,10 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('Email is required', 400);
   }
 
-  await AuthService.forgotPassword(email, (req.params.portal as AuthPortal | undefined) || 'customer');
+  await AuthService.forgotPassword(
+    email,
+    (req.params.portal as AuthPortal | undefined) || 'customer',
+  );
 
   ResponseHandler.success(
     res,
@@ -293,7 +304,11 @@ export const verifyResetOtp = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('Email and OTP are required', 400);
   }
 
-  const resetToken = await AuthService.verifyResetOtp(email, otp, (req.params.portal as AuthPortal | undefined) || 'customer');
+  const resetToken = await AuthService.verifyResetOtp(
+    email,
+    otp,
+    (req.params.portal as AuthPortal | undefined) || 'customer',
+  );
 
   ResponseHandler.success(res, { resetToken }, 'OTP verified successfully');
 });
@@ -310,7 +325,11 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
     throw new AppError('Reset token and password are required', 400);
   }
 
-  await AuthService.resetPassword(resetToken, password, (req.params.portal as AuthPortal | undefined) || 'customer');
+  await AuthService.resetPassword(
+    resetToken,
+    password,
+    (req.params.portal as AuthPortal | undefined) || 'customer',
+  );
 
   ResponseHandler.success(
     res,

@@ -28,7 +28,7 @@ import {
 } from '../../core/security/rate-limiter.js';
 import { validate } from '../../middleware/validation.js';
 import { protect } from '../../middleware/auth.guard.js';
-import { createCsrfToken } from '../../core/security/csrf.js';
+import { createCsrfToken, verifyCsrfToken } from '../../core/security/csrf.js';
 import {
   registerSchema,
   loginSchema,
@@ -71,7 +71,7 @@ router.post(
 );
 
 // Refresh access token (CSRF protected)
-router.post('/refresh-token', refreshToken);
+router.post('/refresh-token', verifyCsrfToken, refreshToken);
 
 // Request password reset
 router.post(
