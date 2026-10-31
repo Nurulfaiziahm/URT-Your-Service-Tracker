@@ -41,7 +41,7 @@ export default function OwnerInvoiceDetailPage() {
           title="Invoice Tidak Ditemukan"
           description="Data invoice tagihan ini tidak tersedia atau Anda tidak memiliki akses ke tempat servis ini."
           symbol="404"
-          action={<ButtonLink to="/owner/transactions">Kembali ke Daftar Transaksi</ButtonLink>}
+          action={<ButtonLink to="/owner/tickets">Kembali ke Daftar Tiket</ButtonLink>}
         />
       </main>
     );
@@ -67,8 +67,8 @@ export default function OwnerInvoiceDetailPage() {
           <Button type="button" variant="secondary" onClick={() => setShowPrintModal(true)}>
             <Icon name="print" /> Cetak Invoice
           </Button>
-          <ButtonLink to="/owner/transactions" variant="secondary">
-           Kembali ke Transaksi
+          <ButtonLink to={invoice.ticketId ? `/owner/tickets/${invoice.ticketId}` : '/owner/tickets'} variant="secondary">
+            Kembali ke Tiket Servis
           </ButtonLink>
         </div>
       </header>

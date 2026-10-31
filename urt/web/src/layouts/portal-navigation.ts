@@ -2,7 +2,7 @@ export const portals = {
   owner: {
     label: 'Owner', name: 'Portal pemilik', description: 'Ringkasan dan pengelolaan tempat servis.',
     items: [
-      ['Beranda', '/owner'], ['Tiket servis', '/owner/tickets'], ['Teknisi', '/owner/technicians'], ['Pelanggan', '/owner/customers'], ['Layanan', '/owner/services'], ['Transaksi', '/owner/transactions'], ['Laporan', '/owner/reports'], ['Langganan', '/owner/subscription'], ['Pengaturan', '/owner/settings'], ['Profil', '/owner/profile'],
+      ['Beranda', '/owner'], ['Tiket servis', '/owner/tickets'], ['Teknisi', '/owner/technicians'], ['Pelanggan', '/owner/customers'], ['Layanan', '/owner/services'], ['Laporan', '/owner/reports'], ['Langganan', '/owner/subscription'], ['Pengaturan', '/owner/settings'], ['Profil', '/owner/profile'],
     ],
   },
   technician: {

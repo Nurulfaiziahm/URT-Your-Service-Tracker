@@ -38,7 +38,7 @@ const OwnerServicesPage = lazy(() => import('../features/owner/OwnerServicesPage
 const OwnerTicketsPage = lazy(() => import('../features/owner/OwnerTicketsPage'));
 const OwnerNewTicketPage = lazy(() => import('../features/owner/OwnerNewTicketPage'));
 const OwnerTicketDetailPage = lazy(() => import('../features/owner/OwnerTicketDetailPage'));
-const OwnerInvoicesPage = lazy(() => import('../features/owner/OwnerInvoicesPage'));
+
 const OwnerInvoiceDetailPage = lazy(() => import('../features/owner/OwnerInvoiceDetailPage'));
 const OwnerReportsPage = lazy(() => import('../features/owner/OwnerReportsPage'));
 const OwnerSubscriptionPaymentPage = lazy(() => import('../features/owner/OwnerSubscriptionPaymentPage'));
@@ -162,7 +162,7 @@ export function AppRoutes() {
                 <Route path="services/new" element={<OwnerServicesPage />} />
                 <Route path="services/:id" element={<OwnerServiceDetailPage />} />
                 <Route path="services/:id/edit" element={<OwnerServiceDetailPage />} />
-                <Route path="transactions" element={<OwnerInvoicesPage />} />
+
                 <Route path="transactions/:id" element={<OwnerInvoiceDetailPage />} />
                 <Route path="reports" element={<OwnerReportsPage />} />
                 <Route path="subscription" element={<OwnerSubscriptionPage />} />

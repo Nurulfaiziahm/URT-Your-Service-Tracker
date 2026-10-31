@@ -108,7 +108,7 @@ mern stack/web/
 | `/owner/customers` | `OwnerCustomersPage` | Customer directory, claim invitation, and CSV import |
 | `/owner/technicians` | `OwnerTechniciansPage` | Technician team, invitations, workload |
 | `/owner/services` | `OwnerServicesPage` | Repair service catalog CRUD |
-| `/owner/transactions` | `OwnerInvoicesPage` | Service transactions list & payment status |
+
 | `/owner/transactions/:id`| `OwnerInvoiceDetailPage` | Invoice detail, recording payments, voiding, printing |
 | `/owner/reports` | `OwnerReportsPage` | Revenue by payment method, completion volume, SLA compliance |
 | `/owner/subscription` | `OwnerSubscriptionPage` | Subscription plan comparison & demo checkout |
