@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
-import { useGetSubscriptionPaymentQuery, useConfirmDemoSubscriptionPaymentMutation } from '../subscription/subscriptionApi';
+import {
+  useCheckoutSubscriptionMutation,
+  useGetSubscriptionPaymentQuery,
+  useConfirmDemoSubscriptionPaymentMutation,
+} from '../subscription/subscriptionApi';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Icon';
 import { StatusBadge } from '../../components/ui/StatusBadge';
@@ -20,16 +24,20 @@ const formatDate = (value: string) => new Date(value).toLocaleString('id-ID', {
 export default function OwnerSubscriptionPaymentPage() {
   const businessId = useAppSelector(selectSelectedBusinessId) || '';
   const { id = '' } = useParams();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { currentData: data, isLoading, isFetching, error, refetch } = useGetSubscriptionPaymentQuery(
     { businessId, paymentId: id }, { skip: !businessId || !id },
   );
   const [confirmPayment, { isLoading: confirming, data: confirmation }] = useConfirmDemoSubscriptionPaymentMutation();
+  const [checkout, { isLoading: retrying }] = useCheckoutSubscriptionMutation();
   const [confirmationError, setConfirmationError] = useState('');
+  const [retryError, setRetryError] = useState('');
   const payment = confirmation?.data.payment.id === id ? confirmation.data.payment : data?.data.payment;
   const paid = payment?.status === 'paid';
   const pending = payment?.status === 'pending';
   const demoAvailable = data?.data.demoConfirmationAvailable;
+  const canSimulateExpiredPayment = payment?.status === 'expired' && demoAvailable;
   const instructions = data?.data.instructions.replace(/\\r\\n|\\n/g, '\n');
 
   async function confirm() {
@@ -39,6 +47,20 @@ export default function OwnerSubscriptionPaymentPage() {
     } catch (err) {
       const result = err as { data?: ApiErrorBody };
       setConfirmationError(result.data?.error || 'Konfirmasi belum berhasil. Silakan coba lagi.');
+    }
+  }
+
+  async function retryPayment() {
+    if (!payment) return;
+    setRetryError('');
+    try {
+      const result = await checkout({ businessId, packageCode: payment.package.code }).unwrap();
+      navigate(`/owner/subscription/payments/${result.data.payment.id}`, {
+        state: { instructions: result.data.instructions },
+      });
+    } catch (err) {
+      const result = err as { data?: ApiErrorBody };
+      setRetryError(result.data?.error || result.data?.message || 'Invoice baru belum dapat dibuat. Silakan coba lagi.');
     }
   }
 
@@ -106,20 +128,21 @@ export default function OwnerSubscriptionPaymentPage() {
         <aside className={styles.paymentPanel}>
           <section className={styles.confirmCard}>
             <span className={styles.demoBadge}>{demoAvailable ? 'MODE PRESENTASI' : 'PEMBAYARAN MANUAL'}</span>
-            <h2>{paid ? 'Paket siap digunakan' : pending ? 'Aktifkan paket Anda' : 'Invoice sudah ditutup'}</h2>
-            <p>{paid ? 'Kelola tiket, teknisi, dan pelanggan dari dashboard pemilik.' : pending ? 'Konfirmasi invoice untuk melanjutkan aktivasi langganan.' : 'Pilih paket kembali untuk membuat invoice pembayaran baru.'}</p>
+            <h2>{paid ? 'Paket siap digunakan' : pending ? 'Aktifkan paket Anda' : canSimulateExpiredPayment ? 'Lanjutkan simulasi pembayaran' : 'Invoice sudah ditutup'}</h2>
+            <p>{paid ? 'Kelola tiket, teknisi, dan pelanggan dari dashboard pemilik.' : pending ? 'Konfirmasi invoice untuk melanjutkan aktivasi langganan.' : canSimulateExpiredPayment ? 'Simulasikan pembayaran untuk mengaktifkan paket dan melanjutkan proses.' : 'Buat invoice pembayaran baru untuk melanjutkan.'}</p>
             <ol className={styles.steps}>
               <li data-complete="true"><span><Icon name="check" /></span><div><strong>Invoice dibuat</strong><small>Paket dan harga sudah tersimpan</small></div></li>
               <li data-complete={paid}><span>{paid ? <Icon name="check" /> : '2'}</span><div><strong>Konfirmasi pembayaran</strong><small>{paid ? 'Pembayaran sudah tercatat' : 'Selesaikan melalui tombol di bawah'}</small></div></li>
               <li data-complete={paid}><span>{paid ? <Icon name="check" /> : '3'}</span><div><strong>Langganan aktif</strong><small>Akses fitur sesuai paket pilihan</small></div></li>
             </ol>
-            {pending && demoAvailable && <>
+            {(pending || canSimulateExpiredPayment) && demoAvailable && <>
               <div className={styles.demoNotice}><Icon name="shield" /><p><strong>Khusus demonstrasi.</strong> Tombol ini mensimulasikan pembayaran dan langsung mengaktifkan paket. Tidak ada uang yang dipindahkan.</p></div>
-              <Button full pending={confirming} onClick={() => void confirm()}><span className={styles.buttonLabel}><Icon name="check" /> Konfirmasi Pembayaran Demo</span></Button>
+              <Button full pending={confirming} onClick={() => void confirm()}><span className={styles.buttonLabel}><Icon name="check" /> Simulasikan Pembayaran Demo</span></Button>
             </>}
             {pending && !demoAvailable && <InlineNotice>Gunakan instruksi pembayaran manual. Konfirmasi demo tidak tersedia di lingkungan ini.</InlineNotice>}
             {paid && <ButtonLink full to="/owner">Buka Dashboard</ButtonLink>}
-            {!paid && !pending && <ButtonLink full to="/owner/subscription/plans">Pilih Paket Kembali</ButtonLink>}
+            {!paid && !pending && <Button full pending={retrying} onClick={() => void retryPayment()}>Buat Invoice Pembayaran Baru</Button>}
+            {retryError && <InlineNotice type="error">{retryError}</InlineNotice>}
             {confirmationError && <InlineNotice type="error">{confirmationError}</InlineNotice>}
             <Button variant="ghost" full pending={isFetching} disabled={confirming} onClick={() => void refetch()}>Periksa Status</Button>
           </section>

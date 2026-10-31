@@ -46,8 +46,10 @@ export class SubscriptionService {
       return { payment: this.serializePayment(payment), subscription: await this.getSubscription(businessId) };
     }
     const now = new Date();
-    if (payment.status !== 'pending' || payment.expiresAt <= now) {
-      throw new AppError('Only an unexpired pending payment can be confirmed', 409, 'PAYMENT_NOT_PENDING');
+    // Demo payments can be confirmed after expiry so owners can continue the
+    // presentation flow. Production manual payments remain subject to expiry.
+    if (!['pending', 'expired'].includes(payment.status)) {
+      throw new AppError('Only a pending or expired payment can be confirmed in demo mode', 409, 'PAYMENT_NOT_PENDING');
     }
     const subscription = await BusinessSubscription.findOne({ businessId });
     const active = !!subscription && subscription.currentPeriodEnd > now;
