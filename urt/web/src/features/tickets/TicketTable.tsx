@@ -21,7 +21,7 @@ export function TicketTable({
   const path = role === 'customer' ? `${customerBasePath}/services` : `/${role}/tickets`;
   return (
     <ResponsiveTable role={history && role === 'customer' ? 'region' : undefined} className={styles.tableWrapper} aria-label={history && role === 'customer' ? 'Riwayat servis' : undefined} tabIndex={history && role === 'customer' ? 0 : undefined} rowHeading={tickets.length ? 'Tiket' : undefined}>
-      <table className={styles.table}>
+      <table className={[styles.table, history ? styles.centeredTable : ''].filter(Boolean).join(' ')}>
         <thead>
           <tr>
             <th>{history ? 'Nomor Tiket & Perangkat' : 'Nomor Tiket'}</th>
@@ -42,11 +42,11 @@ export function TicketTable({
             tickets.map((ticket) => (
               <tr key={ticket.id}>
                 <td>
-                  <Link to={`${path}/${ticket.id}`} className="text-link">
+                  <Link to={`${path}/${ticket.id}`} className="text-link" style={{ fontWeight: 700, color: 'var(--blue, #2563eb)' }}>
                     {ticket.ticketCode}
                   </Link>
                   {history && (
-                    <div>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--slate-500)', marginTop: 2 }}>
                       {ticket.device.brand} {ticket.device.model}
                     </div>
                   )}
@@ -76,8 +76,8 @@ export function TicketTable({
                 {role === 'technician' && !history && <td><DeadlineBadge ticket={ticket} /></td>}
                 {role !== 'owner' && (
                   <td>
-                    <Link to={`${path}/${ticket.id}`} className="text-link">
-                      Lihat Detail
+                    <Link to={`${path}/${ticket.id}`} className="text-link" style={{ fontWeight: 600 }}>
+                      Lihat Detail &rarr;
                     </Link>
                   </td>
                 )}
@@ -85,7 +85,7 @@ export function TicketTable({
             ))
           ) : (
             <tr>
-              <td colSpan={9}>Belum ada tiket servis.</td>
+              <td colSpan={9} style={{ textAlign: 'center' }}>Belum ada tiket servis.</td>
             </tr>
           )}
         </tbody>

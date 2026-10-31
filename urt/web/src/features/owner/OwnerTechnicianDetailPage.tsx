@@ -63,8 +63,9 @@ function EditForm({ item, businessId }: { item: Technician; businessId: string }
           disabled
         />
         <TextInput
-          label="Nomor WhatsApp"
+          label="Nomor WhatsApp *"
           type="tel"
+          required
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />

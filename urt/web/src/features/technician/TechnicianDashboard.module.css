@@ -1,0 +1,681 @@
+/* Technician Dashboard Styles */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+  width: 100%;
+}
+
+/* 1. Dashboard Header */
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dashboardHeader h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--navy-950, #0f172a);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.dashboardHeader p {
+  font-size: 0.92rem;
+  color: var(--slate-500, #64748b);
+  margin: 4px 0 0;
+}
+
+/* 2. Summary Cards Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+/* 3. Pengingat Tenggat (Conditional) */
+.reminderCard {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+  border-radius: var(--radius-md, 10px);
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.reminderHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reminderTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reminderTitleRow h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #991b1b;
+  margin: 0;
+}
+
+.reminderIcon {
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+}
+
+.reminderLead {
+  font-size: 0.85rem;
+  color: #7f1d1d;
+  margin: 0;
+}
+
+.reminderList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reminderItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.reminderItemMain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reminderTicketLink {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-decoration: none;
+}
+
+.reminderTicketLink:hover {
+  color: var(--blue, #2563eb);
+  text-decoration: underline;
+}
+
+.reminderItemMeta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.reminderStatusCol,
+.reminderDeadCol {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metaLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.deadValue {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #991b1b;
+}
+
+.emptyNote {
+  font-size: 0.88rem;
+  color: var(--slate-500, #64748b);
+  margin: 0;
+}
+
+/* 4. Active Service 3-Card Grid */
+.activeServiceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* Common Card Base for the 3 Service Cards */
+.card {
+  background: #ffffff;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 12px;
+  padding: 22px 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--navy-950, #0f172a);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Status Pill in Card 1 */
+.statusPillApproved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ecfdf5;
+  color: #15803d;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.statusDotGreen {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.statusPillGeneric {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.statusDotBlue {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #2563eb;
+}
+
+/* Card 1: Device Row */
+.deviceRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.deviceBox {
+  width: 90px;
+  height: 90px;
+  min-width: 90px;
+  background: #f0f7ff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.deviceDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ticketCode {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.fieldLabel {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.fieldValue {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+/* Card 1: Meta Row (Pelanggan & Tanggal Masuk) */
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 22px;
+  padding-bottom: 20px;
+}
+
+.metaCol {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.metaColLabel {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.metaColValue {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Card 1: Button */
+.primaryDetailBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: #1d4ed8;
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.primaryDetailBtn:hover {
+  background: #1e40af;
+  color: #ffffff !important;
+}
+
+/* Card 2: Status Tiket Timeline */
+.timelineWrapper {
+  margin: 6px 0 16px;
+  flex: 1;
+}
+
+.timelineList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timelineStep {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  min-height: 48px;
+}
+
+.timelineStep:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 24px;
+  bottom: 0;
+  left: 11px;
+  width: 2px;
+  height: calc(100% - 24px);
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.timelineStep[data-state='completed']:not(:last-child)::after {
+  background: #10b981;
+}
+
+.stepIndicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.stepCircle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  z-index: 2;
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.timelineStep[data-state='completed'] .stepCircle {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+
+.timelineStep[data-state='current'] .stepCircle {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 0 0 3px #dbeafe;
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.stepContentActive {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #eff6ff;
+  min-width: 0;
+  flex: 1;
+}
+
+.stepTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.stepContentActive .stepTitle {
+  color: #1d4ed8;
+}
+
+.stepSubtextDate {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.stepSubtextCurrent {
+  font-size: 0.75rem;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.historyLink {
+  margin-top: auto;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: 10px;
+}
+
+.historyLink:hover {
+  text-decoration: underline;
+}
+
+/* Card 3: Jadwal Pengerjaan & QC */
+.scheduleList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 4px;
+  margin-bottom: 22px;
+  flex: 1;
+}
+
+.scheduleItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scheduleLabel {
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.scheduleValue {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.scheduleNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f0f7ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: auto;
+}
+
+.noticeIcon {
+  color: #2563eb;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.scheduleNotice p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #334155;
+  line-height: 1.45;
+}
+
+/* Card 4: Antrian Servis Mendesak */
+.queueCard {
+  background: #ffffff;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 12px;
+  padding: 22px 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.queueCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.queueCardTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--navy-950, #0f172a);
+  margin: 0;
+}
+
+.viewAllLink {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.viewAllLink:hover {
+  text-decoration: underline;
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.urgentTable {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.urgentTable th {
+  background-color: #f8fafc;
+  color: #64748b;
+  padding: 12px 14px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.urgentTable td {
+  padding: 14px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #0f172a;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.urgentTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tableTicketLink {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.statusPillLate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.statusDotRed {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #ef4444;
+}
+
+.btnActionDetail {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #bfdbfe;
+  background: #ffffff;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btnActionDetail:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.emptyTableMessage {
+  padding: 24px;
+  text-align: center;
+  color: var(--slate-500, #64748b);
+  font-size: 0.9rem;
+}
+
+/* Responsive Queries */
+@media (max-width: 1024px) {
+  .activeServiceGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboardHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reminderItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .metaRow {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

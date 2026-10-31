@@ -50,9 +50,9 @@ export function EstimateEditor({
     defaultDate.setDate(defaultDate.getDate() + 3);
     return localDateTimeInput(defaultDate);
   });
-  const [customerExplanation, setCustomerExplanation] = useState<string>(
-    ticket.diagnosis?.customerExplanation || diagnosisExplanation(ticket.diagnosis?.staffFindings || ''),
-  );
+  const customerExplanation =
+    ticket.diagnosis?.customerExplanation ||
+    diagnosisExplanation(ticket.diagnosis?.staffFindings || '');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -116,8 +116,9 @@ export function EstimateEditor({
 
     if (!selectedDifficulty?.catalogItemId) { setErrorMsg('Pilih tingkat kesulitan servis terlebih dahulu.'); return; }
 
-    if (!customerExplanation || customerExplanation.trim().length < 3) {
-      setErrorMsg('Penjelasan untuk pelanggan wajib diisi sebelum mengajukan estimasi.');
+    const explanationToSend = (customerExplanation || '').trim();
+    if (!explanationToSend || explanationToSend.length < 3) {
+      setErrorMsg('Penjelasan untuk pelanggan belum diisi pada diagnosis tiket.');
       return;
     }
 
@@ -134,7 +135,7 @@ export function EstimateEditor({
         ticketId: ticket.id,
         body: {
           expectedRevision: ticket.revision,
-          customerExplanation: customerExplanation.trim(),
+          customerExplanation: explanationToSend,
           repairDurationMinutes: Math.round(Number(repairHours) * 60),
           qcDurationMinutes: Math.round(Number(qcHours) * 60),
           lines,
@@ -167,28 +168,6 @@ export function EstimateEditor({
 
       <div className={styles.estimateWorkspace}>
         <div className={styles.estimateMain}>
-          <div style={{ display: 'grid', gap: 6 }}>
-            <label htmlFor="cust-explanation" style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-              Penjelasan untuk Pelanggan (Wajib):
-            </label>
-            <textarea
-              id="cust-explanation"
-              maxLength={1000}
-              rows={3}
-              value={customerExplanation}
-              onChange={(e) => setCustomerExplanation(e.target.value)}
-              placeholder="Jelaskan kerusakan yang ditemukan dan perbaikan yang dibutuhkan dengan bahasa yang ramah dipahami pelanggan..."
-              style={{
-                padding: '10px 12px',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-md)',
-                fontFamily: 'inherit',
-                fontSize: '0.9rem',
-              }}
-              required
-            />
-          </div>
-
           <div style={{ display: 'grid', gap: 8 }}>
             <EstimateCatalogPicker businessId={businessId} lines={lines} onAdd={handleAddCatalogItem} onDifficulty={(item) => setLines((previous) => [...previous.filter((line) => line.catalogEntryType !== 'difficulty'), ...(item ? [catalogEstimateLine(item)] : [])])} />
             {!lines.length && <p>Pilih item katalog untuk mulai menyusun rincian biaya.</p>}

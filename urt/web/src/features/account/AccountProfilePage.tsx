@@ -16,9 +16,10 @@ import styles from './Account.module.css';
 
 interface ProfileFormProps {
   user: User;
+  isTechnician?: boolean;
 }
 
-function ProfileForm({ user }: ProfileFormProps) {
+function ProfileForm({ user, isTechnician = false }: ProfileFormProps) {
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
 
   const [firstName, setFirstName] = useState(user.firstName);
@@ -35,6 +36,14 @@ function ProfileForm({ user }: ProfileFormProps) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setStatusMessage(null);
+
+    if (isTechnician && !phone.trim()) {
+      setStatusMessage({
+        type: 'error',
+        text: 'Nomor telepon / WhatsApp wajib diisi untuk akun teknisi agar pelanggan dapat menghubungi Anda.',
+      });
+      return;
+    }
 
     let formattedPhone = phone.trim();
     if (formattedPhone && !formattedPhone.startsWith('+')) {
@@ -106,13 +115,18 @@ function ProfileForm({ user }: ProfileFormProps) {
         />
 
         <TextInput
-          label="Nomor telepon / WhatsApp"
+          label={isTechnician ? 'Nomor telepon / WhatsApp * (Wajib)' : 'Nomor telepon / WhatsApp'}
           name="phone"
           type="tel"
           placeholder="08123456789"
+          required={isTechnician}
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          hint="Nomor untuk update notifikasi perbaikan perangkat."
+          hint={
+            isTechnician
+              ? 'Wajib diisi agar pelanggan dapat langsung menghubungi Anda melalui WhatsApp.'
+              : 'Nomor untuk update notifikasi perbaikan perangkat.'
+          }
         />
 
         <TextInput
@@ -162,20 +176,38 @@ export default function AccountProfilePage() {
     return <PageLoader />;
   }
 
+  const isCustomerShop = location.pathname.startsWith('/b/');
+  const homePath = isCustomerShop
+    ? location.pathname.split('/').slice(0, 4).join('/')
+    : portal === 'customer'
+      ? '/customer'
+      : portal === 'owner'
+        ? '/owner'
+        : portal === 'technician'
+          ? '/technician'
+          : '/customer';
+  const isTechnician = portal === 'technician';
+
   return (
     <div className={`container page-content ${styles.container}`}>
       <header className={styles.heading}>
         <span className="eyebrow">Pengaturan Akun</span>
-        <h1>Profil {roleLabel}</h1>
-        <p>Kelola identitas utama Anda di platform URT.</p>
+        <h1>Pengaturan Akun</h1>
+        <p>Kelola profil pengguna, kata sandi, dan keamanan sesi akun Anda.</p>
       </header>
 
       <nav className={styles.nav} aria-label="Menu akun">
-        <Link to={profilePath} data-active={true}>
-          Profil Pengguna
+        <div className={styles.navTabs}>
+          <Link to={profilePath} data-active={true} className={styles.navTab}>
+            Profil Pengguna
+          </Link>
+          <Link to={securityPath} className={styles.navTab}>
+            Keamanan &amp; Sesi
+          </Link>
+        </div>
+        <Link to={homePath} className={styles.navHome}>
+          &larr; Kembali ke Beranda
         </Link>
-        <Link to={securityPath}>Keamanan & Sesi</Link>
-        <Link to="/portal">Kembali ke Portal</Link>
       </nav>
 
       {user && !user.isEmailVerified && (
@@ -231,7 +263,7 @@ export default function AccountProfilePage() {
             </ButtonLink>
           </aside>
           <div className="reference-stack">
-            <ProfileForm key={user.id} user={user} />
+            <ProfileForm key={user.id} user={user} isTechnician={isTechnician} />
             {portal === 'technician' && businessId && (
               <TechnicianProfileSection businessId={businessId} />
             )}

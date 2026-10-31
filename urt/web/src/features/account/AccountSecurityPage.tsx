@@ -130,20 +130,37 @@ export default function AccountSecurityPage() {
     }
   }
 
+  const isCustomerShop = location.pathname.startsWith('/b/');
+  const homePath = isCustomerShop
+    ? location.pathname.split('/').slice(0, 4).join('/')
+    : portal === 'customer'
+      ? '/customer'
+      : portal === 'owner'
+        ? '/owner'
+        : portal === 'technician'
+          ? '/technician'
+          : '/customer';
+
   return (
     <div className={`container page-content ${styles.container}`}>
       <header className={styles.heading}>
         <span className="eyebrow">Pengaturan Akun</span>
-        <h1>Keamanan & Sesi Masuk</h1>
-        <p>Kelola kata sandi akun dan pantau perangkat yang aktif masuk.</p>
+        <h1>Pengaturan Akun</h1>
+        <p>Kelola profil pengguna, kata sandi, dan keamanan sesi akun Anda.</p>
       </header>
 
       <nav className={styles.nav} aria-label="Menu akun">
-        <Link to={profilePath}>Profil Pengguna</Link>
-        <Link to={securityPath} data-active={true}>
-          Keamanan & Sesi
+        <div className={styles.navTabs}>
+          <Link to={profilePath} className={styles.navTab}>
+            Profil Pengguna
+          </Link>
+          <Link to={securityPath} data-active={true} className={styles.navTab}>
+            Keamanan &amp; Sesi
+          </Link>
+        </div>
+        <Link to={homePath} className={styles.navHome}>
+          &larr; Kembali ke Beranda
         </Link>
-        <Link to="/portal">Kembali ke Portal</Link>
       </nav>
 
       {sessionNotice && <InlineNotice>{sessionNotice}</InlineNotice>}

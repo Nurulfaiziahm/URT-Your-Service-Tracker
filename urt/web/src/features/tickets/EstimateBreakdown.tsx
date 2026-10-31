@@ -91,7 +91,7 @@ export function EstimateBreakdown({ revision, title, customerView = false }: Est
                       {line.type === 'part' ? 'Suku Cadang' : 'Jasa / Biaya'}
                     </span>
                   </td>
-                  <td>{customerView && line.catalogEntryType === 'difficulty' ? 'Jasa Servis' : line.description}{line.difficultyLevel && <div>Tingkat kesulitan: {difficultyLabels[line.difficultyLevel]}</div>}</td>
+                  <td>{customerView && line.catalogEntryType === 'difficulty' ? 'Biaya Servis' : line.description}{line.difficultyLevel && <div>Tingkat kesulitan: {difficultyLabels[line.difficultyLevel]}</div>}</td>
                   <td className={styles.textRight}>{line.quantity}</td>
                   <td className={styles.textRight}>{formatRupiah(line.unitPrice)}</td>
                   <td className={styles.textRight}>
@@ -120,7 +120,13 @@ export function EstimateBreakdown({ revision, title, customerView = false }: Est
             <span style={{ fontSize: '0.85rem', color: 'var(--slate-600)' }}>
               Target Selesai:{' '}
               <strong>
-                {new Date(revision.targetCompletionDate).toLocaleString('id-ID')}
+                {new Date(revision.targetCompletionDate).toLocaleString('id-ID', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </strong>
             </span>
           )}
@@ -147,7 +153,13 @@ export function EstimateBreakdown({ revision, title, customerView = false }: Est
               ? '✓ Telah disetujui oleh pelanggan'
               : '✕ Ditolak oleh pelanggan'}
           </strong>{' '}
-          pada {new Date(revision.decision.decidedAt).toLocaleString('id-ID')}
+          pada {new Date(revision.decision.decidedAt).toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
           {revision.decision.reason && ` (Alasan: ${revision.decision.reason})`}
         </div>
       )}

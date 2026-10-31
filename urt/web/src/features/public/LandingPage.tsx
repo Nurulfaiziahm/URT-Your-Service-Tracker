@@ -198,12 +198,12 @@ export default function LandingPage() {
                 terasa jauh lebih profesional.{' '}
               </p>
               <div className="hero__actions">
-                <Link to="/portal" className="btn btn--primary btn--lg">
+                <Link to="/owner/register" className="btn btn--primary btn--lg">
+                  Mulai Sekarang
+                </Link>
+                <Link to="/portal" className="btn btn--secondary btn--lg">
                   Lihat Demo
                 </Link>
-                <a href="#alur-kerja" className="btn btn--secondary btn--lg">
-                  Lihat Cara Kerja
-                </a>
               </div>
               <p className="hero__caption">
                 {' '}

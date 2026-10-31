@@ -93,7 +93,7 @@ export default function PortalSelectPage() {
             </p>
           </div>
           <div className={styles['portal-cards-grid']}>
-            {roles.filter((portal) => choosingAuth || portal.role !== 'owner').map((portal) => (
+            {roles.map((portal) => (
               <article className={styles['portal-card']} key={portal.role}>
                 <div
                   className={`${styles['portal-card__icon']} ${styles[`icon-${portal.theme}`]}`}

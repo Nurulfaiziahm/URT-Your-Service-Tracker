@@ -172,6 +172,12 @@
   font-size: 0.9rem;
 }
 
+.centeredTable th,
+.centeredTable td {
+  text-align: center;
+  vertical-align: middle;
+}
+
 .tableWrapper:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 
 .table th {

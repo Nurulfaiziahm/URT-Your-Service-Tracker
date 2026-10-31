@@ -74,6 +74,11 @@ export default function OwnerTechniciansPage() {
 
     if (!businessId) return;
 
+    if (!phone.trim()) {
+      setFeedback('Nomor WhatsApp teknisi wajib diisi agar pelanggan dapat menghubungi teknisi.');
+      return;
+    }
+
     try {
       const specs = specializations
         .split(',')
@@ -206,10 +211,13 @@ export default function OwnerTechniciansPage() {
 
           <div className={styles.row}>
             <TextInput
-              label="Nomor Telepon (opsional)"
+              label="Nomor Telepon / WhatsApp *"
               type="tel"
+              required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              placeholder="08123456789"
+              hint="Wajib diisi agar pelanggan dapat langsung menghubungi teknisi via WhatsApp."
             />
             <TextInput
               label="Spesialisasi (pisahkan dengan koma)"
