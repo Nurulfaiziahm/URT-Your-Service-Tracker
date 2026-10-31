@@ -147,11 +147,12 @@ application/payment testing is left to the user as requested.
   accepts no payment details; the invoice controls the amount and package.
   Returns `{ payment, subscription }`. Both endpoints require the authenticated
   owner of the specified business.
-- Demo confirmation is disabled when NODE_ENV is production, returning
-  `403 DEMO_PAYMENT_DISABLED`. Missing invoices return `404 PAYMENT_NOT_FOUND`;
-  expired/failed invoices return `409 PAYMENT_NOT_PENDING`.
-- Confirmation validates expiry, current-package renewal rules, and occupied
-  technician seats before activating the subscription. It uses calendar-month
+- Demo confirmation is available in all environments. It simulates payment
+  without moving money, including for expired invoices, so owners can continue
+  the subscription flow. Missing invoices return `404 PAYMENT_NOT_FOUND`;
+  failed invoices return `409 PAYMENT_NOT_PENDING`.
+- Confirmation validates current-package renewal rules and occupied technician
+  seats before activating the subscription. It uses calendar-month
   or calendar-year arithmetic with UTC month-end clamping. An active same-package
   renewal extends the existing end date; an expired plan starts from now.
 - A paid invoice returns its existing result on repeated confirmation. The

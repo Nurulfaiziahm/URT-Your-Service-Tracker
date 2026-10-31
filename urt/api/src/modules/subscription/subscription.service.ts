@@ -30,14 +30,11 @@ export class SubscriptionService {
     return {
       payment: this.serializePayment(payment),
       instructions: config.subscriptionPaymentInstructions.replace(/\\r\\n|\\n/g, '\n'),
-      demoConfirmationAvailable: config.nodeEnv !== 'production',
+      demoConfirmationAvailable: true,
     };
   }
 
   static async confirmDemoPayment(businessId: string, paymentId: string) {
-    if (config.nodeEnv === 'production') {
-      throw new AppError('Demo payment confirmation is disabled in production', 403, 'DEMO_PAYMENT_DISABLED');
-    }
     validateObjectId(businessId, 'Business');
     validateObjectId(paymentId, 'Subscription payment');
     const payment = await SubscriptionPayment.findOne({ _id: paymentId, businessId });
@@ -47,7 +44,7 @@ export class SubscriptionService {
     }
     const now = new Date();
     // Demo payments can be confirmed after expiry so owners can continue the
-    // presentation flow. Production manual payments remain subject to expiry.
+    // presentation flow in any environment.
     if (!['pending', 'expired'].includes(payment.status)) {
       throw new AppError('Only a pending or expired payment can be confirmed in demo mode', 409, 'PAYMENT_NOT_PENDING');
     }
