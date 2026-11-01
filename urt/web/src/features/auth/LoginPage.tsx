@@ -71,7 +71,8 @@ export default function LoginPage({ portal }: { portal: AuthPortal }) {
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
 
-  const [email, setEmail] = useState((location.state as { email?: string })?.email || '');
+  const locationState = location.state as { email?: string } | null;
+  const [email, setEmail] = useState(locationState?.email || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

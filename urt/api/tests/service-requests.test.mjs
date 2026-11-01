@@ -2,8 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { serviceRequestFixture } from './helpers/service-request-fixture.mjs';
 import { serviceRequestLimiter } from '../dist/core/security/rate-limiter.js';
+import { ServiceTicket } from '../dist/models/ServiceTicket.model.js';
 
 test('public intake creates trackable guest tickets and preserves authenticated ownership', async () => {
+  assert.ok(ServiceTicket.schema.indexes().some(([keys, options]) =>
+    keys.ticketCode === 1 && options.unique && options.partialFilterExpression?.ticketCodeVersion === 2,
+  ), 'the database uniquely indexes every new public ticket code');
   const fixture = serviceRequestFixture();
   const server = fixture.app.listen(0, '127.0.0.1');
   await new Promise((resolve) => server.once('listening', resolve));
@@ -29,16 +33,15 @@ test('public intake creates trackable guest tickets and preserves authenticated 
     assert.equal(fixture.contacts[0].userId, undefined);
     assert.equal(fixture.contacts[0].phone, '+6281234567890');
     assert.equal(fixture.tickets[0].device.model, '');
-    const lookup = async (trackingSecret) => fetch(`${base}/public/tracking`, {
+    const lookup = () => fetch(`${base}/public/tracking`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': fixture.csrf },
-      body: JSON.stringify({ businessSlug: receipt.businessSlug, ticketCode: receipt.ticketCode, trackingSecret }),
+      body: JSON.stringify({ ticketCode: receipt.ticketCode }),
     });
-    assert.equal((await lookup('incorrect')).status, 404);
-    const tracked = await lookup(receipt.trackingSecret);
+    const tracked = await lookup();
     assert.equal(tracked.status, 200);
     const progress = (await tracked.json()).data;
     assert.equal(progress.ticketCode, receipt.ticketCode);
-    assert.equal(progress.customer, undefined);
+    assert.equal(progress.customer.name, 'Guest Customer');
     assert.equal(progress.trackingSecretHash, undefined);
     assert.equal(progress.timeline[0].actorId, undefined);
 
@@ -51,6 +54,7 @@ test('public intake creates trackable guest tickets and preserves authenticated 
     assert.equal(fixture.contacts[0].userId, undefined);
     assert.equal((await submit(input, authHeaders)).status, 201);
     assert.equal(fixture.contacts.length, 2, 'Authenticated requests reuse only their own contact');
+    assert.equal(new Set(fixture.tickets.map((ticket) => ticket.ticketCode)).size, fixture.tickets.length, 'ticket numbers are not reused');
     const legacy = await fetch(`${base}/businesses/${fixture.shop._id}/tickets`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders },
       body: JSON.stringify({ device: { category: 'Laptop', brand: 'Asus', model: 'Existing model' }, complaint: 'Existing authenticated submission', intakeMethod: 'online' }),

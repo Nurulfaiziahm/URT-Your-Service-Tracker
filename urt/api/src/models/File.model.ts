@@ -6,7 +6,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IFile extends Document {
   key: string; // Unique S3-like key (e.g., "img_a1b2c3d4e5f6")
   originalName: string;
-  objectKey: string;
+  objectKey?: string;
+  content?: Buffer;
   category: 'images' | 'documents';
   mimeType: string;
   size: number;
@@ -32,7 +33,11 @@ const fileSchema = new Schema<IFile>(
     },
     objectKey: {
       type: String,
-      required: true,
+      required: false,
+    },
+    content: {
+      type: Buffer,
+      select: false,
     },
     category: {
       type: String,

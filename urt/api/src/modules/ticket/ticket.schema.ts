@@ -196,10 +196,8 @@ export const deleteAnonymousTicketSchema = z.object({
 
 export const publicTrackingSchema = z.object({
   body: z.object({
-    businessSlug: z.string().trim().min(1, 'Business slug is required'),
-    ticketCode: z.string().trim().min(1, 'Ticket code is required'),
-    trackingSecret: z.string().trim().min(1, 'Tracking secret is required'),
-  }),
+    ticketCode: z.string().trim().min(1, 'Ticket code is required').max(100),
+  }).strict(),
 });
 
 export const addAttachmentSchema = z.object({

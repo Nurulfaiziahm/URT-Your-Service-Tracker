@@ -7,11 +7,9 @@ export interface ServiceRequestInput {
 export interface ServiceRequestReceipt {
   ticketCode: string;
   businessSlug: string;
-  trackingSecret: string;
   ticketId?: string;
 }
 
 export function serviceTrackingPath(receipt: ServiceRequestReceipt) {
-  const fragment = new URLSearchParams({ business: receipt.businessSlug, access: receipt.trackingSecret });
-  return `/tracking/${encodeURIComponent(receipt.ticketCode)}#${fragment}`;
+  return `/tracking/${encodeURIComponent(receipt.ticketCode)}`;
 }

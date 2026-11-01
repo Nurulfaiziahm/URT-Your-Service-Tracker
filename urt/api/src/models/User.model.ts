@@ -45,7 +45,7 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: [
         function (this: IUser) {
-          return !this.googleId;
+          return !this.googleId && this.registrationPortal !== 'customer';
         },
         'Please provide a last name',
       ],

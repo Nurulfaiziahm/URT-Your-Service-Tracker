@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 import { Business } from '../../models/Business.model.js';
 import { AppError } from '../../middleware/error-handler.js';
 import { requireActiveSubscription } from '../subscription/subscription.access.js';
@@ -10,18 +9,16 @@ export async function createServiceRequest(slug: string, input: ServiceRequestIn
   if (!business) throw new AppError('Tempat servis tidak ditemukan', 404);
   await requireActiveSubscription(business._id.toString());
 
-  const trackingSecret = crypto.randomBytes(32).toString('hex');
   const ticket = await TicketService.createTicket(
     business._id.toString(),
     { id: userId, firstName: input.customer.name, phone: input.customer.phone, email: input.customer.email },
     false,
     { device: input.device, complaint: input.complaint, intakeMethod: 'online' },
-    { trackingSecret },
+    true,
   );
   return {
     ticketCode: ticket.ticketCode,
     businessSlug: business.slug,
-    trackingSecret,
     ...(userId && { ticketId: ticket._id.toString() }),
   };
 }

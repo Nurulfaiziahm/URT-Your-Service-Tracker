@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { useAppSelector } from '../redux/hooks';
 import { selectUser } from '../features/auth/authSlice';
 import { useLogoutMutation } from '../features/auth/authApi';
@@ -35,6 +35,7 @@ export function PortalLayout({ role }: { role: PortalRole }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const location = useLocation();
   const portal = portals[role];
   const user = useAppSelector(selectUser);
   const businessId = useAppSelector(selectSelectedBusinessId);
@@ -47,6 +48,9 @@ export function PortalLayout({ role }: { role: PortalRole }) {
   const [logout, { isLoading }] = useLogoutMutation();
   const initials = user ? `${user.firstName[0] || ''}${user.lastName[0] || ''}` : 'P';
   const portalPath = role === 'customer' ? customerPortal.basePath : `/${role}`;
+  const customerAuthState = {
+    from: { pathname: portalPath, search: location.search || undefined },
+  };
   const profile = `${portalPath}/profile`;
   const navigation = (
     <nav className={styles.nav} aria-label={`Navigasi ${portal.name}`}>
@@ -62,7 +66,16 @@ export function PortalLayout({ role }: { role: PortalRole }) {
           <span>{label}</span>
         </NavLink>
       ))}
-      {user ? <button
+      {role === 'customer' ? (
+        <>
+          {!user && <NavLink to="/customer/login" state={customerAuthState} onClick={() => dialog.current?.close()}>
+            <Icon name="user" /><span>Masuk / Daftar</span>
+          </NavLink>}
+          <NavLink to="/" className={styles.logout} onClick={() => dialog.current?.close()}>
+            <Icon name="logout" /><span>Keluar</span>
+          </NavLink>
+        </>
+      ) : user ? <button
         className={styles.logout}
         onClick={() => {
           dialog.current?.close();

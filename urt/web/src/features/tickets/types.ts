@@ -243,13 +243,12 @@ export interface TicketQueryParams {
 }
 
 export interface PublicTrackingInput {
-  businessSlug: string;
   ticketCode: string;
-  trackingSecret: string;
 }
 
 export interface PublicTrackingResult {
   ticketCode: string;
+  customer: { name: string };
   status: TicketStatus;
   statusLabel: string;
   currentStep: number;
@@ -259,6 +258,14 @@ export interface PublicTrackingResult {
     model: string;
   };
   complaint: string;
+  diagnosis?: { customerExplanation?: string };
+  estimate?: EstimateRevision;
+  attachments: {
+    key: string;
+    originalName: string;
+    mimeType: string;
+    url: string;
+  }[];
   business: {
     name: string;
     slug: string;

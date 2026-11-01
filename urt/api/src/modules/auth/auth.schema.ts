@@ -30,7 +30,7 @@ const phoneField = z
 
 const registerBodySchema = z.object({
   firstName: nameField('First name'),
-  lastName: nameField('Last name'),
+  lastName: z.string().max(50, 'Last name cannot exceed 50 characters').trim().default(''),
   email: emailField,
   phone: phoneField,
   address: z.string().trim().max(200, 'Address cannot exceed 200 characters').optional(),

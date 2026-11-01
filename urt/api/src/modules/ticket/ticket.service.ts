@@ -73,7 +73,7 @@ export class TicketService {
     const expiresAt = new Date(Date.now() + 7 * 86400000);
     await TicketApprovalAccess.create({ businessId, ticketId, estimateVersion: estimate.version,
       tokenHash: crypto.createHash('sha256').update(token).digest('hex'), expiresAt });
-    return { approvalUrl: `${config.allowedOrigins[0]}/service-approval#token=${token}`, expiresAt };
+    return { approvalUrl: `${config.allowedOrigins[0]}/tracking/${encodeURIComponent(ticket.ticketCode)}#token=${token}`, expiresAt };
   }
 
   private static async customerApprovalAccess(token: string) {
@@ -119,30 +119,46 @@ export class TicketService {
       (counts.get(tech._id.toString()) || 0) < (counts.get(selected._id.toString()) || 0) ? tech : selected);
   }
 
-  /**
-   * Generate a readable random ticket code: URT-YYYY-XXXX (e.g. URT-2026-X8F2)
-   */
+  /** Generate a compact shop identifier and a 50-bit random ticket suffix. */
   private static async generateUniqueTicketCode(
-    businessId: mongoose.Types.ObjectId,
+    businessName: string,
   ): Promise<string> {
-    const year = new Date().getFullYear();
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const normalizedName = businessName
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
+    const words = normalizedName.match(/[A-Z0-9]+/g) || [];
+    const first = words[0] || '';
+    const second = words[1] || '';
+    const third = words[2] || '';
+    const identifier = words.length === 1
+      ? `${first[0] || 'U'}${first[Math.floor(first.length / 2)] || first[0] || 'R'}`
+      : words.length === 2
+        ? `${first[0] || 'U'}${second[0] || 'R'}`
+        : words.length >= 3
+          ? `${first[0] || 'U'}${third[0] || 'R'}`
+          : 'UR';
 
-    for (let attempt = 0; attempt < 5; attempt++) {
+    for (let attempt = 0; attempt < 10; attempt++) {
       let randomSuffix = '';
-      const randomBytes = crypto.randomBytes(4);
-      for (let i = 0; i < 4; i++) {
+      const randomBytes = crypto.randomBytes(10);
+      for (let i = 0; i < 10; i++) {
         randomSuffix += chars[randomBytes[i] % chars.length];
       }
-      const ticketCode = `URT-${year}-${randomSuffix}`;
+      const ticketCode = `${identifier}-${randomSuffix}`;
 
-      const exists = await ServiceTicket.exists({ businessId, ticketCode });
+      const exists = await ServiceTicket.exists({ ticketCode });
       if (!exists) {
         return ticketCode;
       }
     }
 
-    return `URT-${year}-${Date.now().toString(36).toUpperCase()}`;
+    throw new AppError(
+      'Unable to generate a unique ticket number. Please try again.',
+      503,
+      'TICKET_CODE_UNAVAILABLE',
+    );
   }
 
   /**
@@ -181,7 +197,7 @@ export class TicketService {
     },
     isOwner: boolean,
     input: CreateTicketInput,
-    selfService?: { trackingSecret: string },
+    updateCustomerProfile = false,
   ): Promise<IServiceTicket> {
     validateObjectId(businessId, 'Business');
 
@@ -283,7 +299,7 @@ export class TicketService {
         throw new AppError('Customer contact is archived', 403, 'CUSTOMER_ARCHIVED');
       }
 
-      if (customer && selfService) {
+      if (customer && updateCustomerProfile) {
         customer.name = customerName;
         customer.phone = callerUser.phone;
         customer.email = callerUser.email;
@@ -327,11 +343,12 @@ export class TicketService {
       }
     }
 
-    const ticketCode = await this.generateUniqueTicketCode(businessObjectId);
+    const ticketCode = await this.generateUniqueTicketCode(business.name);
 
     const ticket = await ServiceTicket.create({
       businessId: businessObjectId,
       ticketCode,
+      ticketCodeVersion: 2,
       customerId,
       assignedTechnicianId: assignedTechObjectId,
       requestedServiceId: requestedServiceObjectId,
@@ -347,7 +364,6 @@ export class TicketService {
       intakeMethod: isOwner ? input.intakeMethod || 'walk_in' : 'online',
       status: startingStatus,
       revision: 1,
-      ...(selfService && { trackingSecretHash: crypto.createHash('sha256').update(selfService.trackingSecret).digest('hex') }),
       intakeReceivedAt,
       timeline: initialTimeline,
     });
@@ -442,8 +458,10 @@ export class TicketService {
       const escaped = query.q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       filter.$or = [
         { ticketCode: { $regex: escaped, $options: 'i' } },
+        { 'device.category': { $regex: escaped, $options: 'i' } },
         { 'device.model': { $regex: escaped, $options: 'i' } },
         { 'device.brand': { $regex: escaped, $options: 'i' } },
+        { 'device.serialNumber': { $regex: escaped, $options: 'i' } },
         { complaint: { $regex: escaped, $options: 'i' } },
       ];
     }
@@ -1492,31 +1510,11 @@ export class TicketService {
    * Only returns safe allowlisted customer/public progress data.
    */
   static async getPublicTracking(input: PublicTrackingInput) {
-    const business = await Business.findOne({
-      slug: input.businessSlug.trim().toLowerCase(),
-      isActive: true,
-    });
-
-    if (!business) {
-      throw new AppError('Tiket servis tidak ditemukan atau kode rahasia salah', 404, 'TRACKING_NOT_FOUND');
-    }
-
-    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false },
-      businessId: business._id,
-      ticketCode: input.ticketCode.trim().toUpperCase(),
-    }).select('+trackingSecretHash');
-
-    if (!ticket || !ticket.trackingSecretHash) {
-      throw new AppError('Tiket servis tidak ditemukan atau kode rahasia salah', 404, 'TRACKING_NOT_FOUND');
-    }
-
-    const providedHash = crypto.createHash('sha256').update(input.trackingSecret.trim()).digest('hex');
-    const hashBufferA = Buffer.from(providedHash);
-    const hashBufferB = Buffer.from(ticket.trackingSecretHash);
-
-    if (hashBufferA.length !== hashBufferB.length || !crypto.timingSafeEqual(hashBufferA, hashBufferB)) {
-      throw new AppError('Tiket servis tidak ditemukan atau kode rahasia salah', 404, 'TRACKING_NOT_FOUND');
-    }
+    const ticket = await ServiceTicket.findOne({ deletedAt: { $exists: false }, ticketCode: input.ticketCode.trim().toUpperCase() })
+      .populate('customerId', 'name');
+    if (!ticket) throw new AppError('Tiket servis tidak ditemukan', 404, 'TRACKING_NOT_FOUND');
+    const business = await Business.findById(ticket.businessId);
+    if (!business?.isActive) throw new AppError('Tiket servis tidak ditemukan', 404, 'TRACKING_NOT_FOUND');
 
     const statusLabels: Record<string, string> = {
       submitted: 'Pendaftaran Diterima',
@@ -1539,8 +1537,57 @@ export class TicketService {
     else if (ticket.status === 'quality_check') currentStep = 5;
     else if (ticket.status === 'completed') currentStep = 6;
 
+    const customer = ticket.customerId as unknown as { name?: string } | null;
+    const attachments = await Promise.all((ticket.attachments || [])
+      .filter((attachment) => attachment.visibility === 'customer' && attachment.mimeType.startsWith('image/'))
+      .map(async (attachment) => {
+        try {
+          const file = await File.findOne({ key: attachment.key }).select('+content');
+          if (!file || file.deleting) return null;
+          const url = file.content?.length
+            ? `data:${attachment.mimeType};base64,${file.content.toString('base64')}`
+            : file.objectKey
+              ? (await signDownload(file.objectKey)).url
+              : null;
+          return url ? {
+            key: attachment.key,
+            originalName: attachment.originalName,
+            mimeType: attachment.mimeType,
+            url,
+          } : null;
+        } catch {
+          return null;
+        }
+      }));
+    const latestEstimate = ticket.estimateRevisions.at(-1);
+    const customerEstimate = latestEstimate && ['pending', 'approved', 'rejected'].includes(latestEstimate.status)
+      ? {
+          version: latestEstimate.version,
+          lines: latestEstimate.lines.map((line) => ({
+            id: line.id?.toString(),
+            description: line.description,
+            type: line.type,
+            quantity: line.quantity,
+            unitPrice: line.unitPrice,
+            subtotal: line.subtotal,
+            catalogEntryType: line.catalogEntryType,
+            difficultyLevel: line.difficultyLevel,
+          })),
+          currency: latestEstimate.currency,
+          totalAmount: latestEstimate.totalAmount,
+          customerExplanation: latestEstimate.customerExplanation,
+          submittedAt: latestEstimate.submittedAt,
+          status: latestEstimate.status,
+          targetCompletionDate: latestEstimate.targetCompletionDate,
+          repairDurationMinutes: latestEstimate.repairDurationMinutes,
+          qcDurationMinutes: latestEstimate.qcDurationMinutes,
+          decision: latestEstimate.decision,
+        }
+      : undefined;
+
     return {
       ticketCode: ticket.ticketCode,
+      customer: { name: customer?.name || 'Pelanggan' },
       status: ticket.status,
       statusLabel: statusLabels[ticket.status] || ticket.status,
       currentStep,
@@ -1550,6 +1597,11 @@ export class TicketService {
         model: ticket.device.model,
       },
       complaint: ticket.complaint,
+      diagnosis: {
+        customerExplanation: customerEstimate?.customerExplanation || ticket.diagnosis?.customerExplanation,
+      },
+      estimate: customerEstimate,
+      attachments: attachments.filter((attachment) => attachment !== null),
       business: {
         name: business.name,
         slug: business.slug,
@@ -1821,7 +1873,7 @@ export class TicketService {
       throw new AppError('You cannot view staff-only attachments', 403, 'ATTACHMENT_FORBIDDEN');
     }
 
-    const file = await File.findOne({ key });
+    const file = await File.findOne({ key }).select('+content');
     if (!file) {
       throw new AppError('File not found', 404, 'UPLOAD_NOT_FOUND');
     }
@@ -1829,7 +1881,17 @@ export class TicketService {
       throw new AppError('File deletion is in progress', 409, 'UPLOAD_DELETING');
     }
 
-    const download = await signDownload(file.objectKey);
+    let download: { url: string; urlExpiresAt: Date };
+    if (file.content?.length) {
+      download = {
+        url: `data:${attachment.mimeType};base64,${file.content.toString('base64')}`,
+        urlExpiresAt: new Date(Date.now() + 15 * 60 * 1000),
+      };
+    } else if (file.objectKey) {
+      download = await signDownload(file.objectKey);
+    } else {
+      throw new AppError('This file must be migrated to R2', 409, 'UPLOAD_MIGRATION_REQUIRED');
+    }
 
     return {
       key: attachment.key,

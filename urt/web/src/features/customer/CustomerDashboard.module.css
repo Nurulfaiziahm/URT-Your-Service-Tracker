@@ -6,6 +6,14 @@
   align-items: start;
 }
 
+:global([data-dashboard='customer'] > .reference-heading) { margin-bottom: 0; }
+
+.trackedServiceLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
 /* Service Summary Card (Left) */
 .summaryCard {
   background: var(--card, #ffffff);
@@ -59,6 +67,23 @@
   letter-spacing: -0.01em;
 }
 
+.ticketSearch { display: grid; gap: 12px; padding-block: 16px; }
+.ticketSearch :global(.reference-panel-header) { margin: 0; }
+.ticketSearch :global(.reference-panel-header) h2 { margin: 0; }
+.searchRow { display: flex; gap: 10px; align-items: stretch; width: 100%; }
+.searchRow input { flex: 1; min-width: 0; min-height: 46px; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-md); font: inherit; }
+.searchRow input:focus-visible { outline: 3px solid color-mix(in srgb, var(--blue) 25%, transparent); border-color: var(--blue); }
+.searchRow :global(button) { flex: 0 0 108px; min-width: 108px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
+.searchRow :global(button) > span:first-child { display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
+.searchError { margin: 0; color: var(--red-700, #b91c1c); font-size: 0.9rem; }
+.trackingMeta { display: grid; gap: 6px; padding: 12px 16px; border-radius: var(--radius-sm); background: var(--canvas); color: var(--slate-600); font-size: 0.86rem; }
+.trackingMeta p { margin: 0; }
+.timelineHeading { margin: 0 0 8px; font-size: 0.95rem; color: var(--navy-950); }
+@media (max-width: 480px) {
+  .searchRow :global(button) { flex-basis: 46px; }
+  .searchRow :global(button) > span:first-child { gap: 6px; }
+}
+
 .deviceName {
   font-size: 0.98rem;
   font-weight: 600;
@@ -96,12 +121,28 @@
   min-width: 0;
 }
 
+.infoItem { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
 .infoLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   color: var(--slate-500, #64748b);
   letter-spacing: 0.04em;
+}
+
+.infoIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #dbeafe;
+  color: #2563eb;
+  flex: 0 0 44px;
 }
 
 .infoValue {
@@ -410,4 +451,5 @@
   .infoSeparator {
     display: none;
   }
+
 }

@@ -18,6 +18,11 @@ export const serviceRequestLimiter = rateLimit({
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per window
+  // Public tracking and approval routes have their own stricter limiter below.
+  // Excluding them here prevents status polling from consuming the general API quota.
+  skip: (req) =>
+    req.originalUrl.startsWith('/api/v1/public/tracking') ||
+    req.originalUrl.startsWith('/api/v1/public/service-approvals'),
   message: {
     success: false,
     code: 'RATE_LIMITED',
@@ -92,7 +97,7 @@ export const passwordResetLimiter = rateLimit({
  */
 export const trackingLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 30, // 30 requests per 15 minutes per IP
+  max: 30, // 30 failed requests per 15 minutes per IP
   message: {
     success: false,
     code: 'RATE_LIMITED',

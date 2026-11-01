@@ -47,6 +47,7 @@ export const businessApi = baseApi.injectEndpoints({
     getPublicBusiness: builder.query<ApiResponse<PublicBusinessResponse>, string>({
       query: (slug) => `/public/businesses/${encodeURIComponent(slug)}`,
     }),
+
   }),
 });
 

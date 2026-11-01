@@ -125,6 +125,8 @@ try {
           return [{
             wrapperWidth: wrapper.clientWidth,
             wrapperScrollWidth: wrapper.scrollWidth,
+            wrapperOverflowX: getComputedStyle(wrapper).overflowX,
+            tableWidth: table.getBoundingClientRect().width,
             tableDisplay: getComputedStyle(table).display,
             bodyDisplay: body && getComputedStyle(body).display,
             rows: [...(body?.rows || [])].map((row) => ({
@@ -144,18 +146,12 @@ try {
       assert.ok(layout.pageWidth <= layout.viewport + 1, `${label} at ${width}px has page overflow: ${layout.pageWidth}px`);
       for (const table of layout.tables) {
         if (width <= 640) {
-          assert.ok(table.wrapperScrollWidth <= table.wrapperWidth + 1, `${label} at ${width}px has a horizontally scrollable table`);
-          assert.equal(table.tableDisplay, 'block', `${label} at ${width}px did not transpose the table`);
-          assert.equal(table.bodyDisplay, 'grid', `${label} at ${width}px did not stack table rows`);
-          for (const row of table.rows) {
-            assert.equal(row.display, 'block', `${label} at ${width}px did not turn a data row into a vertical block`);
-            for (const cell of row.cells) {
-              if (cell.fullRow) continue;
-              assert.equal(cell.display, 'grid', `${label} at ${width}px did not show label/value cells`);
-              assert.ok(cell.label, `${label} at ${width}px has a cell without its column heading`);
-              assert.notEqual(cell.labelContent, 'none', `${label} at ${width}px does not render the ${cell.label} label`);
-              assert.ok(cell.scrollWidth <= cell.clientWidth + 1, `${label} at ${width}px clips a cell value for ${cell.label}`);
-            }
+          assert.equal(table.tableDisplay, 'table', `${label} at ${width}px should preserve table columns`);
+          assert.equal(table.bodyDisplay, 'table-row-group', `${label} at ${width}px should preserve table rows`);
+          assert.equal(table.wrapperOverflowX, 'auto', `${label} at ${width}px should scroll inside the table container`);
+          assert.ok(table.wrapperWidth <= width + 1, `${label} at ${width}px lets the table container widen the page`);
+          if (table.tableWidth > table.wrapperWidth + 1) {
+            assert.ok(table.wrapperScrollWidth > table.wrapperWidth, `${label} at ${width}px should scroll the wide table inside its container`);
           }
         } else {
           assert.equal(table.tableDisplay, 'table', `${label} at ${width}px changed the desktop table structure`);
@@ -163,7 +159,7 @@ try {
       }
     }
     await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
-    console.log(`PASS: ${label} tables transpose on mobile and remain horizontal tables at tablet/desktop widths`);
+    console.log(`PASS: ${label} tables scroll inside their containers on mobile and keep their columns at tablet/desktop widths`);
   }
   async function fill(name, value) {
     await evaluate(`(() => { const input = document.querySelector('[name="${name}"]'); const prototype = input.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype; Object.getOwnPropertyDescriptor(prototype, 'value').set.call(input, ${JSON.stringify(value)}); input.dispatchEvent(new Event('input', { bubbles:true })); })()`);
@@ -181,6 +177,10 @@ try {
   for (const role of ['owner', 'customer', 'technician']) {
     await call('Page.navigate', { url: `${base}/${role}/login` });
     await until("Boolean(document.querySelector('input[name=email]'))");
+    await evaluate("document.querySelector('button[aria-label=\"Lihat kata sandi\"], button[aria-label=\"Tampilkan kata sandi\"]').click()");
+    assert.equal(await evaluate("document.querySelector('input[name=password]').type"), 'text', 'Login eye control must reveal the password');
+    await evaluate("document.querySelector('button[aria-label=\"Sembunyikan kata sandi\"]').click()");
+    assert.equal(await evaluate("document.querySelector('input[name=password]').type"), 'password', 'Login eye control must hide the password');
     if (role === 'customer') await screenshot('customer-login-desktop');
     const registrations = await evaluate("Array.from(document.querySelectorAll('a')).map(link => link.getAttribute('href')).filter(href => href?.endsWith('/register'))");
     assert.ok(registrations.every((href) => href === `/${role}/register`));
@@ -214,6 +214,10 @@ try {
       await call('Page.navigate', { url: `${base}/${role}/reset-password#token=${fixture.recovery.token}` });
     }
     await until("Boolean(document.querySelector('[name=confirmPassword]'))");
+    await evaluate("document.querySelector('button[aria-label=\"Tampilkan kata sandi\"]').click()");
+    assert.equal(await evaluate("document.querySelector('input[name=password]').type"), 'text', 'Shared password fields must reveal the password');
+    await evaluate("document.querySelector('button[aria-label=\"Sembunyikan kata sandi\"]').click()");
+    assert.equal(await evaluate("document.querySelector('input[name=password]').type"), 'password', 'Shared password fields must hide the password');
     assert.equal(await evaluate("document.body.innerText.includes('Kembali ke Beranda')"), false);
     await fill('password', 'updated-fixture-password'); await fill('confirmPassword', 'updated-fixture-password'); await next();
     await until("document.body.innerText.includes('Kata Sandi Berhasil Diperbarui')");
@@ -304,7 +308,7 @@ try {
   await until(`document.body.innerText.includes(${JSON.stringify(fixture.tickets[0].ticketCode)}) && !document.querySelector('#trackingSecret')`);
   await inspectStatusLayout('Customer tracking');
   await screenshot('customer-tracking-390-status');
-  console.log('PASS: mobile guest form → actual API creation → ticket display → private tracking, without email/model/account');
+  console.log('PASS: mobile guest form → actual API creation → ticket display → number-only public tracking');
 
   fixture.signIn(true);
   await call('Page.navigate', { url: `${base}/b/repair-a/customer/services/new` });
@@ -338,6 +342,14 @@ try {
   await until("location.pathname === '/customer/login' && document.querySelector('h1')?.textContent === 'Masuk Pelanggan' && Boolean(document.querySelector('[name=password]'))");
   await fill('email', fixture.user.email); await fill('password', 'fixture-password'); await next();
   await until("location.pathname === '/b/repair-a/customer' && Boolean(document.querySelector('[data-dashboard=customer]'))");
+  await fill('ticketSearch', 'ticket-does-not-exist');
+  await until("document.body.innerText.includes('Tidak ada tiket yang cocok')");
+  await fill('ticketSearch', fixture.tickets[1].ticketCode);
+  await until(`document.body.innerText.includes(${JSON.stringify(fixture.tickets[1].ticketCode)})`);
+  assert.equal(await evaluate("document.querySelector('input[name=ticketSearch]').type"), 'search');
+  await evaluate("Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Hapus pencarian')).click()");
+  assert.equal(await evaluate("document.querySelector('input[name=ticketSearch]').value"), '');
+  console.log('PASS: customer ticket search handles device and ticket lookup, no results and clear');
   await inspectStatusLayout('Customer portal dashboard');
   await inspectTableLayout('Customer portal history');
   console.log('PASS: centered blue customer registration link, no back button, hidden skip link and successful login into the shop portal');
@@ -410,7 +422,7 @@ try {
   }
   fixture.signIn(true, 'owner');
   await call('Page.navigate', { url: `${base}/owner/services/new` });
-  await until("Boolean(document.querySelector('[name=catalogName]'))");
+  await until("Boolean(document.querySelector('[name=catalogName]') && document.querySelector('[name=catalogCategory]') && document.querySelector('[name=catalogPrice]'))");
   assert.equal(await evaluate("Boolean(document.querySelector('[name=entryType]'))"), false);
   await fill('catalogName', 'Keyboard replacement'); await fill('catalogCategory', 'Hardware'); await fill('catalogPrice', '140000'); await next();
   await until("location.pathname === '/owner/services' && document.body.innerText.includes('Keyboard replacement')");

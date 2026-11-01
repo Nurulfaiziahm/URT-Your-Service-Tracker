@@ -9,7 +9,7 @@ import { authDestination, type AuthReturnLocation } from './auth-routing';
 import { customerPortalReturn } from '../customer/customer-return';
 import authStyles from './Auth.module.css';
 
-type IconName = 'user' | 'phone' | 'email' | 'lock' | 'eye' | 'team' | 'chart' | 'shield';
+type IconName = 'user' | 'phone' | 'email' | 'lock' | 'eye' | 'eyeOff' | 'team' | 'chart' | 'shield';
 
 function RegisterIcon({ name, size = 18 }: { name: IconName; size?: number }) {
   return (
@@ -50,6 +50,10 @@ function RegisterIcon({ name, size = 18 }: { name: IconName; size?: number }) {
         <>
           <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
           <circle cx="12" cy="12" r="3" />
+        </>
+      ) : name === 'eyeOff' ? (
+        <>
+          <path d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.2A11 11 0 0 1 12 5c7 0 10 7 10 7a15 15 0 0 1-3 4.2M6.2 6.2C3.5 8 2 12 2 12s3 7 10 7a10 10 0 0 0 4-.8" />
         </>
       ) : name === 'chart' ? (
         <>
@@ -98,7 +102,7 @@ function RegisterField({
             aria-controls={id}
             onClick={() => setVisible(!visible)}
           >
-            <RegisterIcon name="eye" />
+            <RegisterIcon name={visible ? 'eyeOff' : 'eye'} />
           </button>
         )}
       </div>
@@ -113,9 +117,14 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
   const [searchParams] = useSearchParams();
   const isOwner = portal === 'owner';
   const [registerUser, { isLoading }] = useRegisterMutation();
+  const routeState = location.state as {
+    email?: string;
+    from?: { search?: string };
+  } | null;
+  const [fullName, setFullName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState(() => searchParams.get('email') || '');
+  const [email, setEmail] = useState(() => searchParams.get('email') || routeState?.email || '');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -140,15 +149,15 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
           ? '+62' + formattedPhone.slice(1)
           : '+' + formattedPhone;
       }
+      const nameParts = fullName.trim().split(/\s+/).filter(Boolean);
       await registerUser({
         portal,
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
+        firstName: isOwner ? firstName.trim() : nameParts[0] || '',
+        lastName: isOwner ? lastName.trim() : nameParts.slice(1).join(' '),
         email: email.trim().toLowerCase(),
         password,
         phone: formattedPhone || undefined,
       }).unwrap();
-
       const fromLoc = (location.state as { from?: AuthReturnLocation })?.from;
       const token = searchParams.get('role') !== 'technician' ? searchParams.get('token') : null;
       const invitation = token ? { pathname: '/invitations/customer', search: `?token=${encodeURIComponent(token)}` } : undefined;
@@ -167,7 +176,7 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
 
   const form = (
     <form onSubmit={handleSubmit}>
-      <div className={styles['form-grid-2']}>
+      {isOwner ? <div className={styles['form-grid-2']}>
         <RegisterField
           id="firstName"
           name="firstName"
@@ -194,7 +203,19 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
           value={lastName}
           onChange={(event) => setLastName(event.target.value)}
         />
-      </div>
+      </div> : <RegisterField
+        id="fullName"
+        name="fullName"
+        label="Nama Lengkap"
+        icon="user"
+        placeholder="Nama lengkap Anda"
+        autoComplete="name"
+        required
+        minLength={2}
+        maxLength={100}
+        value={fullName}
+        onChange={(event) => setFullName(event.target.value)}
+      />}
       <div className={styles['form-grid-2']}>
         <RegisterField
           id="phone"
@@ -369,15 +390,29 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
               ))}
             </div>
           </div>
-          <div className={styles['sidebar-bottom-info']}>
-            <RegisterIcon name="shield" size={20} />
-            <span>
-              Satu akun untuk terhubung dengan tempat servis. Akses portal disesuaikan dengan peran
-              Anda.
-            </span>
+          <div className={styles['sidebar-footer']}>
+            <Link to="/" className={styles['sidebar-home']}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="m15 18-6-6 6-6M9 12h12" />
+              </svg>
+              Kembali ke beranda
+            </Link>
+            <div className={styles['sidebar-bottom-info']}>
+              <RegisterIcon name="shield" size={20} />
+              <span>
+                Satu akun untuk terhubung dengan tempat servis. Akses portal disesuaikan dengan peran
+                Anda.
+              </span>
+            </div>
           </div>
         </aside>
         <main id="main-content" tabIndex={-1} className={styles['register-main']}>
+          <Link to="/" className={styles['mobile-home']}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m15 18-6-6 6-6M9 12h12" />
+            </svg>
+            Kembali ke beranda
+          </Link>
           <header className={styles['register-topbar']}>
             <nav className={styles.stepper} aria-label="Tahapan pendaftaran">
               <div className={`${styles['step-item']} ${styles.active}`} aria-current="step">

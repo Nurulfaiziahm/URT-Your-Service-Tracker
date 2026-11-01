@@ -3,12 +3,15 @@ import logo from '../../assets/logo-urt.svg';
 import { TicketTimeline } from '../tickets/TicketTimeline';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useLocation, useParams } from 'react-router';
-import { useGetPublicTrackingMutation } from '../tickets/ticketsApi';
-import type { PublicTrackingResult } from '../tickets/types';
+import {
+  useGetPublicTrackingMutation,
+  useInspectServiceApprovalQuery,
+  useRespondServiceApprovalMutation,
+} from '../tickets/ticketsApi';
+import type { EstimateRevision, PublicServiceApproval, PublicTrackingResult } from '../tickets/types';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { ServiceStepper } from '../tickets/ServiceStepper';
 import { EstimateBreakdown } from '../tickets/EstimateBreakdown';
-import type { EstimateRevision } from '../tickets/types';
 import { TextInput } from '../../components/ui/TextInput';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { InlineNotice } from '../../components/feedback/Feedback';
@@ -18,8 +21,7 @@ import ticketStyles from '../tickets/Tickets.module.css';
 import timingStyles from '../tickets/TicketTiming.module.css';
 import { customerPortalPath } from '../customer/customer-portal';
 
-function getTargetCompletionDate(): Date {
-  const now = new Date();
+function getTargetCompletionDate(now: Date): Date {
   const currentHour = now.getHours();
 
   if (currentHour >= 21) {
@@ -42,71 +44,104 @@ function getTargetCompletionDate(): Date {
 
 export default function TrackingPage() {
   const { ticketCode: routeTicketCode } = useParams<{ ticketCode?: string }>();
-  const { hash } = useLocation();
-  const [access] = useState(() => new URLSearchParams(hash.slice(1)));
+  const location = useLocation();
   const autoLookup = useRef(false);
 
   const cleanRoute = (routeTicketCode || '').trim().replace(/^#/, '').toUpperCase();
   const isDemoTicket = cleanRoute === 'URT-1024' || cleanRoute.includes('1024') || cleanRoute === 'URT-2026-123456' || cleanRoute === 'URT-2026-SNRM';
-  const [isDemo, setIsDemo] = useState(isDemoTicket);
-  const [targetDate, setTargetDate] = useState(getTargetCompletionDate);
+  const [ticketCode, setTicketCode] = useState(routeTicketCode || '');
+  const [manualDemoCode, setManualDemoCode] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState<number | null>(null);
+  const [targetDate, setTargetDate] = useState<Date | null>(null);
+  const normalizedTicketCode = (value: string) => value.trim().replace(/^#/, '').toUpperCase();
+  const isDemo = isDemoTicket || manualDemoCode === normalizedTicketCode(ticketCode);
+  const approvalToken = new URLSearchParams(location.hash.slice(1)).get('token') || '';
 
   useEffect(() => {
-    const clean = (routeTicketCode || '').trim().replace(/^#/, '').toUpperCase();
-    if (clean === 'URT-1024' || clean.includes('1024') || clean === 'URT-2026-123456' || clean === 'URT-2026-SNRM') {
-      setIsDemo(true);
-    }
-  }, [routeTicketCode]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTargetDate(getTargetCompletionDate());
-    }, 1000);
-    return () => clearInterval(timer);
+    const updateTime = () => {
+      const now = Date.now();
+      setCurrentTime(now);
+      setTargetDate(getTargetCompletionDate(new Date(now)));
+    };
+    const initialUpdate = window.setTimeout(updateTime, 0);
+    const timer = window.setInterval(updateTime, 1000);
+    return () => {
+      window.clearTimeout(initialUpdate);
+      window.clearInterval(timer);
+    };
   }, []);
 
-  const [ticketCode, setTicketCode] = useState(routeTicketCode || '');
-  const [businessSlug, setBusinessSlug] = useState(access.get('business') || '');
-  const [trackingSecret, setTrackingSecret] = useState(access.get('access') || '');
   const [trackingResult, setTrackingResult] = useState<PublicTrackingResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [approvalError, setApprovalError] = useState('');
+  const [approvalDecision, setApprovalDecision] = useState<'approved' | 'rejected' | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
 
   const [fetchTracking, { isLoading }] = useGetPublicTrackingMutation();
-  const portalPath = businessSlug.trim() ? customerPortalPath(businessSlug.trim()) : '/customer';
+  const { currentData: approvalData, isFetching: isCheckingApproval, isError: isApprovalError } = useInspectServiceApprovalQuery(
+    approvalToken,
+    { skip: !approvalToken, refetchOnFocus: true },
+  );
+  const [respondApproval, { isLoading: isResponding }] = useRespondServiceApprovalMutation();
+  const portalPath = trackingResult?.business.slug ? customerPortalPath(trackingResult.business.slug) : '/customer';
 
   useEffect(() => {
-    const slug = access.get('business');
-    const secret = access.get('access');
-    if (autoLookup.current || !routeTicketCode || !slug || !secret) return;
+    if (isDemoTicket || autoLookup.current || !routeTicketCode) return;
     autoLookup.current = true;
-    void fetchTracking({ businessSlug: slug, ticketCode: routeTicketCode, trackingSecret: secret }).unwrap()
+    void fetchTracking({ ticketCode: routeTicketCode }).unwrap()
       .then((response) => setTrackingResult(response.data))
-      .catch(() => setErrorMessage('Status belum dapat dimuat. Coba lagi menggunakan informasi pelacakan yang sudah terisi.'));
-  }, [access, fetchTracking, routeTicketCode]);
+      .catch(() => setErrorMessage('Nomor tiket tidak ditemukan. Periksa kembali nomor tiket dan coba lagi.'));
+  }, [fetchTracking, isDemoTicket, routeTicketCode]);
+
+  useEffect(() => {
+    if (!trackingResult?.ticketCode) return;
+    const timer = window.setInterval(() => {
+      void fetchTracking({ ticketCode: trackingResult.ticketCode }).unwrap()
+        .then((response) => setTrackingResult(response.data))
+        .catch(() => window.clearInterval(timer));
+    }, 60000);
+    return () => window.clearInterval(timer);
+  }, [fetchTracking, trackingResult?.ticketCode]);
+
+  async function handleApproval(decision: 'approved' | 'rejected') {
+    const approval: PublicServiceApproval | undefined = approvalData?.data;
+    if (!approval || approval.ticketCode !== trackingResult?.ticketCode) return;
+    setApprovalError('');
+    try {
+      await respondApproval({
+        token: approvalToken,
+        expectedRevision: approval.revision,
+        decision,
+        reason: decision === 'rejected' ? rejectReason.trim() || undefined : undefined,
+      }).unwrap();
+      setApprovalDecision(decision);
+      const response = await fetchTracking({ ticketCode: approval.ticketCode }).unwrap();
+      setTrackingResult(response.data);
+    } catch (err) {
+      const body = (err as { data?: ApiErrorBody }).data;
+      setApprovalError(body?.error || body?.message || 'Tanggapan belum terkirim. Periksa kembali estimasi lalu coba lagi.');
+    }
+  }
 
   const handleLookup = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setApprovalDecision(null);
+    setApprovalError('');
 
     const clean = ticketCode.trim().replace(/^#/, '').toUpperCase();
     if (clean === 'URT-1024' || clean.includes('1024') || clean === 'URT-2026-123456' || clean === 'URT-2026-SNRM') {
-      setIsDemo(true);
+      setManualDemoCode(clean);
       return;
     }
 
-    if (!businessSlug.trim() || !ticketCode.trim() || !trackingSecret.trim()) {
-      setErrorMessage(
-        'Mohon lengkapi identitas tempat servis, kode tiket, dan kode akses rahasia.',
-      );
+    if (!ticketCode.trim()) {
+      setErrorMessage('Masukkan nomor tiket servis.');
       return;
     }
 
     try {
-      const res = await fetchTracking({
-        businessSlug: businessSlug.trim().toLowerCase(),
-        ticketCode: ticketCode.trim().toUpperCase(),
-        trackingSecret: trackingSecret.trim(),
-      }).unwrap();
+      const res = await fetchTracking({ ticketCode: ticketCode.trim().toUpperCase() }).unwrap();
 
       setTrackingResult(res.data);
     } catch (err) {
@@ -114,7 +149,7 @@ export default function TrackingPage() {
       setErrorMessage(
         apiErr.data?.error ||
           apiErr.data?.message ||
-          'Tiket servis tidak ditemukan atau kode rahasia salah.',
+          'Nomor tiket tidak ditemukan. Periksa kembali nomor tiket dan coba lagi.',
       );
       setTrackingResult(null);
     }
@@ -123,18 +158,21 @@ export default function TrackingPage() {
   const displayTicketCode = (cleanRoute || ticketCode.trim().replace(/^#/, '').toUpperCase()) || 'URT-1024';
 
   if (isDemo) {
+    if (currentTime === null || targetDate === null) return null;
+    const demoNow = currentTime;
+    const demoTargetDate = targetDate;
     const demoEstimate: EstimateRevision = {
       version: 1,
       status: 'approved',
       currency: 'IDR',
       totalAmount: 250000,
-      submittedAt: new Date(Date.now() - 3600000).toISOString(),
+      submittedAt: new Date(demoNow - 3600000).toISOString(),
       repairDurationMinutes: 120,
       qcDurationMinutes: 30,
-      targetCompletionDate: targetDate.toISOString(),
+      targetCompletionDate: demoTargetDate.toISOString(),
       decision: {
         decision: 'approved',
-        decidedAt: new Date(Date.now() - 1800000).toISOString(),
+        decidedAt: new Date(demoNow - 1800000).toISOString(),
       },
       lines: [
         {
@@ -193,7 +231,7 @@ export default function TrackingPage() {
               <div>
                 <dt>Target siap diambil</dt>
                 <dd>
-                  {targetDate.toLocaleString('id-ID', {
+                  {demoTargetDate.toLocaleString('id-ID', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric',
@@ -303,8 +341,7 @@ export default function TrackingPage() {
             <span className="eyebrow">Pelacakan Servis Mandiri</span>
             <h1>Ikuti Perjalanan Perbaikan Perangkat</h1>
             <p>
-              Nomor tiket dan kode akses unik menjaga informasi perkembangan servis perangkat Anda
-              tetap terlindungi dan dapat diakses kapan saja.
+              Masukkan nomor tiket servis untuk melihat perkembangan perbaikan perangkat Anda.
             </p>
           </div>
 
@@ -314,31 +351,11 @@ export default function TrackingPage() {
           {!trackingResult ? (
             <form onSubmit={handleLookup} className={styles.form}>
               <TextInput
-                id="businessSlug"
-                label="Kode / Slug Tempat Servis *"
-                value={businessSlug}
-                onChange={(e) => setBusinessSlug(e.target.value)}
-                placeholder="Contoh: bengkel-jaya-servis"
-                required
-              />
-
-              <TextInput
                 id="ticketCode"
                 label="Nomor / Kode Tiket *"
                 value={ticketCode}
                 onChange={(e) => setTicketCode(e.target.value)}
-                placeholder="Contoh: SRV-202610-001"
-                required
-              />
-
-              <TextInput
-                id="trackingSecret"
-                label="Kode Akses Rahasia Pelacakan *"
-                type="password"
-                value={trackingSecret}
-                onChange={(e) => setTrackingSecret(e.target.value)}
-                placeholder="Diberikan oleh tempat servis pada tanda terima"
-                autoComplete="off"
+                placeholder="Contoh: SI-KPC2TSZXP3"
                 required
               />
 
@@ -346,10 +363,7 @@ export default function TrackingPage() {
                 {isLoading ? 'Mencari Status Servis...' : 'Lacak Status Servis'}
               </Button>
 
-              <p style={{ fontSize: '0.82rem', color: 'var(--slate-500)', margin: 0 }}>
-                * Data pribadi seperti nomor kontak atau rincian internal dilindungi dan tidak
-                ditampilkan ke publik.
-              </p>
+              <p style={{ fontSize: '0.82rem', color: 'var(--slate-500)', margin: 0 }}>Hanya informasi perkembangan servis yang ditampilkan.</p>
             </form>
           ) : (
             <div style={{ display: 'grid', gap: 20 }}>
@@ -375,7 +389,12 @@ export default function TrackingPage() {
                   <Button
                     type="button"
                     variant="secondary"
-                    onClick={() => setTrackingResult(null)}
+                    onClick={() => {
+                      setTrackingResult(null);
+                      setApprovalDecision(null);
+                      setApprovalError('');
+                      setRejectReason('');
+                    }}
                     style={{ fontSize: '0.82rem' }}
                   >
                     Lacak Tiket Lain
@@ -428,6 +447,99 @@ export default function TrackingPage() {
                     </div>
                   </div>
                 </div>
+
+                {trackingResult.attachments?.length > 0 && (
+                  <section aria-labelledby="tracking-photos-title">
+                    <h3 id="tracking-photos-title" style={{ fontSize: '1.05rem', color: 'var(--navy-950)', marginBottom: 8 }}>
+                      Foto Perangkat
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
+                      {trackingResult.attachments.map((attachment) => (
+                        <a
+                          key={attachment.key}
+                          href={attachment.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ display: 'grid', gap: 6, color: 'var(--navy-950)', textDecoration: 'none' }}
+                        >
+                          <img
+                            src={attachment.url}
+                            alt={`Foto perangkat: ${attachment.originalName}`}
+                            loading="lazy"
+                            style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--border)' }}
+                          />
+                          <span style={{ fontSize: '0.82rem' }}>{attachment.originalName}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {trackingResult.diagnosis?.customerExplanation && (
+                  <section className="reference-panel">
+                    <h3>Hasil Diagnosis Teknisi</h3>
+                    <p style={{ marginBottom: 0 }}>{trackingResult.diagnosis.customerExplanation}</p>
+                  </section>
+                )}
+
+                {trackingResult.estimate && (
+                  <section className="reference-panel">
+                    <EstimateBreakdown revision={trackingResult.estimate} customerView />
+                  </section>
+                )}
+
+                {approvalDecision && trackingResult.status !== 'awaiting_approval' && (
+                  <InlineNotice type="success">
+                    {approvalDecision === 'approved'
+                      ? 'Estimasi berhasil disetujui. Teknisi dapat melanjutkan perbaikan.'
+                      : 'Estimasi ditolak. Tempat servis akan menghubungi Anda untuk membahas langkah selanjutnya.'}
+                  </InlineNotice>
+                )}
+
+                {trackingResult.status === 'awaiting_approval' && (
+                  <section className="reference-panel reference-stack" aria-labelledby="tracking-approval-title">
+                    <h3 id="tracking-approval-title">Persetujuan Estimasi Servis</h3>
+                    {approvalError && <InlineNotice type="error">{approvalError}</InlineNotice>}
+                    {approvalDecision ? (
+                      <InlineNotice type="success">
+                        {approvalDecision === 'approved'
+                          ? 'Estimasi berhasil disetujui. Teknisi dapat melanjutkan perbaikan.'
+                          : 'Estimasi ditolak. Tempat servis akan menghubungi Anda untuk membahas langkah selanjutnya.'}
+                      </InlineNotice>
+                    ) : !approvalToken ? (
+                      <InlineNotice>
+                        Untuk menyetujui atau menolak estimasi, buka tautan persetujuan yang dikirim oleh tempat servis.
+                      </InlineNotice>
+                    ) : isCheckingApproval ? (
+                      <p>Memuat rincian persetujuan…</p>
+                    ) : isApprovalError || !approvalData?.data ? (
+                      <InlineNotice type="error">Tautan persetujuan tidak tersedia atau sudah kedaluwarsa. Minta tautan terbaru dari tempat servis.</InlineNotice>
+                    ) : approvalData.data.ticketCode !== trackingResult.ticketCode ? (
+                      <InlineNotice type="error">Tautan persetujuan ini bukan untuk tiket yang sedang dilacak.</InlineNotice>
+                    ) : approvalData.data.estimate.status !== 'pending' ? (
+                      <InlineNotice>Estimasi ini sudah diproses sebelumnya.</InlineNotice>
+                    ) : (
+                      <>
+                        <p>Tinjau diagnosis dan rincian biaya di atas sebelum menentukan persetujuan.</p>
+                        <label htmlFor="tracking-reject-reason">Alasan jika menolak (opsional)</label>
+                        <textarea
+                          id="tracking-reject-reason"
+                          maxLength={500}
+                          value={rejectReason}
+                          onChange={(event) => setRejectReason(event.target.value)}
+                        />
+                        <div className="actions">
+                          <Button variant="secondary" disabled={isResponding} onClick={() => void handleApproval('rejected')}>
+                            {isResponding ? 'Memproses…' : 'Tolak Estimasi'}
+                          </Button>
+                          <Button disabled={isResponding} onClick={() => void handleApproval('approved')}>
+                            {isResponding ? 'Memproses…' : 'Setujui Servis'}
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </section>
+                )}
 
                 {/* Ready / Handed over notification */}
                 {trackingResult.status === 'completed' && !trackingResult.handedOverAt && (

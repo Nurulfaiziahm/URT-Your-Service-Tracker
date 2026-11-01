@@ -1,11 +1,12 @@
 import { Icon } from '../../components/ui/Icon';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import type { ServiceTicket, SerializedAttachment } from './types';
 import {
   useUploadFileMutation,
   useAddAttachmentMutation,
   useDetachAttachmentMutation,
+  useGetAttachmentDownloadQuery,
 } from './ticketsApi';
 import { Button } from '../../components/ui/Button';
 import { InlineNotice } from '../../components/feedback/Feedback';
@@ -27,6 +28,59 @@ function formatBytes(bytes: number): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
+function AttachmentPreview({
+  businessId,
+  ticketId,
+  attachment,
+}: {
+  businessId: string;
+  ticketId: string;
+  attachment: SerializedAttachment;
+}) {
+  const { currentData, isFetching, isError } = useGetAttachmentDownloadQuery({
+    businessId,
+    ticketId,
+    key: attachment.key,
+  });
+  const url = currentData?.data.url;
+  const isImage = attachment.mimeType.startsWith('image/');
+  const previewStyle = {
+    width: 104,
+    height: 76,
+    flex: '0 0 104px',
+    display: 'grid',
+    placeItems: 'center',
+    overflow: 'hidden',
+    borderRadius: 6,
+    background: 'var(--canvas)',
+    border: '1px solid var(--border)',
+    color: 'var(--slate-500)',
+    fontSize: '0.75rem',
+    textAlign: 'center' as const,
+  };
+
+  if (isImage && url) {
+    return <a href={url} target="_blank" rel="noreferrer" aria-label={`Buka foto ${attachment.originalName}`}>
+      <img
+        src={url}
+        alt={`Foto unit: ${attachment.originalName}`}
+        loading="lazy"
+        style={{ ...previewStyle, objectFit: 'cover' }}
+      />
+    </a>;
+  }
+
+  if (!isImage && url) {
+    return <a href={url} target="_blank" rel="noreferrer" style={previewStyle}>
+      <span><Icon name="file" /><br />Buka PDF</span>
+    </a>;
+  }
+
+  return <div style={previewStyle} role={isError ? 'status' : undefined}>
+    {isFetching ? 'Memuat pratinjau…' : isError ? 'Pratinjau tidak tersedia' : <Icon name={isImage ? 'image' : 'file'} />}
+  </div>;
+}
+
 export function TicketAttachments({
   businessId,
   ticket,
@@ -38,6 +92,7 @@ export function TicketAttachments({
   const [visibility, setVisibility] = useState<'customer' | 'staff'>('customer');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const [uploadFile, { isLoading: isUploading }] = useUploadFileMutation();
   const [addAttachment, { isLoading: isAttaching }] = useAddAttachmentMutation();
@@ -46,9 +101,14 @@ export function TicketAttachments({
   const isBusy = isUploading || isAttaching || isDetaching;
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-    }
+    const file = e.target.files?.[0];
+    setErrorMsg(null); setSuccessMsg(null);
+    if (!file) { setSelectedFile(null); return; }
+    const image = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type);
+    const pdf = file.type === 'application/pdf';
+    if (!image && !pdf) { setSelectedFile(null); setErrorMsg('Pilih gambar JPEG, PNG, WebP, GIF atau dokumen PDF.'); e.target.value = ''; return; }
+    if (file.size > (image ? 5 : 10) * 1024 * 1024) { setSelectedFile(null); setErrorMsg(image ? 'Ukuran gambar maksimal 5 MiB.' : 'Ukuran PDF maksimal 10 MiB.'); e.target.value = ''; return; }
+    setSelectedFile(file);
   };
 
   const handleUploadSubmit = async (e: FormEvent) => {
@@ -82,6 +142,7 @@ export function TicketAttachments({
       }).unwrap();
 
       setSelectedFile(null);
+      if (fileInput.current) fileInput.current.value = '';
       setSuccessMsg('Berkas lampiran berhasil diunggah.');
       onSuccess?.();
     } catch (err) {
@@ -156,7 +217,7 @@ export function TicketAttachments({
               key={att.key}
               style={{
                 display: 'flex',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
                 padding: '10px 14px',
                 border: '1px solid var(--border)',
@@ -166,6 +227,7 @@ export function TicketAttachments({
                 gap: 8,
               }}
             >
+              <AttachmentPreview businessId={businessId} ticketId={ticket.id} attachment={att} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ fontSize: '1.2rem' }}>
                   <Icon name={att.mimeType.startsWith('image/') ? 'image' : 'file'} />
@@ -237,8 +299,9 @@ export function TicketAttachments({
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
           <input
+            ref={fileInput}
             type="file"
-            accept="image/*,.pdf"
+            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
             onChange={handleFileChange}
             disabled={isBusy}
             style={{ fontSize: '0.88rem' }}

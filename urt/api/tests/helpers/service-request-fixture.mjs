@@ -252,10 +252,11 @@ export function serviceRequestFixture() {
     subscribe(value) { subscribed = value; },
     restore() { for (const restore of originals.reverse()) restore(); },
     verifyReceipt(receipt) {
-      assert.match(receipt.ticketCode, /^URT-\d{4}-[A-Z0-9]+$/);
+      assert.match(receipt.ticketCode, /^RA-[A-HJ-NP-Z2-9]{10}$/);
+      assert.equal(receipt.trackingSecret, undefined);
       const ticket = tickets.find((item) => item.ticketCode === receipt.ticketCode);
-      assert.equal(ticket.trackingSecretHash, crypto.createHash('sha256').update(receipt.trackingSecret).digest('hex'));
-      assert.notEqual(ticket.trackingSecretHash, receipt.trackingSecret);
+      assert.equal(ticket.ticketCodeVersion, 2);
+      assert.equal(ticket.trackingSecretHash, undefined);
       return ticket;
     },
   };

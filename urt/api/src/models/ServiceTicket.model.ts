@@ -125,6 +125,7 @@ export interface IServiceTicket extends Document {
   _id: mongoose.Types.ObjectId;
   businessId: mongoose.Types.ObjectId;
   ticketCode: string;
+  ticketCodeVersion?: number;
   customerId: mongoose.Types.ObjectId;
   assignedTechnicianId?: mongoose.Types.ObjectId;
   requestedServiceId?: mongoose.Types.ObjectId;
@@ -499,6 +500,7 @@ const serviceTicketSchema = new Schema<IServiceTicket>(
       trim: true,
       uppercase: true,
     },
+    ticketCodeVersion: { type: Number, default: 1, select: false },
     customerId: {
       type: Schema.Types.ObjectId,
       ref: 'Customer',
@@ -660,8 +662,9 @@ const serviceTicketSchema = new Schema<IServiceTicket>(
   },
 );
 
-// Enforce business-scoped ticketCode uniqueness
-serviceTicketSchema.index({ businessId: 1, ticketCode: 1 }, { unique: true });
+// New ticket codes are public tracking credentials. Limit the unique index to
+// newly generated codes so legacy shop-scoped codes can remain unchanged.
+serviceTicketSchema.index({ ticketCode: 1 }, { unique: true, partialFilterExpression: { ticketCodeVersion: 2 } });
 
 // Scoped listing & sorting indexes
 serviceTicketSchema.index({ businessId: 1, status: 1, createdAt: -1 });

@@ -1478,6 +1478,13 @@
   text-align: center;
 }
 
+.urt-landing .tracking-form__error {
+  margin-top: 10px;
+  color: #b91c1c;
+  font-size: 13px;
+  text-align: center;
+}
+
 .urt-landing .demo-ticket-hint {
   display: flex;
   justify-content: center;
@@ -2173,4 +2180,14 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+@media (max-width: 767px) {
+  .urt-landing .ui-table td { font-size: 12px; padding: 9px 11px; }
+  .urt-landing .ui-table th { font-size: 11px; padding: 9px 11px; }
+}
+
+@media (max-width: 479px) {
+  .urt-landing .ui-table td { font-size: 12px; }
+  .urt-landing .ui-table th { font-size: 12px; }
 }

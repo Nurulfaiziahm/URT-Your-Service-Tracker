@@ -501,7 +501,13 @@ export class AuthService {
 
     const now = new Date();
     const anonymizedEmail = `deleted+${user.id}@deleted.invalid`;
-    await Business.updateOne({ ownerId: user._id }, { $set: { isActive: false } });
+    const ownedBusiness = await Business.findOne({ ownerId: user._id });
+    if (ownedBusiness) {
+      // Keep the business document and its history, but release the public registration slug.
+      ownedBusiness.isActive = false;
+      ownedBusiness.slug = `deleted-${ownedBusiness._id.toString()}`;
+      await ownedBusiness.save();
+    }
     user.firstName = 'Akun';
     user.lastName = 'Dihapus';
     user.email = anonymizedEmail;

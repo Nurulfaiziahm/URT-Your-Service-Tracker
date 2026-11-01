@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { authDestination, authPortalFromPath } from '../src/features/auth/auth-routing.ts';
+import { serviceTrackingPath } from '../src/features/customer/service-request.types.ts';
 
 test('role login never follows a return path into another role', () => {
   for (const portal of ['owner', 'customer', 'technician']) {
@@ -13,9 +14,10 @@ test('role login never follows a return path into another role', () => {
   }
 });
 
-test('customer service and tracking returns retain business context and private fragments', () => {
+test('customer service returns retain business context and public tracking needs only its ticket number', () => {
   assert.equal(authPortalFromPath('/b/repair-a/customer/services/new'), 'customer');
   assert.equal(authDestination('customer', { pathname: '/b/repair-a/customer/services/new' }), '/b/repair-a/customer/services/new');
+  assert.equal(serviceTrackingPath({ ticketCode: 'RA-2026-ABC2345678', businessSlug: 'repair-a' }), '/tracking/RA-2026-ABC2345678');
   assert.equal(authDestination('customer', { pathname: '/tracking/TEST', hash: '#access=fixture' }), '/tracking/TEST#access=fixture');
   assert.equal(authDestination('owner', { pathname: '/tracking/TEST' }), '/owner');
 });

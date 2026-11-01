@@ -4,8 +4,21 @@ import { AppError } from '../../middleware/error-handler.js';
 import { generateFileKey } from '../../lib/upload/key-generator.js';
 import { deleteObject, putObject, signDownload } from '../../lib/storage/r2.js';
 import { IMAGE_LIMIT } from './upload.middleware.js';
+import { config } from '../../core/config/index.js';
 
 export const formatUpload = async (file: IFile) => {
+  if (file.content?.length) {
+    return {
+      key: file.key,
+      originalName: file.originalName,
+      mimeType: file.mimeType,
+      size: file.size,
+      category: file.category,
+      url: `data:${file.mimeType};base64,${file.content.toString('base64')}`,
+      urlExpiresAt: new Date(Date.now() + 15 * 60 * 1000),
+      uploadedAt: file.createdAt,
+    };
+  }
   if (!file.objectKey) {
     throw new AppError('This file must be migrated to R2', 409, 'UPLOAD_MIGRATION_REQUIRED');
   }
@@ -28,32 +41,45 @@ export const uploadFile = async (file: Express.Multer.File, userId: string) => {
   }
   const key = generateFileKey(category);
   const objectKey = `${category}/${userId}/${key}`;
-
-  await putObject(objectKey, file.buffer, file.mimetype);
   let download;
   let record;
+  let uploadedToR2 = false;
   try {
-    download = await signDownload(objectKey);
-    record = await File.create({
-      key, objectKey, category, uploadedBy: userId,
-      originalName: file.originalname, mimeType: file.mimetype, size: file.size,
-    });
+    if (!config.r2.accountId && config.nodeEnv === 'development') {
+      // Development fallback: keep bounded uploads in Mongo and serve them only
+      // through the existing authenticated, ticket-scoped download endpoint.
+      record = await File.create({
+        key, category, uploadedBy: userId,
+        originalName: file.originalname, mimeType: file.mimetype, size: file.size,
+        content: file.buffer,
+      });
+    } else {
+      await putObject(objectKey, file.buffer, file.mimetype);
+      uploadedToR2 = true;
+      download = await signDownload(objectKey);
+      record = await File.create({
+        key, objectKey, category, uploadedBy: userId,
+        originalName: file.originalname, mimeType: file.mimetype, size: file.size,
+      });
+    }
   } catch (error) {
-    try {
-      await deleteObject(objectKey);
-    } catch {
-      console.error('Failed to remove orphaned R2 upload', { key, objectKey });
+    if (uploadedToR2) {
+      try {
+        await deleteObject(objectKey);
+      } catch {
+        console.error('Failed to remove orphaned R2 upload', { key, objectKey });
+      }
     }
     throw error;
   }
   return {
     key, originalName: record.originalName, mimeType: record.mimeType,
-    size: record.size, category, ...download, uploadedAt: record.createdAt,
+    size: record.size, category, ...(download || {}), uploadedAt: record.createdAt,
   };
 };
 
 const findOwnedUpload = async (key: string, userId: string, isAdmin: boolean) => {
-  const file = await File.findOne({ key });
+  const file = await File.findOne({ key }).select('+content');
   if (!file) throw new AppError('File not found', 404, 'UPLOAD_NOT_FOUND');
   if (!isAdmin && file.uploadedBy.toString() !== userId) {
     throw new AppError('You cannot access this file', 403, 'UPLOAD_FORBIDDEN');
@@ -69,7 +95,7 @@ export const getUpload = async (key: string, userId: string, isAdmin: boolean) =
 
 export const deleteUpload = async (key: string, userId: string, isAdmin: boolean): Promise<void> => {
   const file = await findOwnedUpload(key, userId, isAdmin);
-  if (!file.objectKey) throw new AppError('This file must be migrated to R2', 409, 'UPLOAD_MIGRATION_REQUIRED');
+  if (!file.objectKey && !file.content?.length) throw new AppError('This file must be migrated to R2', 409, 'UPLOAD_MIGRATION_REQUIRED');
   if (await ServiceTicket.exists({ 'attachments.key': key })) {
     throw new AppError('Detach this file from tickets before deleting it', 409, 'UPLOAD_IN_USE');
   }
@@ -80,6 +106,6 @@ export const deleteUpload = async (key: string, userId: string, isAdmin: boolean
     { new: true },
   );
   if (!claimed) throw new AppError('File is attached or being attached to a ticket', 409, 'UPLOAD_IN_USE');
-  await deleteObject(claimed.objectKey);
+  if (claimed.objectKey) await deleteObject(claimed.objectKey);
   await File.deleteOne({ _id: claimed._id, deleting: true });
 };

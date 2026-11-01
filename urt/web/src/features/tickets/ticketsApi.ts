@@ -236,7 +236,7 @@ export const ticketsApi = baseApi.injectEndpoints({
     }),
 
     uploadFile: builder.mutation<
-      ApiResponse<{ key: string; originalName: string; size: number; downloadUrl: string }>,
+      ApiResponse<{ key: string; originalName: string; size: number; url?: string; urlExpiresAt?: string }>,
       FormData
     >({
       query: (formData) => ({
@@ -281,7 +281,7 @@ export const ticketsApi = baseApi.injectEndpoints({
     }),
 
     getAttachmentDownload: builder.query<
-      ApiResponse<{ downloadUrl: string }>,
+      ApiResponse<{ url: string; urlExpiresAt: string }>,
       { businessId: string; ticketId: string; key: string }
     >({
       query: ({ businessId, ticketId, key }) =>

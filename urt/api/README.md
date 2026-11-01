@@ -65,6 +65,8 @@ The application validates its environment variables at startup.
 | `MAIL_ENABLED`         | Set to `true` to enable verification and password-reset mail |
 | `SMTP_*`               | SMTP host, port, credentials, sender, and TLS settings       |
 
+When R2 is not configured in `development`, uploads are stored in MongoDB for local use and remain available through the ticket's authorized attachment route. Production uploads require all four R2 values and use the private R2 bucket.
+
 Each key-ring entry has an `id`, a unique `secret`, and an `activatedAt` Unix timestamp. Retained
 keys may also specify `lastIssuedAt` and `acceptUntil` for rotation.
 

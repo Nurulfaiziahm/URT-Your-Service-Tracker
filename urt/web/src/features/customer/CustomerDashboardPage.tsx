@@ -1,15 +1,21 @@
 import { Link } from 'react-router';
+import { useEffect, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router';
 import { useAppSelector } from '../../redux/hooks';
 import { selectUser } from '../auth/authSlice';
 import { useCustomerPortal } from './customer-portal';
 import { useGetCustomerDashboardQuery } from '../dashboard/dashboardApi';
 import { SummaryCard } from '../../components/ui/SummaryCard';
-import { ButtonLink } from '../../components/ui/Button';
+import { Button, ButtonLink } from '../../components/ui/Button';
 import { EmptyState, PageLoader } from '../../components/feedback/Feedback';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { TicketTable } from '../tickets/TicketTable';
 import { serviceWorkflowStages, serviceProgressState } from '../tickets/status';
 import { durationLabel } from '../tickets/service-timing';
+import { useGetPublicTrackingMutation } from '../tickets/ticketsApi';
+import { ServiceStepper } from '../tickets/ServiceStepper';
+import { TicketTimeline } from '../tickets/TicketTimeline';
+import type { PublicTrackingResult } from '../tickets/types';
 import { whatsappMessageLink } from '../tickets/whatsapp';
 import styles from './CustomerDashboard.module.css';
 
@@ -31,13 +37,152 @@ function DeviceIcon() {
   );
 }
 
+function TrackedTicketPanel({ ticket }: { ticket: PublicTrackingResult }) {
+  const deviceTitle = [ticket.device.brand, ticket.device.model].filter(Boolean).join(' ') || ticket.device.category;
+
+  return (
+    <div className={styles.trackedServiceLayout} aria-label="Informasi tiket yang dicari">
+      <section className={styles.summaryCard}>
+        <div className={styles.summaryTop}>
+          <div className={styles.deviceVisual}><DeviceIcon /></div>
+          <div className={styles.summaryMeta}>
+            <div className={styles.summaryHeader}>
+              <span className={styles.ticketCode}>{ticket.ticketCode}</span>
+              <TicketStatusBadge status={ticket.status} />
+            </div>
+            <h2 className={styles.deviceName}>{deviceTitle}</h2>
+            <p className={styles.complaintText}><strong>Pemilik perangkat:</strong> {ticket.customer.name}</p>
+            <p className={styles.complaintText}>{ticket.complaint}</p>
+          </div>
+        </div>
+
+        <hr className={styles.cardDivider} />
+
+        <div className={styles.infoRow}>
+          <div className={styles.infoItem}>
+            <span className={styles.infoIcon} aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 21h18M5 21V7l8-4 6 4v14M9 21v-6h6v6M8 9h.01M12 9h.01M16 9h.01" />
+              </svg>
+            </span>
+            <div className={styles.infoCol}>
+              <span className={styles.infoLabel}>Tempat Servis</span>
+              <strong className={styles.infoValue}>{ticket.business.name}</strong>
+            </div>
+          </div>
+          <div className={styles.infoSeparator} aria-hidden="true" />
+          <div className={styles.infoItem}>
+            <span className={styles.infoIcon} aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="16" rx="2" />
+                <path d="M16 3v4M8 3v4M3 11h18" />
+              </svg>
+            </span>
+            <div className={styles.infoCol}>
+              <span className={styles.infoLabel}>Tanggal Diterima</span>
+              <strong className={styles.infoValue}>
+                {new Date(ticket.receivedAt).toLocaleString('id-ID')}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        {ticket.attachments?.length > 0 && (
+          <section aria-label="Foto perangkat">
+            <h3 className={styles.timelineHeading}>Foto Perangkat</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
+              {ticket.attachments.map((attachment) => (
+                <a key={attachment.key} href={attachment.url} target="_blank" rel="noreferrer">
+                  <img
+                    src={attachment.url}
+                    alt={`Foto perangkat: ${attachment.originalName}`}
+                    loading="lazy"
+                    style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--border)' }}
+                  />
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {(ticket.readyAt || ticket.handedOverAt || ticket.business.phone) && (
+          <div className={styles.trackingMeta}>
+            {ticket.readyAt && <p><strong>Siap diambil:</strong> {new Date(ticket.readyAt).toLocaleString('id-ID')}</p>}
+            {ticket.handedOverAt && <p><strong>Diserahkan:</strong> {new Date(ticket.handedOverAt).toLocaleString('id-ID')}</p>}
+            {ticket.business.phone && <p><strong>Telepon servis:</strong> {ticket.business.phone}</p>}
+          </div>
+        )}
+      </section>
+
+      <section className={styles.journeyCard}>
+        <div className={styles.journeyHeader}><h2>Perjalanan Servis</h2></div>
+        <ServiceStepper status={ticket.status} />
+        <div>
+          <h3 className={styles.timelineHeading}>Riwayat Status</h3>
+          <TicketTimeline timeline={ticket.timeline} />
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default function CustomerDashboardPage() {
   const { businessId, business, basePath, hasMembership, isAuthenticated } = useCustomerPortal();
+  const [searchParams] = useSearchParams();
+  const initialTicketCode = searchParams.get('ticketCode')?.trim() || '';
+  const [ticketSearch, setTicketSearch] = useState(initialTicketCode);
+  const [trackingResult, setTrackingResult] = useState<PublicTrackingResult | null>(null);
+  const [searchError, setSearchError] = useState('');
+  const [fetchTracking, { isLoading: isSearching }] = useGetPublicTrackingMutation();
+  const authState = {
+    from: {
+      pathname: basePath,
+      search: initialTicketCode ? `?ticketCode=${encodeURIComponent(initialTicketCode)}` : undefined,
+    },
+  };
   const user = useAppSelector(selectUser);
   const { currentData: data, isLoading, isError, refetch } = useGetCustomerDashboardQuery(
     { businessId: businessId || '' },
     { skip: !businessId || !hasMembership || !isAuthenticated, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true },
   );
+
+  useEffect(() => {
+    if (!initialTicketCode) return;
+    const ticketCode = initialTicketCode.replace(/^#/, '').toUpperCase();
+    setTicketSearch(ticketCode);
+    void fetchTracking({ ticketCode }).unwrap()
+      .then((response) => setTrackingResult(response.data))
+      .catch(() => setSearchError('Nomor tiket tidak ditemukan. Periksa kembali nomor tiket dan coba lagi.'));
+  }, [fetchTracking, initialTicketCode]);
+
+  useEffect(() => {
+    if (!trackingResult?.ticketCode) return;
+    const interval = window.setInterval(() => {
+      void fetchTracking({ ticketCode: trackingResult.ticketCode }).unwrap()
+        .then((response) => setTrackingResult(response.data))
+        .catch(() => window.clearInterval(interval));
+    }, 60000);
+    return () => window.clearInterval(interval);
+  }, [fetchTracking, trackingResult?.ticketCode]);
+
+  const handleTicketSearch = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const ticketCode = ticketSearch.trim().replace(/^#/, '').toUpperCase();
+    if (!ticketCode) {
+      setSearchError('Masukkan nomor tiket untuk melacak status servis.');
+      setTrackingResult(null);
+      return;
+    }
+
+    setSearchError('');
+    setTrackingResult(null);
+    try {
+      const response = await fetchTracking({ ticketCode }).unwrap();
+      setTrackingResult(response.data);
+    } catch {
+      setSearchError('Nomor tiket tidak ditemukan. Periksa kembali nomor tiket dan coba lagi.');
+    }
+  };
 
   if (isLoading) return <PageLoader />;
   if (hasMembership && isAuthenticated && (isError || !data?.data))
@@ -49,10 +194,20 @@ export default function CustomerDashboardPage() {
       />
     );
 
-  const { stats, recentTickets } = hasMembership && isAuthenticated && data?.data ? data.data : {
+  const ownDashboard = hasMembership && isAuthenticated && data?.data ? data.data : undefined;
+  const { stats, recentTickets } = ownDashboard || {
     stats: { activeTickets: 0, completedTickets: 0, awaitingApproval: 0 },
     recentTickets: [],
   };
+  const displayPublicStats = !isAuthenticated || !hasMembership;
+  const trackedTicketStats = trackingResult
+    ? {
+        activeTickets: ['completed', 'cancelled'].includes(trackingResult.status) ? 0 : 1,
+        completedTickets: trackingResult.status === 'completed' ? 1 : 0,
+        awaitingApproval: trackingResult.status === 'awaiting_approval' ? 1 : 0,
+      }
+    : { activeTickets: 0, completedTickets: 0, awaitingApproval: 0 };
+  const displayStats = displayPublicStats ? trackedTicketStats : stats;
 
   const ticket = recentTickets.find((item) => !['completed', 'cancelled'].includes(item.status));
   const completed = recentTickets.filter((item) =>
@@ -105,37 +260,74 @@ export default function CustomerDashboardPage() {
         </div>
         <div className="actions">
           {!isAuthenticated && (
-            <ButtonLink to="/customer/login" variant="secondary" state={{ from: { pathname: basePath } }}>
-              Login Pelanggan
-            </ButtonLink>
+            <>
+              <ButtonLink to="/customer/login" variant="secondary" state={authState}>
+                Masuk
+              </ButtonLink>
+              <ButtonLink to="/customer/register" variant="secondary" state={authState}>
+                Daftar Akun
+              </ButtonLink>
+            </>
           )}
           <ButtonLink to={`${basePath}/services/new`}>+ Ajukan Servis</ButtonLink>
         </div>
       </header>
 
+      <section className={`reference-panel ${styles.ticketSearch}`} aria-labelledby="ticket-search-title">
+        <div className="reference-panel-header">
+          <h2 id="ticket-search-title">Lacak Tiket Servis</h2>
+        </div>
+        <form className={styles.searchRow} onSubmit={handleTicketSearch}>
+          <input
+            id="customer-ticket-search"
+            name="ticketSearch"
+            type="search"
+            aria-label="Nomor tiket servis untuk melacak status"
+            value={ticketSearch}
+            onChange={(event) => {
+              setTicketSearch(event.target.value);
+              setSearchError('');
+              setTrackingResult(null);
+            }}
+            placeholder="Masukkan nomor tiket untuk melacak status servis"
+            autoComplete="off"
+          />
+          <Button type="submit" pending={isSearching}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-4-4" />
+            </svg>
+            Cari
+          </Button>
+        </form>
+        {searchError && <p className={styles.searchError} role="alert">{searchError}</p>}
+      </section>
+
       <section className="reference-stats reference-stats-three">
         <SummaryCard
           label="Servis Aktif"
-          value={stats.activeTickets}
-          detail="Perangkat dalam penanganan"
+          value={displayStats.activeTickets}
+          detail={displayPublicStats ? 'Tiket yang sedang dilacak' : 'Perangkat dalam penanganan'}
         />
         <SummaryCard
           label="Servis Selesai"
-          value={stats.completedTickets}
-          detail="Riwayat perbaikan Anda"
+          value={displayStats.completedTickets}
+          detail={displayPublicStats ? 'Status tiket yang sedang dilacak' : 'Riwayat perbaikan Anda'}
           tone="green"
           icon="check"
         />
         <SummaryCard
           label="Menunggu Persetujuan"
-          value={stats.awaitingApproval}
-          detail="Estimasi membutuhkan keputusan"
+          value={displayStats.awaitingApproval}
+          detail={displayPublicStats ? 'Tiket yang sedang dilacak' : 'Estimasi membutuhkan keputusan'}
           tone="orange"
           icon="clock"
         />
       </section>
 
-      {ticket ? (
+      {trackingResult ? (
+        <TrackedTicketPanel ticket={trackingResult} />
+      ) : ticket ? (
         <div className={styles.activeServiceGrid}>
           {/* Card Kiri: Service Summary */}
           <section className={styles.summaryCard}>

@@ -5,6 +5,8 @@ import logo from '../../assets/logo-urt.svg';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { ServiceStepper } from '../tickets/ServiceStepper';
+import { useGetPublicTrackingMutation } from '../tickets/ticketsApi';
+import { customerPortalPath } from '../customer/customer-portal';
 import './landing.css';
 
 type Persona = 'owner' | 'technician' | 'customer';
@@ -15,11 +17,13 @@ export default function LandingPage() {
   const [persona, setPersona] = useState<Persona>('owner');
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
   const [ticketCode, setTicketCode] = useState('');
+  const [trackingError, setTrackingError] = useState('');
   const [activeSection, setActiveSection] = useState('');
   const root = useRef<HTMLDivElement>(null);
   const navToggle = useRef<HTMLButtonElement>(null);
   const ticketInput = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const [fetchTracking, { isLoading: isTracking }] = useGetPublicTrackingMutation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,10 +64,27 @@ export default function LandingPage() {
     root.current?.querySelector<HTMLButtonElement>(`#tab-${personas[next]}`)?.focus();
   }
 
-  function handleTrackingSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleTrackingSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const code = ticketCode.trim().replace(/^#/, '').toUpperCase();
-    if (code) navigate(`/tracking/${encodeURIComponent(code)}`);
+    if (!code) return;
+    setTrackingError('');
+
+    const isDemoTicket = code === 'URT-1024'
+      || code.includes('1024')
+      || code === 'URT-2026-123456'
+      || code === 'URT-2026-SNRM';
+    if (isDemoTicket) {
+      navigate(`/tracking/${encodeURIComponent(code)}`);
+      return;
+    }
+
+    try {
+      const response = await fetchTracking({ ticketCode: code }).unwrap();
+      navigate(`${customerPortalPath(response.data.business.slug)}?ticketCode=${encodeURIComponent(response.data.ticketCode)}`);
+    } catch {
+      setTrackingError('Nomor tiket tidak ditemukan. Periksa kembali nomor tiket dan coba lagi.');
+    }
   }
 
   return (
@@ -344,6 +365,26 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+        </section>
+        <section id="lacak-servis" className="section section--canvas" aria-labelledby="tracking-title">
+          <div className="container container--sm"><div className="tracking-card">
+            <div className="text-center"><span className="eyebrow">PORTAL PELACAKAN MANDIRI</span>
+              <h2 id="tracking-title" className="section-title">Lacak Progres Servis Perangkat Anda</h2>
+              <p className="section-lead">Ketahui status servis perangkat tanpa harus menunggu balasan chat admin.</p>
+            </div>
+            <form onSubmit={handleTrackingSubmit} className="tracking-form" id="trackingForm" aria-label="Formulir Lacak Servis">
+              <div className="tracking-form__group">
+                <label htmlFor="nomor-tiket" className="sr-only">Nomor Tiket Servis</label>
+                <input ref={ticketInput} value={ticketCode} onChange={(event) => { setTicketCode(event.target.value); setTrackingError(''); }} type="text" id="nomor-tiket" name="ticket" className="tracking-form__input" placeholder="Masukkan nomor tiket servis" required autoComplete="off" />
+                <button type="submit" className="btn btn--primary" disabled={isTracking} aria-busy={isTracking || undefined}>{isTracking ? 'Mencari tiket…' : 'Lacak Servis'}</button>
+              </div>
+              {trackingError && <p className="tracking-form__error" role="alert">{trackingError}</p>}
+              <p className="tracking-form__help">Nomor tiket tertera pada struk fisik atau pesan konfirmasi saat perangkat diserahkan.</p>
+            </form>
+            <div className="demo-ticket-hint"><span>Ingin mencoba sampel tiket?</span>
+              <button onClick={() => { setTicketCode('URT-1024'); ticketInput.current?.focus(); }} type="button" className="btn-text font-mono" id="btnFillDemoTicket" data-ticket="URT-1024">Isi #URT-1024</button>
+            </div>
+          </div></div>
         </section>
         <section className="section section--canvas" aria-labelledby="problem-title">
           <div className="container">
@@ -1074,77 +1115,6 @@ export default function LandingPage() {
                     </div>
                   </li>
                 </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section
-          id="lacak-servis"
-          className="section section--canvas"
-          aria-labelledby="tracking-title"
-        >
-          <div className="container container--sm">
-            <div className="tracking-card">
-              <div className="text-center">
-                <span className="eyebrow">PORTAL PELACAKAN MANDIRI</span>
-                <h2 id="tracking-title" className="section-title">
-                  {' '}
-                  Lacak Progres Servis Perangkat Anda{' '}
-                </h2>
-                <p className="section-lead">
-                  {' '}
-                  Ketahui status pemeriksaan, hasil diagnosis teknisi, estimasi suku cadang, serta
-                  rincian biaya tanpa harus menunggu balasan chat admin.{' '}
-                </p>
-              </div>
-              <form
-                onSubmit={handleTrackingSubmit}
-                className="tracking-form"
-                id="trackingForm"
-                aria-label="Formulir Lacak Servis"
-              >
-                <div className="tracking-form__group">
-                  <label htmlFor="nomor-tiket" className="sr-only">
-                    Nomor Tiket Servis
-                  </label>
-                  <input
-                    ref={ticketInput}
-                    value={ticketCode}
-                    onChange={(event) => setTicketCode(event.target.value)}
-                    type="text"
-                    id="nomor-tiket"
-                    name="ticket"
-                    className="tracking-form__input"
-                    placeholder="Contoh: URT-1024 atau URT-2026-123456"
-                    required
-                    autoComplete="off"
-                  />
-                  <button type="submit" className="btn btn--primary">
-                    {' '}
-                    Lacak Servis{' '}
-                  </button>
-                </div>
-                <p className="tracking-form__help">
-                  {' '}
-                  Nomor tiket tertera pada struk fisik atau pesan konfirmasi saat perangkat
-                  diserahkan.{' '}
-                </p>
-              </form>
-              <div className="demo-ticket-hint">
-                <span>Ingin mencoba sampel tiket?</span>
-                <button
-                  onClick={() => {
-                    setTicketCode('URT-1024');
-                    ticketInput.current?.focus();
-                  }}
-                  type="button"
-                  className="btn-text font-mono"
-                  id="btnFillDemoTicket"
-                  data-ticket="URT-1024"
-                >
-                  {' '}
-                  Isi #URT-1024{' '}
-                </button>
               </div>
             </div>
           </div>

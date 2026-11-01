@@ -72,6 +72,7 @@ export const errorMessages: Record<string, string> = {
   SLUG_IN_USE: 'Alamat tempat servis sudah digunakan. Pilih alamat lain.',
   STATUS_CHANGE_FORBIDDEN: 'Hanya pemilik tempat servis yang dapat mengubah status teknisi.',
   STORAGE_UNAVAILABLE: 'Penyimpanan berkas sedang tidak tersedia. Coba lagi nanti.',
+  STORAGE_NOT_CONFIGURED: 'Penyimpanan berkas belum dikonfigurasi untuk tempat servis ini. Hubungi pemilik tempat servis.',
   SUBSCRIPTION_REQUIRED: 'Langganan belum aktif atau sudah berakhir. Pemilik perlu mengaktifkan paket terlebih dahulu.',
   TECHNICIAN_EXISTS: 'Teknisi dengan email ini sudah aktif di tempat servis Anda.',
   TECHNICIAN_HAS_ACTIVE_TICKETS: 'Teknisi masih memiliki tiket aktif. Alihkan penugasan sebelum menonaktifkannya.',

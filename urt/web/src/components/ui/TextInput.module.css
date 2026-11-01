@@ -3,5 +3,11 @@
 .input { width: 100%; min-height: 44px; padding: 11px 14px; background: white; border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--navy-950); }
 .input::placeholder { color: var(--slate-500); }
 .input[aria-invalid=true] { border-color: var(--danger); }
+.passwordWrap { position: relative; min-width: 0; }
+.passwordInput { padding-right: 52px; }
+.passwordToggle { position: absolute; top: 50%; right: 6px; transform: translateY(-50%); width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 8px; color: var(--slate-600); background: transparent; cursor: pointer; }
+.passwordToggle:hover { background: var(--canvas); color: var(--navy-950); }
+.passwordToggle svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.passwordToggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 .hint { color: var(--slate-600); font-size: .85rem; }
 .error { color: var(--danger); font-size: .85rem; }

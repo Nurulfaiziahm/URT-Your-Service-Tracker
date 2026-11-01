@@ -516,3 +516,25 @@ form[class] > label select {
     padding: 8px;
   }
 }
+@media (max-width: 767px) {
+  body { font-size: 15px; line-height: 1.5; }
+  .reference-heading h1, .page-content h1 { font-size: 24px; line-height: 1.25; }
+  .reference-heading p, .reference-panel > p, .reference-callout > p { font-size: 14px; }
+  .reference-panel, .reference-callout { padding: 18px; }
+  input:not([type='checkbox']):not([type='radio']), select, textarea { min-height: 44px; padding: 10px 12px; font-size: 16px; }
+  input[class*='passwordInput']:not([type='checkbox']):not([type='radio']) { padding-right: 54px; }
+  [class*='input-container'] input:not([type='checkbox']):not([type='radio']):not([class*='passwordInput']) { padding-left: 42px; }
+  [class*='input-container'] input[class*='passwordInput']:not([type='checkbox']):not([type='radio']) { padding-right: 54px; padding-left: 42px; }
+  [class*='customerCard'] [class*='input-container'] input:not([type='checkbox']):not([type='radio']):not([class*='passwordInput']) { padding-left: 12px; }
+  textarea { min-height: 96px; }
+  button, .button, a.button { min-height: 44px; }
+  [data-responsive-table] th, [data-responsive-table] td { padding: 10px 12px; }
+}
+
+@media (max-width: 479px) {
+  body { font-size: 14px; }
+  .reference-heading h1, .page-content h1 { font-size: 22px; }
+  .reference-panel, .reference-callout { padding: 16px; }
+  .reference-panel h2, .reference-callout h2 { font-size: 19px; }
+  [data-responsive-table] th, [data-responsive-table] td { padding: 9px 10px; font-size: 12px; }
+}

@@ -8,7 +8,6 @@ import { useGetBusinessByIdQuery } from '../business/businessApi';
 import {
   useGetTicketByIdQuery,
   useTransitionTicketMutation,
-  useIssueTrackingAccessMutation,
   useDeleteAnonymousTicketMutation,
 } from '../tickets/ticketsApi';
 import { useIssueInvoiceMutation } from '../invoices/invoicesApi';
@@ -38,9 +37,7 @@ export default function OwnerTicketDetailPage() {
   const [showPrintReceipt, setShowPrintReceipt] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [activeQCModal, setActiveQCModal] = useState<QCOperation | null>(null);
-  const [copyNotice, setCopyNotice] = useState('');
   const [actionError, setActionError] = useState<string | null>(null);
-  const [issuedTrackingSecret, setIssuedTrackingSecret] = useState<string | null>(null);
 
   const { data: businessRes } = useGetBusinessByIdQuery(businessId || '', {
     skip: !businessId,
@@ -54,7 +51,6 @@ export default function OwnerTicketDetailPage() {
 
   const [transition, { isLoading: isTransitioning }] = useTransitionTicketMutation();
   const [deleteTicket, { isLoading: isDeleting }] = useDeleteAnonymousTicketMutation();
-  const [issueTracking, { isLoading: isIssuingTracking }] = useIssueTrackingAccessMutation();
   const [issueInvoice, { isLoading: isIssuingInvoice }] = useIssueInvoiceMutation();
   const [issuedInvoiceId, setIssuedInvoiceId] = useState<string | null>(null);
 
@@ -143,25 +139,6 @@ export default function OwnerTicketDetailPage() {
     }
   };
 
-  const handleIssueTracking = async () => {
-    setActionError(null);
-    try {
-      const res = await issueTracking({
-        businessId,
-        ticketId: ticket.id,
-        expectedRevision: ticket.revision,
-      }).unwrap();
-
-      setIssuedTrackingSecret(res.data?.trackingSecret || null);
-      refetch();
-    } catch (err) {
-      const apiErr = err as { data?: ApiErrorBody };
-      setActionError(
-        apiErr.data?.error || apiErr.data?.message || 'Gagal menerbitkan kode akses pelacakan.',
-      );
-    }
-  };
-
   const handleIssueInvoice = async () => {
     setActionError(null);
     try {
@@ -203,14 +180,9 @@ export default function OwnerTicketDetailPage() {
           <Button type="button" variant="secondary" onClick={() => setShowPrintReceipt(true)}>
             <Icon name="print" /> Cetak Tanda Terima
           </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleIssueTracking}
-            disabled={isIssuingTracking}
-          >
-            {isIssuingTracking ? 'Membuat...' : 'Buat Kode Lacak'}
-          </Button>
+          <ButtonLink to={`/tracking/${encodeURIComponent(ticket.ticketCode)}`} variant="secondary">
+            Lihat Lacak Publik
+          </ButtonLink>
           <ButtonLink to="/owner/tickets" variant="secondary">
            Kembali ke Daftar Tiket
           </ButtonLink>
@@ -218,69 +190,6 @@ export default function OwnerTicketDetailPage() {
       </header>
 
       {actionError && <InlineNotice type="error">{actionError}</InlineNotice>}
-
-      {/* Secret notice if issued */}
-      {issuedTrackingSecret && (
-        <div
-          style={{
-            background: '#ecfdf5',
-            border: '1px solid #a7f3d0',
-            padding: 16,
-            borderRadius: 'var(--radius-md)',
-            display: 'grid',
-            gap: 8,
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <strong style={{ color: '#065f46', fontSize: '1rem' }}>
-              ✓ Kode Akses Pelacakan Publik Berhasil Diterbitkan:
-            </strong>
-            <button
-              type="button"
-              onClick={() => setIssuedTrackingSecret(null)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#065f46' }}
-            >
-              ✕
-            </button>
-          </div>
-          <p style={{ margin: 0, fontSize: '0.88rem', color: '#047857' }}>
-            Berikan kode akses berikut kepada pelanggan untuk melacak status servis unit secara
-            mandiri. Kode ini dibuat acak dan aman.
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
-            <div
-              style={{
-                fontFamily: 'monospace',
-                fontSize: '1.25rem',
-                fontWeight: 800,
-                color: '#064e3b',
-                background: '#ffffff',
-                padding: '6px 14px',
-                borderRadius: 4,
-                border: '1px solid #6ee7b7',
-              }}
-            >
-              {issuedTrackingSecret}
-            </div>
-            <Button
-              type="button"
-              variant="secondary"
-              style={{ fontSize: '0.82rem', padding: '6px 12px' }}
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(issuedTrackingSecret);
-                  setCopyNotice('Kode akses berhasil disalin.');
-                } catch {
-                  setCopyNotice('Kode tidak dapat disalin. Silakan salin secara manual.');
-                }
-              }}
-            >
-              Salin Kode
-            </Button>
-            {copyNotice && <span role="status">{copyNotice}</span>}
-          </div>
-        </div>
-      )}
 
       {/* Invoice alert if issued */}
       {issuedInvoiceId && (

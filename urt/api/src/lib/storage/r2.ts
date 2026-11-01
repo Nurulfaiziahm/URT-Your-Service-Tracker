@@ -15,9 +15,14 @@ const client = config.r2.accountId
   : null;
 
 const getClient = (): S3Client => {
-  if (!client) throw new AppError('File storage is not configured', 503, 'STORAGE_UNAVAILABLE');
+  if (!client) throw new AppError('File storage is not configured', 503, 'STORAGE_NOT_CONFIGURED');
   return client;
 };
+
+const storageError = (error: unknown, message: string) =>
+  error instanceof AppError && error.publicCode === 'STORAGE_NOT_CONFIGURED'
+    ? error
+    : new AppError(message, 503, 'STORAGE_UNAVAILABLE');
 
 export const putObject = async (objectKey: string, body: Buffer, mimeType: string): Promise<void> => {
   try {
@@ -28,16 +33,16 @@ export const putObject = async (objectKey: string, body: Buffer, mimeType: strin
       ContentType: mimeType,
       ContentLength: body.length,
     }));
-  } catch {
-    throw new AppError('File storage is unavailable', 503, 'STORAGE_UNAVAILABLE');
+  } catch (error) {
+    throw storageError(error, 'File storage is unavailable');
   }
 };
 
 export const deleteObject = async (objectKey: string): Promise<void> => {
   try {
     await getClient().send(new DeleteObjectCommand({ Bucket: config.r2.bucketName, Key: objectKey }));
-  } catch {
-    throw new AppError('File storage is unavailable', 503, 'STORAGE_UNAVAILABLE');
+  } catch (error) {
+    throw storageError(error, 'File storage is unavailable');
   }
 };
 
@@ -51,8 +56,8 @@ export const signDownload = async (objectKey: string): Promise<{ url: string; ur
       { expiresIn, signingDate: now },
     );
     return { url, urlExpiresAt: new Date(now.getTime() + expiresIn * 1000) };
-  } catch {
-    throw new AppError('File storage is unavailable', 503, 'STORAGE_UNAVAILABLE');
+  } catch (error) {
+    throw storageError(error, 'File storage is unavailable');
   }
 };
 
@@ -62,7 +67,7 @@ export const verifyObject = async (objectKey: string, size: number, mimeType: st
     if (object.ContentLength !== size || object.ContentType !== mimeType) {
       throw new Error('Object metadata does not match');
     }
-  } catch {
-    throw new AppError('Could not verify migrated R2 object', 503, 'STORAGE_UNAVAILABLE');
+  } catch (error) {
+    throw storageError(error, 'Could not verify migrated R2 object');
   }
 };

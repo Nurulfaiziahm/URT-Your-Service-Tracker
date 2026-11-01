@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useAppSelector } from '../../redux/hooks';
 import { selectUser } from '../auth/authSlice';
 import { useGetMyBusinessesQuery, useGetPublicBusinessQuery } from '../business/businessApi';
@@ -14,6 +14,7 @@ import styles from './CustomerServiceForm.module.css';
 
 export default function CustomerNewServicePage() {
   const { businessSlug } = useParams();
+  const navigate = useNavigate();
   const portal = useCustomerPortal();
   const user = useAppSelector(selectUser);
   const membership = useGetMyBusinessesQuery(undefined, { skip: Boolean(businessSlug) || !portal.isAuthenticated });
@@ -36,6 +37,12 @@ export default function CustomerNewServicePage() {
     setFailure('');
     try {
       const result = await submitServiceRequest({ slug, body: input }).unwrap();
+      if (!portal.isAuthenticated) {
+        navigate(
+          `${customerPortalPath(result.data.businessSlug)}?ticketCode=${encodeURIComponent(result.data.ticketCode)}`,
+        );
+        return;
+      }
       setReceipt(result.data);
     } catch (error) {
       const response = error as { data?: ApiErrorBody };
@@ -65,7 +72,7 @@ export default function CustomerNewServicePage() {
       {!portal.isAuthenticated && showAccountOffer && <div className={styles.optional}>
         <strong>Ingin menyimpan riwayat servis Anda?</strong>
         <p className={styles.note}>Buat akun untuk pengajuan berikutnya. Tiket ini tetap dapat dilacak melalui tautan di atas.</p>
-        <div className={styles.actions}><ButtonLink to="/customer/register" state={{ from: { pathname: trackingPath.split('#')[0], hash: trackingPath.slice(trackingPath.indexOf('#')) } }}>Buat Akun</ButtonLink>
+        <div className={styles.actions}><ButtonLink to="/customer/register" state={{ from: { pathname: customerPortalPath(receipt.businessSlug), search: `?ticketCode=${encodeURIComponent(receipt.ticketCode)}` } }}>Buat Akun</ButtonLink>
           <Button variant="ghost" onClick={() => setShowAccountOffer(false)}>Nanti Saja</Button></div>
       </div>}
     </section></div>;

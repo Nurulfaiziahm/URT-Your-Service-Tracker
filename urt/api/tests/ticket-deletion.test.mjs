@@ -23,6 +23,10 @@ test('only the owner can delete anonymous tickets; accounts, business scope and 
     const guest = await request('/public/businesses/repair-a/service-requests', 'POST', input, {});
     const registered = await request('/public/businesses/repair-a/service-requests', 'POST', input);
     assert.equal(guest.status, 201); assert.equal(registered.status, 201);
+    const publicStatus = await request('/public/tracking', 'POST', { ticketCode: guest.body.data.ticketCode }, {});
+    assert.equal(publicStatus.status, 200, 'a ticket number alone is enough for public tracking');
+    assert.equal(publicStatus.body.data.ticketCode, guest.body.data.ticketCode);
+    assert.equal(publicStatus.body.data.customer, undefined, 'public tracking does not expose customer identity');
     const ticket = fixture.tickets[0], linkedTicket = fixture.tickets[1];
     const path = `/businesses/${businessId}/tickets/${ticket._id}`;
     const linkedPath = `/businesses/${businessId}/tickets/${linkedTicket._id}`;
@@ -74,7 +78,7 @@ test('only the owner can delete anonymous tickets; accounts, business scope and 
     assert.equal(after.stats.urgentCount, 0);
     assert.equal(after.deadlineTickets.length, 0);
     assert.equal(after.recentTickets.some((entry) => entry.id === String(ticket._id)), false);
-    assert.equal((await request('/public/tracking', 'POST', { businessSlug: 'repair-a', ticketCode: guest.body.data.ticketCode, trackingSecret: guest.body.data.trackingSecret }, {})).status, 404);
+    assert.equal((await request('/public/tracking', 'POST', { ticketCode: guest.body.data.ticketCode }, {})).status, 404, 'deleted tickets are no longer available to public tracking');
     assert.equal((await request('/public/service-approvals/inspect', 'POST', { token: proof }, {})).status, 400);
     assert.equal(fixture.contacts.length, 2, 'Deleting a ticket does not delete a customer contact');
     assert.equal(linkedTicket.deletedAt, undefined);
