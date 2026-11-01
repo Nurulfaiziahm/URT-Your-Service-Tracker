@@ -35,7 +35,6 @@ jobs:
                            # Build Docker image on VPS (.env is already in the directory)
                            cd "$APP_DIR"
 
-                           docker compose down
                            docker compose up -d --build
 
 

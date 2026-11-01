@@ -1564,12 +1564,13 @@ export class TicketService {
       ? {
           version: latestEstimate.version,
           lines: latestEstimate.lines.map((line) => ({
-            id: line.id?.toString(),
+            id: line.catalogItemId?.toString(),
+            catalogItemId: line.catalogItemId?.toString(),
             description: line.description,
             type: line.type,
             quantity: line.quantity,
             unitPrice: line.unitPrice,
-            subtotal: line.subtotal,
+            subtotal: line.total,
             catalogEntryType: line.catalogEntryType,
             difficultyLevel: line.difficultyLevel,
           })),
@@ -1581,7 +1582,13 @@ export class TicketService {
           targetCompletionDate: latestEstimate.targetCompletionDate,
           repairDurationMinutes: latestEstimate.repairDurationMinutes,
           qcDurationMinutes: latestEstimate.qcDurationMinutes,
-          decision: latestEstimate.decision,
+          decision: latestEstimate.decisionAt && latestEstimate.status !== 'pending'
+            ? {
+                decision: latestEstimate.status,
+                reason: latestEstimate.decisionReason,
+                decidedAt: latestEstimate.decisionAt,
+              }
+            : undefined,
         }
       : undefined;
 
