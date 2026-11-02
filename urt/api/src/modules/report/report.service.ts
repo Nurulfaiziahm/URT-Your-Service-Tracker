@@ -52,6 +52,15 @@ function currentBusinessDate(now: Date, timezone: string): string {
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
+function businessMonthKey(date: Date, timezone: string): string {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+  }).formatToParts(date).map(({ type, value }) => [type, value]));
+  return `${parts.year}-${parts.month}`;
+}
+
 export class ReportService {
   /**
    * Get role-specific dashboard metrics and recent tickets
@@ -483,6 +492,34 @@ export class ReportService {
       (sum, ticket) => sum + (ticket.approvedEstimate?.totalAmount || 0),
       0,
     );
+    const monthlyRevenue = new Map<string, { totalRevenue: number; serviceCount: number }>();
+    for (const ticket of revenueTickets) {
+      if (!ticket.readyAt) continue;
+      const month = businessMonthKey(ticket.readyAt, timezone);
+      const current = monthlyRevenue.get(month) || { totalRevenue: 0, serviceCount: 0 };
+      current.totalRevenue += ticket.approvedEstimate?.totalAmount || 0;
+      current.serviceCount += 1;
+      monthlyRevenue.set(month, current);
+    }
+
+    const [startYear, startMonth] = businessMonthKey(startDate, timezone).split('-').map(Number);
+    const [endYear, endMonth] = businessMonthKey(endDate, timezone).split('-').map(Number);
+    const monthlyRevenueSeries: { month: string; label: string; totalRevenue: number; serviceCount: number }[] = [];
+    let monthCursor = new Date(Date.UTC(startYear, startMonth - 1, 1));
+    const lastMonth = new Date(Date.UTC(endYear, endMonth - 1, 1));
+    while (monthCursor <= lastMonth) {
+      const year = monthCursor.getUTCFullYear();
+      const monthNumber = monthCursor.getUTCMonth() + 1;
+      const month = `${year}-${String(monthNumber).padStart(2, '0')}`;
+      const label = new Intl.DateTimeFormat('id-ID', {
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'UTC',
+      }).format(new Date(Date.UTC(year, monthNumber - 1, 15)));
+      const totals = monthlyRevenue.get(month) || { totalRevenue: 0, serviceCount: 0 };
+      monthlyRevenueSeries.push({ month, label, ...totals });
+      monthCursor = new Date(Date.UTC(year, monthNumber, 1));
+    }
 
     // Format status distribution
     const statusDistribution: Record<string, number> = {
@@ -579,6 +616,7 @@ export class ReportService {
       revenue: {
         totalRevenue,
         serviceCount: revenueTickets.length,
+        byMonth: monthlyRevenueSeries,
       },
       volume: {
         ticketsCompleted: completedTicketsInPeriod.length,

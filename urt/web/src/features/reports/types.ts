@@ -21,6 +21,12 @@ export interface ReportOverviewData {
   revenue: {
     totalRevenue: number;
     serviceCount: number;
+    byMonth: {
+      month: string;
+      label: string;
+      totalRevenue: number;
+      serviceCount: number;
+    }[];
   };
   volume: {
     ticketsCompleted: number;

@@ -46,7 +46,12 @@ export default function OwnerReportsPage() {
     return toDateInputValue(new Date());
   };
 
-  const [startDate, setStartDate] = useState(getMonthStart);
+  const getSixMonthStart = () => {
+    const now = new Date();
+    return toDateInputValue(new Date(now.getFullYear(), now.getMonth() - 5, 1));
+  };
+
+  const [startDate, setStartDate] = useState(getSixMonthStart);
   const [endDate, setEndDate] = useState(getToday);
 
   const { data, isLoading, refetch } = useGetReportOverviewQuery(
@@ -76,6 +81,12 @@ export default function OwnerReportsPage() {
     setEndDate(toDateInputValue(end));
   };
 
+  const setMonthPreset = (months: number) => {
+    const end = new Date();
+    setStartDate(toDateInputValue(new Date(end.getFullYear(), end.getMonth() - months + 1, 1)));
+    setEndDate(toDateInputValue(end));
+  };
+
   if (isLoading && !report) {
     return <PageLoader />;
   }
@@ -95,6 +106,8 @@ export default function OwnerReportsPage() {
   const { revenue, volume, sla, invoices, technicians } = report;
   const statusDistribution = Object.entries(report.statusDistribution).map(([status, count]) => ({ status, count }));
   const hasTickets = statusDistribution.some(({ count }) => count > 0);
+  const maxMonthlyRevenue = Math.max(...revenue.byMonth.map((month) => month.totalRevenue), 1);
+  const hasMonthlyRevenue = revenue.byMonth.some((month) => month.totalRevenue > 0);
 
   return (
     <div className={`container page-content ${styles.container}`}>
@@ -123,6 +136,14 @@ export default function OwnerReportsPage() {
             Rentang Waktu Laporan:
           </strong>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Button
+              type="button"
+              variant="secondary"
+              style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+              onClick={() => setMonthPreset(6)}
+            >
+              6 Bulan Terakhir
+            </Button>
             <Button
               type="button"
               variant="secondary"
@@ -204,6 +225,38 @@ export default function OwnerReportsPage() {
           icon="clock"
         />
       </div>
+      <section className={`${ticketStyles.ticketCard} ${styles.monthlyRevenuePanel}`}>
+        <div>
+          <h2>Perbandingan Pendapatan per Bulan</h2>
+          <p>Nilai estimasi disetujui dari servis yang selesai pada rentang laporan.</p>
+        </div>
+        {revenue.byMonth.length === 0 ? (
+          <p className={styles.monthlyRevenueEmpty}>Belum ada pendapatan servis selesai pada rentang ini.</p>
+        ) : (
+          <>
+            {!hasMonthlyRevenue && (
+              <p className={styles.monthlyRevenueEmpty}>Belum ada pendapatan servis selesai pada rentang ini.</p>
+            )}
+            <div className={styles.monthlyRevenueList} role="img" aria-label="Grafik perbandingan pendapatan bulanan">
+              {revenue.byMonth.map((month) => {
+                const width = month.totalRevenue > 0 ? Math.max(2, (month.totalRevenue / maxMonthlyRevenue) * 100) : 0;
+                return (
+                <div className={styles.monthlyRevenueRow} key={month.month}>
+                  <div className={styles.monthlyRevenueLabel}>
+                    <strong>{month.label}</strong>
+                    <span>{formatRupiah(month.totalRevenue)} · {month.serviceCount} servis</span>
+                  </div>
+                  <div className={styles.monthlyRevenueTrack}>
+                    <div style={{ width: `${width}%` }} />
+                  </div>
+                </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </section>
+
       <div className="reference-columns">
         <section className="reference-panel">
           <h2>Volume Servis dalam Periode</h2>
