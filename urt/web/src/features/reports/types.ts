@@ -20,8 +20,7 @@ export interface ReportOverviewData {
   };
   revenue: {
     totalRevenue: number;
-    paymentCount: number;
-    byMethod: Record<string, number>;
+    serviceCount: number;
   };
   volume: {
     ticketsCompleted: number;

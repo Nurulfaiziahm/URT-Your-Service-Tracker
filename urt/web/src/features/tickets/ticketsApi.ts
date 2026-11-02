@@ -24,7 +24,7 @@ export const ticketsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     deleteAnonymousTicket: builder.mutation<ApiResponse<null>, { businessId: string; ticketId: string; expectedRevision: number }>({
       query: ({ businessId, ticketId, expectedRevision }) => ({ url: `/businesses/${encodeURIComponent(businessId)}/tickets/${encodeURIComponent(ticketId)}`, method: 'DELETE', body: { expectedRevision } }),
-      invalidatesTags: ['Tickets', 'Dashboard'],
+      invalidatesTags: ['Tickets', 'Dashboard', 'Reports'],
     }),
     getCustomerApprovalLink: builder.query<ApiResponse<{ approvalUrl: string; expiresAt: string }>, { businessId: string; ticketId: string; estimateVersion: number }>({
       query: ({ businessId, ticketId, estimateVersion }) => ({ url: `/businesses/${encodeURIComponent(businessId)}/tickets/${encodeURIComponent(ticketId)}/customer-approval-link`, method: 'POST', body: { estimateVersion } }),
@@ -36,13 +36,13 @@ export const ticketsApi = baseApi.injectEndpoints({
     }),
     respondServiceApproval: builder.mutation<ApiResponse<{ decision: 'approved' | 'rejected' }>, { token: string; expectedRevision: number; decision: 'approved' | 'rejected'; reason?: string }>({
       query: (body) => ({ url: '/public/service-approvals/respond', method: 'POST', body }),
-      invalidatesTags: ['Tickets', 'Dashboard'],
+      invalidatesTags: ['Tickets', 'Dashboard', 'Reports'],
     }),
     submitServiceRequest: builder.mutation<ApiResponse<ServiceRequestReceipt>, { slug: string; body: ServiceRequestInput }>({
       query: ({ slug, body }) => ({
         url: `/public/businesses/${encodeURIComponent(slug)}/service-requests`, method: 'POST', body,
       }),
-      invalidatesTags: ['Tickets', 'Membership:ME', 'Dashboard'],
+      invalidatesTags: ['Tickets', 'Membership:ME', 'Dashboard', 'Reports'],
     }),
     getTickets: builder.query<
       PaginatedResponse<ServiceTicket>,
@@ -81,7 +81,7 @@ export const ticketsApi = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['Tickets', 'Membership:ME', 'Dashboard'],
+      invalidatesTags: ['Tickets', 'Membership:ME', 'Dashboard', 'Reports'],
     }),
 
     assignTechnician: builder.mutation<
@@ -96,6 +96,7 @@ export const ticketsApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _err, { ticketId }) => [
         'Tickets',
         'Dashboard',
+        'Reports',
         { type: 'Tickets', id: ticketId },
       ],
     }),
@@ -157,6 +158,7 @@ export const ticketsApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _err, { ticketId }) => [
         'Tickets',
         'Dashboard',
+        'Reports',
         { type: 'Tickets', id: ticketId },
       ],
     }),
@@ -173,6 +175,7 @@ export const ticketsApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _err, { ticketId }) => [
         'Tickets',
         'Dashboard',
+        'Reports',
         { type: 'Tickets', id: ticketId },
       ],
     }),
@@ -189,6 +192,7 @@ export const ticketsApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _err, { ticketId }) => [
         'Tickets',
         'Dashboard',
+        'Reports',
         { type: 'Tickets', id: ticketId },
       ],
     }),
@@ -205,6 +209,7 @@ export const ticketsApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _err, { ticketId }) => [
         'Tickets',
         'Dashboard',
+        'Reports',
         { type: 'Tickets', id: ticketId },
       ],
     }),

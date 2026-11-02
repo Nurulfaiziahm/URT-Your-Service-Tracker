@@ -22,6 +22,13 @@ const statusColors: Record<StatusTone, string> = {
   danger: '#dc2626',
 };
 
+function toDateInputValue(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function statusColor(status: string) {
   const definition = ticketStatuses[status as TicketStatus];
   return definition ? statusColors[definition.tone] : statusColors.neutral;
@@ -32,11 +39,11 @@ export default function OwnerReportsPage() {
 
   const getMonthStart = () => {
     const d = new Date();
-    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0];
+    return toDateInputValue(new Date(d.getFullYear(), d.getMonth(), 1));
   };
 
   const getToday = () => {
-    return new Date().toISOString().split('T')[0];
+    return toDateInputValue(new Date());
   };
 
   const [startDate, setStartDate] = useState(getMonthStart);
@@ -46,11 +53,17 @@ export default function OwnerReportsPage() {
     {
       businessId: businessId || '',
       params: {
-        startDate: startDate ? new Date(startDate).toISOString() : undefined,
-        endDate: endDate ? new Date(endDate + 'T23:59:59.999Z').toISOString() : undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
       },
     },
-    { skip: !businessId },
+    {
+      skip: !businessId,
+      pollingInterval: 60_000,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMountOrArgChange: true,
+    },
   );
 
   const report = data?.data;
@@ -59,8 +72,8 @@ export default function OwnerReportsPage() {
     const end = new Date();
     const start = new Date();
     start.setDate(end.getDate() - days);
-    setStartDate(start.toISOString().split('T')[0]);
-    setEndDate(end.toISOString().split('T')[0]);
+    setStartDate(toDateInputValue(start));
+    setEndDate(toDateInputValue(end));
   };
 
   if (isLoading && !report) {
@@ -81,7 +94,6 @@ export default function OwnerReportsPage() {
 
   const { revenue, volume, sla, invoices, technicians } = report;
   const statusDistribution = Object.entries(report.statusDistribution).map(([status, count]) => ({ status, count }));
-  const paymentMethods = Object.entries(revenue.byMethod);
   const hasTickets = statusDistribution.some(({ count }) => count > 0);
 
   return (
@@ -91,7 +103,7 @@ export default function OwnerReportsPage() {
           <span className="eyebrow">Analisis Bisnis</span>
           <h1>Laporan Keuangan & Performa</h1>
           <p>
-            Ringkasan pendapatan kas aktual, volume pengerjaan servis, dan metrik kepatuhan SLA.
+            Pendapatan dihitung dari estimasi yang disetujui pada servis yang selesai. Servis yang ditolak tidak dihitung.
           </p>
         </div>
       </header>
@@ -172,9 +184,9 @@ export default function OwnerReportsPage() {
 
       <div className="reference-stats">
         <SummaryCard
-          label="Pendapatan"
+          label="Pendapatan Servis Selesai"
           value={formatRupiah(revenue.totalRevenue)}
-          detail={`${revenue.paymentCount} pembayaran`}
+          detail={`${revenue.serviceCount} servis dengan estimasi disetujui`}
           icon="wallet"
           tone="green"
         />
@@ -252,7 +264,7 @@ export default function OwnerReportsPage() {
         </p>
       </div>
 
-      {/* Revenue by Method & Status Distribution */}
+      {/* Revenue basis & Status Distribution */}
       <div
         style={{
           display: 'grid',
@@ -260,35 +272,14 @@ export default function OwnerReportsPage() {
           gap: 16,
         }}
       >
-        {/* Payment Methods */}
+        {/* Revenue basis */}
         <div className={ticketStyles.ticketCard}>
-          <h2>Pendapatan per Metode Pembayaran</h2>
-          {paymentMethods.length === 0 ? (
-            <p style={{ margin: 0, color: 'var(--slate-500)', fontStyle: 'italic' }}>
-              Belum ada transaksi pembayaran pada rentang tanggal ini.
-            </p>
-          ) : (
-            <ResponsiveTable className={ticketStyles.tableWrapper}>
-              <table className={ticketStyles.table}>
-                <thead>
-                  <tr>
-                    <th>Metode Pembayaran</th>
-                    <th className={ticketStyles.textRight}>Total Diterima</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paymentMethods.map(([method, total]) => (
-                    <tr key={method}>
-                      <td style={{ textTransform: 'uppercase', fontWeight: 600 }}>{method}</td>
-                      <td className={ticketStyles.textRight}>
-                        <strong>{formatRupiah(total)}</strong>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </ResponsiveTable>
-          )}
+          <h2>Dasar Perhitungan Pendapatan</h2>
+          <p style={{ margin: 0, color: 'var(--slate-600)' }}>
+            Total berasal dari nilai estimasi yang disetujui untuk servis berstatus selesai pada rentang tanggal ini.
+            Transaksi dilakukan langsung di toko, jadi laporan tidak bergantung pada pencatatan pembayaran di aplikasi.
+            Tiket yang ditolak pelanggan dan servis tanpa estimasi disetujui tidak dihitung.
+          </p>
         </div>
 
         {/* Status Distribution */}

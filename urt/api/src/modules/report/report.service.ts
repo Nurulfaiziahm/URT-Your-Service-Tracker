@@ -10,6 +10,48 @@ import { serializeTicket } from '../ticket/ticket.serializer.js';
 import { ReportOverviewQueryParams } from './report.schema.js';
 import { SubscriptionService } from '../subscription/subscription.service.js';
 
+function businessDateBoundary(dateInput: string, timezone: string, endOfDay = false): Date {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) return new Date(dateInput);
+
+  const [year, month, day] = dateInput.split('-').map(Number);
+  const dayStartUtc = Date.UTC(year, month - 1, day + (endOfDay ? 1 : 0));
+  let boundary = dayStartUtc;
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  });
+
+  // Convert local midnight to UTC by correcting the timezone offset.
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const parts = Object.fromEntries(formatter.formatToParts(new Date(boundary)).map(({ type, value }) => [type, value]));
+    const localAsUtc = Date.UTC(
+      Number(parts.year), Number(parts.month) - 1, Number(parts.day),
+      Number(parts.hour), Number(parts.minute), Number(parts.second),
+    );
+    const correctedBoundary = dayStartUtc - (localAsUtc - boundary);
+    if (correctedBoundary === boundary) break;
+    boundary = correctedBoundary;
+  }
+
+  return new Date(boundary - (endOfDay ? 1 : 0));
+}
+
+function currentBusinessDate(now: Date, timezone: string): string {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now).map(({ type, value }) => [type, value]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
 export class ReportService {
   /**
    * Get role-specific dashboard metrics and recent tickets
@@ -60,7 +102,6 @@ export class ReportService {
         totalCustomers,
         activeTechnicians,
         recentDocs,
-        revenueAgg,
         unpaidInvoices,
         completedTicketsInMonth,
       ] = await Promise.all([
@@ -105,13 +146,6 @@ export class ReportService {
             { path: 'assignedTechnicianId', select: 'name email phone specializations' },
             { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
           ]),
-        // Revenue this month: sum payments where paidAt is this month
-        ServiceInvoice.aggregate([
-          { $match: { businessId: businessObjectId } },
-          { $unwind: '$payments' },
-          { $match: { 'payments.paidAt': { $gte: startOfMonth, $lte: endOfMonth } } },
-          { $group: { _id: null, totalRevenue: { $sum: '$payments.amount' }, paymentCount: { $sum: 1 } } },
-        ]),
         // Unpaid or partially paid invoices
         ServiceInvoice.find({
           businessId: businessObjectId,
@@ -126,7 +160,11 @@ export class ReportService {
       ]);
 
       const recentTickets = recentDocs.map((ticket) => serializeTicket(ticket, 'owner'));
-      const revenueThisMonth = revenueAgg[0]?.totalRevenue || 0;
+      const revenueThisMonth = completedTicketsInMonth.reduce((sum, ticket) => (
+        ticket.approvedEstimate?.status === 'approved'
+          ? sum + ticket.approvedEstimate.totalAmount
+          : sum
+      ), 0);
       const unpaidInvoicesCount = unpaidInvoices.length;
       const unpaidInvoicesBalance = unpaidInvoices.reduce((sum, inv) => sum + inv.balance, 0);
 
@@ -366,20 +404,15 @@ export class ReportService {
 
     // Date range parsing & bounding
     const now = new Date();
+    const timezone = business.timezone || 'Asia/Jakarta';
+    const businessToday = currentBusinessDate(now, timezone);
     let startDate: Date;
     let endDate: Date;
 
-    if (query?.startDate) {
-      startDate = new Date(query.startDate);
-    } else {
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-    }
-
-    if (query?.endDate) {
-      endDate = new Date(query.endDate);
-    } else {
-      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    }
+    const startInput = query?.startDate || `${businessToday.slice(0, 7)}-01`;
+    const endInput = query?.endDate || businessToday;
+    startDate = businessDateBoundary(startInput, timezone);
+    endDate = businessDateBoundary(endInput, timezone, true);
 
     if (startDate > endDate) {
       throw new AppError('startDate cannot be after endDate', 400, 'INVALID_DATE_RANGE');
@@ -392,8 +425,6 @@ export class ReportService {
 
     // Parallel aggregations
     const [
-      revenueByMethodAgg,
-      totalRevenueAgg,
       completedTicketsInPeriod,
       incomingTicketsCount,
       statusCountsAgg,
@@ -401,56 +432,30 @@ export class ReportService {
       unpaidInvoices,
       issuedInPeriodAgg,
     ] = await Promise.all([
-      // 1. Payments broken down by paymentMethod
-      ServiceInvoice.aggregate([
-        { $match: { businessId: businessObjectId } },
-        { $unwind: '$payments' },
-        { $match: { 'payments.paidAt': { $gte: startDate, $lte: endDate } } },
-        {
-          $group: {
-            _id: '$payments.paymentMethod',
-            total: { $sum: '$payments.amount' },
-            count: { $sum: 1 },
-          },
-        },
-      ]),
-      // 2. Total revenue in period
-      ServiceInvoice.aggregate([
-        { $match: { businessId: businessObjectId } },
-        { $unwind: '$payments' },
-        { $match: { 'payments.paidAt': { $gte: startDate, $lte: endDate } } },
-        {
-          $group: {
-            _id: null,
-            totalRevenue: { $sum: '$payments.amount' },
-            paymentCount: { $sum: 1 },
-          },
-        },
-      ]),
-      // 3. Completed tickets in period (for volume and SLA)
+      // 1. Completed tickets in period (for revenue, volume, and SLA)
       ServiceTicket.find({ deletedAt: { $exists: false },
         businessId: businessObjectId,
         status: 'completed',
         readyAt: { $gte: startDate, $lte: endDate },
       }),
-      // 4. Incoming tickets in period
+      // 2. Incoming tickets in period
       ServiceTicket.countDocuments({ deletedAt: { $exists: false },
         businessId: businessObjectId,
         createdAt: { $gte: startDate, $lte: endDate },
       }),
-      // 5. Status distribution across all business tickets
+      // 3. Status distribution across all business tickets
       ServiceTicket.aggregate([
         { $match: { deletedAt: { $exists: false }, businessId: businessObjectId } },
         { $group: { _id: '$status', count: { $sum: 1 } } },
       ]),
-      // 6. Active technicians
+      // 4. Active technicians
       Technician.find({ businessId: businessObjectId, status: 'active' }),
-      // 7. Unpaid invoices balance
+      // 5. Unpaid invoices balance
       ServiceInvoice.find({
         businessId: businessObjectId,
         status: { $in: ['issued', 'partially_paid'] },
       }),
-      // 8. Invoices issued in period
+      // 6. Invoices issued in period
       ServiceInvoice.aggregate([
         {
           $match: {
@@ -468,13 +473,16 @@ export class ReportService {
       ]),
     ]);
 
-    // Format revenue data
-    const totalRevenue = totalRevenueAgg[0]?.totalRevenue || 0;
-    const paymentCount = totalRevenueAgg[0]?.paymentCount || 0;
-    const revenueByMethod: Record<string, number> = {};
-    for (const item of revenueByMethodAgg) {
-      revenueByMethod[item._id] = item.total;
-    }
+    // Offline service transactions are not recorded as app payments. Count the
+    // approved estimate only after the ticket is completed; rejected estimates
+    // and tickets without an approved estimate do not contribute revenue.
+    const revenueTickets = completedTicketsInPeriod.filter(
+      (ticket) => ticket.status === 'completed' && ticket.approvedEstimate?.status === 'approved',
+    );
+    const totalRevenue = revenueTickets.reduce(
+      (sum, ticket) => sum + (ticket.approvedEstimate?.totalAmount || 0),
+      0,
+    );
 
     // Format status distribution
     const statusDistribution: Record<string, number> = {
@@ -566,12 +574,11 @@ export class ReportService {
         startDate,
         endDate,
         days: diffDays,
-        timezone: business.timezone || 'Asia/Jakarta',
+        timezone,
       },
       revenue: {
         totalRevenue,
-        paymentCount,
-        byMethod: revenueByMethod,
+        serviceCount: revenueTickets.length,
       },
       volume: {
         ticketsCompleted: completedTicketsInPeriod.length,

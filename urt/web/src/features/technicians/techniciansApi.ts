@@ -9,7 +9,7 @@ export const techniciansApi = baseApi.injectEndpoints({
     }),
     activateTechnicianInvitation: builder.mutation<ApiResponse<{ email: string; membership: { businessId: string; role: 'technician' } }>, { token: string; password: string; confirmPassword: string }>({
       query: (body) => ({ url: '/technician-invitations/activate', method: 'POST', body }),
-      invalidatesTags: ['Membership:ME', 'Technicians'],
+      invalidatesTags: ['Membership:ME', 'Technicians', 'Reports'],
     }),
     getTechnician: builder.query<
       ApiResponse<{ technician: Technician }>,
@@ -41,7 +41,7 @@ export const techniciansApi = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['Technicians'],
+      invalidatesTags: ['Technicians', 'Reports'],
     }),
 
     resendTechnicianInvitation: builder.mutation<
@@ -59,7 +59,7 @@ export const techniciansApi = baseApi.injectEndpoints({
         url: `/businesses/${encodeURIComponent(businessId)}/technicians/${encodeURIComponent(technicianId)}/invitation`,
         method: 'POST',
       }),
-      invalidatesTags: ['Technicians'],
+      invalidatesTags: ['Technicians', 'Reports'],
     }),
 
     deleteTechnician: builder.mutation<void, { businessId: string; technicianId: string }>({
@@ -67,7 +67,7 @@ export const techniciansApi = baseApi.injectEndpoints({
         url: `/businesses/${encodeURIComponent(businessId)}/technicians/${encodeURIComponent(technicianId)}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Technicians'],
+      invalidatesTags: ['Technicians', 'Reports'],
     }),
 
     updateTechnician: builder.mutation<
@@ -79,7 +79,7 @@ export const techniciansApi = baseApi.injectEndpoints({
         method: 'PUT',
         body,
       }),
-      invalidatesTags: ['Technicians'],
+      invalidatesTags: ['Technicians', 'Reports'],
     }),
 
     acceptTechnicianInvitation: builder.mutation<
@@ -91,7 +91,7 @@ export const techniciansApi = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['Membership:ME', 'Technicians'],
+      invalidatesTags: ['Membership:ME', 'Technicians', 'Reports'],
     }),
   }),
 });
