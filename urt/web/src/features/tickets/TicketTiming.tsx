@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { durationLabel, ticketDeadline } from './service-timing';
+import { durationLabel, ticketDeadline, totalServiceDurationMinutes } from './service-timing';
 import type { ServiceTicket } from './types';
 import styles from './TicketTiming.module.css';
 import { StatusBadge } from '../../components/ui/StatusBadge';
@@ -15,15 +15,23 @@ export function DeadlineBadge({ ticket }: { ticket: ServiceTicket }) {
   </div>;
 }
 
-export function TicketTiming({ ticket }: { ticket: ServiceTicket }) {
+export function TicketTiming({ ticket, customerView = false }: { ticket: ServiceTicket; customerView?: boolean }) {
   const estimate = ticket.status === 'awaiting_approval' ? ticket.estimateRevisions?.at(-1) : ticket.approvedEstimate || ticket.estimateRevisions?.at(-1);
+  const totalServiceDuration = totalServiceDurationMinutes(estimate);
   if (!estimate && !ticket.repairDueAt && !ticket.qcDueAt) return null;
-  return <section className="reference-panel"><h2>Jadwal Pengerjaan & QC</h2>
-    <dl className="reference-dl"><div><dt>Estimasi pengerjaan</dt><dd>{durationLabel(estimate?.repairDurationMinutes)}</dd></div>
-      <div><dt>Estimasi QC</dt><dd>{durationLabel(estimate?.qcDurationMinutes)}</dd></div>
-      {estimate?.targetCompletionDate && <div><dt>Target siap diambil</dt><dd>{new Date(estimate.targetCompletionDate).toLocaleString('id-ID')}</dd></div>}
-      {ticket.repairDueAt && <div><dt>Target pengerjaan selesai</dt><dd>{new Date(ticket.repairDueAt).toLocaleString('id-ID')}</dd></div>}
-      {ticket.qcDueAt && <div><dt>Target QC selesai</dt><dd>{new Date(ticket.qcDueAt).toLocaleString('id-ID')}</dd></div>}
-    </dl><p className={styles.note}>Jadwal adalah estimasi. Teknisi mengonfirmasi pengerjaan selesai dan hasil QC secara terpisah.</p>
+  return <section className="reference-panel"><h2>{customerView ? 'Estimasi Servis Selesai' : 'Jadwal Pengerjaan & QC'}</h2>
+    <dl className="reference-dl">
+      {customerView ? (
+        totalServiceDuration && <div><dt>Durasi servis (termasuk QC)</dt><dd>{durationLabel(totalServiceDuration)}</dd></div>
+      ) : (
+        <>
+          <div><dt>Estimasi pengerjaan</dt><dd>{durationLabel(estimate?.repairDurationMinutes)}</dd></div>
+          <div><dt>Estimasi QC</dt><dd>{durationLabel(estimate?.qcDurationMinutes)}</dd></div>
+          {ticket.repairDueAt && <div><dt>Target pengerjaan selesai</dt><dd>{new Date(ticket.repairDueAt).toLocaleString('id-ID')}</dd></div>}
+          {ticket.qcDueAt && <div><dt>Target QC selesai</dt><dd>{new Date(ticket.qcDueAt).toLocaleString('id-ID')}</dd></div>}
+        </>
+      )}
+      {estimate?.targetCompletionDate && <div><dt>{customerView ? 'Perkiraan selesai' : 'Target siap diambil'}</dt><dd>{new Date(estimate.targetCompletionDate).toLocaleString('id-ID')}</dd></div>}
+    </dl><p className={styles.note}>{customerView ? 'Durasi mencakup pengerjaan dan pemeriksaan kualitas.' : 'Jadwal adalah estimasi. Teknisi mengonfirmasi pengerjaan selesai dan hasil QC secara terpisah.'}</p>
   </section>;
 }

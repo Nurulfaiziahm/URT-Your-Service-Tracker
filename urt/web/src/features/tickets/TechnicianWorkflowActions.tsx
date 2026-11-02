@@ -73,7 +73,7 @@ export function TechnicianWorkflowActions({
             onClick={() => handleSimpleTransition('repairing')}
             disabled={isLoading}
           >
-            {isLoading ? 'Memproses...' : 'Mulai Proses Perbaikan'}
+            {isLoading ? 'Memproses...' : 'Mulai Pengerjaan'}
           </Button>
         )}
 
@@ -106,7 +106,7 @@ export function TechnicianWorkflowActions({
             onClick={() => setActiveModal('pass_qc')}
             disabled={isLoading}
           >
-            QC Lulus, Siap Diambil
+            {ticket.status === 'repairing' ? 'QC Selesai, Barang Siap Diambil' : 'QC Lulus, Siap Diambil'}
           </Button>
         )}
 
@@ -119,6 +119,12 @@ export function TechnicianWorkflowActions({
             style={{ color: '#dc2626' }}
           >
             ✕ QC Gagal (Perlu Perbaikan Ulang)
+          </Button>
+        )}
+
+        {allowed.includes('extend_qc') && (
+          <Button type="button" variant="secondary" onClick={() => setActiveModal('delay_qc')} disabled={isLoading}>
+            Tunda QC & Tambah Estimasi
           </Button>
         )}
 

@@ -48,6 +48,7 @@ export interface EstimateLine {
 export interface EstimateRevision {
   repairDurationMinutes?: number;
   qcDurationMinutes?: number;
+  serviceDurationMinutes?: number;
   version: number;
   lines: EstimateLine[];
   currency: string;
@@ -223,6 +224,7 @@ export interface TransitionTicketInput {
   workSummary?: string;
   qcPassed?: boolean;
   qcNotes?: string;
+  qcDelayHours?: number;
   warrantyDays?: number;
   warrantyTerms?: string;
 }

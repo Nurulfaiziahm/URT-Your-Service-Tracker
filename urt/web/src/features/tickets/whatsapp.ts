@@ -1,6 +1,6 @@
 import type { ServiceTicket } from './types';
 import { formatRupiah } from './currency.ts';
-import { durationLabel } from './service-timing.ts';
+import { durationLabel, totalServiceDurationMinutes } from './service-timing.ts';
 import { difficultyLabels } from '../services/catalog.ts';
 
 export function whatsappMessageLink(phone: string | undefined, message: string) {
@@ -26,9 +26,8 @@ export function customerServiceUpdate(ticket: ServiceTicket, status: string, tec
       ...estimate.lines.map((line) => `${line.description} (${line.quantity}): ${formatRupiah(line.subtotal ?? line.quantity * line.unitPrice)}`),
       ...estimate.lines.filter((line) => line.difficultyLevel).map((line) => `Tingkat kesulitan: ${difficultyLabels[line.difficultyLevel!]}`),
       `Total estimasi: ${formatRupiah(estimate.totalAmount)}`,
-      `Estimasi pengerjaan: ${durationLabel(estimate.repairDurationMinutes)}`,
-      `Estimasi QC: ${durationLabel(estimate.qcDurationMinutes)}`,
-      estimate.targetCompletionDate && `Target siap diambil: ${new Date(estimate.targetCompletionDate).toLocaleString('id-ID')}`,
+      `Estimasi servis selesai (termasuk QC): ${durationLabel(totalServiceDurationMinutes(estimate))}`,
+      estimate.targetCompletionDate && `Perkiraan selesai: ${new Date(estimate.targetCompletionDate).toLocaleString('id-ID')}`,
       `Persetujuan biaya: ${approvalUrl}`,
     ] : ['Perbaikan dan QC telah selesai. Perangkat Anda siap diambil.', ticket.workSummary]),
     `Portal pelanggan: ${portalUrl}`,

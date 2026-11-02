@@ -106,7 +106,8 @@ export const estimateDraftSchema = z.object({
 export const submitEstimateSchema = z.object({
   body: z
     .object({
-      ...serviceTimingFields,
+      repairDurationMinutes: z.number().int().min(1).max(525600),
+      qcDurationMinutes: z.number().int().min(1).max(525600),
       expectedRevision: z.number().int().min(1, 'expectedRevision is required'),
       customerExplanation: z.string().trim().min(3).max(1000).optional(),
       lines: z.array(estimateLineInputSchema).min(1).optional(),
@@ -152,6 +153,7 @@ export const ticketTransitionSchema = z.object({
       workSummary: z.string().trim().max(1000).optional(),
       qcPassed: z.boolean().optional(),
       qcNotes: z.string().trim().max(500).optional(),
+      qcDelayHours: z.number().int().min(1).max(168).optional(),
       warrantyDays: z.number().int().min(0).optional(),
       warrantyTerms: z.string().trim().max(500).optional(),
     })

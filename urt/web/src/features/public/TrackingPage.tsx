@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import logo from '../../assets/logo-urt.svg';
-import { TicketTimeline } from '../tickets/TicketTimeline';
+import { currentStatusNote, TicketTimeline } from '../tickets/TicketTimeline';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useLocation, useParams } from 'react-router';
 import {
@@ -20,6 +20,7 @@ import styles from './InfoPages.module.css';
 import ticketStyles from '../tickets/Tickets.module.css';
 import timingStyles from '../tickets/TicketTiming.module.css';
 import { customerPortalPath } from '../customer/customer-portal';
+import { durationLabel, totalServiceDurationMinutes } from '../tickets/service-timing';
 
 function getTargetCompletionDate(now: Date): Date {
   const currentHour = now.getHours();
@@ -169,6 +170,7 @@ export default function TrackingPage() {
       submittedAt: new Date(demoNow - 3600000).toISOString(),
       repairDurationMinutes: 120,
       qcDurationMinutes: 30,
+      serviceDurationMinutes: 150,
       targetCompletionDate: demoTargetDate.toISOString(),
       decision: {
         decision: 'approved',
@@ -216,20 +218,16 @@ export default function TrackingPage() {
 
         {/* Stepper Card */}
         <div className={ticketStyles.ticketCard}>
-          <ServiceStepper status="approved" />
+          <ServiceStepper status="approved" statusNote={currentStatusNote('approved')} />
           <section className="reference-panel">
-            <h2>Jadwal Pengerjaan &amp; QC</h2>
+            <h2>Estimasi Servis Selesai</h2>
             <dl className="reference-dl">
               <div>
-                <dt>Estimasi pengerjaan</dt>
-                <dd>2 jam</dd>
+                <dt>Durasi servis (termasuk QC)</dt>
+                <dd>{durationLabel(totalServiceDurationMinutes(demoEstimate))}</dd>
               </div>
               <div>
-                <dt>Estimasi QC</dt>
-                <dd>30 menit</dd>
-              </div>
-              <div>
-                <dt>Target siap diambil</dt>
+                <dt>Perkiraan selesai</dt>
                 <dd>
                   {demoTargetDate.toLocaleString('id-ID', {
                     day: '2-digit',
@@ -242,7 +240,7 @@ export default function TrackingPage() {
               </div>
             </dl>
             <p className={timingStyles.note}>
-              Jadwal adalah estimasi. Teknisi mengonfirmasi pengerjaan selesai dan hasil QC secara terpisah.
+              Durasi yang ditampilkan mencakup pengerjaan dan pemeriksaan kualitas.
             </p>
           </section>
         </div>
@@ -402,7 +400,10 @@ export default function TrackingPage() {
                 </div>
 
                 {/* Progress Stepper */}
-                <ServiceStepper status={trackingResult.status} />
+                <ServiceStepper
+                  status={trackingResult.status}
+                  statusNote={currentStatusNote(trackingResult.status, trackingResult.timeline)}
+                />
 
                 {/* Device and Complaint */}
                 <div

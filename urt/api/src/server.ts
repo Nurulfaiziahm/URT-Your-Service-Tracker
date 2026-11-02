@@ -5,9 +5,11 @@ import { connectDatabase, disconnectDatabase } from './core/config/database.js';
 import { connectRedis, disconnectRedis } from './lib/redis/index.js';
 import { logger } from './utils/index.js';
 import { passwordRecovery } from './modules/auth/password-recovery.service.js';
+import { TicketService } from './modules/ticket/ticket.service.js';
 
 const PORT = Number(config.port);
 let server: http.Server;
+let ticketScheduleTimer: NodeJS.Timeout | undefined;
 
 const gracefulShutdown = async (signal: string): Promise<void> => {
   logger.info(`🛑 ${signal} received. Shutting down...`);
@@ -16,6 +18,7 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
 
   try {
     server?.close();
+    if (ticketScheduleTimer) clearInterval(ticketScheduleTimer);
     await passwordRecovery.waitForDeliveries();
     await disconnectRedis();
     await disconnectDatabase();
@@ -30,6 +33,15 @@ const startServer = async (): Promise<void> => {
   try {
     await connectRedis();
     await connectDatabase();
+
+    ticketScheduleTimer = setInterval(() => {
+      void TicketService.advanceTicketsByEstimate().catch((error) =>
+        logger.error('Could not process ticket estimate schedule', { error }),
+      );
+    }, 60_000);
+    void TicketService.advanceTicketsByEstimate().catch((error) =>
+      logger.error('Could not process ticket estimate schedule', { error }),
+    );
 
     server = http.createServer(app);
 

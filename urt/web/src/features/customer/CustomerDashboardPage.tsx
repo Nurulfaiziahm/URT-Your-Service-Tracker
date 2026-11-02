@@ -11,10 +11,10 @@ import { EmptyState, PageLoader } from '../../components/feedback/Feedback';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { TicketTable } from '../tickets/TicketTable';
 import { serviceWorkflowStages, serviceProgressState } from '../tickets/status';
-import { durationLabel } from '../tickets/service-timing';
+import { durationLabel, totalServiceDurationMinutes } from '../tickets/service-timing';
 import { useGetPublicTrackingMutation } from '../tickets/ticketsApi';
 import { ServiceStepper } from '../tickets/ServiceStepper';
-import { TicketTimeline } from '../tickets/TicketTimeline';
+import { currentStatusNote, TicketTimeline } from '../tickets/TicketTimeline';
 import type { PublicTrackingResult } from '../tickets/types';
 import { whatsappMessageLink } from '../tickets/whatsapp';
 import styles from './CustomerDashboard.module.css';
@@ -116,7 +116,7 @@ function TrackedTicketPanel({ ticket }: { ticket: PublicTrackingResult }) {
 
       <section className={styles.journeyCard}>
         <div className={styles.journeyHeader}><h2>Perjalanan Servis</h2></div>
-        <ServiceStepper status={ticket.status} />
+        <ServiceStepper status={ticket.status} statusNote={currentStatusNote(ticket.status, ticket.timeline)} />
         <div>
           <h3 className={styles.timelineHeading}>Riwayat Status</h3>
           <TicketTimeline timeline={ticket.timeline} />
@@ -229,15 +229,8 @@ export default function CustomerDashboardPage() {
         hour: '2-digit',
         minute: '2-digit',
       })
-    : ticket?.repairDueAt
-      ? new Date(ticket.repairDueAt).toLocaleString('id-ID', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      : '30/10/2026, 16.25';
+    : undefined;
+  const totalServiceDuration = totalServiceDurationMinutes(estimate);
 
   const techPhone = ticket?.technician?.phone;
   const techName = ticket?.technician?.name || 'Patrick Star';
@@ -474,21 +467,18 @@ export default function CustomerDashboardPage() {
                 </ol>
               </div>
 
-              {/* Jadwal Pengerjaan & QC */}
+            <p className={styles.scheduleNote} role="status">
+              {currentStatusNote(ticket.status, ticket.timeline)}
+            </p>
+
+              {/* Estimasi Servis Selesai */}
               <div className={styles.scheduleCard}>
-                <h3 className={styles.scheduleTitle}>Jadwal Pengerjaan &amp; QC</h3>
+                <h3 className={styles.scheduleTitle}>Estimasi Servis Selesai</h3>
                 <dl className={styles.scheduleDl}>
-                  <div>
-                    <dt>Estimasi pengerjaan</dt>
-                    <dd>{durationLabel(estimate?.repairDurationMinutes) || '2 jam'}</dd>
-                  </div>
-                  <div>
-                    <dt>Estimasi QC</dt>
-                    <dd>{durationLabel(estimate?.qcDurationMinutes) || '30 menit'}</dd>
-                  </div>
+                  {totalServiceDuration && <div><dt>Durasi servis (termasuk QC)</dt><dd>{durationLabel(totalServiceDuration)}</dd></div>}
                   {targetDateFormatted && (
                     <div>
-                      <dt>Target siap diambil</dt>
+                      <dt>Perkiraan selesai</dt>
                       <dd>{targetDateFormatted}</dd>
                     </div>
                   )}
@@ -499,7 +489,7 @@ export default function CustomerDashboardPage() {
                     <line x1="12" y1="16" x2="12" y2="12" />
                     <line x1="12" y1="8" x2="12.01" y2="8" />
                   </svg>
-                  <span>Jadwal adalah estimasi. Teknisi mengonfirmasi pengerjaan selesai dan hasil QC secara terpisah.</span>
+                  <span>Durasi yang ditampilkan mencakup pengerjaan dan pemeriksaan kualitas.</span>
                 </div>
               </div>
             </div>

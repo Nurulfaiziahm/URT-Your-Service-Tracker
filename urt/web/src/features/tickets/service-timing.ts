@@ -6,6 +6,16 @@ export function durationLabel(minutes?: number) {
   return [hours ? `${hours} jam` : '', rest ? `${rest} menit` : ''].filter(Boolean).join(' ');
 }
 
+export function totalServiceDurationMinutes(estimate?: {
+  serviceDurationMinutes?: number;
+  repairDurationMinutes?: number;
+  qcDurationMinutes?: number;
+}) {
+  if (!estimate) return undefined;
+  const total = estimate.serviceDurationMinutes ?? (estimate.repairDurationMinutes || 0) + (estimate.qcDurationMinutes || 0);
+  return total > 0 ? total : undefined;
+}
+
 export function ticketDeadline(ticket: Pick<ServiceTicket, 'status' | 'nextDeadlineAt'>, now = Date.now()) {
   const due = ticket.nextDeadlineAt ? new Date(ticket.nextDeadlineAt).getTime() : NaN;
   if (['completed', 'cancelled', 'rejected'].includes(ticket.status) || !Number.isFinite(due)) return { level: 'normal', rank: 3, label: 'Tanpa tenggat', remaining: '', dueAt: undefined };

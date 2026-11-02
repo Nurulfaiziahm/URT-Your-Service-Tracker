@@ -8,7 +8,7 @@ import { InlineNotice } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from './Tickets.module.css';
 
-export type QCOperation = 'submit_qc' | 'pass_qc' | 'fail_qc' | 'reopen_diagnosis';
+export type QCOperation = 'submit_qc' | 'pass_qc' | 'fail_qc' | 'delay_qc' | 'reopen_diagnosis';
 
 interface QCActionModalProps {
   businessId: string;
@@ -27,6 +27,7 @@ export function QCActionModal({
 }: QCActionModalProps) {
   const [workSummary, setWorkSummary] = useState(ticket.workSummary || '');
   const [qcNotes, setQcNotes] = useState('');
+  const [qcDelayHours, setQcDelayHours] = useState('1');
   const [warrantyDays, setWarrantyDays] = useState('30');
   const [warrantyTerms, setWarrantyTerms] = useState(
     'Garansi perbaikan meliputi kerusakan komponen yang sama. Segel tidak boleh rusak.',
@@ -44,6 +45,8 @@ export function QCActionModal({
         return 'Persetujuan QC (Lolos Uji & Selesai)';
       case 'fail_qc':
         return 'Pengujian QC Gagal (Perlu Perbaikan Ulang)';
+      case 'delay_qc':
+        return 'Tunda Quality Check';
       case 'reopen_diagnosis':
         return 'Buka Kembali Diagnosis Tiket';
     }
@@ -95,6 +98,21 @@ export function QCActionModal({
             targetStatus: 'repairing',
             qcPassed: false,
             qcNotes: qcNotes.trim(),
+          },
+        }).unwrap();
+      } else if (operation === 'delay_qc') {
+        if (!reason.trim()) {
+          setErrorMsg('Alasan penundaan QC wajib diisi.');
+          return;
+        }
+        await transition({
+          businessId,
+          ticketId: ticket.id,
+          body: {
+            expectedRevision: ticket.revision,
+            targetStatus: 'quality_check',
+            qcDelayHours: parseInt(qcDelayHours, 10),
+            reason: reason.trim(),
           },
         }).unwrap();
       } else if (operation === 'reopen_diagnosis') {
@@ -229,6 +247,17 @@ export function QCActionModal({
                 required
               />
             </div>
+          )}
+
+          {operation === 'delay_qc' && (
+            <>
+              <TextInput id="qcDelayHours" label="Tambahan Estimasi QC (Jam)" type="number" min="1" max="168" value={qcDelayHours} onChange={(e) => setQcDelayHours(e.target.value)} required />
+              <div style={{ display: 'grid', gap: 6 }}>
+                <label htmlFor="qcDelayReason" style={{ fontWeight: 600, fontSize: '0.9rem' }}>Alasan Penundaan (Wajib):</label>
+                <textarea id="qcDelayReason" rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Contoh: Menunggu alat pengujian tersedia." required style={{ padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', fontFamily: 'inherit', fontSize: '0.9rem' }} />
+              </div>
+              <p>Estimasi servis selesai pelanggan akan ditambah {qcDelayHours} jam.</p>
+            </>
           )}
 
           {operation === 'reopen_diagnosis' && (

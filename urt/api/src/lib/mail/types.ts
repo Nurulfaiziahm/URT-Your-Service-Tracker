@@ -101,6 +101,7 @@ export interface EstimateReadyTemplateData {
   device: string;
   totalAmount: number;
   customerExplanation: string;
+  serviceDuration?: string;
   targetCompletionDate?: string | Date;
   approvalUrl?: string;
   timezone?: string;

@@ -1,7 +1,7 @@
 import { serviceProgressState, serviceWorkflowStages, type TicketStatus } from './status';
 import styles from './Tickets.module.css';
 
-export function ServiceStepper({ status, className }: { status: TicketStatus; className?: string }) {
+export function ServiceStepper({ status, className, statusNote }: { status: TicketStatus; className?: string; statusNote?: string }) {
   const stopped = status === 'cancelled' || status === 'rejected';
   return (
     <div className={[styles.serviceStatus, className].filter(Boolean).join(' ')}>
@@ -25,9 +25,9 @@ export function ServiceStepper({ status, className }: { status: TicketStatus; cl
           );
         })}
       </ol>
-      {stopped && (
-        <p className={`${styles.stepNotice} ${status === 'rejected' ? styles.stepNoticeDanger : ''}`} role="status">
-          {status === 'rejected' ? 'Estimasi ditolak. Menunggu tindak lanjut tempat servis.' : 'Pengajuan servis dibatalkan.'}
+      {(statusNote || stopped) && (
+        <p className={`${styles.stepNotice} ${status === 'rejected' || status === 'cancelled' ? styles.stepNoticeDanger : ''}`} role="status">
+          {statusNote || (status === 'rejected' ? 'Estimasi ditolak. Menunggu tindak lanjut tempat servis.' : 'Pengajuan servis dibatalkan.')}
         </p>
       )}
     </div>

@@ -34,6 +34,14 @@ import {
   AddAttachmentInput,
 } from './ticket.schema.js';
 
+const formatServiceDuration = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return [hours ? `${hours} jam` : '', remainingMinutes ? `${remainingMinutes} menit` : '']
+    .filter(Boolean)
+    .join(' ') || 'Kurang dari 1 menit';
+};
+
 export class TicketService {
   static async deleteAnonymousTicket(businessId: string, ticketId: string, ownerUserId: string, expectedRevision: number) {
     validateObjectId(businessId, 'Business');
@@ -92,7 +100,8 @@ export class TicketService {
       device: { category: ticket.device.category, brand: ticket.device.brand, model: ticket.device.model },
       estimate: { version: estimate.version, lines: estimate.lines, currency: estimate.currency, totalAmount: estimate.totalAmount,
         customerExplanation: estimate.customerExplanation, submittedAt: estimate.submittedAt, status: estimate.status,
-        targetCompletionDate: estimate.targetCompletionDate, repairDurationMinutes: estimate.repairDurationMinutes, qcDurationMinutes: estimate.qcDurationMinutes } };
+        targetCompletionDate: estimate.targetCompletionDate,
+        serviceDurationMinutes: (estimate.repairDurationMinutes || 0) + (estimate.qcDurationMinutes || 0) } };
   }
 
   static async respondToCustomerApproval(token: string, input: Omit<ApprovalInput, 'estimateVersion'>) {
@@ -106,6 +115,53 @@ export class TicketService {
     const values = dates.filter((date): date is Date => Boolean(date));
     return values.length ? new Date(Math.min(...values.map((date) => date.getTime()))) : undefined;
   }
+
+  static async advanceTicketsByEstimate(now = new Date()): Promise<void> {
+    const dueTickets = await ServiceTicket.find({
+      deletedAt: { $exists: false },
+      status: { $in: ['repairing', 'quality_check'] },
+      nextDeadlineAt: { $lte: now },
+    }).limit(100);
+
+    for (const ticket of dueTickets) {
+      try {
+        if (ticket.status === 'repairing' && ticket.repairDueAt && ticket.repairDueAt <= now) {
+          const qcDueAt = new Date(ticket.repairDueAt.getTime() + (ticket.approvedEstimate?.qcDurationMinutes || 0) * 60000);
+          ticket.status = 'quality_check';
+          ticket.repairCompletedAt = ticket.repairDueAt;
+          ticket.qcStartedAt = ticket.repairDueAt;
+          ticket.qcDueAt = qcDueAt;
+          ticket.nextDeadlineAt = qcDueAt;
+          ticket.revision += 1;
+          ticket.timeline.push({
+            status: 'quality_check', action: 'quality_check_started_automatically', actorRole: 'system', actorName: 'Sistem',
+            note: 'Estimasi waktu perbaikan selesai. Perangkat memasuki tahap pemeriksaan kualitas sesuai jadwal estimasi.',
+            isPublic: true, timestamp: ticket.repairDueAt,
+          });
+          await ticket.save();
+        } else if (ticket.status === 'quality_check' && ticket.qcDueAt && ticket.qcDueAt <= now) {
+          ticket.status = 'completed';
+          ticket.nextDeadlineAt = undefined;
+          ticket.readyAt = ticket.qcDueAt;
+          ticket.qualityCheck = {
+            passed: true,
+            notes: 'Status diperbarui otomatis setelah estimasi quality check berakhir.',
+            checkedAt: ticket.qcDueAt,
+          };
+          ticket.revision += 1;
+          ticket.timeline.push({
+            status: 'completed', action: 'completed_automatically', actorRole: 'system', actorName: 'Sistem',
+            note: 'Estimasi waktu quality check telah berakhir. Servis ditandai siap diambil sesuai jadwal estimasi.',
+            isPublic: true, timestamp: ticket.qcDueAt,
+          });
+          await ticket.save();
+        }
+      } catch (error) {
+        logger.warn('Could not advance ticket using its estimate', { ticketId: ticket.id, error });
+      }
+    }
+  }
+
   private static async selectAvailableTechnician(businessId: mongoose.Types.ObjectId) {
     const technicians = await Technician.find({ businessId, status: 'active', userId: { $ne: null } })
       .sort({ createdAt: 1, _id: 1 });
@@ -927,6 +983,9 @@ export class TicketService {
               device: `${ticket.device.brand ? ticket.device.brand + ' ' : ''}${ticket.device.model}`,
               totalAmount: newRevision.totalAmount,
               customerExplanation: newRevision.customerExplanation,
+              serviceDuration: formatServiceDuration(
+                (newRevision.repairDurationMinutes || 0) + (newRevision.qcDurationMinutes || 0),
+              ),
               targetCompletionDate: newRevision.targetCompletionDate,
               timezone: business?.timezone || 'Asia/Jakarta',
             },
@@ -1011,7 +1070,7 @@ export class TicketService {
         actorId: callerObjectId,
         actorRole: 'customer',
         actorName: customerName,
-        note: `Customer approved estimate revision #${pendingRevision.version} (Rp ${pendingRevision.totalAmount.toLocaleString('id-ID')})`,
+        note: 'Customer approved the estimate. Waiting for the technician to start the repair.',
         isPublic: true,
         timestamp: new Date(),
       });
@@ -1208,6 +1267,36 @@ export class TicketService {
         // Submitting repair for quality control inspection
         await this.verifyAssignedTechnician(businessObjectId, ticket, callerUserId);
 
+        if (ticket.status === 'quality_check' && input.qcDelayHours) {
+          if (!input.reason?.trim()) {
+            throw new AppError('Alasan penundaan QC wajib diisi.', 400, 'QC_DELAY_REASON_REQUIRED');
+          }
+          const delayMilliseconds = input.qcDelayHours * 60 * 60 * 1000;
+          const extensionBase = ticket.qcDueAt && ticket.qcDueAt > new Date() ? ticket.qcDueAt : new Date();
+          ticket.qcDueAt = new Date(extensionBase.getTime() + delayMilliseconds);
+          ticket.nextDeadlineAt = ticket.qcDueAt;
+          if (ticket.approvedEstimate) {
+            ticket.approvedEstimate.qcDurationMinutes = (ticket.approvedEstimate.qcDurationMinutes || 0) + input.qcDelayHours * 60;
+            if (ticket.approvedEstimate.targetCompletionDate) {
+              ticket.approvedEstimate.targetCompletionDate = new Date(ticket.approvedEstimate.targetCompletionDate.getTime() + delayMilliseconds);
+            }
+            const approvedRevision = ticket.estimateRevisions.find((revision) => revision.version === ticket.approvedEstimate?.version);
+            if (approvedRevision) {
+              approvedRevision.qcDurationMinutes = (approvedRevision.qcDurationMinutes || 0) + input.qcDelayHours * 60;
+              if (approvedRevision.targetCompletionDate) {
+                approvedRevision.targetCompletionDate = new Date(approvedRevision.targetCompletionDate.getTime() + delayMilliseconds);
+              }
+            }
+          }
+          ticket.revision += 1;
+          ticket.timeline.push({
+            status: 'quality_check', action: 'qc_delayed', actorId: callerObjectId, actorRole: 'technician', actorName: 'Teknisi',
+            note: `QC ditunda ${input.qcDelayHours} jam: ${input.reason.trim()}. Estimasi servis selesai diperpanjang ${input.qcDelayHours} jam.`,
+            isPublic: true, timestamp: new Date(),
+          });
+          break;
+        }
+
         if (ticket.status !== 'repairing') {
           throw new AppError('Can only submit for QC from repairing status', 400, 'INVALID_STATUS_TRANSITION');
         }
@@ -1237,9 +1326,9 @@ export class TicketService {
       }
 
       case 'completed': {
-        // Quality check passed -> repair completed & ready for pickup
-        if (ticket.status !== 'quality_check') {
-          throw new AppError('Can only complete ticket after passing quality check', 400, 'INVALID_STATUS_TRANSITION');
+        // A technician may confirm QC directly from repairing when work finishes early.
+        if (ticket.status !== 'quality_check' && ticket.status !== 'repairing') {
+          throw new AppError('Can only complete ticket after repair and quality check', 400, 'INVALID_STATUS_TRANSITION');
         }
 
         if (callerRole !== 'owner') {
@@ -1253,6 +1342,7 @@ export class TicketService {
         ticket.status = 'completed';
         ticket.nextDeadlineAt = undefined;
         ticket.readyAt = new Date();
+        if (!ticket.repairCompletedAt) ticket.repairCompletedAt = ticket.readyAt;
         ticket.qualityCheck = {
           passed: true,
           notes: input.qcNotes,
@@ -1580,8 +1670,7 @@ export class TicketService {
           submittedAt: latestEstimate.submittedAt,
           status: latestEstimate.status,
           targetCompletionDate: latestEstimate.targetCompletionDate,
-          repairDurationMinutes: latestEstimate.repairDurationMinutes,
-          qcDurationMinutes: latestEstimate.qcDurationMinutes,
+          serviceDurationMinutes: (latestEstimate.repairDurationMinutes || 0) + (latestEstimate.qcDurationMinutes || 0),
           decision: latestEstimate.decisionAt && latestEstimate.status !== 'pending'
             ? {
                 decision: latestEstimate.status,

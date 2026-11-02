@@ -1,4 +1,5 @@
 import styles from './Tickets.module.css';
+import { customerStatusNotes, type TicketStatus } from './status';
 
 const actions: Record<string, string> = {
   created: 'Tiket servis dibuat',
@@ -14,6 +15,9 @@ const actions: Record<string, string> = {
   repair_started: 'Perbaikan dimulai',
   qc_failed: 'Pemeriksaan kualitas perlu perbaikan',
   quality_check_submitted: 'Pemeriksaan kualitas selesai',
+  qc_delayed: 'Jadwal quality check diperbarui',
+  quality_check_started_automatically: 'Quality check dimulai sesuai estimasi',
+  completed_automatically: 'Status siap diambil diperbarui sesuai estimasi',
   completed: 'Perbaikan selesai',
   cancelled: 'Tiket dibatalkan',
   handed_over: 'Perangkat diserahkan',
@@ -33,7 +37,7 @@ function timelineActionLabel(action: string) {
   return actions[action] || 'Status servis diperbarui';
 }
 
-function timelineNoteLabel(note: string) {
+export function timelineNoteLabel(note: string) {
   const fixedNotes: Record<string, string> = {
     'Walk-in service intake recorded at frontdesk': 'Penerimaan servis langsung dicatat di meja layanan.',
     'Assigned to technician': 'Tiket ditugaskan kepada teknisi.',
@@ -43,6 +47,7 @@ function timelineNoteLabel(note: string) {
     'Device physically received at repair shop': 'Perangkat diterima di tempat servis.',
     'Technician started device diagnosis': 'Teknisi mulai memeriksa perangkat.',
     'Repair work commenced according to approved estimate': 'Perbaikan dimulai sesuai estimasi yang disetujui.',
+    'Customer approved the estimate. Waiting for the technician to start the repair.': customerStatusNotes.approved,
   };
   if (fixedNotes[note]) return fixedNotes[note];
 
@@ -82,11 +87,20 @@ function timelineNoteLabel(note: string) {
 
 export interface TicketTimelineEntry {
   id?: string;
+  status?: TicketStatus;
   action: string;
   actorName?: string;
   actorRole: string;
   note?: string;
   timestamp: string;
+}
+
+export function currentStatusNote(
+  status: TicketStatus,
+  timeline: { status?: TicketStatus; note?: string }[] = [],
+) {
+  const currentEvent = [...timeline].reverse().find((event) => event.status === status && event.note?.trim());
+  return currentEvent?.note ? timelineNoteLabel(currentEvent.note) : customerStatusNotes[status];
 }
 
 export function TicketTimeline({ timeline }: { timeline: TicketTimelineEntry[] }) {

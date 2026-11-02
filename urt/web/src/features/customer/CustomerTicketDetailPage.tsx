@@ -7,6 +7,7 @@ import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { DeviceSummary } from '../tickets/DeviceSummary';
 import { ServiceStepper } from '../tickets/ServiceStepper';
 import { TicketTiming } from '../tickets/TicketTiming';
+import { currentStatusNote } from '../tickets/TicketTimeline';
 import { TicketTimeline } from '../tickets/TicketTimeline';
 import { EstimateBreakdown } from '../tickets/EstimateBreakdown';
 import { TicketAttachments } from '../tickets/TicketAttachments';
@@ -173,8 +174,8 @@ export default function CustomerTicketDetailPage() {
 
       {/* Stepper */}
       <div className={styles.ticketCard}>
-        <ServiceStepper status={ticket.status} />
-        <TicketTiming ticket={ticket} />
+        <ServiceStepper status={ticket.status} statusNote={currentStatusNote(ticket.status, ticket.timeline)} />
+        <TicketTiming ticket={ticket} customerView />
       </div>
 
       <div className="reference-columns">

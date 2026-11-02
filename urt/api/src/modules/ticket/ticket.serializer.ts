@@ -33,6 +33,32 @@ export interface SerializedTimelineEvent {
   timestamp: Date;
 }
 
+type SerializedEstimateRevision = Omit<IEstimateRevision, 'repairDurationMinutes' | 'qcDurationMinutes' | 'decisionAt' | 'decisionReason'> & {
+  repairDurationMinutes?: number;
+  qcDurationMinutes?: number;
+  serviceDurationMinutes?: number;
+  decision?: { decision: 'approved' | 'rejected'; reason?: string; decidedAt?: Date };
+};
+
+function serializeCustomerEstimate(estimate: IEstimateRevision): SerializedEstimateRevision {
+  return {
+    version: estimate.version,
+    lines: estimate.lines,
+    currency: estimate.currency,
+    totalAmount: estimate.totalAmount,
+    targetCompletionDate: estimate.targetCompletionDate,
+    customerExplanation: estimate.customerExplanation,
+    submittedBy: estimate.submittedBy,
+    submittedByName: estimate.submittedByName,
+    submittedAt: estimate.submittedAt,
+    status: estimate.status,
+    serviceDurationMinutes: (estimate.repairDurationMinutes || 0) + (estimate.qcDurationMinutes || 0),
+    decision: estimate.decisionAt && estimate.status !== 'pending'
+      ? { decision: estimate.status, reason: estimate.decisionReason, decidedAt: estimate.decisionAt }
+      : undefined,
+  };
+}
+
 export interface SerializedTicket {
   id: string;
   businessId: string;
@@ -91,8 +117,8 @@ export interface SerializedTicket {
     notes?: string;
     updatedAt?: Date;
   };
-  estimateRevisions: IEstimateRevision[];
-  approvedEstimate?: IEstimateRevision;
+  estimateRevisions: SerializedEstimateRevision[];
+  approvedEstimate?: SerializedEstimateRevision;
   workSummary?: string;
   repairStartedAt?: Date;
   repairCompletedAt?: Date;
@@ -166,10 +192,10 @@ export const computeAllowedActions = (
           actions.push('start_repair', 'revise_estimate');
           break;
         case 'repairing':
-          actions.push('submit_qc', 'revise_estimate');
+          actions.push('submit_qc', 'pass_qc', 'revise_estimate');
           break;
         case 'quality_check':
-          actions.push('pass_qc', 'fail_qc');
+          actions.push('pass_qc', 'fail_qc', 'extend_qc');
           break;
         case 'rejected':
           actions.push('reopen_diagnosis');
@@ -256,6 +282,12 @@ export const serializeTicket = (
           notes: ticket.estimateDraft.notes,
           updatedAt: ticket.estimateDraft.updatedAt,
         };
+  const estimateRevisionData = isCustomer
+    ? (ticket.estimateRevisions || []).map(serializeCustomerEstimate)
+    : ticket.estimateRevisions || [];
+  const approvedEstimateData = ticket.approvedEstimate
+    ? isCustomer ? serializeCustomerEstimate(ticket.approvedEstimate) : ticket.approvedEstimate
+    : undefined;
 
   return {
     id: ticket._id.toString(),
@@ -316,14 +348,14 @@ export const serializeTicket = (
     cancellationReason: ticket.cancellationReason,
     diagnosis: diagnosisData,
     estimateDraft: estimateDraftData,
-    estimateRevisions: ticket.estimateRevisions || [],
-    approvedEstimate: ticket.approvedEstimate,
+    estimateRevisions: estimateRevisionData,
+    approvedEstimate: approvedEstimateData,
     workSummary: ticket.workSummary,
     repairStartedAt: ticket.repairStartedAt,
     repairCompletedAt: ticket.repairCompletedAt,
-    repairDueAt: ticket.repairDueAt,
-    qcStartedAt: ticket.qcStartedAt,
-    qcDueAt: ticket.qcDueAt,
+    repairDueAt: isCustomer ? undefined : ticket.repairDueAt,
+    qcStartedAt: isCustomer ? undefined : ticket.qcStartedAt,
+    qcDueAt: isCustomer ? undefined : ticket.qcDueAt,
     nextDeadlineAt: ticket.nextDeadlineAt,
     qualityCheck: ticket.qualityCheck
       ? {

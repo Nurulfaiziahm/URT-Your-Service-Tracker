@@ -22,6 +22,12 @@
       <td style='padding: 8px 0; color: #64748b; font-size: 14px;'>Total Estimasi Biaya:</td>
       <td style='padding: 8px 0; color: #2563eb; font-weight: 700; font-size: 17px;'>{{formatRupiah totalAmount}}</td>
     </tr>
+    {{#if serviceDuration}}
+    <tr>
+      <td style='padding: 8px 0; color: #64748b; font-size: 14px;'>Estimasi Servis Selesai:</td>
+      <td style='padding: 8px 0; color: #334155; font-size: 14px;'>{{serviceDuration}} (termasuk quality check)</td>
+    </tr>
+    {{/if}}
     {{#if targetCompletionDate}}
     <tr>
       <td style='padding: 8px 0; color: #64748b; font-size: 14px;'>Target Selesai:</td>

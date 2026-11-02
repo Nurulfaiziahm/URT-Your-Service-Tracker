@@ -7,7 +7,7 @@ import { InlineNotice } from '../../components/feedback/Feedback';
 import { formatRupiah } from './currency';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from './Tickets.module.css';
-import { localDateTimeInput } from './service-timing';
+import { durationLabel, localDateTimeInput } from './service-timing';
 import { diagnosisExplanation } from './diagnosis-explanation';
 import { EstimateCatalogPicker } from './EstimateCatalogPicker';
 import { catalogEstimateLine, difficultyLabels } from '../services/catalog';
@@ -82,6 +82,7 @@ export function EstimateEditor({
   const itemSubtotal = itemLines.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const difficultyAmount = selectedDifficulty?.unitPrice ?? 0;
   const totalAmount = itemSubtotal + difficultyAmount;
+  const totalServiceDuration = Math.round((Number(repairHours) + Number(qcHours)) * 60);
 
   const handleSaveDraft = async () => {
     setErrorMsg(null);
@@ -214,7 +215,7 @@ export function EstimateEditor({
             <div style={{ maxWidth: 220 }}>
               <TextInput
                 id="targetDate"
-                label="Target Siap Diambil"
+                label="Perkiraan Selesai Servis"
                 type="datetime-local"
                 required
                 value={targetDate}
@@ -230,8 +231,11 @@ export function EstimateEditor({
 
           <div className={styles.estimateSchedule}>
             <TextInput label="Durasi Pengerjaan (jam)" name="repairHours" type="number" min={1 / 60} max={8760} step="any" required value={repairHours} onChange={(event) => setRepairHours(event.target.value)} hint="Contoh: 2 untuk dua jam." />
-            <TextInput label="Durasi QC (jam)" name="qcHours" type="number" min={1 / 60} max={8760} step="any" required value={qcHours} onChange={(event) => setQcHours(event.target.value)} hint="Contoh: 0.5 untuk 30 menit." />
+            <TextInput label="Estimasi Durasi QC Internal (jam)" name="qcHours" type="number" min={1 / 60} max={8760} step="any" required value={qcHours} onChange={(event) => setQcHours(event.target.value)} hint="Untuk perencanaan teknisi; durasi QC tidak ditampilkan terpisah kepada pelanggan." />
           </div>
+          <p className={styles.estimateHint}>
+            Estimasi servis selesai untuk pelanggan: <strong>{durationLabel(totalServiceDuration)}</strong> (pengerjaan dan QC).
+          </p>
         </div>
         <aside className={styles.estimateReceipt} aria-label="Struk Estimasi">
           <div className={styles.receiptHeading}><span className="eyebrow">Struk Estimasi</span><h3>Rincian Biaya Servis</h3><p>{ticket.ticketCode}</p><p>{ticket.customer?.name || 'Pelanggan'}</p></div>

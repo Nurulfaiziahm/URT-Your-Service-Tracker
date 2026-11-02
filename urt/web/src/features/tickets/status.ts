@@ -14,6 +14,19 @@ export const ticketStatuses = {
 
 export type TicketStatus = keyof typeof ticketStatuses;
 
+export const customerStatusNotes: Record<TicketStatus, string> = {
+  submitted: 'Pengajuan servis sudah diterima. Tempat servis akan meninjau permintaan Anda.',
+  waiting_diagnosis: 'Perangkat sudah diterima dan sedang menunggu pemeriksaan teknisi.',
+  diagnosing: 'Teknisi sedang memeriksa perangkat dan menyiapkan diagnosis serta estimasi biaya.',
+  awaiting_approval: 'Estimasi biaya sudah dikirim. Tinjau rincian servis lalu pilih setujui atau tolak.',
+  approved: 'Persetujuan telah diterima. Mohon menunggu teknisi memulai pengerjaan.',
+  rejected: 'Estimasi ditolak. Tempat servis akan menindaklanjuti keputusan Anda.',
+  repairing: 'Teknisi sedang mengerjakan perbaikan perangkat.',
+  quality_check: 'Perbaikan selesai dan perangkat sedang menjalani pemeriksaan kualitas.',
+  completed: 'Pemeriksaan kualitas selesai. Perangkat siap diambil di tempat servis.',
+  cancelled: 'Servis dibatalkan. Hubungi tempat servis jika Anda memerlukan bantuan.',
+};
+
 export const serviceWorkflowStages = [
   { label: 'Pengajuan', statuses: ['submitted', 'waiting_diagnosis'] },
   { label: 'Diagnosis', statuses: ['diagnosing'] },

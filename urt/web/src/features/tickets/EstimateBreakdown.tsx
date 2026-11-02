@@ -1,7 +1,7 @@
 import type { EstimateRevision } from './types';
 import { formatRupiah } from './currency';
 import styles from './Tickets.module.css';
-import { durationLabel } from './service-timing';
+import { durationLabel, totalServiceDurationMinutes } from './service-timing';
 import { difficultyLabels } from '../services/catalog';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
@@ -20,6 +20,7 @@ export function EstimateBreakdown({ revision, title, customerView = false }: Est
     superseded: { label: 'Digantikan Revisi Baru', tone: 'neutral' },
   } as const;
   const status = estimateStatus[revision.status];
+  const totalServiceDuration = totalServiceDurationMinutes(revision);
 
   return (
     <div className={styles.estimateBox}>
@@ -114,11 +115,17 @@ export function EstimateBreakdown({ revision, title, customerView = false }: Est
         }}
       >
         <div style={{ display: 'grid', gap: 6 }}>
-          {revision.repairDurationMinutes && <span>Pengerjaan: {durationLabel(revision.repairDurationMinutes)}</span>}
-          {revision.qcDurationMinutes && <span>QC: {durationLabel(revision.qcDurationMinutes)}</span>}
+          {customerView ? (
+            totalServiceDuration && <span>Estimasi servis selesai: {durationLabel(totalServiceDuration)}</span>
+          ) : (
+            <>
+              {revision.repairDurationMinutes && <span>Pengerjaan: {durationLabel(revision.repairDurationMinutes)}</span>}
+              {revision.qcDurationMinutes && <span>QC: {durationLabel(revision.qcDurationMinutes)}</span>}
+            </>
+          )}
           {revision.targetCompletionDate && (
             <span style={{ fontSize: '0.85rem', color: 'var(--slate-600)' }}>
-              Target Selesai:{' '}
+              {customerView ? 'Perkiraan selesai: ' : 'Target Selesai: '}
               <strong>
                 {new Date(revision.targetCompletionDate).toLocaleString('id-ID', {
                   day: '2-digit',
