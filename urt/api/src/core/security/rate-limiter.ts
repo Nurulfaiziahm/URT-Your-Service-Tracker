@@ -37,7 +37,7 @@ export const apiLimiter = rateLimit({
  */
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // Limit each IP to 20 auth requests per window
+  max: 50, // Limit each IP to 50 auth requests per window
   message: {
     success: false,
     code: 'RATE_LIMITED',
@@ -53,7 +53,7 @@ export const authLimiter = rateLimit({
  */
 export const loginLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // 5 failed attempts per hour
+  max: 50,
   message: {
     success: false,
     code: 'RATE_LIMITED',
