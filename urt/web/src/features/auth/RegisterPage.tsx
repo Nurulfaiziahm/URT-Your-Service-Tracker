@@ -391,12 +391,6 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
             </div>
           </div>
           <div className={styles['sidebar-footer']}>
-            <Link to="/" className={styles['sidebar-home']}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="m15 18-6-6 6-6M9 12h12" />
-              </svg>
-              Kembali ke beranda
-            </Link>
             <div className={styles['sidebar-bottom-info']}>
               <RegisterIcon name="shield" size={20} />
               <span>
@@ -407,12 +401,6 @@ export default function RegisterPage({ portal }: { portal: 'owner' | 'customer' 
           </div>
         </aside>
         <main id="main-content" tabIndex={-1} className={styles['register-main']}>
-          <Link to="/" className={styles['mobile-home']}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="m15 18-6-6 6-6M9 12h12" />
-            </svg>
-            Kembali ke beranda
-          </Link>
           <header className={styles['register-topbar']}>
             <nav className={styles.stepper} aria-label="Tahapan pendaftaran">
               <div className={`${styles['step-item']} ${styles.active}`} aria-current="step">

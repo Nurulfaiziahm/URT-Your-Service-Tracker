@@ -107,25 +107,7 @@
   box-sizing: border-box;
 }
 
-.sidebar-home,
-.mobile-home {
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
-  min-height: 36px;
-  padding: 7px 11px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
-  color: #cbd5e1;
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
 .sidebar-footer { display: grid; gap: 12px; }
-.sidebar-home { display: inline-flex; background: rgba(255, 255, 255, 0.05); }
-.sidebar-home:hover { background: rgba(255, 255, 255, 0.11); color: #fff; }
-.mobile-home { display: none; }
 
 .brand-badge {
   display: flex;
@@ -593,16 +575,6 @@
     padding: 0 0 16px 0;
     justify-content: center;
   }
-
-  .mobile-home {
-    display: inline-flex;
-    margin-bottom: 16px;
-    border-color: var(--border);
-    background: #fff;
-    color: var(--text-muted);
-  }
-
-  .mobile-home:hover { color: var(--primary); border-color: var(--primary); }
 
   .login-link-wrap {
     display: none;
