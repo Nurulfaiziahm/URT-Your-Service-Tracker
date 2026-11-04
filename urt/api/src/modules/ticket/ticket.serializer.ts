@@ -158,7 +158,10 @@ export const computeAllowedActions = (
         actions.push('assign_technician', 'correct_intake', 'cancel', 'start_diagnosis');
         break;
       case 'rejected':
-        actions.push('cancel', 'reopen_diagnosis', 'reassign_technician');
+        actions.push('cancel', 'reopen_diagnosis', 'start_reassembly', 'reassign_technician');
+        break;
+      case 'reassembling':
+        actions.push('finish_reassembly', 'reassign_technician');
         break;
       case 'diagnosing':
       case 'awaiting_approval':
@@ -198,7 +201,10 @@ export const computeAllowedActions = (
           actions.push('pass_qc', 'fail_qc', 'extend_qc');
           break;
         case 'rejected':
-          actions.push('reopen_diagnosis');
+          actions.push('reopen_diagnosis', 'start_reassembly');
+          break;
+        case 'reassembling':
+          actions.push('finish_reassembly');
           break;
         default:
           break;

@@ -104,7 +104,7 @@ export function CustomerPicker({
           }}
         >
           <strong>Tambah Kontak Pelanggan Baru (Walk-in)</strong>
-          {formError && <InlineNotice>{formError}</InlineNotice>}
+          {formError && <InlineNotice type="error">{formError}</InlineNotice>}
           <TextInput
             label="Nama Lengkap"
             value={newName}

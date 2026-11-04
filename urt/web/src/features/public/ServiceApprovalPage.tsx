@@ -37,10 +37,10 @@ function ApprovalForm({ token }: { token: string }) {
     <header className="reference-heading"><div><h1>Persetujuan Servis</h1><p>{approval.businessName} · {approval.ticketCode}</p><p>{[approval.device.brand, approval.device.model].filter(Boolean).join(' ') || approval.device.category}</p></div></header>
     <section className="reference-panel"><EstimateBreakdown revision={approval.estimate} customerView /></section>
     {error && <InlineNotice type="error">{error}</InlineNotice>}
-    {result ? <InlineNotice type="success">{result === 'approved' ? 'Persetujuan berhasil dikirim. Teknisi dapat memulai perbaikan.' : 'Estimasi ditolak. Hubungi tempat servis untuk membahas langkah berikutnya.'}</InlineNotice> : approval.estimate.status === 'pending' ? <section className="reference-panel reference-stack">
+    {result ? <InlineNotice type="success">{result === 'approved' ? 'Servis disetujui. Teknisi dapat mulai memperbaiki perangkat.' : 'Servis ditolak. Perangkat akan dirakit kembali sebelum siap diambil.'}</InlineNotice> : approval.estimate.status === 'pending' ? <section className="reference-panel reference-stack">
       <p>Dengan menyetujui, Anda menyetujui rincian biaya dan estimasi waktu di atas. Teknisi mengonfirmasi pengerjaan selesai dan QC secara terpisah.</p>
       <label htmlFor="approval-reason">Alasan jika menolak (opsional)</label><textarea id="approval-reason" maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} />
-      <div className="actions"><Button disabled={sending} onClick={() => void submit('approved')}>Setujui Biaya Servis</Button><Button disabled={sending} variant="secondary" onClick={() => void submit('rejected')}>Tolak Estimasi Biaya</Button></div>
+      <div className="actions"><Button disabled={sending} onClick={() => void submit('approved')}>Setujui Servis</Button><Button disabled={sending} variant="secondary" onClick={() => void submit('rejected')}>Tolak Servis</Button></div>
     </section> : <InlineNotice>Estimasi ini sudah diperbarui. Minta tautan terbaru kepada teknisi.</InlineNotice>}
     <div><ButtonLink to={`/b/${encodeURIComponent(approval.businessSlug)}/customer`} variant="secondary">Buka Portal Pelanggan</ButtonLink></div>
   </main>;

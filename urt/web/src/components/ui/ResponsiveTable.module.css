@@ -4,6 +4,22 @@
   overflow-x: auto;
   overscroll-behavior-inline: contain;
   -webkit-overflow-scrolling: touch;
+  background: var(--card, #fff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+}
+
+.responsiveTable :global(table) {
+  background: var(--card, #fff);
+  border-collapse: collapse;
+}
+
+.responsiveTable :global(thead th) {
+  background: var(--canvas, #f8fafc);
+}
+
+.responsiveTable :global(tbody tr:hover td) {
+  background: var(--canvas, #f8fafc);
 }
 
 @media (max-width: 640px) {

@@ -9,6 +9,7 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { Icon } from '../../components/ui/Icon';
 import { TicketTable } from '../tickets/TicketTable';
 import { OwnerOnboardingChecklist } from './OwnerOnboardingChecklist';
+import { OwnerPortalQrDialog, type OwnerPortalLink } from './OwnerPortalQrDialog';
 import { PageLoader, EmptyState, InlineNotice } from '../../components/feedback/Feedback';
 import styles from './OwnerDashboardPage.module.css';
 
@@ -19,6 +20,7 @@ export default function OwnerDashboardPage() {
     { skip: !businessId },
   );
   const [copyStatus, setCopyStatus] = useState('');
+  const [qrPortal, setQrPortal] = useState<OwnerPortalLink | null>(null);
   const [now] = useState(() => Date.now());
   if (isLoading || !businessId) return <PageLoader />;
   if (error || !data?.data)
@@ -82,7 +84,7 @@ export default function OwnerDashboardPage() {
           <section className={styles.subscription} aria-labelledby="subscription-title">
             <div className={styles.subscriptionHeading}>
               <h3 id="subscription-title">{subscription?.planName || 'Langganan'}</h3>
-              <StatusBadge label={isActive ? 'Aktif' : subscription?.status === 'expired' ? 'Berakhir' : 'Belum aktif'} tone={isActive ? 'success' : subscription?.status === 'expired' ? 'danger' : 'warning'} />
+              <StatusBadge label={isActive ? 'Aktif' : subscription?.status === 'expired' ? 'Berakhir' : 'Belum aktif'} tone={isActive ? 'success' : subscription?.status === 'expired' ? 'neutral' : 'warning'} />
             </div>
             <p>
               {end ? `Berakhir ${new Date(end).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: business.timezone })}` : 'Pilih paket untuk mengaktifkan layanan tempat servis.'}
@@ -99,7 +101,7 @@ export default function OwnerDashboardPage() {
 
         <div className={styles.portals}>
           {[
-            { title: 'Portal Teknisi', path: '/technician', description: 'Bagikan tautan agar teknisi dapat menerima dan mengelola tiket servis.' },
+            { title: 'Portal Teknisi', path: '/technician', description: 'Bagikan QR agar teknisi membuka portal dan mengelola tiket servis.' },
             { title: 'Portal Pelanggan', path: `${customerPortalPath(business.slug)}/services/new`, description: 'Bagikan tautan atau jadikan QR. Pelanggan mengisi formulir, mendapat nomor tiket, lalu melacak servis tanpa membuat akun.' },
           ].map((portal) => (
             <article key={portal.title} className={styles.portalCard}>
@@ -110,7 +112,7 @@ export default function OwnerDashboardPage() {
                 <span title={`${window.location.origin}${portal.path}`}>{window.location.host}{portal.path}</span>
                 <div className={styles.portalActions}>
                   <button type="button" aria-label={`Salin tautan ${portal.title}`} onClick={() => copy(portal.path)}><Icon name="copy" /></button>
-                  <Link to={portal.path} aria-label={`Buka ${portal.title}`}><Icon name="external" /></Link>
+                  <button type="button" aria-label={`Tampilkan QR Code ${portal.title}`} onClick={() => setQrPortal(portal)}><Icon name="qr" /></button>
                 </div>
               </div>
             </article>
@@ -129,6 +131,7 @@ export default function OwnerDashboardPage() {
         <Link to="/owner/reports" className={styles.slaScore}><strong>{sla == null ? '—' : `${sla}%`}</strong> <span>SLA terpenuhi</span></Link>
       </section>
       {copyStatus && <div role="status"><InlineNotice>{copyStatus}</InlineNotice></div>}
+      {qrPortal && <OwnerPortalQrDialog key={qrPortal.path} portal={qrPortal} onClose={() => setQrPortal(null)} />}
     </div>
   );
 }

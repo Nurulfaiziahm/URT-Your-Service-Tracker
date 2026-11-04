@@ -1,0 +1,10 @@
+<h2 style='color: #0f172a; font-size: 20px; font-weight: 700; margin-bottom: 16px;'>Status Servis Diperbarui</h2>
+<p style='margin-bottom: 16px; color: #334155;'>Halo <strong>{{name}}</strong>, ada kabar terbaru dari {{businessName}}.</p>
+<div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; margin: 24px 0;'>
+  <p style='margin: 4px 0; color: #64748b;'>Nomor tiket</p><strong style='color: #0f172a;'>{{ticketCode}}</strong>
+  <p style='margin: 16px 0 4px; color: #64748b;'>Perangkat</p><strong style='color: #0f172a;'>{{device}}</strong>
+  <p style='margin: 16px 0 4px; color: #64748b;'>Status terbaru</p><strong style='color: #0f172a;'>{{statusLabel}}</strong>
+  {{#if statusNote}}<p style='margin: 12px 0 0; color: #334155;'>{{statusNote}}</p>{{/if}}
+</div>
+<div style='text-align: center; margin: 28px 0;'><a href='{{trackingUrl}}' class='button'>Lihat status servis</a></div>
+<p style='font-size: 13px; color: #64748b;'>Anda dapat membuka tautan ini tanpa masuk ke akun.</p>

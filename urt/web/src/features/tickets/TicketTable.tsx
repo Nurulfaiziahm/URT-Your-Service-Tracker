@@ -20,8 +20,8 @@ export function TicketTable({
 }) {
   const path = role === 'customer' ? `${customerBasePath}/services` : `/${role}/tickets`;
   return (
-    <ResponsiveTable role={history && role === 'customer' ? 'region' : undefined} className={styles.tableWrapper} aria-label={history && role === 'customer' ? 'Riwayat servis' : undefined} tabIndex={history && role === 'customer' ? 0 : undefined} rowHeading={tickets.length ? 'Tiket' : undefined}>
-      <table className={[styles.table, history ? styles.centeredTable : ''].filter(Boolean).join(' ')}>
+    <ResponsiveTable role={history && role === 'customer' ? 'region' : undefined} className={[styles.tableWrapper, history && role === 'customer' ? styles.customerHistoryWrapper : ''].filter(Boolean).join(' ')} aria-label={history && role === 'customer' ? 'Riwayat servis' : undefined} tabIndex={history && role === 'customer' ? 0 : undefined} rowHeading={tickets.length ? 'Tiket' : undefined}>
+      <table data-mobile-card-layout={history && role === 'customer' ? 'true' : undefined} className={[styles.table, history ? styles.centeredTable : '', history && role === 'customer' ? styles.customerHistoryTable : ''].filter(Boolean).join(' ')}>
         <thead>
           <tr>
             <th>{history ? 'Nomor Tiket & Perangkat' : 'Nomor Tiket'}</th>

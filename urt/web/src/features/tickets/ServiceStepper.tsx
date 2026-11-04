@@ -1,13 +1,14 @@
-import { serviceProgressState, serviceWorkflowStages, type TicketStatus } from './status';
+import { serviceProgressState, serviceWorkflowForStatus, type TicketStatus } from './status';
 import styles from './Tickets.module.css';
 
-export function ServiceStepper({ status, className, statusNote }: { status: TicketStatus; className?: string; statusNote?: string }) {
+export function ServiceStepper({ status, className, statusNote, rejectedFlow = false }: { status: TicketStatus; className?: string; statusNote?: string; rejectedFlow?: boolean }) {
   const stopped = status === 'cancelled' || status === 'rejected';
+  const workflow = serviceWorkflowForStatus(status, rejectedFlow);
   return (
     <div className={[styles.serviceStatus, className].filter(Boolean).join(' ')}>
       <ol className={styles.stepper} aria-label="Tahapan pengerjaan servis">
-        {serviceWorkflowStages.map((stage, index) => {
-          const state = serviceProgressState(status, index);
+        {workflow.map((stage, index) => {
+          const state = serviceProgressState(status, index, workflow);
           return (
             <li
               key={stage.label}

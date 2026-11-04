@@ -50,7 +50,7 @@ export function CustomerApprovalCard({ businessId, ticket, onSuccess }: Customer
       setSuccessMsg(
         decision === 'approved'
           ? 'Estimasi berhasil disetujui! Teknisi akan segera memulai perbaikan perangkat Anda.'
-          : 'Estimasi telah ditolak. Pihak tempat servis akan menghubungi Anda terkait langkah selanjutnya.',
+          : 'Servis ditolak. Perangkat akan dirakit kembali sebelum siap diambil.',
       );
       setIsRejecting(false);
       onSuccess?.(decision);
@@ -93,7 +93,7 @@ export function CustomerApprovalCard({ businessId, ticket, onSuccess }: Customer
             disabled={isLoading}
             style={{ color: '#dc2626' }}
           >
-            Tolak Estimasi Biaya
+            Tolak Servis
           </Button>
           <Button
             type="button"

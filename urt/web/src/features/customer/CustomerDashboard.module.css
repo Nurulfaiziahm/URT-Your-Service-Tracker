@@ -1,8 +1,8 @@
 /* Active Service Grid */
 .activeServiceGrid {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(0, 1.45fr);
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
   align-items: start;
 }
 
@@ -33,12 +33,12 @@
 }
 
 .deviceVisual {
-  width: 64px;
-  height: 64px;
-  min-width: 64px;
-  border-radius: 12px;
-  background: #e0f2fe;
-  color: #0284c7;
+  width: 90px;
+  height: 90px;
+  min-width: 90px;
+  border-radius: 10px;
+  background: #f0f7ff;
+  color: #2563eb;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,9 +59,10 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+.summaryHeader :global([data-status-badge]) { flex-shrink: 0; }
 
 .ticketCode {
-  font-size: 1.25rem;
+  font-size: 1.18rem;
   font-weight: 700;
   color: var(--navy-950, #0f172a);
   letter-spacing: -0.01em;
@@ -75,13 +76,17 @@
 .searchRow input:focus-visible { outline: 3px solid color-mix(in srgb, var(--blue) 25%, transparent); border-color: var(--blue); }
 .searchRow :global(button) { flex: 0 0 108px; min-width: 108px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
 .searchRow :global(button) > span:first-child { display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
+.searchButtonLabel { display: inline; }
 .searchError { margin: 0; color: var(--red-700, #b91c1c); font-size: 0.9rem; }
 .trackingMeta { display: grid; gap: 6px; padding: 12px 16px; border-radius: var(--radius-sm); background: var(--canvas); color: var(--slate-600); font-size: 0.86rem; }
 .trackingMeta p { margin: 0; }
 .timelineHeading { margin: 0 0 8px; font-size: 0.95rem; color: var(--navy-950); }
+.historySection :global(.reference-panel-header > div:first-child) { min-width: 0; }
+.historySection :global(.reference-panel-header > a) { flex: 0 0 auto; white-space: nowrap; }
 @media (max-width: 480px) {
-  .searchRow :global(button) { flex-basis: 46px; }
-  .searchRow :global(button) > span:first-child { gap: 6px; }
+  .searchRow :global(button) { flex-basis: 46px; min-width: 46px; padding-inline: 0; }
+  .searchRow :global(button) > span:first-child { gap: 0; }
+  .searchButtonLabel { display: none; }
 }
 
 .deviceName {
@@ -450,6 +455,12 @@
 
   .infoSeparator {
     display: none;
+  }
+
+  .deviceVisual {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
   }
 
 }

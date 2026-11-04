@@ -6,17 +6,12 @@ export function InlineNotice({
   type = 'info',
 }: {
   children: ReactNode;
-  type?: 'info' | 'error' | 'success';
+  type?: 'info' | 'error' | 'success' | 'warning';
 }) {
-  const typeClass =
-    type === 'error'
-      ? styles.noticeError
-      : type === 'success'
-        ? styles.noticeSuccess
-        : styles.notice;
+  const typeClass = styles[`notice${type[0].toUpperCase()}${type.slice(1)}`];
 
   return (
-    <div className={typeClass} role="status">
+    <div className={typeClass} role={type === 'error' ? 'alert' : 'status'}>
       {children}
     </div>
   );

@@ -10,6 +10,25 @@ import { serializeTicket } from '../ticket/ticket.serializer.js';
 import { ReportOverviewQueryParams } from './report.schema.js';
 import { SubscriptionService } from '../subscription/subscription.service.js';
 
+const customerNotificationTitles: Record<string, string> = {
+  created: 'Servis baru dicatat',
+  assigned: 'Teknisi telah ditugaskan',
+  intake_accepted: 'Servis mulai diproses',
+  diagnosis_started: 'Pemeriksaan perangkat dimulai',
+  diagnosed: 'Pemeriksaan perangkat selesai',
+  estimate_submitted: 'Estimasi biaya siap ditinjau',
+  repair_started: 'Perbaikan perangkat dimulai',
+  qc_failed: 'Perangkat perlu pemeriksaan lanjutan',
+  reassembly_started: 'Perangkat sedang dirakit kembali',
+  qc_delayed: 'Jadwal pemeriksaan diperbarui',
+  quality_check_submitted: 'Pemeriksaan kualitas selesai',
+  reassembly_completed: 'Perakitan kembali selesai',
+  completed: 'Servis selesai dan siap diambil',
+  completed_automatically: 'Servis selesai dan siap diambil',
+  cancelled: 'Servis dibatalkan',
+  handed_over: 'Perangkat telah diserahkan',
+};
+
 function businessDateBoundary(dateInput: string, timezone: string, endOfDay = false): Date {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) return new Date(dateInput);
 
@@ -239,6 +258,7 @@ export class ReportService {
         qualityCheck,
         completed,
         recentDocs,
+        notificationDocs,
         deadlineDocs,
         urgentCount,
       ] = await Promise.all([
@@ -288,6 +308,14 @@ export class ReportService {
             { path: 'assignedTechnicianId', select: 'name email phone specializations' },
             { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
           ]),
+        ServiceTicket.find({ deletedAt: { $exists: false },
+          businessId: businessObjectId,
+          assignedTechnicianId: technician._id,
+        })
+          .sort({ updatedAt: -1, createdAt: -1 })
+          .limit(100)
+          .select('ticketCode customerId device.category intakeMethod timeline updatedAt createdAt')
+          .populate({ path: 'customerId', select: 'name' }),
         ServiceTicket.find({ deletedAt: { $exists: false }, businessId: businessObjectId, assignedTechnicianId: technician._id,
           status: { $nin: ['completed', 'cancelled', 'rejected'] }, nextDeadlineAt: { $lte: new Date(Date.now() + 86400000) } })
           .sort({ nextDeadlineAt: 1, _id: 1 }).limit(20).populate('customerId', 'name email phone userId'),
@@ -298,6 +326,31 @@ export class ReportService {
       const recentTickets = recentDocs.map((ticket) =>
         serializeTicket(ticket, 'technician', true),
       );
+      const notificationCutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+      const notifications = notificationDocs.flatMap((ticket) => {
+        const customer = ticket.customerId as unknown as { name?: string };
+        return (ticket.timeline || []).flatMap((event) => {
+          const eventTime = new Date(event.timestamp).getTime();
+          if (!Number.isFinite(eventTime) || eventTime < notificationCutoff || event.actorRole !== 'customer') return [];
+
+          const type = event.action === 'created' && ticket.intakeMethod === 'online'
+            ? 'customer_request'
+            : event.action === 'estimate_approved'
+              ? 'service_approved'
+              : undefined;
+          if (!type) return [];
+
+          return [{
+            id: `${ticket._id.toString()}:${event.action}:${eventTime}`,
+            type,
+            ticketId: ticket._id.toString(),
+            ticketCode: ticket.ticketCode,
+            customerName: customer?.name || event.actorName,
+            deviceCategory: ticket.device.category,
+            timestamp: new Date(eventTime).toISOString(),
+          }];
+        });
+      }).sort((left, right) => right.timestamp.localeCompare(left.timestamp)).slice(0, 20);
 
       return {
         role: 'technician',
@@ -318,6 +371,7 @@ export class ReportService {
           urgentCount,
         },
         deadlineTickets: deadlineDocs.map((ticket) => serializeTicket(ticket, 'technician', true)),
+        notifications,
         recentTickets,
       };
     }
@@ -339,6 +393,7 @@ export class ReportService {
       readyForPickup,
       completedTickets,
       recentDocs,
+      notificationDocs,
     ] = await Promise.all([
       ServiceTicket.countDocuments({ deletedAt: { $exists: false },
         businessId: businessObjectId,
@@ -372,9 +427,30 @@ export class ReportService {
           { path: 'assignedTechnicianId', select: 'name email phone specializations' },
           { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
         ]),
+      ServiceTicket.find({ deletedAt: { $exists: false },
+        businessId: businessObjectId,
+        customerId: customer._id,
+      })
+        .sort({ updatedAt: -1, createdAt: -1 })
+        .limit(100)
+        .select('ticketCode device.category timeline updatedAt createdAt'),
     ]);
 
     const recentTickets = recentDocs.map((ticket) => serializeTicket(ticket, 'customer'));
+    const notificationCutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const notifications = notificationDocs.flatMap((ticket) => (ticket.timeline || []).flatMap((event) => {
+      const eventTime = new Date(event.timestamp).getTime();
+      const title = customerNotificationTitles[event.action];
+      if (!title || !event.isPublic || event.actorRole === 'customer' || !Number.isFinite(eventTime) || eventTime < notificationCutoff) return [];
+      return [{
+        id: `${ticket._id.toString()}:${event.action}:${eventTime}`,
+        title,
+        ticketId: ticket._id.toString(),
+        ticketCode: ticket.ticketCode,
+        deviceCategory: ticket.device.category,
+        timestamp: new Date(eventTime).toISOString(),
+      }];
+    })).sort((left, right) => right.timestamp.localeCompare(left.timestamp)).slice(0, 20);
 
     return {
       role: 'customer',
@@ -390,6 +466,7 @@ export class ReportService {
         readyForPickup,
         completedTickets,
       },
+      notifications,
       recentTickets,
     };
   }

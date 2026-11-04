@@ -8,7 +8,7 @@ import { Button, ButtonLink } from '../../components/ui/Button';
 import { EmptyState, InlineNotice, PageLoader } from '../../components/feedback/Feedback';
 import { CustomerServiceForm } from './CustomerServiceForm';
 import { customerPortalPath, useCustomerPortal } from './customer-portal';
-import { serviceTrackingPath, type ServiceRequestInput, type ServiceRequestReceipt } from './service-request.types';
+import type { ServiceRequestInput } from './service-request.types';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from './CustomerServiceForm.module.css';
 
@@ -21,10 +21,7 @@ export default function CustomerNewServicePage() {
   const slug = businessSlug || membership.currentData?.data.businesses.find((item) => item.businessId === portal.businessId)?.slug || '';
   const { currentData, isFetching, error, refetch } = useGetPublicBusinessQuery(slug, { skip: !slug });
   const [submitServiceRequest] = useSubmitServiceRequestMutation();
-  const [receipt, setReceipt] = useState<ServiceRequestReceipt | null>(null);
   const [failure, setFailure] = useState('');
-  const [copyMessage, setCopyMessage] = useState('');
-  const [showAccountOffer, setShowAccountOffer] = useState(true);
   const business = currentData?.data.business;
 
   if ((isFetching && !currentData) || membership.isLoading) return <PageLoader />;
@@ -37,45 +34,15 @@ export default function CustomerNewServicePage() {
     setFailure('');
     try {
       const result = await submitServiceRequest({ slug, body: input }).unwrap();
-      if (!portal.isAuthenticated) {
-        navigate(
-          `${customerPortalPath(result.data.businessSlug)}?ticketCode=${encodeURIComponent(result.data.ticketCode)}`,
-        );
-        return;
-      }
-      setReceipt(result.data);
+      navigate(
+        `${customerPortalPath(result.data.businessSlug)}?ticketCode=${encodeURIComponent(result.data.ticketCode)}`,
+        { replace: true },
+      );
     } catch (error) {
       const response = error as { data?: ApiErrorBody };
       setFailure(response.data?.error || 'Layanan belum dapat menerima pengajuan. Silakan coba lagi.');
       throw error;
     }
-  }
-
-  if (receipt) {
-    const trackingPath = serviceTrackingPath(receipt);
-    return <div className={styles.page}><section className={`${styles.card} ${styles.success}`} aria-live="polite">
-      <span className="eyebrow">Pengajuan berhasil</span>
-      <h1>Tiket berhasil dibuat</h1>
-      <p>{business.name}</p>
-      <p>Nomor tiket Anda</p>
-      <div className={styles.ticket}>{receipt.ticketCode}</div>
-      <ButtonLink to={trackingPath}>Lacak Servis</ButtonLink>
-      <p className={styles.note}>Simpan tautan pelacakan pribadi ini untuk membuka status servis tanpa akun.</p>
-      <Button variant="secondary" onClick={async () => {
-        try {
-          await navigator.clipboard.writeText(`${window.location.origin}${trackingPath}`);
-          setCopyMessage('Tautan pelacakan disalin.');
-        } catch { setCopyMessage('Buka Lacak Servis lalu simpan alamat halaman tersebut.'); }
-      }}>Salin Tautan Pelacakan</Button>
-      <p role="status">{copyMessage}</p>
-      {portal.isAuthenticated && receipt.ticketId && <ButtonLink variant="secondary" to={`${customerPortalPath(receipt.businessSlug)}/services/${receipt.ticketId}`}>Lihat di Portal Saya</ButtonLink>}
-      {!portal.isAuthenticated && showAccountOffer && <div className={styles.optional}>
-        <strong>Ingin menyimpan riwayat servis Anda?</strong>
-        <p className={styles.note}>Buat akun untuk pengajuan berikutnya. Tiket ini tetap dapat dilacak melalui tautan di atas.</p>
-        <div className={styles.actions}><ButtonLink to="/customer/register" state={{ from: { pathname: customerPortalPath(receipt.businessSlug), search: `?ticketCode=${encodeURIComponent(receipt.ticketCode)}` } }}>Buat Akun</ButtonLink>
-          <Button variant="ghost" onClick={() => setShowAccountOffer(false)}>Nanti Saja</Button></div>
-      </div>}
-    </section></div>;
   }
 
   return <div className={styles.page}>

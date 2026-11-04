@@ -7,6 +7,7 @@ export type TicketStatus =
   | 'awaiting_approval'
   | 'approved'
   | 'rejected'
+  | 'reassembling'
   | 'repairing'
   | 'quality_check'
   | 'completed'
@@ -571,6 +572,7 @@ const serviceTicketSchema = new Schema<IServiceTicket>(
         'awaiting_approval',
         'approved',
         'rejected',
+        'reassembling',
         'repairing',
         'quality_check',
         'completed',

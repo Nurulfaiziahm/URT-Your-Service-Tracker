@@ -95,7 +95,7 @@ export function AssignmentModal({
           </button>
         </div>
 
-        {errorMessage && <InlineNotice>{errorMessage}</InlineNotice>}
+        {errorMessage && <InlineNotice type="error">{errorMessage}</InlineNotice>}
 
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }} noValidate>
           <div>

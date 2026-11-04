@@ -25,7 +25,7 @@ export function TechnicianWorkflowActions({
 
   const [transition, { isLoading }] = useTransitionTicketMutation();
 
-  const handleSimpleTransition = async (targetStatus: 'waiting_diagnosis' | 'diagnosing' | 'repairing') => {
+  const handleSimpleTransition = async (targetStatus: 'waiting_diagnosis' | 'diagnosing' | 'repairing' | 'reassembling' | 'completed') => {
     setErrorMsg(null);
     try {
       await transition({
@@ -34,6 +34,7 @@ export function TechnicianWorkflowActions({
         body: {
           expectedRevision: ticket.revision,
           targetStatus,
+          ...(targetStatus === 'completed' ? { reason: 'Perangkat selesai dirakit kembali dan siap diambil pelanggan.' } : {}),
         },
       }).unwrap();
       onSuccess();
@@ -76,6 +77,9 @@ export function TechnicianWorkflowActions({
             {isLoading ? 'Memproses...' : 'Mulai Pengerjaan'}
           </Button>
         )}
+
+        {allowed.includes('start_reassembly') && <Button type="button" variant="primary" onClick={() => handleSimpleTransition('reassembling')} disabled={isLoading}>Mulai Rakit Kembali</Button>}
+        {allowed.includes('finish_reassembly') && <Button type="button" variant="primary" onClick={() => handleSimpleTransition('completed')} disabled={isLoading}>Selesai Dirakit, Siap Diambil</Button>}
 
         {allowed.includes('revise_estimate') && onToggleEstimateEditor && (
           <Button

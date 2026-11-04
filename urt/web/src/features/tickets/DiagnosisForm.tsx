@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { ServiceTicket } from './types';
 import { useSaveDiagnosisMutation } from './ticketsApi';
 import { Button } from '../../components/ui/Button';
@@ -14,6 +14,7 @@ interface DiagnosisFormProps {
 }
 
 export function DiagnosisForm({ businessId, ticket, onSuccess }: DiagnosisFormProps) {
+  const formRef = useRef<HTMLFormElement>(null);
   const [staffFindings, setStaffFindings] = useState(ticket.diagnosis?.staffFindings || '');
   const [manualExplanation, setManualExplanation] = useState<string | null>(
     ticket.diagnosis?.customerExplanation || null,
@@ -23,6 +24,12 @@ export function DiagnosisForm({ businessId, ticket, onSuccess }: DiagnosisFormPr
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [saveDiagnosis, { isLoading }] = useSaveDiagnosisMutation();
+
+  useEffect(() => {
+    if (!window.matchMedia('(max-width: 640px)').matches) return;
+    const timer = window.setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -56,7 +63,7 @@ export function DiagnosisForm({ businessId, ticket, onSuccess }: DiagnosisFormPr
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.ticketCard}>
+    <form ref={formRef} onSubmit={handleSubmit} className={styles.ticketCard}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Hasil Diagnosis & Pemeriksaan Perangkat</h2>
         <span style={{ fontSize: '0.85rem', color: 'var(--slate-500)' }}>

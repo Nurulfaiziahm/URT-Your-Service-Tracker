@@ -19,6 +19,9 @@ export function BusinessGate() {
 
   const businesses = useMemo(() => data?.data?.businesses || [], [data]);
   const requestedRole = location.pathname.split('/')[1] as BusinessRole;
+  const matchingBusiness = businesses.find((business) => business.roles.includes(requestedRole));
+  const selectedBusiness = businesses.find((business) => business.businessId === selectedBusinessId);
+  const selectionNeedsUpdate = Boolean(matchingBusiness && (!selectedBusiness || !selectedBusiness.roles.includes(requestedRole)));
 
   useEffect(() => {
     if (businesses.length > 0) {
@@ -37,6 +40,8 @@ export function BusinessGate() {
       }
     }
   }, [businesses, selectedBusinessId, requestedRole, dispatch]);
+
+  if (selectionNeedsUpdate) return <PageLoader />;
 
   if (isLoading) {
     return <PageLoader />;

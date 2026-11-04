@@ -47,8 +47,19 @@ export interface TechnicianDashboardStats {
   completed: number;
 }
 
+export interface TechnicianNotification {
+  id: string;
+  type: 'customer_request' | 'service_approved';
+  ticketId: string;
+  ticketCode: string;
+  customerName: string;
+  deviceCategory: string;
+  timestamp: string;
+}
+
 export interface TechnicianDashboardData {
   deadlineTickets: ServiceTicket[];
+  notifications: TechnicianNotification[];
   role: 'technician';
   technicianId: string;
   business: {
@@ -67,6 +78,15 @@ export interface CustomerDashboardStats {
   completedTickets: number;
 }
 
+export interface CustomerNotification {
+  id: string;
+  title: string;
+  ticketId: string;
+  ticketCode: string;
+  deviceCategory: string;
+  timestamp: string;
+}
+
 export interface CustomerDashboardData {
   role: 'customer';
   customerId: string;
@@ -76,5 +96,6 @@ export interface CustomerDashboardData {
     slug: string;
   };
   stats: CustomerDashboardStats;
+  notifications: CustomerNotification[];
   recentTickets: ServiceTicket[];
 }

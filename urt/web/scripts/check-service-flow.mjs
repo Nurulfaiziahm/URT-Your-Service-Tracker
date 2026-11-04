@@ -42,7 +42,10 @@ try {
   const exceptions = [];
   socket.addEventListener('message', ({ data }) => {
     const message = JSON.parse(data);
-    if (message.method === 'Runtime.exceptionThrown') exceptions.push(message.params.exceptionDetails.text);
+    if (message.method === 'Runtime.exceptionThrown') {
+      const description = message.params.exceptionDetails.exception?.description || message.params.exceptionDetails.text;
+      if (!(description.includes('WebSocket closed without opened') && description.includes('/@vite/client:'))) exceptions.push(description);
+    }
     if (!message.id) return;
     const task = pending.get(message.id);
     pending.delete(message.id);
@@ -76,8 +79,9 @@ try {
     throw new Error(`Browser condition timed out: ${expression}\n${await evaluate("document.querySelector('main')?.innerText.slice(0, 1800)")}`);
   }
   async function inspectStatusLayout(label) {
-    for (const width of [320, 375, 390, 430, 768, 1024, 1280, 1440]) {
-      await call('Emulation.setDeviceMetricsOverride', { width, height: 1000, deviceScaleFactor: 1, mobile: width <= 640 });
+    const viewports = [[360, 800], [375, 812], [390, 844], [414, 896], [768, 1024], [1024, 768], [1280, 800], [1440, 900]];
+    for (const [width, height] of viewports) {
+      await call('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width <= 640 });
       const layout = await evaluate(`(() => {
         const root = document.documentElement;
         const steppers = [...document.querySelectorAll('[aria-label="Tahapan pengerjaan servis"]')].map((list) => {
@@ -93,7 +97,13 @@ try {
           labelScroll: badge.querySelector('span')?.scrollWidth,
           labelClient: badge.querySelector('span')?.clientWidth,
         }));
-        return { pageWidth: root.scrollWidth, viewport: innerWidth, steppers, badges };
+        const searchButton = document.querySelector('input[name="ticketSearch"]')?.form?.querySelector('button');
+        const searchLabel = searchButton?.querySelector(':scope > span > span');
+        const topbar = document.querySelector('[data-portal-topbar]');
+        const menuButton = topbar?.querySelector('button[aria-label="Buka menu navigasi"]');
+        const menuRect = menuButton?.getBoundingClientRect();
+        const topbarRect = topbar?.getBoundingClientRect();
+        return { pageWidth: root.scrollWidth, viewport: innerWidth, steppers, badges, menuButton: menuRect && topbarRect && { width: menuRect.width, height: menuRect.height, topGap: menuRect.top - topbarRect.top, bottomGap: topbarRect.bottom - menuRect.bottom }, searchButton: searchButton && { ariaLabel: searchButton.getAttribute('aria-label'), width: searchButton.getBoundingClientRect().width, labelDisplay: searchLabel && getComputedStyle(searchLabel).display, iconCount: searchButton.querySelectorAll('svg[aria-hidden="true"]').length } };
       })()`);
       assert.ok(layout.pageWidth <= layout.viewport + 1, `${label} at ${width}px has page overflow: ${layout.pageWidth}px`);
       for (const stepper of layout.steppers) {
@@ -107,17 +117,37 @@ try {
       for (const badge of layout.badges) {
         assert.ok(badge.height >= 25 && badge.height <= 27, `${label} at ${width}px has inconsistent status badge height: ${badge.height}`);
         assert.ok(badge.labelHeight <= badge.height, `${label} at ${width}px has a wrapped status badge label`);
+        if (label === 'Customer portal dashboard' && width <= 640) {
+          assert.ok(badge.labelScroll <= badge.labelClient + 1, `${label} at ${width}px clips status text inside a badge`);
+        }
+      }
+      if (label === 'Customer portal dashboard') {
+        if (width <= 860) {
+          assert.equal(layout.menuButton?.width, 48, `${label} at ${width}px should provide a 48px hamburger target`);
+          assert.equal(layout.menuButton?.height, 48, `${label} at ${width}px should provide a 48px-tall hamburger target`);
+          assert.ok(Math.abs((layout.menuButton?.topGap || 0) - (layout.menuButton?.bottomGap || 0)) <= 1, `${label} at ${width}px should vertically center the hamburger with equal top and bottom spacing`);
+        }
+        assert.equal(layout.searchButton?.ariaLabel, 'Cari tiket servis', `${label} at ${width}px should provide an accessible search button name`);
+        assert.equal(layout.searchButton?.iconCount, 1, `${label} at ${width}px should keep the search icon visible`);
+        if (width <= 480) {
+          assert.equal(layout.searchButton.labelDisplay, 'none', `${label} at ${width}px should show the icon-only search action`);
+          assert.ok(layout.searchButton.width <= 48, `${label} at ${width}px should keep the icon button compact`);
+        } else {
+          assert.notEqual(layout.searchButton.labelDisplay, 'none', `${label} at ${width}px should retain the search label`);
+        }
       }
     }
     await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
-    console.log(`PASS: ${label} service status layout and badges at 320, 375, 390, 430, 768, 1024, 1280 and 1440px`);
+    console.log(`PASS: ${label} service status layout, badges, and responsive hamburger at 360x800, 375x812, 390x844, 414x896, 768x1024, 1024x768, 1280x800 and 1440x900`);
   }
   async function inspectTableLayout(label) {
-    for (const width of [320, 375, 390, 430, 768, 1024, 1280, 1440]) {
-      await call('Emulation.setDeviceMetricsOverride', { width, height: 1000, deviceScaleFactor: 1, mobile: width <= 640 });
+    const viewports = [[360, 800], [375, 812], [390, 844], [414, 896], [768, 1024], [1024, 768], [1280, 800], [1440, 900]];
+    for (const [width, height] of viewports) {
+      await call('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width <= 640 });
       const layout = await evaluate(`(() => ({
         pageWidth: document.documentElement.scrollWidth,
         viewport: innerWidth,
+        historyLink: (() => { const link = [...document.querySelectorAll('.reference-panel-header > a')].find((item) => item.textContent.trim() === 'Lihat semua'); if (!link) return null; const style = getComputedStyle(link); return { whiteSpace: style.whiteSpace, height: link.getBoundingClientRect().height, lineHeight: parseFloat(style.lineHeight) }; })(),
         tables: [...document.querySelectorAll('[data-responsive-table]')].flatMap((wrapper) => {
           const table = wrapper.querySelector('table');
           if (!table) return [];
@@ -126,6 +156,7 @@ try {
             wrapperWidth: wrapper.clientWidth,
             wrapperScrollWidth: wrapper.scrollWidth,
             wrapperOverflowX: getComputedStyle(wrapper).overflowX,
+            mobileCardLayout: table.dataset.mobileCardLayout === 'true',
             tableWidth: table.getBoundingClientRect().width,
             tableDisplay: getComputedStyle(table).display,
             bodyDisplay: body && getComputedStyle(body).display,
@@ -146,23 +177,40 @@ try {
       assert.ok(layout.pageWidth <= layout.viewport + 1, `${label} at ${width}px has page overflow: ${layout.pageWidth}px`);
       for (const table of layout.tables) {
         if (width <= 640) {
-          assert.equal(table.tableDisplay, 'table', `${label} at ${width}px should preserve table columns`);
-          assert.equal(table.bodyDisplay, 'table-row-group', `${label} at ${width}px should preserve table rows`);
-          assert.equal(table.wrapperOverflowX, 'auto', `${label} at ${width}px should scroll inside the table container`);
-          assert.ok(table.wrapperWidth <= width + 1, `${label} at ${width}px lets the table container widen the page`);
-          if (table.tableWidth > table.wrapperWidth + 1) {
-            assert.ok(table.wrapperScrollWidth > table.wrapperWidth, `${label} at ${width}px should scroll the wide table inside its container`);
+          if (table.mobileCardLayout) {
+            assert.equal(table.tableDisplay, 'block', `${label} at ${width}px should use the mobile card layout`);
+            assert.equal(table.bodyDisplay, 'grid', `${label} at ${width}px should stack history rows as cards`);
+            assert.equal(table.wrapperOverflowX, 'visible', `${label} at ${width}px should not clip history cards in a scroller`);
+            for (const row of table.rows) {
+              assert.equal(row.display, 'grid', `${label} at ${width}px should render each history row as a card`);
+              for (const cell of row.cells.filter((cell) => !cell.fullRow)) {
+                assert.ok(cell.label && cell.labelContent !== 'none', `${label} at ${width}px should label each card value`);
+                assert.ok(cell.clientWidth <= table.wrapperWidth + 1, `${label} at ${width}px clips a history card value`);
+              }
+            }
+          } else {
+            assert.equal(table.tableDisplay, 'table', `${label} at ${width}px should preserve table columns`);
+            assert.equal(table.bodyDisplay, 'table-row-group', `${label} at ${width}px should preserve table rows`);
+            assert.equal(table.wrapperOverflowX, 'auto', `${label} at ${width}px should scroll inside the table container`);
+            assert.ok(table.wrapperWidth <= width + 1, `${label} at ${width}px lets the table container widen the page`);
+            if (table.tableWidth > table.wrapperWidth + 1) {
+              assert.ok(table.wrapperScrollWidth > table.wrapperWidth, `${label} at ${width}px should scroll the wide table inside its container`);
+            }
           }
         } else {
           assert.equal(table.tableDisplay, 'table', `${label} at ${width}px changed the desktop table structure`);
         }
       }
+      if (label === 'Customer portal history' && width <= 640) {
+        assert.equal(layout.historyLink?.whiteSpace, 'nowrap', `${label} at ${width}px should keep the history action on one line`);
+        assert.ok(layout.historyLink.height <= layout.historyLink.lineHeight + 1, `${label} at ${width}px wraps the history action`);
+      }
     }
     await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
-    console.log(`PASS: ${label} tables scroll inside their containers on mobile and keep their columns at tablet/desktop widths`);
+    console.log(`PASS: ${label} mobile table strategy and tablet/desktop layout at all eight requested viewports`);
   }
   async function fill(name, value) {
-    await evaluate(`(() => { const input = document.querySelector('[name="${name}"]'); const prototype = input.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype; Object.getOwnPropertyDescriptor(prototype, 'value').set.call(input, ${JSON.stringify(value)}); input.dispatchEvent(new Event('input', { bubbles:true })); })()`);
+    await evaluate(`(() => { const input = document.querySelector('[name="${name}"]'); const prototype = Object.getPrototypeOf(input); Object.getOwnPropertyDescriptor(prototype, 'value').set.call(input, ${JSON.stringify(value)}); input.dispatchEvent(new Event(input.tagName === 'SELECT' ? 'change' : 'input', { bubbles:true })); })()`);
   }
   const next = () => evaluate("document.querySelector('form button[type=submit]').click()");
   async function completeDevice() {
@@ -171,7 +219,7 @@ try {
     await next();
     await until("document.body.innerText.includes('Kirim & Dapatkan Nomor Tiket')");
     await evaluate("document.querySelector('form button[type=submit]').click(); document.querySelector('form button[type=submit]')?.click()");
-    await until("document.body.innerText.includes('Tiket berhasil dibuat')");
+    await until("location.pathname === '/b/repair-a/customer' && Boolean(new URLSearchParams(location.search).get('ticketCode')) && document.body.innerText.includes(new URLSearchParams(location.search).get('ticketCode'))");
   }
 
   for (const role of ['owner', 'customer', 'technician']) {
@@ -301,10 +349,10 @@ try {
   await next(); await completeDevice();
   assert.equal(fixture.tickets.length, 1, 'Double clicking must create exactly one ticket');
   assert.equal(fixture.contacts[0].userId, undefined);
-  assert.equal(await evaluate("Array.from(document.querySelectorAll('a')).find(link => link.textContent === 'Buat Akun')?.getAttribute('href')"), '/customer/register');
+  assert.equal(await evaluate("Array.from(document.querySelectorAll('a')).find(link => link.textContent === 'Daftar Akun')?.getAttribute('href')"), '/customer/register');
   assert.ok(await evaluate(`document.body.innerText.includes(${JSON.stringify(fixture.tickets[0].ticketCode)})`));
   assert.equal(await evaluate('document.documentElement.scrollWidth <= window.innerWidth'), true, 'Mobile form should not overflow');
-  await evaluate("Array.from(document.querySelectorAll('a')).find(link => link.textContent === 'Lacak Servis').click()");
+  await until("Boolean(document.querySelector('[aria-label=\"Informasi tiket yang dicari\"]'))");
   await until(`document.body.innerText.includes(${JSON.stringify(fixture.tickets[0].ticketCode)}) && !document.querySelector('#trackingSecret')`);
   await inspectStatusLayout('Customer tracking');
   await screenshot('customer-tracking-390-status');
@@ -319,13 +367,13 @@ try {
   assert.equal(fixture.tickets.length, 2);
   assert.equal(String(fixture.contacts[1].userId), fixture.user.id);
   assert.equal(fixture.contacts[0].userId, undefined);
-  assert.deepEqual(exceptions, []);
+  fixture.tickets[1].status = 'completed';
   console.log('PASS: authenticated customer autofill → linked ticket, with no guest-record takeover or browser runtime exceptions');
 
   fixture.signIn(false);
   await call('Page.navigate', { url: `${base}/b/repair-a/customer` });
-  await until("document.body.innerText.includes('Login Pelanggan')");
-  await evaluate("Array.from(document.querySelectorAll('a')).find(link => link.textContent === 'Login Pelanggan').click()");
+  await until("Boolean(document.querySelector('a[href=\"/customer/login\"]'))");
+  await evaluate("document.querySelector('a[href=\"/customer/login\"]').click()");
   await until("Boolean(document.querySelector('[name=password]'))");
   const registrationStyle = await evaluate("(() => { const link = document.querySelector('a[href=\"/customer/register\"]'); return {color:getComputedStyle(link).color,align:getComputedStyle(link.parentElement).textAlign}; })()");
   assert.deepEqual(registrationStyle, { color: 'rgb(37, 99, 235)', align: 'center' });
@@ -342,16 +390,27 @@ try {
   await until("location.pathname === '/customer/login' && document.querySelector('h1')?.textContent === 'Masuk Pelanggan' && Boolean(document.querySelector('[name=password]'))");
   await fill('email', fixture.user.email); await fill('password', 'fixture-password'); await next();
   await until("location.pathname === '/b/repair-a/customer' && Boolean(document.querySelector('[data-dashboard=customer]'))");
+  fixture.tickets[1].timeline.push({ status: 'awaiting_approval', action: 'estimate_submitted', actorRole: 'technician', actorName: 'Technician Fixture', note: 'Estimate submitted', isPublic: true, timestamp: new Date() });
+  await evaluate("document.querySelector('[aria-label=\"Pemberitahuan\"]').click()");
+  await until(`document.body.innerText.includes('Estimasi biaya siap ditinjau') && document.body.innerText.includes(${JSON.stringify(fixture.tickets[1].ticketCode)})`);
+  console.log('PASS: signed-in customer receives a notification for technician service updates');
+  await evaluate(`Array.from(document.querySelectorAll('[data-notification-link]')).find((link) => link.href.endsWith(${JSON.stringify(`/services/${fixture.tickets[1]._id}`)})).click()`);
+  await until(`location.pathname === ${JSON.stringify(`/b/repair-a/customer/services/${fixture.tickets[1]._id}`)} && document.body.innerText.includes(${JSON.stringify(fixture.tickets[1].ticketCode)})`);
+  console.log('PASS: customer notification opens the related service ticket');
+  await call('Page.navigate', { url: `${base}/b/repair-a/customer` });
+  await until("Boolean(document.querySelector('[data-dashboard=customer]'))");
   await fill('ticketSearch', 'ticket-does-not-exist');
-  await until("document.body.innerText.includes('Tidak ada tiket yang cocok')");
+  await next();
+  await until("document.body.innerText.includes('Nomor tiket tidak ditemukan')");
   await fill('ticketSearch', fixture.tickets[1].ticketCode);
-  await until(`document.body.innerText.includes(${JSON.stringify(fixture.tickets[1].ticketCode)})`);
+  await next();
+  await until(`Boolean(document.querySelector('[aria-label="Informasi tiket yang dicari"]')) && document.body.innerText.includes(${JSON.stringify(fixture.tickets[1].ticketCode)})`);
   assert.equal(await evaluate("document.querySelector('input[name=ticketSearch]').type"), 'search');
-  await evaluate("Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Hapus pencarian')).click()");
-  assert.equal(await evaluate("document.querySelector('input[name=ticketSearch]').value"), '');
-  console.log('PASS: customer ticket search handles device and ticket lookup, no results and clear');
+  console.log('PASS: customer ticket search shows invalid-code feedback and loads a real ticket');
   await inspectStatusLayout('Customer portal dashboard');
   await inspectTableLayout('Customer portal history');
+  await screenshot('customer-history-mobile');
+  assert.deepEqual(exceptions, []);
   console.log('PASS: centered blue customer registration link, no back button, hidden skip link and successful login into the shop portal');
 
   fixture.addTechnician({ userId: fixture.user.id, name: 'Technician Fixture' });
@@ -369,6 +428,14 @@ try {
   const firstUpdate = await incoming('Keyboard does not work');
   await until(`document.body.innerText.includes(${JSON.stringify(firstUpdate.ticketCode)})`);
   assert.equal(await evaluate('location.pathname'), '/technician/queue');
+  await evaluate("document.querySelector('[aria-label=\"Pemberitahuan\"]').click()");
+  await until(`document.body.innerText.includes('Pengajuan pelanggan baru') && document.body.innerText.includes(${JSON.stringify(firstUpdate.ticketCode)})`);
+  console.log('PASS: assigned technician receives a notification for a new customer request');
+  await evaluate(`Array.from(document.querySelectorAll('[data-notification-link]')).find((link) => link.href.endsWith(${JSON.stringify(`/technician/tickets/${fixture.tickets[2]._id}`)})).click()`);
+  await until(`location.pathname === ${JSON.stringify(`/technician/tickets/${fixture.tickets[2]._id}`)} && document.body.innerText.includes(${JSON.stringify(firstUpdate.ticketCode)})`);
+  console.log('PASS: technician notification opens the assigned ticket');
+  await call('Page.navigate', { url: `${base}/technician/queue` });
+  await until("document.body.innerText.includes('Antrian Pengerjaan')");
   await call('Page.navigate', { url: `${base}/technician` });
   await until(`document.body.innerText.includes(${JSON.stringify(firstUpdate.ticketCode)})`);
   const nextUpdate = await incoming('Battery does not charge');
@@ -421,6 +488,23 @@ try {
     await evaluate(`(() => { const select = document.querySelector('[name="${name}"]'); select.value = ${JSON.stringify(value)}; select.dispatchEvent(new Event('change', { bubbles: true })); })()`);
   }
   fixture.signIn(true, 'owner');
+  await call('Page.navigate', { url: `${base}/owner` });
+  await until("Boolean(document.querySelector('[data-dashboard=owner]')) && document.querySelectorAll('[aria-label^=\"Tampilkan QR Code Portal\"]').length === 2");
+  for (const [title, path, filename] of [
+    ['Portal Teknisi', '/technician', 'teknisi'],
+    ['Portal Pelanggan', '/b/repair-a/customer/services/new', 'pelanggan'],
+  ]) {
+    await evaluate(`Array.from(document.querySelectorAll('button[aria-label^=\"Tampilkan QR Code Portal\"]')).find((button) => button.getAttribute('aria-label') === ${JSON.stringify(`Tampilkan QR Code ${title}`)}).click()`);
+    await until(`Boolean(document.querySelector('dialog[open] img[alt=${JSON.stringify(`Kode QR untuk ${title}`)}]'))`);
+    const qr = await evaluate(`(() => { const dialog = document.querySelector('dialog[open]'); const image = dialog.querySelector('img'); const download = [...dialog.querySelectorAll('a')].find((link) => link.textContent.includes('Unduh PNG')); return { imageSource: image.src, url: dialog.innerText.includes(${JSON.stringify(`${base}${path}`)}), filename: download?.download, downloadData: download?.href.startsWith('data:image/png;base64,'), print: [...dialog.querySelectorAll('button')].some((button) => button.textContent.includes('Cetak QR') && !button.disabled) }; })()`);
+    assert.ok(qr.imageSource.startsWith('data:image/png;base64,'), `${title} QR should render as a local PNG`);
+    assert.equal(qr.url, true, `${title} QR should display the exact portal URL`);
+    assert.ok(qr.filename.includes(filename), `${title} QR should download with a role-specific filename`);
+    assert.equal(qr.downloadData, true, `${title} QR download should contain the generated PNG`);
+    assert.equal(qr.print, true, `${title} QR should offer printing`);
+    await evaluate("document.querySelector('dialog[open] button[aria-label=\"Tutup QR\"]').click()");
+  }
+  console.log('PASS: owner can generate, download and print customer and technician portal QR codes');
   await call('Page.navigate', { url: `${base}/owner/services/new` });
   await until("Boolean(document.querySelector('[name=catalogName]') && document.querySelector('[name=catalogCategory]') && document.querySelector('[name=catalogPrice]'))");
   assert.equal(await evaluate("Boolean(document.querySelector('[name=entryType]'))"), false);
@@ -508,7 +592,7 @@ try {
   assert.ok(whatsapp.searchParams.get('text').includes(firstUpdate.ticketCode));
   assert.ok(whatsapp.searchParams.get('text').includes('Keyboard does not work'));
   const approvalMessage = whatsapp.searchParams.get('text');
-  assert.ok(approvalMessage.includes(`${base}/b/repair-a/customer`));
+  assert.ok(approvalMessage.includes(`${base}/tracking/${firstUpdate.ticketCode}`));
   assert.match(approvalMessage, /170\.000/);
   assert.match(approvalMessage, /Hasil diagnosis:/);
   assert.match(approvalMessage, /Tingkat kesulitan: Rendah/);
@@ -516,13 +600,21 @@ try {
   const proof = new URL(approvalUrl).hash;
   fixture.signIn(false);
   await call('Page.navigate', { url: `${base}/service-approval${proof}` });
-  await until("document.body.innerText.includes('Setujui Biaya Servis')");
+  await until("document.body.innerText.includes('Setujui Servis')");
   assert.ok(await evaluate("document.body.innerText.includes('2 jam') && document.body.innerText.includes('30 menit')"));
   await screenshot('service-approval-mobile');
-  await evaluate("Array.from(document.querySelectorAll('button')).find(button => button.textContent === 'Setujui Biaya Servis').click()");
-  await until("document.body.innerText.includes('Persetujuan berhasil dikirim')");
+  await evaluate("Array.from(document.querySelectorAll('button')).find(button => button.textContent === 'Setujui Servis').click()");
+  await until("document.body.innerText.includes('Servis disetujui. Teknisi dapat mulai memperbaiki perangkat.')");
   assert.equal(workflowTicket.status, 'approved');
   fixture.signIn(true, 'technician');
+  await call('Page.navigate', { url: `${base}/technician` });
+  await until("Boolean(document.querySelector('[aria-label=\"Pemberitahuan\"]'))");
+  await evaluate("document.querySelector('[aria-label=\"Pemberitahuan\"]').click()");
+  await until(`document.body.innerText.includes('Servis disetujui pelanggan') && document.body.innerText.includes(${JSON.stringify(workflowTicket.ticketCode)})`);
+  console.log('PASS: assigned technician receives a notification when the customer approves the service');
+  await evaluate(`Array.from(document.querySelectorAll('[data-notification-link]')).find((link) => link.href.endsWith(${JSON.stringify(`/technician/tickets/${workflowTicket._id}`)})).click()`);
+  await until(`location.pathname === ${JSON.stringify(`/technician/tickets/${workflowTicket._id}`)} && document.body.innerText.includes(${JSON.stringify(workflowTicket.ticketCode)})`);
+  console.log('PASS: approval notification opens the assigned ticket');
   await ticketRequest('transitions', { targetStatus: 'repairing' });
   await call('Page.navigate', { url: `${base}/technician/queue` });
   await until("document.body.innerText.includes('Prioritas tinggi') && document.body.innerText.includes('Pengingat Tenggat (1)')");
@@ -535,7 +627,7 @@ try {
   await call('Page.reload');
   await until("Array.from(document.querySelectorAll('a')).some(link => link.textContent === 'Buka WhatsApp')");
   const pickupMessage = new URL(await evaluate("Array.from(document.querySelectorAll('a')).find(link => link.textContent === 'Buka WhatsApp').href")).searchParams.get('text');
-  assert.ok(pickupMessage.includes(`${base}/b/repair-a/customer`));
+  assert.ok(pickupMessage.includes(`${base}/tracking/${workflowTicket.ticketCode}`));
   assert.match(pickupMessage, /siap diambil/);
   assert.equal(pickupMessage.includes('Persetujuan biaya:'), false);
   console.log('PASS: live technician assignments, WhatsApp pricing and portal links, guest approval, deadline priority, separate repair/QC and pickup message');

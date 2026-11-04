@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import logo from '../../assets/logo-urt.svg';
-import { currentStatusNote, TicketTimeline } from '../tickets/TicketTimeline';
+import { TicketTimeline } from '../tickets/TicketTimeline';
+import { currentStatusNote } from '../tickets/timeline-utils';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useLocation, useParams } from 'react-router';
 import {
@@ -493,7 +494,7 @@ export default function TrackingPage() {
                   <InlineNotice type="success">
                     {approvalDecision === 'approved'
                       ? 'Estimasi berhasil disetujui. Teknisi dapat melanjutkan perbaikan.'
-                      : 'Estimasi ditolak. Tempat servis akan menghubungi Anda untuk membahas langkah selanjutnya.'}
+                      : 'Servis ditolak. Perangkat akan dirakit kembali sebelum siap diambil.'}
                   </InlineNotice>
                 )}
 
@@ -505,7 +506,7 @@ export default function TrackingPage() {
                       <InlineNotice type="success">
                         {approvalDecision === 'approved'
                           ? 'Estimasi berhasil disetujui. Teknisi dapat melanjutkan perbaikan.'
-                          : 'Estimasi ditolak. Tempat servis akan menghubungi Anda untuk membahas langkah selanjutnya.'}
+                          : 'Servis ditolak. Perangkat akan dirakit kembali sebelum siap diambil.'}
                       </InlineNotice>
                     ) : !approvalToken ? (
                       <InlineNotice>
@@ -531,7 +532,7 @@ export default function TrackingPage() {
                         />
                         <div className="actions">
                           <Button variant="secondary" disabled={isResponding} onClick={() => void handleApproval('rejected')}>
-                            {isResponding ? 'Memproses…' : 'Tolak Estimasi'}
+                            {isResponding ? 'Memproses…' : 'Tolak Servis'}
                           </Button>
                           <Button disabled={isResponding} onClick={() => void handleApproval('approved')}>
                             {isResponding ? 'Memproses…' : 'Setujui Servis'}

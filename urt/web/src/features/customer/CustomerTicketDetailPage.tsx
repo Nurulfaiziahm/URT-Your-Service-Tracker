@@ -7,7 +7,7 @@ import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { DeviceSummary } from '../tickets/DeviceSummary';
 import { ServiceStepper } from '../tickets/ServiceStepper';
 import { TicketTiming } from '../tickets/TicketTiming';
-import { currentStatusNote } from '../tickets/TicketTimeline';
+import { currentStatusNote } from '../tickets/timeline-utils';
 import { TicketTimeline } from '../tickets/TicketTimeline';
 import { EstimateBreakdown } from '../tickets/EstimateBreakdown';
 import { TicketAttachments } from '../tickets/TicketAttachments';
@@ -174,7 +174,7 @@ export default function CustomerTicketDetailPage() {
 
       {/* Stepper */}
       <div className={styles.ticketCard}>
-        <ServiceStepper status={ticket.status} statusNote={currentStatusNote(ticket.status, ticket.timeline)} />
+        <ServiceStepper status={ticket.status} statusNote={currentStatusNote(ticket.status, ticket.timeline)} rejectedFlow={ticket.timeline?.some((event) => event.action === 'estimate_rejected')} />
         <TicketTiming ticket={ticket} customerView />
       </div>
 

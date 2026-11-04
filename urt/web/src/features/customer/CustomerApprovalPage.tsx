@@ -40,12 +40,12 @@ export default function CustomerApprovalPage() {
             <Icon name={result === 'approved' ? 'check' : 'ticket'} width={32} height={32} />
           </span>
           <h2>
-            {result === 'approved' ? 'Persetujuan Berhasil Dikirim' : 'Estimasi Servis Ditolak'}
+            {result === 'approved' ? 'Servis Disetujui' : 'Servis Ditolak'}
           </h2>
           <p>
             {result === 'approved'
-              ? 'Terima kasih. Teknisi dapat melanjutkan perbaikan sesuai estimasi yang Anda setujui.'
-              : 'Keputusan Anda telah diterima. Hubungi tempat servis untuk membahas langkah berikutnya.'}
+              ? 'Terima kasih. Teknisi dapat mulai memperbaiki perangkat sesuai estimasi.'
+              : 'Perangkat akan dirakit kembali dan Anda akan mendapat kabar saat siap diambil.'}
           </p>
           <ButtonLink to={`${basePath}/services/${id}`}>Lihat Status Servis</ButtonLink>
         </section>

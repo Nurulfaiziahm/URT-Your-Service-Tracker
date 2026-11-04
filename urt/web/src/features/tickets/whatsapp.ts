@@ -12,16 +12,16 @@ export function whatsappMessageLink(phone: string | undefined, message: string) 
 
 export function customerServiceUpdate(ticket: ServiceTicket, status: string, technicianName: string, portalUrl: string, approvalUrl?: string) {
   const estimate = ticket.estimateRevisions?.at(-1);
-  if (!portalUrl || !['awaiting_approval', 'completed'].includes(ticket.status)) return '';
+  if (!portalUrl || !['awaiting_approval', 'completed', 'rejected', 'reassembling'].includes(ticket.status)) return '';
   if (ticket.status === 'awaiting_approval' && (!approvalUrl || !estimate)) return '';
   return [
-    `Halo ${ticket.customer?.name || 'Pelanggan'}, berikut informasi servis Anda:`,
+    `Halo ${ticket.customer?.name || 'Pelanggan'}, ini kabar terbaru tentang servis Anda:`,
     `Nomor tiket: ${ticket.ticketCode}`,
     `Perangkat: ${[ticket.device.brand, ticket.device.model].filter(Boolean).join(' ') || ticket.device.category}`,
     `Keluhan: ${ticket.complaint}`,
     `Status: ${status}`,
     ...(ticket.status === 'awaiting_approval' && estimate ? [
-      'Mohon tinjau dan setujui biaya servis sebelum perbaikan dimulai.',
+      'Silakan tinjau biaya servis. Perbaikan dimulai setelah Anda menyetujuinya.',
       estimate.customerExplanation && `Hasil diagnosis: ${estimate.customerExplanation}`,
       ...estimate.lines.map((line) => `${line.description} (${line.quantity}): ${formatRupiah(line.subtotal ?? line.quantity * line.unitPrice)}`),
       ...estimate.lines.filter((line) => line.difficultyLevel).map((line) => `Tingkat kesulitan: ${difficultyLabels[line.difficultyLevel!]}`),
@@ -29,8 +29,12 @@ export function customerServiceUpdate(ticket: ServiceTicket, status: string, tec
       `Estimasi servis selesai (termasuk QC): ${durationLabel(totalServiceDurationMinutes(estimate))}`,
       estimate.targetCompletionDate && `Perkiraan selesai: ${new Date(estimate.targetCompletionDate).toLocaleString('id-ID')}`,
       `Persetujuan biaya: ${approvalUrl}`,
-    ] : ['Perbaikan dan QC telah selesai. Perangkat Anda siap diambil.', ticket.workSummary]),
-    `Portal pelanggan: ${portalUrl}`,
+    ] : ticket.status === 'rejected'
+      ? ['Anda menolak estimasi servis. Perangkat sedang dirakit kembali agar siap diambil.']
+      : ticket.status === 'reassembling'
+        ? ['Perangkat sedang dirakit kembali dan akan diberi kabar saat siap diambil.']
+        : ['Perbaikan dan pemeriksaan selesai. Perangkat Anda siap diambil.', ticket.workSummary]),
+      `Lihat status servis tanpa login: ${portalUrl.replace(/\/b\/.*$/, `/tracking/${encodeURIComponent(ticket.ticketCode)}`)}`,
     `Teknisi: ${ticket.technician?.name || technicianName}`,
   ].filter(Boolean).join('\n');
 }

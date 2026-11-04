@@ -34,6 +34,39 @@ import {
   AddAttachmentInput,
 } from './ticket.schema.js';
 
+const serviceStatusLabels: Record<string, string> = {
+  submitted: 'Pengajuan diterima', waiting_diagnosis: 'Menunggu diagnosis', diagnosing: 'Sedang didiagnosis',
+  awaiting_approval: 'Menunggu persetujuan biaya', approved: 'Servis disetujui', rejected: 'Servis ditolak',
+  reassembling: 'Perangkat sedang dirakit kembali', repairing: 'Sedang diperbaiki', quality_check: 'Sedang diperiksa',
+  completed: 'Siap diambil', cancelled: 'Servis dibatalkan',
+};
+
+async function notifyCustomerOfStatus(ticket: any, businessId: string, note?: string) {
+  const customer = ticket.customerId;
+  if (!customer?.email) return;
+  try {
+    const business = await Business.findById(businessId);
+    void mailService.sendTemplate({
+      to: customer.email,
+      subject: `Pembaruan Servis ${ticket.ticketCode}: ${serviceStatusLabels[ticket.status] || ticket.status}`,
+      template: 'service-status-update',
+      data: {
+        title: 'Status servis Anda diperbarui',
+        preheader: `${ticket.ticketCode}: ${serviceStatusLabels[ticket.status] || ticket.status}`,
+        name: customer.name || 'Pelanggan',
+        businessName: business?.name || 'Tempat Servis',
+        ticketCode: ticket.ticketCode,
+        device: `${ticket.device?.brand ? `${ticket.device.brand} ` : ''}${ticket.device?.model || ticket.device?.category || 'Perangkat'}`,
+        statusLabel: serviceStatusLabels[ticket.status] || ticket.status,
+        statusNote: note || '',
+        trackingUrl: `${config.allowedOrigins[0]}/tracking/${encodeURIComponent(ticket.ticketCode)}`,
+      },
+    }).catch((error) => logger.error('Failed to send service status notification', { ticketId: ticket.id, error }));
+  } catch (error) {
+    logger.error('Could not prepare service status notification', { ticketId: ticket.id, error });
+  }
+}
+
 const formatServiceDuration = (minutes: number): string => {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
@@ -139,6 +172,8 @@ export class TicketService {
             isPublic: true, timestamp: ticket.repairDueAt,
           });
           await ticket.save();
+          const updated = await ticket.populate('customerId', 'name email phone userId');
+          await notifyCustomerOfStatus(updated, ticket.businessId.toString(), updated.timeline.at(-1)?.note);
         } else if (ticket.status === 'quality_check' && ticket.qcDueAt && ticket.qcDueAt <= now) {
           ticket.status = 'completed';
           ticket.nextDeadlineAt = undefined;
@@ -155,6 +190,8 @@ export class TicketService {
             isPublic: true, timestamp: ticket.qcDueAt,
           });
           await ticket.save();
+          const updated = await ticket.populate('customerId', 'name email phone userId');
+          await notifyCustomerOfStatus(updated, ticket.businessId.toString(), updated.timeline.at(-1)?.note);
         }
       } catch (error) {
         logger.warn('Could not advance ticket using its estimate', { ticketId: ticket.id, error });
@@ -670,11 +707,13 @@ export class TicketService {
 
     await ticket.save();
 
-    return (await ticket.populate([
+    const populated = (await ticket.populate([
       { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
+    await notifyCustomerOfStatus(populated, ticket.businessId.toString(), populated.timeline.at(-1)?.note);
+    return populated;
   }
 
   /**
@@ -740,11 +779,13 @@ export class TicketService {
 
     await ticket.save();
 
-    return (await ticket.populate([
+    const populated = (await ticket.populate([
       { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
+    await notifyCustomerOfStatus(populated, businessId, populated.timeline.at(-1)?.note);
+    return populated;
   }
 
   /**
@@ -1096,11 +1137,13 @@ export class TicketService {
 
     await ticket.save();
 
-    return (await ticket.populate([
+    const populated = (await ticket.populate([
       { path: 'customerId', select: 'name email phone userId' },
       { path: 'assignedTechnicianId', select: 'name email phone specializations' },
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
+    await notifyCustomerOfStatus(populated, ticket.businessId.toString(), populated.timeline.at(-1)?.note);
+    return populated;
   }
 
   /**
@@ -1263,6 +1306,26 @@ export class TicketService {
         break;
       }
 
+      case 'reassembling': {
+        if (ticket.status !== 'rejected') {
+          throw new AppError('Perakitan kembali hanya dapat dimulai setelah estimasi ditolak.', 400, 'INVALID_STATUS_TRANSITION');
+        }
+        if (callerRole !== 'owner') await this.verifyAssignedTechnician(businessObjectId, ticket, callerUserId);
+        ticket.status = 'reassembling';
+        ticket.revision += 1;
+        ticket.timeline.push({
+          status: 'reassembling',
+          action: 'reassembly_started',
+          actorId: callerObjectId,
+          actorRole: callerRole,
+          actorName: callerRole === 'owner' ? 'Owner' : 'Technician',
+          note: input.reason || 'Perangkat sedang dirakit kembali setelah estimasi servis ditolak.',
+          isPublic: true,
+          timestamp: new Date(),
+        });
+        break;
+      }
+
       case 'quality_check': {
         // Submitting repair for quality control inspection
         await this.verifyAssignedTechnician(businessObjectId, ticket, callerUserId);
@@ -1326,6 +1389,24 @@ export class TicketService {
       }
 
       case 'completed': {
+        if (ticket.status === 'reassembling') {
+          if (callerRole !== 'owner') await this.verifyAssignedTechnician(businessObjectId, ticket, callerUserId);
+          ticket.status = 'completed';
+          ticket.nextDeadlineAt = undefined;
+          ticket.readyAt = new Date();
+          ticket.revision += 1;
+          ticket.timeline.push({
+            status: 'completed',
+            action: 'reassembly_completed',
+            actorId: callerObjectId,
+            actorRole: callerRole,
+            actorName: callerRole === 'owner' ? 'Owner' : 'Technician',
+            note: input.reason || 'Perangkat selesai dirakit kembali dan siap diambil pelanggan.',
+            isPublic: true,
+            timestamp: new Date(),
+          });
+          break;
+        }
         // A technician may confirm QC directly from repairing when work finishes early.
         if (ticket.status !== 'quality_check' && ticket.status !== 'repairing') {
           throw new AppError('Can only complete ticket after repair and quality check', 400, 'INVALID_STATUS_TRANSITION');
@@ -1429,35 +1510,7 @@ export class TicketService {
       { path: 'requestedServiceId', select: 'name category basePrice estimatedDuration' },
     ])) as IServiceTicket;
 
-    if (input.targetStatus === 'completed') {
-      try {
-        const recipientEmail = (populated.customerId as any)?.email;
-        if (recipientEmail) {
-          const business = await Business.findById(businessId);
-          mailService
-            .sendTemplate({
-              to: recipientEmail,
-              subject: `Perbaikan Selesai & Siap Diambil - ${ticket.ticketCode}`,
-              template: 'repair-ready',
-              data: {
-                title: 'Perbaikan Selesai & Siap Diambil',
-                preheader: `Perangkat siap diambil di ${business?.name || 'URT'}`,
-                name: (populated.customerId as any)?.name || 'Pelanggan',
-                businessName: business?.name || 'URT Servis',
-                ticketCode: ticket.ticketCode,
-                device: `${ticket.device.brand ? ticket.device.brand + ' ' : ''}${ticket.device.model}`,
-                workSummary: ticket.workSummary,
-                readyAt: ticket.readyAt || new Date(),
-                warrantyDays: ticket.warranty?.days,
-                timezone: business?.timezone || 'Asia/Jakarta',
-              },
-            })
-            .catch((err) => logger.error('Failed to send repair-ready email', { error: err }));
-        }
-      } catch (err) {
-        logger.error('Error triggering repair-ready email', { error: err });
-      }
-    }
+    await notifyCustomerOfStatus(populated, businessId, populated.timeline.at(-1)?.note);
 
     return populated;
   }
@@ -1613,6 +1666,7 @@ export class TicketService {
       awaiting_approval: 'Menunggu Persetujuan Biaya',
       approved: 'Estimasi Disetujui',
       rejected: 'Estimasi Ditolak',
+      reassembling: 'Perangkat Dirakit Kembali',
       repairing: 'Sedang Dikerjakan',
       quality_check: 'Uji Kendali Mutu (QC)',
       completed: 'Selesai & Siap Diambil',
@@ -1622,7 +1676,7 @@ export class TicketService {
     let currentStep = 1;
     if (['submitted', 'waiting_diagnosis'].includes(ticket.status)) currentStep = 1;
     else if (ticket.status === 'diagnosing') currentStep = 2;
-    else if (['awaiting_approval', 'approved', 'rejected'].includes(ticket.status)) currentStep = 3;
+    else if (['awaiting_approval', 'approved', 'rejected', 'reassembling'].includes(ticket.status)) currentStep = 3;
     else if (ticket.status === 'repairing') currentStep = 4;
     else if (ticket.status === 'quality_check') currentStep = 5;
     else if (ticket.status === 'completed') currentStep = 6;

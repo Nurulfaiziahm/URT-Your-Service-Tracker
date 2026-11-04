@@ -109,7 +109,7 @@ export default function OwnerSubscriptionPage() {
           <section className="reference-panel">
             <div className="reference-panel-header">
               <h2>Status Langganan</h2>
-              <StatusBadge label={subscription.status === 'active' ? 'Aktif' : subscription.status === 'expired' ? 'Kedaluwarsa' : 'Belum Aktif'} tone={subscription.status === 'active' ? 'success' : subscription.status === 'expired' ? 'danger' : 'warning'} />
+              <StatusBadge label={subscription.status === 'active' ? 'Aktif' : subscription.status === 'expired' ? 'Kedaluwarsa' : 'Belum Aktif'} tone={subscription.status === 'active' ? 'success' : subscription.status === 'expired' ? 'neutral' : 'warning'} />
             </div>
             <dl className="reference-dl">
               <div>

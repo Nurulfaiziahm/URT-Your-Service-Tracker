@@ -217,6 +217,7 @@ export interface TransitionTicketInput {
     | 'waiting_diagnosis'
     | 'diagnosing'
     | 'repairing'
+    | 'reassembling'
     | 'quality_check'
     | 'completed'
     | 'cancelled';

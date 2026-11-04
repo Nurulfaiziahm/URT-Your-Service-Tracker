@@ -1,14 +1,15 @@
 /** Agreed machine values; transitions and permissions remain server-owned. */
 export const ticketStatuses = {
-  submitted: { label: 'Pengajuan', tone: 'neutral' },
-  waiting_diagnosis: { label: 'Menunggu diagnosis', tone: 'neutral' },
+  submitted: { label: 'Pengajuan', tone: 'warning' },
+  waiting_diagnosis: { label: 'Menunggu diagnosis', tone: 'warning' },
   diagnosing: { label: 'Diagnosis', tone: 'info' },
   awaiting_approval: { label: 'Menunggu persetujuan', tone: 'warning' },
-  approved: { label: 'Disetujui', tone: 'success' },
+  approved: { label: 'Servis Disetujui', tone: 'success' },
   repairing: { label: 'Dalam pengerjaan', tone: 'info' },
   quality_check: { label: 'Quality check', tone: 'info' },
   completed: { label: 'Siap diambil', tone: 'success' },
-  rejected: { label: 'Ditolak', tone: 'danger' },
+  rejected: { label: 'Servis Ditolak', tone: 'danger' },
+  reassembling: { label: 'Dirakit kembali', tone: 'info' },
   cancelled: { label: 'Dibatalkan', tone: 'neutral' },
 } as const;
 
@@ -20,31 +21,49 @@ export const customerStatusNotes: Record<TicketStatus, string> = {
   diagnosing: 'Teknisi sedang memeriksa perangkat dan menyiapkan diagnosis serta estimasi biaya.',
   awaiting_approval: 'Estimasi biaya sudah dikirim. Tinjau rincian servis lalu pilih setujui atau tolak.',
   approved: 'Persetujuan telah diterima. Mohon menunggu teknisi memulai pengerjaan.',
-  rejected: 'Estimasi ditolak. Tempat servis akan menindaklanjuti keputusan Anda.',
+  rejected: 'Servis ditolak. Perangkat akan dirakit kembali sebelum siap diambil.',
+  reassembling: 'Perangkat sedang dirakit kembali agar siap diambil.',
   repairing: 'Teknisi sedang mengerjakan perbaikan perangkat.',
   quality_check: 'Perbaikan selesai dan perangkat sedang menjalani pemeriksaan kualitas.',
   completed: 'Pemeriksaan kualitas selesai. Perangkat siap diambil di tempat servis.',
   cancelled: 'Servis dibatalkan. Hubungi tempat servis jika Anda memerlukan bantuan.',
 };
 
-export const serviceWorkflowStages = [
+export interface ServiceWorkflowStage {
+  label: string;
+  statuses: readonly TicketStatus[];
+}
+
+export const serviceWorkflowStages: readonly ServiceWorkflowStage[] = [
   { label: 'Pengajuan', statuses: ['submitted', 'waiting_diagnosis'] },
   { label: 'Diagnosis', statuses: ['diagnosing'] },
   { label: 'Persetujuan', statuses: ['awaiting_approval', 'rejected'] },
   { label: 'Pengerjaan', statuses: ['approved', 'repairing'] },
   { label: 'Quality Check', statuses: ['quality_check'] },
   { label: 'Siap Diambil', statuses: ['completed'] },
-] as const satisfies readonly { label: string; statuses: readonly TicketStatus[] }[];
+];
 
-const activeStageByStatus = Object.fromEntries(
-  serviceWorkflowStages.flatMap((stage, index) => stage.statuses.map((status) => [status, index])),
-) as Record<TicketStatus, number>;
-activeStageByStatus.cancelled = -1;
+const rejectedWorkflowStages: readonly ServiceWorkflowStage[] = [
+  { label: 'Persetujuan', statuses: ['awaiting_approval', 'rejected'] },
+  { label: 'Rakit Kembali', statuses: ['reassembling'] },
+  { label: 'Selesai', statuses: ['completed'] },
+];
 
-export function serviceProgressState(status: TicketStatus, stage: number): 'completed' | 'current' | 'pending' | 'rejected' | 'cancelled' {
+export function serviceWorkflowForStatus(status: TicketStatus, rejectedFlow = false): readonly ServiceWorkflowStage[] {
+  return status === 'rejected' || status === 'reassembling' || (status === 'completed' && rejectedFlow)
+    ? rejectedWorkflowStages
+    : serviceWorkflowStages;
+}
+
+export function serviceProgressState(
+  status: TicketStatus,
+  stage: number,
+  workflow: readonly ServiceWorkflowStage[] = serviceWorkflowForStatus(status),
+): 'completed' | 'current' | 'pending' | 'rejected' | 'cancelled' {
   if (status === 'cancelled') return 'cancelled';
-  if (status === 'rejected' && stage === activeStageByStatus.rejected) return 'rejected';
-  if (status === 'completed' || stage < activeStageByStatus[status]) return 'completed';
-  if (stage === activeStageByStatus[status]) return 'current';
+  const activeStage = workflow.findIndex((item) => (item.statuses as readonly string[]).includes(status));
+  if (status === 'rejected' && stage === activeStage) return 'rejected';
+  if (status === 'completed' || stage < activeStage) return 'completed';
+  if (stage === activeStage) return 'current';
   return 'pending';
 }

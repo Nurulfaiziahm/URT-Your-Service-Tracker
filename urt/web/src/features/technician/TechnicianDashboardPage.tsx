@@ -5,8 +5,9 @@ import { useGetTechnicianDashboardQuery } from '../dashboard/dashboardApi';
 import { PageLoader, EmptyState } from '../../components/feedback/Feedback';
 import { SummaryCard } from '../../components/ui/SummaryCard';
 import { ButtonLink } from '../../components/ui/Button';
+import { DeviceIllustration } from '../../components/ui/DeviceIllustration';
 import { StatusBadge } from '../../components/ui/StatusBadge';
-import { serviceWorkflowStages, serviceProgressState, ticketStatuses } from '../tickets/status';
+import { serviceWorkflowForStatus, serviceProgressState, ticketStatuses } from '../tickets/status';
 import { durationLabel, ticketDeadline } from '../tickets/service-timing';
 import styles from './TechnicianDashboard.module.css';
 
@@ -176,22 +177,7 @@ export default function TechnicianDashboardPage() {
 
             <div className={styles.deviceRow}>
               <div className={styles.deviceBox}>
-                <svg width="78" height="66" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <defs>
-                    <linearGradient id="laptopScreenGrad" x1="0" y1="0" x2="100" y2="80" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stopColor="#1e3a8a" />
-                      <stop offset="45%" stopColor="#2563eb" />
-                      <stop offset="100%" stopColor="#60a5fa" />
-                    </linearGradient>
-                  </defs>
-                  <rect x="14" y="6" width="72" height="48" rx="4" fill="#0f172a" />
-                  <rect x="17" y="9" width="66" height="42" rx="2" fill="url(#laptopScreenGrad)" />
-                  <path d="M22 45L44 22L58 36L78 16" stroke="rgba(255,255,255,0.45)" strokeWidth="3" strokeLinecap="round" />
-                  <circle cx="50" cy="7.5" r="1" fill="#64748b" />
-                  <polygon points="6,60 94,60 88,54 12,54" fill="#1e293b" />
-                  <rect x="5" y="60" width="90" height="4" rx="2" fill="#334155" />
-                  <rect x="42" y="55" width="16" height="2" rx="1" fill="#475569" />
-                </svg>
+                <DeviceIllustration category={ticket.device.category} size={78} />
               </div>
               <div className={styles.deviceDetails}>
                 <div className={styles.ticketCode}>{ticket.ticketCode}</div>
@@ -234,8 +220,8 @@ export default function TechnicianDashboardPage() {
 
             <div className={styles.timelineWrapper}>
               <ol className={styles.timelineList} aria-label="Tahapan pengerjaan servis">
-                {serviceWorkflowStages.map((stage, index) => {
-                  const state = serviceProgressState(ticket.status, index);
+                {serviceWorkflowForStatus(ticket.status, ticket.timeline?.some((event) => event.action === 'estimate_rejected')).map((stage, index, workflow) => {
+                  const state = serviceProgressState(ticket.status, index, workflow);
 
                   const stageDateText = index === 0
                     ? '30 Okt 2026, 10:15'

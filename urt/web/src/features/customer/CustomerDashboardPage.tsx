@@ -6,15 +6,15 @@ import { selectUser } from '../auth/authSlice';
 import { useCustomerPortal } from './customer-portal';
 import { useGetCustomerDashboardQuery } from '../dashboard/dashboardApi';
 import { SummaryCard } from '../../components/ui/SummaryCard';
+import { DeviceIllustration } from '../../components/ui/DeviceIllustration';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { EmptyState, PageLoader } from '../../components/feedback/Feedback';
 import { TicketStatusBadge } from '../tickets/TicketStatusBadge';
 import { TicketTable } from '../tickets/TicketTable';
-import { serviceWorkflowStages, serviceProgressState } from '../tickets/status';
-import { durationLabel, totalServiceDurationMinutes } from '../tickets/service-timing';
 import { useGetPublicTrackingMutation } from '../tickets/ticketsApi';
 import { ServiceStepper } from '../tickets/ServiceStepper';
-import { currentStatusNote, TicketTimeline } from '../tickets/TicketTimeline';
+import { TicketTimeline } from '../tickets/TicketTimeline';
+import { currentStatusNote } from '../tickets/timeline-utils';
 import type { PublicTrackingResult } from '../tickets/types';
 import { whatsappMessageLink } from '../tickets/whatsapp';
 import styles from './CustomerDashboard.module.css';
@@ -27,16 +27,6 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-function DeviceIcon() {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-    </svg>
-  );
-}
-
 function TrackedTicketPanel({ ticket }: { ticket: PublicTrackingResult }) {
   const deviceTitle = [ticket.device.brand, ticket.device.model].filter(Boolean).join(' ') || ticket.device.category;
 
@@ -44,7 +34,7 @@ function TrackedTicketPanel({ ticket }: { ticket: PublicTrackingResult }) {
     <div className={styles.trackedServiceLayout} aria-label="Informasi tiket yang dicari">
       <section className={styles.summaryCard}>
         <div className={styles.summaryTop}>
-          <div className={styles.deviceVisual}><DeviceIcon /></div>
+          <div className={styles.deviceVisual}><DeviceIllustration category={ticket.device.category} /></div>
           <div className={styles.summaryMeta}>
             <div className={styles.summaryHeader}>
               <span className={styles.ticketCode}>{ticket.ticketCode}</span>
@@ -116,7 +106,7 @@ function TrackedTicketPanel({ ticket }: { ticket: PublicTrackingResult }) {
 
       <section className={styles.journeyCard}>
         <div className={styles.journeyHeader}><h2>Perjalanan Servis</h2></div>
-        <ServiceStepper status={ticket.status} statusNote={currentStatusNote(ticket.status, ticket.timeline)} />
+        <ServiceStepper status={ticket.status} statusNote={currentStatusNote(ticket.status, ticket.timeline)} rejectedFlow={ticket.timeline?.some((event) => event.action === 'estimate_rejected')} />
         <div>
           <h3 className={styles.timelineHeading}>Riwayat Status</h3>
           <TicketTimeline timeline={ticket.timeline} />
@@ -130,7 +120,7 @@ export default function CustomerDashboardPage() {
   const { businessId, business, basePath, hasMembership, isAuthenticated } = useCustomerPortal();
   const [searchParams] = useSearchParams();
   const initialTicketCode = searchParams.get('ticketCode')?.trim() || '';
-  const [ticketSearch, setTicketSearch] = useState(initialTicketCode);
+  const [ticketSearch, setTicketSearch] = useState(() => initialTicketCode.replace(/^#/, '').toUpperCase());
   const [trackingResult, setTrackingResult] = useState<PublicTrackingResult | null>(null);
   const [searchError, setSearchError] = useState('');
   const [fetchTracking, { isLoading: isSearching }] = useGetPublicTrackingMutation();
@@ -149,7 +139,6 @@ export default function CustomerDashboardPage() {
   useEffect(() => {
     if (!initialTicketCode) return;
     const ticketCode = initialTicketCode.replace(/^#/, '').toUpperCase();
-    setTicketSearch(ticketCode);
     void fetchTracking({ ticketCode }).unwrap()
       .then((response) => setTrackingResult(response.data))
       .catch(() => setSearchError('Nomor tiket tidak ditemukan. Periksa kembali nomor tiket dan coba lagi.'));
@@ -214,24 +203,6 @@ export default function CustomerDashboardPage() {
     ['completed', 'cancelled'].includes(item.status),
   );
 
-  // Active ticket estimate data
-  const estimate = ticket
-    ? ticket.status === 'awaiting_approval'
-      ? ticket.estimateRevisions?.at(-1)
-      : ticket.approvedEstimate || ticket.estimateRevisions?.at(-1)
-    : undefined;
-
-  const targetDateFormatted = estimate?.targetCompletionDate
-    ? new Date(estimate.targetCompletionDate).toLocaleString('id-ID', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : undefined;
-  const totalServiceDuration = totalServiceDurationMinutes(estimate);
-
   const techPhone = ticket?.technician?.phone;
   const techName = ticket?.technician?.name || 'Patrick Star';
   const deviceTitle = ticket
@@ -241,6 +212,9 @@ export default function CustomerDashboardPage() {
     ? `Halo ${techName}, saya ingin menanyakan perkembangan servis tiket #${ticket.ticketCode} (${deviceTitle}). Terima kasih!`
     : '';
   const waLink = whatsappMessageLink(techPhone, waMsg) || (techPhone ? `https://wa.me/${techPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(waMsg)}` : `https://wa.me/?text=${encodeURIComponent(waMsg)}`);
+  const adminWaLink = business?.phone
+    ? whatsappMessageLink(business.phone, `Halo admin ${business.name}, saya perlu bantuan terkait servis ${ticketSearch || 'saya'}.`)
+    : undefined;
 
   return (
     <div className="reference-stack" data-dashboard="customer">
@@ -282,19 +256,25 @@ export default function CustomerDashboardPage() {
               setSearchError('');
               setTrackingResult(null);
             }}
-            placeholder="Masukkan nomor tiket untuk melacak status servis"
+            placeholder="Masukkan nomor tiket"
             autoComplete="off"
           />
-          <Button type="submit" pending={isSearching}>
+          <Button type="submit" pending={isSearching} aria-label="Cari tiket servis">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="11" cy="11" r="7" />
               <path d="m20 20-4-4" />
             </svg>
-            Cari
+            <span className={styles.searchButtonLabel}>Cari</span>
           </Button>
         </form>
         {searchError && <p className={styles.searchError} role="alert">{searchError}</p>}
       </section>
+
+      {adminWaLink && <section className="reference-panel" aria-label="Bantuan pelanggan">
+        <h2>Butuh bantuan?</h2>
+        <p>Hubungi admin tempat servis melalui WhatsApp.</p>
+        <ButtonLink to={adminWaLink} target="_blank" rel="noopener noreferrer" variant="secondary">Hubungi Admin via WhatsApp</ButtonLink>
+      </section>}
 
       <section className="reference-stats reference-stats-three">
         <SummaryCard
@@ -325,17 +305,14 @@ export default function CustomerDashboardPage() {
           {/* Card Kiri: Service Summary */}
           <section className={styles.summaryCard}>
             <div className={styles.summaryTop}>
-              <div className={styles.deviceVisual}>
-                <DeviceIcon />
-              </div>
+              <div className={styles.deviceVisual}><DeviceIllustration category={ticket.device.category} /></div>
               <div className={styles.summaryMeta}>
                 <div className={styles.summaryHeader}>
                   <span className={styles.ticketCode}>{ticket.ticketCode}</span>
                   <TicketStatusBadge status={ticket.status} />
                 </div>
-                <h3 className={styles.deviceName}>
-                  {[ticket.device.brand, ticket.device.model].filter(Boolean).join(' ') || ticket.device.category}
-                </h3>
+                <h2 className={styles.deviceName}>{[ticket.device.brand, ticket.device.model].filter(Boolean).join(' ') || ticket.device.category}</h2>
+                <p className={styles.complaintText}><strong>Pelanggan:</strong> {ticket.customer?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim()}</p>
                 <p className={styles.complaintText}>{ticket.complaint}</p>
               </div>
             </div>
@@ -343,18 +320,29 @@ export default function CustomerDashboardPage() {
             <hr className={styles.cardDivider} />
 
             <div className={styles.infoRow}>
-              <div className={styles.infoCol}>
-                <span className={styles.infoLabel}>Teknisi</span>
-                <strong className={styles.infoValue}>
-                  {ticket.technician?.name || 'Patrick Star'}
-                </strong>
+              <div className={styles.infoItem}>
+                <span className={styles.infoIcon} aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 21h18M5 21V7l8-4 6 4v14M9 21v-6h6v6M8 9h.01M12 9h.01M16 9h.01" />
+                  </svg>
+                </span>
+                <div className={styles.infoCol}>
+                  <span className={styles.infoLabel}>Tempat Servis</span>
+                  <strong className={styles.infoValue}>{business?.name || data?.data.business.name || '—'}</strong>
+                </div>
               </div>
               <div className={styles.infoSeparator} aria-hidden="true" />
-              <div className={styles.infoCol}>
-                <span className={styles.infoLabel}>Tempat Servis</span>
-                <strong className={styles.infoValue}>
-                  {business?.name || data?.data.business.name || 'nfservice'}
-                </strong>
+              <div className={styles.infoItem}>
+                <span className={styles.infoIcon} aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <path d="M16 3v4M8 3v4M3 11h18" />
+                  </svg>
+                </span>
+                <div className={styles.infoCol}>
+                  <span className={styles.infoLabel}>Tanggal Diterima</span>
+                  <strong className={styles.infoValue}>{new Date(ticket.intakeReceivedAt || ticket.createdAt).toLocaleString('id-ID')}</strong>
+                </div>
               </div>
             </div>
 
@@ -390,108 +378,11 @@ export default function CustomerDashboardPage() {
 
           {/* Card Kanan: Perjalanan Servis */}
           <section className={styles.journeyCard}>
-            <div className={styles.journeyHeader}>
-              <h2>Perjalanan Servis</h2>
-              <Link to={`${basePath}/services/${ticket.id}`} className="text-link">
-                Lihat riwayat lengkap
-              </Link>
-            </div>
-
-            <div className={styles.journeyBody}>
-              {/* Timeline 6 Tahap */}
-              <div className={styles.timelineWrapper}>
-                <ol className={styles.journeyTimeline} aria-label="Tahapan pengerjaan servis">
-                  {serviceWorkflowStages.map((stage, index) => {
-                    const state = serviceProgressState(ticket.status, index);
-
-                    let timestamp: string | undefined;
-                    if (index === 0 && ticket.createdAt) {
-                      timestamp = new Date(ticket.createdAt).toLocaleString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      });
-                    } else if (state === 'completed') {
-                      const event = ticket.timeline?.find((e) => {
-                        if (index === 1) return e.action === 'diagnosed' || e.action === 'diagnosis_started';
-                        if (index === 2) return e.action === 'estimate_approved';
-                        if (index === 3) return e.action === 'repair_started' || e.action === 'estimate_approved';
-                        if (index === 4) return e.action === 'quality_check_submitted';
-                        if (index === 5) return e.action === 'completed';
-                        return false;
-                      });
-                      if (event?.timestamp) {
-                        timestamp = new Date(event.timestamp).toLocaleString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        });
-                      }
-                    }
-
-                    return (
-                      <li
-                        key={stage.label}
-                        className={styles.timelineStep}
-                        data-state={state}
-                        aria-current={state === 'current' ? 'step' : undefined}
-                      >
-                        <div className={styles.stepIndicator}>
-                          <span className={styles.stepCircle} aria-hidden="true">
-                            {state === 'completed' ? (
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="20 6 9 17 4 12" />
-                              </svg>
-                            ) : (
-                              index + 1
-                            )}
-                          </span>
-                        </div>
-
-                        <div className={state === 'current' ? styles.stepContentActive : styles.stepContent}>
-                          <strong className={styles.stepTitle}>{stage.label}</strong>
-                          {state === 'current' && (
-                            <span className={styles.stepSubtext}>Sedang dalam proses</span>
-                          )}
-                          {timestamp && state === 'completed' && (
-                            <span className={styles.stepTimestamp}>{timestamp}</span>
-                          )}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </div>
-
-            <p className={styles.scheduleNote} role="status">
-              {currentStatusNote(ticket.status, ticket.timeline)}
-            </p>
-
-              {/* Estimasi Servis Selesai */}
-              <div className={styles.scheduleCard}>
-                <h3 className={styles.scheduleTitle}>Estimasi Servis Selesai</h3>
-                <dl className={styles.scheduleDl}>
-                  {totalServiceDuration && <div><dt>Durasi servis (termasuk QC)</dt><dd>{durationLabel(totalServiceDuration)}</dd></div>}
-                  {targetDateFormatted && (
-                    <div>
-                      <dt>Perkiraan selesai</dt>
-                      <dd>{targetDateFormatted}</dd>
-                    </div>
-                  )}
-                </dl>
-                <div className={styles.scheduleNote}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="16" x2="12" y2="12" />
-                    <line x1="12" y1="8" x2="12.01" y2="8" />
-                  </svg>
-                  <span>Durasi yang ditampilkan mencakup pengerjaan dan pemeriksaan kualitas.</span>
-                </div>
-              </div>
+            <div className={styles.journeyHeader}><h2>Perjalanan Servis</h2></div>
+            <ServiceStepper status={ticket.status} statusNote={currentStatusNote(ticket.status, ticket.timeline)} rejectedFlow={ticket.timeline?.some((event) => event.action === 'estimate_rejected')} />
+            <div>
+              <h3 className={styles.timelineHeading}>Riwayat Status</h3>
+              <TicketTimeline timeline={ticket.timeline} />
             </div>
           </section>
         </div>
@@ -508,7 +399,7 @@ export default function CustomerDashboardPage() {
       )}
 
       {/* Servis Sebelumnya / Riwayat Servis */}
-      <section className="reference-panel">
+      <section className={`reference-panel ${styles.historySection}`}>
         <div className="reference-panel-header">
           <div>
             <h2>Servis Sebelumnya</h2>

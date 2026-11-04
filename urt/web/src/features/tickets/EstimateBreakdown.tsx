@@ -14,8 +14,8 @@ interface EstimateBreakdownProps {
 
 export function EstimateBreakdown({ revision, title, customerView = false }: EstimateBreakdownProps) {
   const estimateStatus = {
-    approved: { label: 'Disetujui Pelanggan', tone: 'success' },
-    rejected: { label: 'Ditolak', tone: 'danger' },
+    approved: { label: 'Servis Disetujui', tone: 'success' },
+    rejected: { label: 'Servis Ditolak', tone: 'danger' },
     pending: { label: 'Menunggu Persetujuan', tone: 'info' },
     superseded: { label: 'Digantikan Revisi Baru', tone: 'neutral' },
   } as const;

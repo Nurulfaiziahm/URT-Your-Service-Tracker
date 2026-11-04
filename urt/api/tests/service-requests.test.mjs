@@ -105,7 +105,28 @@ test('customer tickets are assigned to active technicians and fictitious contact
     assert.equal(assigned[0].technician.name, 'Technician A');
     const dashboard = await fetch(`${base}/businesses/${fixture.shop._id}/dashboard?role=technician`, { headers: staffHeaders });
     assert.equal(dashboard.status, 200);
-    assert.equal((await dashboard.json()).data.stats.myActiveTickets, 1);
+    const dashboardData = (await dashboard.json()).data;
+    assert.equal(dashboardData.stats.myActiveTickets, 1);
+    assert.deepEqual(dashboardData.notifications.map(({ type, ticketCode }) => ({ type, ticketCode })), [
+      { type: 'customer_request', ticketCode: fixture.tickets[0].ticketCode },
+    ], 'the assigned technician dashboard exposes new online customer requests as notifications');
+    fixture.tickets[0].timeline.push({ status: 'approved', action: 'estimate_approved', actorRole: 'customer', actorName: 'Guest Customer', note: 'Customer approved estimate', isPublic: true, timestamp: new Date(Date.now() + 1000) });
+    const refreshedDashboard = await fetch(`${base}/businesses/${fixture.shop._id}/dashboard?role=technician`, { headers: staffHeaders });
+    const refreshedNotifications = (await refreshedDashboard.json()).data.notifications;
+    assert.deepEqual(refreshedNotifications.map(({ type, ticketCode }) => ({ type, ticketCode })), [
+      { type: 'service_approved', ticketCode: fixture.tickets[0].ticketCode },
+      { type: 'customer_request', ticketCode: fixture.tickets[0].ticketCode },
+    ], 'customer approvals are included in the assigned technician notification feed');
+    fixture.contacts[1].userId = fixture.user.id;
+    fixture.tickets[1].timeline.push({ status: 'awaiting_approval', action: 'estimate_submitted', actorRole: 'technician', actorName: 'Technician B', note: 'Estimate submitted', isPublic: true, timestamp: new Date(Date.now() + 2000) });
+    fixture.signIn(true, 'customer');
+    const customerDashboard = await fetch(`${base}/businesses/${fixture.shop._id}/dashboard?role=customer`, { headers: staffHeaders });
+    assert.equal(customerDashboard.status, 200);
+    const customerNotifications = (await customerDashboard.json()).data.notifications;
+    assert.deepEqual(customerNotifications.map(({ title, ticketCode }) => ({ title, ticketCode })), [
+      { title: 'Estimasi biaya siap ditinjau', ticketCode: fixture.tickets[1].ticketCode },
+      { title: 'Teknisi telah ditugaskan', ticketCode: fixture.tickets[1].ticketCode },
+    ], 'customers receive a notification for technician updates to their service ticket');
     fixture.signIn(true, 'owner');
     const contactPath = `${base}/businesses/${fixture.shop._id}/customers/${fixture.contacts[0]._id}`;
     const contact = await fetch(contactPath, { headers: staffHeaders });

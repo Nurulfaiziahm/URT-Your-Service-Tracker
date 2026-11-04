@@ -10,7 +10,7 @@ export function InvoiceStatusBadge({ status }: InvoiceStatusBadgeProps) {
     paid: { label: 'Lunas', tone: 'success' },
     partially_paid: { label: 'Sebagian Dibayar', tone: 'info' },
     issued: { label: 'Belum Dibayar', tone: 'warning' },
-    voided: { label: 'Dibatalkan', tone: 'danger' },
+    voided: { label: 'Dibatalkan', tone: 'neutral' },
   };
   const { label, tone } = statusInfo[status];
   return <StatusBadge label={label} tone={tone} />;

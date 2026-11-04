@@ -6,7 +6,6 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { ServiceStepper } from '../tickets/ServiceStepper';
 import { useGetPublicTrackingMutation } from '../tickets/ticketsApi';
-import { customerPortalPath } from '../customer/customer-portal';
 import './landing.css';
 
 type Persona = 'owner' | 'technician' | 'customer';
@@ -81,7 +80,7 @@ export default function LandingPage() {
 
     try {
       const response = await fetchTracking({ ticketCode: code }).unwrap();
-      navigate(`${customerPortalPath(response.data.business.slug)}?ticketCode=${encodeURIComponent(response.data.ticketCode)}`);
+      navigate(`/tracking/${encodeURIComponent(response.data.ticketCode)}`);
     } catch {
       setTrackingError('Nomor tiket tidak ditemukan. Periksa kembali nomor tiket dan coba lagi.');
     }
@@ -857,7 +856,7 @@ export default function LandingPage() {
             <div className="journey-grid">
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 1</span>
-                <StatusBadge label="Pengajuan" tone="neutral" />
+                <StatusBadge label="Pengajuan" tone="warning" />
                 <h3 className="journey-card__title">Registrasi Masuk</h3>
                 <p className="journey-card__desc">
                   {' '}
@@ -866,7 +865,7 @@ export default function LandingPage() {
               </div>
               <div className="journey-card">
                 <span className="journey-card__step">Tahap 2</span>
-                <StatusBadge label="Menunggu Diagnosis" tone="neutral" />
+                <StatusBadge label="Menunggu Diagnosis" tone="warning" />
                 <h3 className="journey-card__title">Antrean Meja</h3>
                 <p className="journey-card__desc">
                   {' '}

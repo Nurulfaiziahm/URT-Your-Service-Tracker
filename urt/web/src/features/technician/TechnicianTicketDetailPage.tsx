@@ -68,7 +68,7 @@ export default function TechnicianTicketDetailPage() {
 
       {/* Stepper */}
       <div className={styles.ticketCard}>
-        <ServiceStepper status={ticket.status} />
+        <ServiceStepper status={ticket.status} rejectedFlow={ticket.timeline?.some((event) => event.action === 'estimate_rejected')} />
         <DeadlineBadge ticket={ticket} />
       </div>
       <TicketTiming ticket={ticket} />

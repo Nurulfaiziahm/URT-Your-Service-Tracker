@@ -105,7 +105,7 @@ function ExistingTechnicianInvitation({ token }: { token: string }) {
         <p>Anda diundang untuk bergabung sebagai teknisi di tempat servis.</p>
       </header>
 
-      {errorMessage && <InlineNotice>{errorMessage}</InlineNotice>}
+      {errorMessage && <InlineNotice type="error">{errorMessage}</InlineNotice>}
 
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -223,7 +223,7 @@ function TechnicianInvitation({ token }: { token: string }) {
   return <div className={authStyles.form}>
     <header className={authStyles.heading}><span className="eyebrow">Undangan Teknisi</span><h1>{info.accountExists ? 'Terima Undangan Teknisi' : 'Daftar Akun Teknisi'}</h1>
       <p>{info.name}, Anda diundang bergabung di {info.businessName}.</p></header>
-    {failure && <InlineNotice>{failure}</InlineNotice>}
+    {failure && <InlineNotice type="error">{failure}</InlineNotice>}
     {info.accountExists ? <section className={styles.card}><p>Akun Anda sudah tersedia. Masuk untuk menerima undangan ini.</p>
       <ButtonLink to="/technician/login" state={{ email: info.email, from: location }}>Masuk & Terima Undangan</ButtonLink></section>
       : <form className={authStyles.form} onSubmit={handleActivate}>

@@ -367,6 +367,13 @@
 
 .page .onboarding-form-card button {
   padding: 10px 18px;
+  white-space: normal;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.page .onboarding-form-card :global(.actions) {
+  flex-wrap: wrap;
 }
 
 .register-card {

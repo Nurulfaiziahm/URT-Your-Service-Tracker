@@ -1,7 +1,7 @@
 import { Icon } from '../../components/ui/Icon';
 import { Modal } from '../../components/ui/Modal';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
 import { useGetBusinessByIdQuery } from '../business/businessApi';
@@ -30,6 +30,7 @@ import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 export default function OwnerTicketDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const businessId = useAppSelector(selectSelectedBusinessId);
 
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -190,6 +191,9 @@ export default function OwnerTicketDetailPage() {
       </header>
 
       {actionError && <InlineNotice type="error">{actionError}</InlineNotice>}
+      {(location.state as { intakePhotoError?: string } | null)?.intakePhotoError && (
+        <InlineNotice type="error">{(location.state as { intakePhotoError: string }).intakePhotoError}</InlineNotice>
+      )}
 
       {/* Invoice alert if issued */}
       {issuedInvoiceId && (
@@ -221,7 +225,7 @@ export default function OwnerTicketDetailPage() {
 
       {/* Stepper */}
       <div className={styles.ticketCard}>
-        <ServiceStepper status={ticket.status} />
+        <ServiceStepper status={ticket.status} rejectedFlow={ticket.timeline?.some((event) => event.action === 'estimate_rejected')} />
       </div>
 
       <div className="reference-columns">
@@ -342,7 +346,7 @@ export default function OwnerTicketDetailPage() {
         </div>
         <div className="reference-stack">
           {/* Action Bar for Owner */}
-          {(canAcceptIntake || canHandover || ticket.status === 'rejected') && (
+          {(canAcceptIntake || canHandover || ticket.status === 'rejected' || ticket.status === 'reassembling') && (
             <div className={styles.ticketCard} style={{ background: '#f8fafc' }}>
               <h2>Tindakan Pemilik Servis</h2>
               <div className={styles.actionBar}>
@@ -380,6 +384,11 @@ export default function OwnerTicketDetailPage() {
 
                 {ticket.status === 'rejected' && (
                   <>
+                    {ticket.allowedActions.includes('start_reassembly') && <Button type="button" variant="primary" onClick={async () => {
+                      setActionError(null);
+                      try { await transition({ businessId, ticketId: ticket.id, body: { expectedRevision: ticket.revision, targetStatus: 'reassembling', reason: 'Perangkat dirakit kembali setelah estimasi servis ditolak.' } }).unwrap(); refetch(); }
+                      catch (err) { const body = (err as { data?: ApiErrorBody }).data; setActionError(body?.message || body?.error || 'Gagal memulai perakitan kembali.'); }
+                    }}>Mulai Rakit Kembali</Button>}
                     <Button
                       type="button"
                       variant="secondary"
@@ -397,6 +406,11 @@ export default function OwnerTicketDetailPage() {
                     </Button>
                   </>
                 )}
+                {ticket.status === 'reassembling' && ticket.allowedActions.includes('finish_reassembly') && <Button type="button" variant="primary" onClick={async () => {
+                  setActionError(null);
+                  try { await transition({ businessId, ticketId: ticket.id, body: { expectedRevision: ticket.revision, targetStatus: 'completed', reason: 'Perangkat selesai dirakit kembali dan siap diambil pelanggan.' } }).unwrap(); refetch(); }
+                  catch (err) { const body = (err as { data?: ApiErrorBody }).data; setActionError(body?.message || body?.error || 'Gagal menandai perangkat siap diambil.'); }
+                }}>Selesai Dirakit, Siap Diambil</Button>}
               </div>
             </div>
           )}

@@ -11,9 +11,19 @@ import { Icon, type IconName } from '../components/ui/Icon';
 import logo from '../assets/logo-urt.svg';
 import { portals, type PortalRole } from './portal-navigation';
 import styles from './PortalLayout.module.css';
-import { useGetTechnicianDashboardQuery } from '../features/dashboard/dashboardApi';
+import { useGetCustomerDashboardQuery, useGetTechnicianDashboardQuery } from '../features/dashboard/dashboardApi';
 import { DeadlineBadge } from '../features/tickets/TicketTiming';
 import timingStyles from '../features/tickets/TicketTiming.module.css';
+
+function loadReadNotificationIds(storageKey: string): string[] {
+  try {
+    const saved = window.localStorage.getItem(storageKey);
+    const parsed: unknown = saved ? JSON.parse(saved) : [];
+    return Array.isArray(parsed) && parsed.every((id) => typeof id === 'string') ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 const icons: Record<string, IconName> = {
   Beranda: 'home',
@@ -39,9 +49,46 @@ export function PortalLayout({ role }: { role: PortalRole }) {
   const portal = portals[role];
   const user = useAppSelector(selectUser);
   const businessId = useAppSelector(selectSelectedBusinessId);
-  const { data: deadlines } = useGetTechnicianDashboardQuery({ businessId: businessId || '' }, { skip: role !== 'technician' || !businessId, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true });
-  const urgentCount = deadlines?.data.stats.urgentCount || 0;
   const customerPortal = useCustomerPortal();
+  const activeBusinessId = role === 'customer' ? customerPortal.businessId || businessId : businessId;
+  const { data: deadlines } = useGetTechnicianDashboardQuery({ businessId: businessId || '' }, { skip: role !== 'technician' || !businessId, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true });
+  const { data: customerDashboard } = useGetCustomerDashboardQuery({ businessId: activeBusinessId || '' }, { skip: role !== 'customer' || !activeBusinessId || !user, pollingInterval: 10000, refetchOnFocus: true, refetchOnReconnect: true });
+  const urgentCount = deadlines?.data.stats.urgentCount || 0;
+  const technicianNotifications = deadlines?.data.notifications || [];
+  const customerNotifications = customerDashboard?.data.notifications || [];
+  const portalNotifications = role === 'technician'
+    ? technicianNotifications.map((notice) => ({
+      ...notice,
+      title: notice.type === 'customer_request' ? 'Pengajuan pelanggan baru' : 'Servis disetujui pelanggan',
+      detail: `${notice.ticketCode} · ${notice.customerName} · ${notice.deviceCategory}`,
+    }))
+    : role === 'customer'
+      ? customerNotifications.map((notice) => ({
+        ...notice,
+        detail: `${notice.ticketCode} · ${notice.deviceCategory}`,
+      }))
+      : [];
+  const notificationStorageKey = `urt:${role}-notifications:${activeBusinessId || ''}:${user?.id || ''}`;
+  const [readNotificationState, setReadNotificationState] = useState(() => ({
+    key: notificationStorageKey,
+    ids: loadReadNotificationIds(notificationStorageKey),
+  }));
+  const readNotificationIds = readNotificationState.key === notificationStorageKey
+    ? readNotificationState.ids
+    : loadReadNotificationIds(notificationStorageKey);
+  const unreadNotificationCount = portalNotifications.filter((notice) => !readNotificationIds.includes(notice.id)).length;
+  const handleNotificationToggle = () => {
+    if (!notificationsOpen && role !== 'owner') {
+      const readIds = [...new Set([...readNotificationIds, ...portalNotifications.map((notice) => notice.id)])].slice(-100);
+      setReadNotificationState({ key: notificationStorageKey, ids: readIds });
+      try {
+        window.localStorage.setItem(notificationStorageKey, JSON.stringify(readIds));
+      } catch {
+        // Notifications remain usable when browser storage is unavailable.
+      }
+    }
+    setNotificationsOpen(!notificationsOpen);
+  };
   const { data } = useGetMyBusinessesQuery(undefined, { skip: !user });
   const business = (role === 'customer' && customerPortal.business)
     || data?.data?.businesses.find((item) => item.businessId === businessId);
@@ -174,14 +221,36 @@ export function PortalLayout({ role }: { role: PortalRole }) {
                 className={styles.iconButton}
                 aria-label="Pemberitahuan"
                 aria-expanded={notificationsOpen}
-                onClick={() => setNotificationsOpen(!notificationsOpen)}
+                onClick={handleNotificationToggle}
               >
                 <Icon name="bell" />
-                {role === 'technician' && urgentCount > 0 && <span className={timingStyles.count}>{urgentCount}</span>}
+                {role !== 'owner' && unreadNotificationCount + (role === 'technician' ? urgentCount : 0) > 0 && <span className={timingStyles.count}>{unreadNotificationCount + (role === 'technician' ? urgentCount : 0)}</span>}
               </button>
               {notificationsOpen && (
-                <div className={role === 'technician' ? timingStyles.panel : styles.notificationPanel}>
-                  {role === 'technician' ? <><strong>Pengingat Tenggat ({urgentCount})</strong>{deadlines?.data.deadlineTickets?.length ? <ul className={timingStyles.deadlines}>{deadlines.data.deadlineTickets.map((ticket) => <li key={ticket.id}><Link className="text-link" onClick={() => setNotificationsOpen(false)} to={`/technician/tickets/${ticket.id}`}>{ticket.ticketCode}</Link><DeadlineBadge ticket={ticket} /></li>)}</ul> : <p>Belum ada tiket yang mendekati tenggat.</p>}</> : 'Perkembangan servis dapat dilihat melalui halaman tiket Anda.'}
+                <div className={role !== 'owner' ? timingStyles.panel : styles.notificationPanel}>
+                  {role === 'technician' ? <>
+                    <strong>Pemberitahuan Servis ({technicianNotifications.length})</strong>
+                    {technicianNotifications.length ? <ul className={styles.portalNotifications}>{technicianNotifications.map((notice) => <li key={notice.id}>
+                      <Link data-notification-link onClick={() => setNotificationsOpen(false)} to={`/technician/tickets/${notice.ticketId}`}>
+                        <strong>{notice.type === 'customer_request' ? 'Pengajuan pelanggan baru' : 'Servis disetujui pelanggan'}</strong>
+                        <span>{notice.ticketCode} · {notice.customerName} · {notice.deviceCategory}</span>
+                        <time dateTime={notice.timestamp}>{new Date(notice.timestamp).toLocaleString('id-ID')}</time>
+                        <span className={styles.notificationOpenLink}>Buka tiket →</span>
+                      </Link>
+                    </li>)}</ul> : <p>Belum ada pemberitahuan servis baru.</p>}
+                    <strong className={styles.deadlineHeading}>Pengingat Tenggat ({urgentCount})</strong>
+                    {deadlines?.data.deadlineTickets?.length ? <ul className={timingStyles.deadlines}>{deadlines.data.deadlineTickets.map((ticket) => <li key={ticket.id}><Link className="text-link" onClick={() => setNotificationsOpen(false)} to={`/technician/tickets/${ticket.id}`}>{ticket.ticketCode}</Link><DeadlineBadge ticket={ticket} /></li>)}</ul> : <p>Belum ada tiket yang mendekati tenggat.</p>}
+                  </> : role === 'customer' ? <>
+                    <strong>Pembaruan Servis ({customerNotifications.length})</strong>
+                    {customerNotifications.length ? <ul className={styles.portalNotifications}>{portalNotifications.map((notice) => <li key={notice.id}>
+                      <Link data-notification-link onClick={() => setNotificationsOpen(false)} to={`${portalPath}/services/${notice.ticketId}`}>
+                        <strong>{notice.title}</strong>
+                        <span>{notice.detail}</span>
+                        <time dateTime={notice.timestamp}>{new Date(notice.timestamp).toLocaleString('id-ID')}</time>
+                        <span className={styles.notificationOpenLink}>Buka tiket →</span>
+                      </Link>
+                    </li>)}</ul> : <p>Belum ada pembaruan servis.</p>}
+                  </> : 'Perkembangan servis dapat dilihat melalui halaman tiket Anda.'}
                 </div>
               )}
             </div>

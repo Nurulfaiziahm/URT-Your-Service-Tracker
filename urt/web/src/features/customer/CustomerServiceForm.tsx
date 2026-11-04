@@ -7,6 +7,9 @@ import type { ServiceRequestInput } from './service-request.types';
 import styles from './CustomerServiceForm.module.css';
 
 const steps = ['Mulai Servis', 'Data Perangkat', 'Konfirmasi'];
+const deviceTypes = ['Laptop', 'Smartphone', 'Tablet', 'Komputer Desktop', 'Printer', 'Monitor', 'Kamera', 'Perangkat Audio'];
+const deviceBrands = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Canon', 'Epson', 'Sony'];
+const otherOption = '__other__';
 
 export function CustomerServiceForm({ initialCustomer, signedIn, returnPath, onSubmit }: {
   initialCustomer: ServiceRequestInput['customer'];
@@ -19,7 +22,9 @@ export function CustomerServiceForm({ initialCustomer, signedIn, returnPath, onS
   const [phone, setPhone] = useState(initialCustomer.phone);
   const [email, setEmail] = useState(initialCustomer.email || '');
   const [category, setCategory] = useState('');
+  const [customCategory, setCustomCategory] = useState('');
   const [brand, setBrand] = useState('');
+  const [customBrand, setCustomBrand] = useState('');
   const [model, setModel] = useState('');
   const [complaint, setComplaint] = useState('');
   const [condition, setCondition] = useState('');
@@ -28,6 +33,8 @@ export function CustomerServiceForm({ initialCustomer, signedIn, returnPath, onS
   const [pending, setPending] = useState(false);
   const inFlight = useRef(false);
   const heading = useRef<HTMLHeadingElement>(null);
+  const deviceCategory = category === otherOption ? customCategory : category;
+  const deviceBrand = brand === otherOption ? customBrand : brand;
 
   function move(next: number) {
     setError('');
@@ -46,7 +53,7 @@ export function CustomerServiceForm({ initialCustomer, signedIn, returnPath, onS
       move(1); return;
     }
     if (step === 1) {
-      if (!category.trim() || !brand.trim() || complaint.trim().length < 3) {
+      if (!deviceCategory.trim() || !deviceBrand.trim() || complaint.trim().length < 3) {
         setError('Isi jenis perangkat, merek, dan keluhan minimal 3 karakter.'); return;
       }
       const items = accessories.split(',').map((item) => item.trim()).filter(Boolean);
@@ -62,7 +69,7 @@ export function CustomerServiceForm({ initialCustomer, signedIn, returnPath, onS
       await onSubmit({
         customer: { name: name.trim(), phone: phone.trim(), email: email.trim() || undefined },
         device: {
-          category: category.trim(), brand: brand.trim(), model: model.trim() || undefined,
+          category: deviceCategory.trim(), brand: deviceBrand.trim(), model: model.trim() || undefined,
           condition: condition.trim() || undefined,
           accessories: accessories.split(',').map((item) => item.trim()).filter(Boolean),
         },
@@ -95,9 +102,11 @@ export function CustomerServiceForm({ initialCustomer, signedIn, returnPath, onS
         <TextInput label="Email (opsional)" name="email" type="email" autoComplete="email" maxLength={254} value={email} onChange={(e) => setEmail(e.target.value)} />
       </>}
       {step === 1 && <>
-        <TextInput label="Jenis perangkat *" name="category" required maxLength={50} placeholder="Contoh: Laptop, HP, Printer" value={category} onChange={(e) => setCategory(e.target.value)} />
+        <label>Jenis perangkat *<select name="category" required value={category} onChange={(e) => setCategory(e.target.value)}><option value="">Pilih jenis perangkat</option>{deviceTypes.map((value) => <option key={value} value={value}>{value}</option>)}<option value={otherOption}>Perangkat Lain</option></select></label>
+        {category === otherOption && <TextInput label="Nama perangkat *" name="customCategory" required maxLength={50} placeholder="Tulis jenis perangkat" value={customCategory} onChange={(e) => setCustomCategory(e.target.value)} />}
         <div className={styles.row}>
-          <TextInput label="Merek *" name="brand" required maxLength={50} placeholder="Contoh: Samsung, Asus" value={brand} onChange={(e) => setBrand(e.target.value)} />
+          <label>Merek *<select name="brand" required value={brand} onChange={(e) => setBrand(e.target.value)}><option value="">Pilih merek</option>{deviceBrands.map((value) => <option key={value} value={value}>{value}</option>)}<option value={otherOption}>Merek Lain</option></select></label>
+          {brand === otherOption && <TextInput label="Nama merek *" name="customBrand" required maxLength={50} placeholder="Tulis nama merek" value={customBrand} onChange={(e) => setCustomBrand(e.target.value)} />}
           <TextInput label="Model (opsional)" name="model" maxLength={100} value={model} onChange={(e) => setModel(e.target.value)} />
         </div>
         <label className={styles.textarea}>Keluhan/masalah *<textarea name="complaint" required minLength={3} maxLength={1000} rows={4} placeholder="Jelaskan masalah perangkat Anda" value={complaint} onChange={(e) => setComplaint(e.target.value)} /></label>
@@ -108,7 +117,7 @@ export function CustomerServiceForm({ initialCustomer, signedIn, returnPath, onS
         <div><dt>Nama lengkap</dt><dd>{name}</dd></div>
         <div><dt>WhatsApp</dt><dd>{phone}</dd></div>
         {email && <div><dt>Email</dt><dd>{email}</dd></div>}
-        <div><dt>Perangkat</dt><dd>{[category, brand, model].filter(Boolean).join(' · ')}</dd></div>
+        <div><dt>Perangkat</dt><dd>{[deviceCategory, deviceBrand, model].filter(Boolean).join(' · ')}</dd></div>
         <div><dt>Keluhan/masalah</dt><dd>{complaint}</dd></div>
         {condition && <div><dt>Kondisi</dt><dd>{condition}</dd></div>}
         {accessories && <div><dt>Perlengkapan</dt><dd>{accessories}</dd></div>}

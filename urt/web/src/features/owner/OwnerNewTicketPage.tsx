@@ -4,7 +4,7 @@ import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
 import { useGetServicesQuery } from '../services/servicesApi';
 import { useGetTechniciansQuery } from '../technicians/techniciansApi';
-import { useCreateTicketMutation } from '../tickets/ticketsApi';
+import { useAddAttachmentMutation, useCreateTicketMutation, useUploadFileMutation } from '../tickets/ticketsApi';
 import { CustomerPicker } from '../customers/CustomerPicker';
 import type { Customer } from '../customers/types';
 import { TextInput } from '../../components/ui/TextInput';
@@ -12,6 +12,9 @@ import { Button, ButtonLink } from '../../components/ui/Button';
 import { InlineNotice, EmptyState } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from '../tickets/Tickets.module.css';
+
+const deviceTypes = ['Laptop', 'Smartphone', 'Tablet', 'Komputer Desktop', 'Printer', 'Monitor', 'Kamera', 'Perangkat Audio', 'Perangkat Lain'];
+const deviceBrands = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Canon', 'Epson', 'Sony', 'Merek Lain'];
 
 export default function OwnerNewTicketPage() {
   const navigate = useNavigate();
@@ -28,6 +31,8 @@ export default function OwnerNewTicketPage() {
   );
 
   const [createTicket, { isLoading: isSubmitting }] = useCreateTicketMutation();
+  const [uploadFile, { isLoading: isUploading }] = useUploadFileMutation();
+  const [addAttachment, { isLoading: isAttaching }] = useAddAttachmentMutation();
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [category, setCategory] = useState('');
@@ -39,6 +44,7 @@ export default function OwnerNewTicketPage() {
   const [complaint, setComplaint] = useState('');
   const [requestedServiceId, setRequestedServiceId] = useState('');
   const [assignedTechnicianId, setAssignedTechnicianId] = useState('');
+  const [intakePhoto, setIntakePhoto] = useState<File | null>(null);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -97,7 +103,22 @@ export default function OwnerNewTicketPage() {
       }).unwrap();
 
       const created = res.data.ticket;
-      navigate(`/owner/tickets/${created.id}`);
+      let intakePhotoError: string | undefined;
+      if (intakePhoto) {
+        try {
+          const formData = new FormData();
+          formData.append('file', intakePhoto);
+          const uploaded = await uploadFile(formData).unwrap();
+          await addAttachment({
+            businessId: businessId!,
+            ticketId: created.id,
+            body: { key: uploaded.data.key, visibility: 'customer', expectedRevision: created.revision },
+          }).unwrap();
+        } catch {
+          intakePhotoError = 'Tiket berhasil dicatat, tetapi foto belum terunggah. Anda dapat mengunggahnya dari detail tiket.';
+        }
+      }
+      navigate(`/owner/tickets/${created.id}`, { state: { intakePhotoError } });
     } catch (err: unknown) {
       const apiErr = err as { data?: ApiErrorBody; error?: string };
       setErrorMessage(
@@ -140,19 +161,8 @@ export default function OwnerNewTicketPage() {
             gap: 16,
           }}
         >
-          <TextInput
-            label="Kategori Perangkat"
-            placeholder="Contoh: Laptop, Smartphone, Motherboard"
-            required
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
-          <TextInput
-            label="Merk / Brand"
-            placeholder="Contoh: Lenovo, Apple, Dell"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-          />
+          <label htmlFor="intake-category">Jenis perangkat<select id="intake-category" required value={category} onChange={(e) => setCategory(e.target.value)}><option value="">Pilih jenis perangkat</option>{deviceTypes.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+          <label htmlFor="intake-brand">Merek<select id="intake-brand" value={brand} onChange={(e) => setBrand(e.target.value)}><option value="">Pilih merek</option>{deviceBrands.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
           <TextInput
             label="Tipe / Model"
             placeholder="Contoh: ThinkPad T480"
@@ -190,6 +200,15 @@ export default function OwnerNewTicketPage() {
           value={accessories}
           onChange={(e) => setAccessories(e.target.value)}
         />
+        <label htmlFor="intake-photo">Foto kondisi perangkat saat diterima (opsional)
+          <input id="intake-photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => {
+            const file = event.target.files?.[0] || null;
+            setIntakePhoto(file && file.size <= 5 * 1024 * 1024 ? file : null);
+            if (file && (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type) || file.size > 5 * 1024 * 1024)) setErrorMessage('Pilih foto JPEG, PNG, WebP, atau GIF dengan ukuran maksimal 5 MiB.');
+            else setErrorMessage(null);
+          }} />
+          <small>JPG, PNG, WebP, atau GIF. Maksimal 5 MiB.</small>
+        </label>
 
         <hr style={{ border: 'none', borderTop: '1px solid var(--border)', marginBlock: 8 }} />
 
@@ -271,7 +290,7 @@ export default function OwnerNewTicketPage() {
         </div>
 
         <div className="actions" style={{ marginTop: 16 }}>
-          <Button type="submit" pending={isSubmitting}>
+          <Button type="submit" pending={isSubmitting || isUploading || isAttaching}>
             Simpan Tiket Masuk
           </Button>
           <ButtonLink to="/owner/tickets" variant="ghost">

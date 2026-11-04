@@ -105,8 +105,7 @@ input:disabled {
   text-underline-offset: 4px;
 }
 .page-content {
-  padding-block: 56px 80px;
-  min-height: 60vh;
+  padding-block: 32px 40px;
 }
 dialog {
   color: var(--navy-950);
@@ -128,8 +127,14 @@ dialog::backdrop {
     padding-block: 48px;
   }
   .page-content {
-    padding-block: 32px 48px;
+    padding-block: 20px 28px;
   }
+}
+
+@media (max-width: 479px) {
+  .stack { gap: 16px; }
+  .reference-stack { gap: 16px; }
+  .reference-panel > h2 { margin-bottom: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html {
