@@ -54,6 +54,20 @@
   text-decoration: none;
 }
 
+.page .step-link {
+  border-radius: 999px;
+  transition: color 0.15s ease;
+}
+
+.page .step-link:hover {
+  color: var(--primary);
+}
+
+.page .step-link:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.28);
+  outline-offset: 4px;
+}
+
 .page .checkbox-group a {
   color: var(--primary);
   text-decoration: underline;
@@ -309,6 +323,20 @@
   color: #ffffff;
 }
 
+.step-item.complete {
+  color: #0284c7;
+}
+
+.step-item.complete .step-num {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.step-item[aria-disabled='true'] .step-num {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+}
+
 .stepper-line {
   width: 36px;
   height: 2px;
@@ -347,6 +375,16 @@
   padding: 11px 14px;
 }
 
+.onboarding-page .onboarding-form-row > div > label {
+  display: flex;
+  align-items: flex-end;
+  min-height: 2.6em;
+}
+
+.onboarding-page .onboarding-form-row > div {
+  align-content: start;
+}
+
 .page .onboarding-form-card button {
   padding: 10px 18px;
   white-space: normal;
@@ -356,6 +394,41 @@
 
 .page .onboarding-form-card :global(.actions) {
   flex-wrap: wrap;
+}
+
+.onboarding-page {
+  align-items: stretch;
+}
+
+.onboarding-page .register-layout {
+  width: min(1160px, 100%);
+  min-width: 0;
+  max-width: 1160px;
+  height: auto;
+  min-height: 680px;
+  max-height: none;
+}
+
+.onboarding-page .register-sidebar {
+  height: auto;
+}
+
+.onboarding-page .register-main {
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  height: auto;
+  flex: 1;
+  overflow: visible;
+}
+
+.onboarding-page .register-content {
+  align-items: flex-start;
+  padding-bottom: 32px;
+}
+
+.onboarding-page .container {
+  width: 100%;
 }
 
 .register-card {
@@ -556,6 +629,20 @@
     border-radius: 0;
     margin: 0 auto;
     flex-direction: column;
+  }
+
+  .onboarding-page .register-layout {
+    width: 100%;
+    min-height: 0;
+    max-width: 520px;
+  }
+
+  .onboarding-page .register-content {
+    padding: 0;
+  }
+
+  .onboarding-page .register-main {
+    background: transparent;
   }
 
   .register-sidebar {

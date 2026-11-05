@@ -74,7 +74,7 @@ export default function OwnerOnboardingPage() {
   }
 
   return (
-    <div className={registrationStyles.page}>
+    <div className={`${registrationStyles.page} ${registrationStyles['onboarding-page']}`}>
       <a className="skip-link" href="#main-content">
         Lewati ke konten utama
       </a>
@@ -137,16 +137,29 @@ export default function OwnerOnboardingPage() {
         <main id="main-content" tabIndex={-1} className={registrationStyles['register-main']}>
           <header className={registrationStyles['register-topbar']}>
             <nav className={registrationStyles.stepper} aria-label="Tahapan pendaftaran">
-              <span className={registrationStyles['step-item']}>✓ Data Akun</span>
-              <span className={registrationStyles['stepper-line']} />
-              <span
+              <Link
+                className={`${registrationStyles['step-item']} ${registrationStyles['step-link']} ${registrationStyles.complete}`}
+                to="/owner/register"
+                aria-label="Kembali ke langkah 1: Data Akun"
+              >
+                <span className={registrationStyles['step-num']}>
+                  <Icon name="check" width={14} height={14} aria-hidden="true" />
+                </span>
+                <span>Data Akun</span>
+              </Link>
+              <span className={registrationStyles['stepper-line']} aria-hidden="true" />
+              <div
                 className={`${registrationStyles['step-item']} ${registrationStyles.active}`}
                 aria-current="step"
               >
-                2 Data Usaha
-              </span>
-              <span className={registrationStyles['stepper-line']} />
-              <span className={registrationStyles['step-item']}>3 Akses Portal</span>
+                <span className={registrationStyles['step-num']}>2</span>
+                <span>Data Usaha</span>
+              </div>
+              <span className={registrationStyles['stepper-line']} aria-hidden="true" />
+              <div className={registrationStyles['step-item']} aria-disabled="true">
+                <span className={registrationStyles['step-num']}>3</span>
+                <span>Akses Portal</span>
+              </div>
             </nav>
           </header>
           <div className={registrationStyles['register-content']}>
@@ -172,7 +185,7 @@ export default function OwnerOnboardingPage() {
                   </p>
                 </div>
 
-                <div className={styles.row}>
+                <div className={`${styles.row} ${registrationStyles['onboarding-form-row']}`}>
                   <TextInput
                     label="Nama Tempat Servis"
                     name="name"
@@ -192,7 +205,7 @@ export default function OwnerOnboardingPage() {
                   />
                 </div>
 
-                <div className={styles.row}>
+                <div className={`${styles.row} ${registrationStyles['onboarding-form-row']}`}>
                   <TextInput
                     label="Nomor Telepon / WhatsApp Tempat Servis"
                     name="phone"
@@ -219,7 +232,7 @@ export default function OwnerOnboardingPage() {
                   onChange={(e) => setAddress(e.target.value)}
                 />
 
-                <div className={styles.row}>
+                <div className={`${styles.row} ${registrationStyles['onboarding-form-row']}`}>
                   <TextInput
                     label="Jam Operasional"
                     name="businessHours"
