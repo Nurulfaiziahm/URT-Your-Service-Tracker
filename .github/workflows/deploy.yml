@@ -36,8 +36,10 @@ jobs:
                  working-directory: ${{ env.APP_DIR }}
                  run: |
                       set -e
-                      docker compose down
-                      docker compose up -d --build
+                      # Build first: if the build fails, the old containers keep running
+                      docker compose build
+                      # Recreate containers with the new image (only swaps once build succeeded)
+                      docker compose up -d --remove-orphans
 
                - name: Cleanup old Docker images
                  if: always()

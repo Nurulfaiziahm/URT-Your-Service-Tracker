@@ -257,26 +257,24 @@ export class TechnicianService {
     }
 
     // Do not remove access while the technician still owns active work.
-    if (technician.status !== 'inactive') {
-      const activeTicketsCount = await ServiceTicket.countDocuments({
-        deletedAt: { $exists: false },
-        businessId: technician.businessId,
-        assignedTechnicianId: technician._id,
-        status: { $nin: ['completed', 'cancelled'] },
-      });
+    const activeTicketsCount = await ServiceTicket.countDocuments({
+      deletedAt: { $exists: false },
+      businessId: technician.businessId,
+      assignedTechnicianId: technician._id,
+      status: { $nin: ['completed', 'cancelled'] },
+    });
 
-      if (activeTicketsCount > 0) {
-        throw new AppError(
-          `Cannot deactivate technician with ${activeTicketsCount} active assigned ticket(s). Reassign them first.`,
-          400,
-          'TECHNICIAN_HAS_ACTIVE_TICKETS',
-        );
-      }
-
-      // Revoke access and invalidate a pending invitation before checking history.
-      technician.status = 'inactive';
-      await technician.save();
+    if (activeTicketsCount > 0) {
+      throw new AppError(
+        `Cannot deactivate technician with ${activeTicketsCount} active assigned ticket(s). Reassign them first.`,
+        400,
+        'TECHNICIAN_HAS_ACTIVE_TICKETS',
+      );
     }
+
+    // Revoke access and invalidate a pending invitation before checking history.
+    technician.status = 'inactive';
+    await technician.save();
 
     const hasTickets = await ServiceTicket.exists({
       deletedAt: { $exists: false },
