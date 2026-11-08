@@ -20,7 +20,7 @@ export function ServiceStepper({ status, className, statusNote, rejectedFlow = f
                 {state === 'completed' ? '\u2713' : state === 'rejected' ? '!' : index + 1}
               </span>
               <span className={styles.stepLabel}>
-                {stage.label}{state === 'rejected' ? ' \u00b7 Ditolak' : ''}
+                {stage.label}
               </span>
             </li>
           );

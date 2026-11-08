@@ -228,10 +228,7 @@ export function TicketAttachments({
               }}
             >
               <AttachmentPreview businessId={businessId} ticketId={ticket.id} attachment={att} />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: '1.2rem' }}>
-                  <Icon name={att.mimeType.startsWith('image/') ? 'image' : 'file'} />
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--navy-950)' }}>
                     {att.originalName}
@@ -243,37 +240,17 @@ export function TicketAttachments({
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {userRole !== 'customer' && (
-                  <span
-                    style={{
-                      fontSize: '0.75rem',
-                      padding: '2px 8px',
-                      borderRadius: 4,
-                      background: att.visibility === 'customer' ? '#eff6ff' : '#f1f5f9',
-                      color: att.visibility === 'customer' ? '#1d4ed8' : '#475569',
-                      fontWeight: 600,
-                    }}
-                  >
-                    {att.visibility === 'customer' ? 'Pelanggan & Staf' : 'Hanya Staf'}
-                  </span>
-                )}
-
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', paddingLeft: 16 }}>
                 {userRole === 'owner' && (
                   <button
                     type="button"
                     onClick={() => setDeleteKey(att.key)}
                     disabled={isBusy}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#dc2626',
-                      cursor: 'pointer',
-                      fontSize: '0.85rem',
-                      fontWeight: 500,
-                    }}
+                    className={styles.attachmentDeleteButton}
+                    aria-label={`Hapus lampiran ${att.originalName}`}
                   >
-                    Hapus
+                    <Icon name="trash" />
+                    <span>Hapus</span>
                   </button>
                 )}
               </div>

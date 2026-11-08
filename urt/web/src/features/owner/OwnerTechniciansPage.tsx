@@ -9,7 +9,7 @@ import {
   useGetTechniciansQuery,
   useInviteTechnicianMutation,
   useResendTechnicianInvitationMutation,
-  useDeleteTechnicianMutation,
+  useUpdateTechnicianMutation,
 } from '../technicians/techniciansApi';
 import { TextInput } from '../../components/ui/TextInput';
 import { Button } from '../../components/ui/Button';
@@ -41,7 +41,10 @@ export default function OwnerTechniciansPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [specializations, setSpecializations] = useState('');
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const routeFeedback = (location.state as { feedback?: unknown } | null)?.feedback;
+  const [feedback, setFeedback] = useState<string | null>(
+    typeof routeFeedback === 'string' ? routeFeedback : null,
+  );
   const [invitationUrl, setInvitationUrl] = useState<string | null>(null);
 
   const { data, isLoading, isError } = useGetTechniciansQuery(
@@ -64,7 +67,7 @@ export default function OwnerTechniciansPage() {
   );
   const [inviteTechnician, { isLoading: isInviting }] = useInviteTechnicianMutation();
   const [resendInvitation, { isLoading: isResending }] = useResendTechnicianInvitationMutation();
-  const [deleteTechnician, { isLoading: isDeleting }] = useDeleteTechnicianMutation();
+  const [updateTechnician, { isLoading: isUpdating }] = useUpdateTechnicianMutation();
 
   const technicians = data?.data || [];
 
@@ -125,25 +128,33 @@ export default function OwnerTechniciansPage() {
     }
   }
 
-  async function handleDelete(technicianId: string, technicianName: string) {
-    if (!businessId || !window.confirm(
-      `Hapus ${technicianName}? Teknisi aktif harus dinonaktifkan terlebih dahulu. Teknisi dengan riwayat tiket akan dinonaktifkan agar riwayat tetap utuh.`,
-    )) return;
+  async function handleStatusToggle(technician: Technician) {
+    if (!businessId || technician.status === 'pending') return;
+
+    const nextStatus = technician.status === 'active' ? 'inactive' : 'active';
+    const confirmation = nextStatus === 'inactive'
+      ? `Nonaktifkan ${technician.name}? Tiket aktif harus dialihkan dahulu. Riwayat servis tetap tersimpan.`
+      : `Aktifkan ${technician.name}?`;
+    if (!window.confirm(confirmation)) return;
 
     setFeedback(null);
     setInvitationUrl(null);
     try {
-      await deleteTechnician({ businessId, technicianId }).unwrap();
-      setFeedback(`${technicianName} berhasil dihapus.`);
+      await updateTechnician({
+        businessId,
+        technicianId: technician.id,
+        body: { status: nextStatus },
+      }).unwrap();
+      setFeedback(`${technician.name} sekarang ${nextStatus === 'active' ? 'aktif' : 'nonaktif'}.`);
     } catch (error) {
       const code = (error as { data?: { code?: string } }).data?.code;
-      setFeedback(
-        code === 'TECHNICIAN_HAS_TICKETS'
-          ? `${technicianName} memiliki riwayat tiket dan dinonaktifkan agar riwayat tetap utuh.`
-          : code === 'TECHNICIAN_ACTIVE'
-            ? 'Nonaktifkan teknisi aktif terlebih dahulu sebelum menghapusnya.'
-            : 'Teknisi gagal dihapus. Coba lagi.',
-      );
+      if (code === 'TECHNICIAN_HAS_ACTIVE_TICKETS') {
+        setFeedback('Alihkan tiket aktif teknisi sebelum menonaktifkannya.');
+      } else if (code === 'INVITATION_REQUIRED') {
+        setFeedback('Teknisi harus menerima undangan sebelum dapat diaktifkan.');
+      } else {
+        setFeedback(`Status ${technician.name} gagal diperbarui. Coba lagi.`);
+      }
     }
   }
 
@@ -339,14 +350,16 @@ export default function OwnerTechniciansPage() {
                             Kirim Ulang
                           </Button>
                         )}
-                        <Button
-                          variant="danger"
-                          onClick={() => void handleDelete(tech.id, tech.name)}
-                          pending={isDeleting}
-                          style={{ fontSize: '0.85rem' }}
-                        >
-                          Hapus
-                        </Button>
+                        {tech.status !== 'pending' && (
+                          <Button
+                            variant={tech.status === 'active' ? 'danger' : 'secondary'}
+                            onClick={() => void handleStatusToggle(tech)}
+                            pending={isUpdating}
+                            style={{ fontSize: '0.85rem' }}
+                          >
+                            {tech.status === 'active' ? 'Nonaktifkan' : 'Aktifkan'}
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}

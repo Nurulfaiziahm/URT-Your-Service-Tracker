@@ -1,7 +1,11 @@
 import { DirectoryTicketHistory } from '../tickets/DirectoryTicketHistory';
 import { useState, type FormEvent } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router';
-import { useGetTechnicianQuery, useUpdateTechnicianMutation } from '../technicians/techniciansApi';
+import {
+  useDeleteTechnicianMutation,
+  useGetTechnicianQuery,
+  useUpdateTechnicianMutation,
+} from '../technicians/techniciansApi';
 import type { Technician } from '../technicians/types';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
@@ -21,6 +25,32 @@ function EditForm({ item, businessId }: { item: Technician; businessId: string }
   );
   const [error, setError] = useState('');
   const [update, { isLoading }] = useUpdateTechnicianMutation();
+  const [deleteTechnician, { isLoading: isDeleting }] = useDeleteTechnicianMutation();
+
+  async function removePendingInvitation() {
+    if (item.status !== 'pending' || !window.confirm(`Hapus undangan untuk ${item.name}?`)) return;
+    setError('');
+    try {
+      const result = await deleteTechnician({
+        businessId,
+        technicianId: item.id,
+      }).unwrap();
+      const feedback = result.data.outcome === 'deactivated'
+        ? `${item.name} dinonaktifkan. Riwayat servis tetap tersimpan.`
+        : `Undangan untuk ${item.name} dihapus.`;
+      navigate('/owner/technicians', { state: { feedback } });
+    } catch (deleteError) {
+      const code = (deleteError as { data?: { code?: string } }).data?.code;
+      setError(
+        code === 'TECHNICIAN_NOT_PENDING'
+          ? 'Hanya undangan yang belum diterima yang dapat dihapus permanen.'
+          : code === 'TECHNICIAN_HAS_ACTIVE_TICKETS'
+            ? 'Alihkan tiket aktif teknisi sebelum menghapus undangannya.'
+            : 'Undangan teknisi gagal dihapus. Coba lagi.',
+      );
+    }
+  }
+
   async function submit(e: FormEvent) {
     e.preventDefault();
     setError('');
@@ -89,6 +119,16 @@ function EditForm({ item, businessId }: { item: Technician; businessId: string }
         <Button type="submit" pending={isLoading}>
           Simpan Perubahan
         </Button>
+        {item.status === 'pending' && (
+          <Button
+            type="button"
+            variant="danger"
+            pending={isDeleting}
+            onClick={() => void removePendingInvitation()}
+          >
+            Hapus Undangan
+          </Button>
+        )}
         <ButtonLink to={`/owner/technicians/${item.id}`} variant="secondary">
           Batal
         </ButtonLink>

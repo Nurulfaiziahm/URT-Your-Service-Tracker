@@ -7,7 +7,7 @@ export const ticketStatuses = {
   approved: { label: 'Servis Disetujui', tone: 'success' },
   repairing: { label: 'Dalam pengerjaan', tone: 'info' },
   quality_check: { label: 'Quality check', tone: 'info' },
-  completed: { label: 'Siap diambil', tone: 'success' },
+  completed: { label: 'Servis Selesai', tone: 'success' },
   rejected: { label: 'Servis Ditolak', tone: 'danger' },
   reassembling: { label: 'Dirakit kembali', tone: 'info' },
   cancelled: { label: 'Dibatalkan', tone: 'neutral' },
@@ -25,7 +25,7 @@ export const customerStatusNotes: Record<TicketStatus, string> = {
   reassembling: 'Perangkat sedang dirakit kembali agar siap diambil.',
   repairing: 'Teknisi sedang mengerjakan perbaikan perangkat.',
   quality_check: 'Perbaikan selesai dan perangkat sedang menjalani pemeriksaan kualitas.',
-  completed: 'Pemeriksaan kualitas selesai. Perangkat siap diambil di tempat servis.',
+  completed: 'Servis selesai setelah pemeriksaan kualitas. Perangkat siap diambil di tempat servis.',
   cancelled: 'Servis dibatalkan. Hubungi tempat servis jika Anda memerlukan bantuan.',
 };
 
@@ -37,14 +37,15 @@ export interface ServiceWorkflowStage {
 export const serviceWorkflowStages: readonly ServiceWorkflowStage[] = [
   { label: 'Pengajuan', statuses: ['submitted', 'waiting_diagnosis'] },
   { label: 'Diagnosis', statuses: ['diagnosing'] },
-  { label: 'Persetujuan', statuses: ['awaiting_approval', 'rejected'] },
+  { label: 'Persetujuan', statuses: ['awaiting_approval'] },
   { label: 'Pengerjaan', statuses: ['approved', 'repairing'] },
   { label: 'Quality Check', statuses: ['quality_check'] },
   { label: 'Siap Diambil', statuses: ['completed'] },
 ];
 
 const rejectedWorkflowStages: readonly ServiceWorkflowStage[] = [
-  { label: 'Persetujuan', statuses: ['awaiting_approval', 'rejected'] },
+  { label: 'Persetujuan', statuses: ['awaiting_approval'] },
+  { label: 'Persetujuan Ditolak', statuses: ['rejected'] },
   { label: 'Rakit Kembali', statuses: ['reassembling'] },
   { label: 'Selesai', statuses: ['completed'] },
 ];
@@ -62,7 +63,12 @@ export function serviceProgressState(
 ): 'completed' | 'current' | 'pending' | 'rejected' | 'cancelled' {
   if (status === 'cancelled') return 'cancelled';
   const activeStage = workflow.findIndex((item) => (item.statuses as readonly string[]).includes(status));
-  if (status === 'rejected' && stage === activeStage) return 'rejected';
+  const isRejectedStage = (workflow[stage]?.statuses as readonly string[] | undefined)?.includes('rejected');
+  const completedRejectedFlow = status === 'completed'
+    && workflow.some((item) => (item.statuses as readonly string[]).includes('rejected'));
+  if (isRejectedStage && (status === 'rejected' || completedRejectedFlow)) {
+    return 'rejected';
+  }
   if (status === 'completed' || stage < activeStage) return 'completed';
   if (stage === activeStage) return 'current';
   return 'pending';

@@ -62,6 +62,12 @@
   overflow-wrap: anywhere;
   line-height: 1.15;
 }
+.compact.compact .value {
+  margin-top: 12px;
+  font-size: 23px;
+}
+.compact.compact .accent { height: 25px; }
+.compact.compact .head { font-size: 12px; }
 .accent {
   flex-shrink: 0;
 }
@@ -116,4 +122,13 @@
 :global([data-role='owner']) .card p {
   margin-top: 16px;
   color: #94a3b8;
+}
+
+@media (max-width: 640px) {
+  .compactMobile.compactMobile { min-height: 0; padding: 12px; border-radius: 11px; }
+  .compactMobile.compactMobile .head { gap: 6px; font-size: 11px; line-height: 1.25; }
+  .compactMobile.compactMobile .icon { width: 26px; height: 26px; border-radius: 7px; }
+  .compactMobile.compactMobile .value { gap: 8px; margin-top: 8px; font-size: 24px; line-height: 1; }
+  .compactMobile.compactMobile .accent { height: 24px; }
+  .compactMobile.compactMobile p { margin-top: 5px; font-size: 10px; line-height: 1.3; }
 }

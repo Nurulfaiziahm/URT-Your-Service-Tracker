@@ -140,3 +140,11 @@
   gap: 16px;
   margin-top: 8px;
 }
+
+@media (max-width: 640px) {
+  .container { margin: 16px auto; gap: 18px; padding-inline: 0; }
+  .heading h1 { font-size: 1.5rem; }
+  .grid { gap: 12px; }
+  .card { padding: 16px; gap: 12px; }
+  .footerActions { gap: 10px; margin-top: 0; }
+}

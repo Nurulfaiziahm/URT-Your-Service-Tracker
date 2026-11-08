@@ -234,8 +234,11 @@ export class TechnicianService {
     };
   }
 
-  /** Permanently remove a technician only when no service tickets reference it. */
-  static async deleteTechnician(businessId: string, technicianId: string): Promise<void> {
+  /** Remove a technician from the active team and preserve ticket history. */
+  static async deleteTechnician(
+    businessId: string,
+    technicianId: string,
+  ): Promise<{ outcome: 'deactivated' | 'deleted' }> {
     validateObjectId(businessId, 'Business');
     validateObjectId(technicianId, 'Technician');
 
@@ -245,22 +248,43 @@ export class TechnicianService {
     });
     if (!technician) throw new AppError('Technician not found', 404);
 
-    // Revoke access and invalidate a pending invitation before checking references.
+    if (technician.status !== 'pending') {
+      throw new AppError(
+        'Only an invitation that has not been accepted can be permanently deleted.',
+        409,
+        'TECHNICIAN_NOT_PENDING',
+      );
+    }
+
+    // Do not remove access while the technician still owns active work.
     if (technician.status !== 'inactive') {
+      const activeTicketsCount = await ServiceTicket.countDocuments({
+        deletedAt: { $exists: false },
+        businessId: technician.businessId,
+        assignedTechnicianId: technician._id,
+        status: { $nin: ['completed', 'cancelled'] },
+      });
+
+      if (activeTicketsCount > 0) {
+        throw new AppError(
+          `Cannot deactivate technician with ${activeTicketsCount} active assigned ticket(s). Reassign them first.`,
+          400,
+          'TECHNICIAN_HAS_ACTIVE_TICKETS',
+        );
+      }
+
+      // Revoke access and invalidate a pending invitation before checking history.
       technician.status = 'inactive';
       await technician.save();
     }
 
-    const hasTickets = await ServiceTicket.exists({ deletedAt: { $exists: false },
+    const hasTickets = await ServiceTicket.exists({
+      deletedAt: { $exists: false },
       businessId: technician.businessId,
       assignedTechnicianId: technician._id,
     });
     if (hasTickets) {
-      throw new AppError(
-        'This technician has service ticket history and was deactivated instead of deleted.',
-        409,
-        'TECHNICIAN_HAS_TICKETS',
-      );
+      return { outcome: 'deactivated' };
     }
 
     await Technician.deleteOne({
@@ -268,6 +292,7 @@ export class TechnicianService {
       businessId: technician.businessId,
       status: 'inactive',
     });
+    return { outcome: 'deleted' };
   }
 
   /**

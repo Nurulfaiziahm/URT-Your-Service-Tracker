@@ -12,9 +12,12 @@ import { Button, ButtonLink } from '../../components/ui/Button';
 import { InlineNotice, EmptyState } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from '../tickets/Tickets.module.css';
+import pageStyles from './OwnerNewTicketPage.module.css';
+import { difficultyLabels } from '../services/catalog';
 
-const deviceTypes = ['Laptop', 'Smartphone', 'Tablet', 'Komputer Desktop', 'Printer', 'Monitor', 'Kamera', 'Perangkat Audio', 'Perangkat Lain'];
-const deviceBrands = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Canon', 'Epson', 'Sony', 'Merek Lain'];
+const deviceTypes = ['Laptop', 'Smartphone', 'Tablet', 'Komputer Desktop', 'Printer', 'Monitor', 'Kamera', 'Perangkat Audio'];
+const deviceBrands = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Canon', 'Epson', 'Sony'];
+const otherOption = '__other__';
 
 export default function OwnerNewTicketPage() {
   const navigate = useNavigate();
@@ -36,20 +39,24 @@ export default function OwnerNewTicketPage() {
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [category, setCategory] = useState('');
+  const [customCategory, setCustomCategory] = useState('');
   const [brand, setBrand] = useState('');
+  const [customBrand, setCustomBrand] = useState('');
   const [model, setModel] = useState('');
-  const [serialNumber, setSerialNumber] = useState('');
   const [condition, setCondition] = useState('');
   const [accessories, setAccessories] = useState('');
   const [complaint, setComplaint] = useState('');
   const [requestedServiceId, setRequestedServiceId] = useState('');
   const [assignedTechnicianId, setAssignedTechnicianId] = useState('');
+  const [intakeDifficultyLevel, setIntakeDifficultyLevel] = useState('');
   const [intakePhoto, setIntakePhoto] = useState<File | null>(null);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const services = servicesData?.data || [];
   const technicians = techsData?.data || [];
+  const deviceCategory = category === otherOption ? customCategory : category;
+  const deviceBrand = brand === otherOption ? customBrand : brand;
 
   if (!businessId) {
     return (
@@ -68,12 +75,12 @@ export default function OwnerNewTicketPage() {
     setErrorMessage(null);
 
     if (!selectedCustomer?.id) {
-      setErrorMessage('Pilih atau buat kontak pelanggan walk-in terlebih dahulu.');
+      setErrorMessage('Pilih atau buat kontak untuk pelanggan yang datang langsung terlebih dahulu.');
       return;
     }
 
-    if (!category.trim() || !model.trim() || !complaint.trim()) {
-      setErrorMessage('Kategori, model perangkat, dan keluhan wajib diisi.');
+    if (!deviceCategory.trim() || !deviceBrand.trim() || !complaint.trim()) {
+      setErrorMessage('Jenis perangkat, merek, dan keluhan wajib diisi.');
       return;
     }
 
@@ -83,10 +90,9 @@ export default function OwnerNewTicketPage() {
         body: {
           customerId: selectedCustomer.id,
           device: {
-            category: category.trim(),
-            brand: brand.trim() || undefined,
+            category: deviceCategory.trim(),
+            brand: deviceBrand.trim(),
             model: model.trim(),
-            serialNumber: serialNumber.trim() || undefined,
             condition: condition.trim() || undefined,
             accessories: accessories
               ? accessories
@@ -96,6 +102,7 @@ export default function OwnerNewTicketPage() {
               : [],
           },
           complaint: complaint.trim(),
+          intakeDifficultyLevel: intakeDifficultyLevel || undefined,
           requestedServiceId: requestedServiceId || undefined,
           assignedTechnicianId: assignedTechnicianId || undefined,
           intakeMethod: 'walk_in',
@@ -124,68 +131,48 @@ export default function OwnerNewTicketPage() {
       setErrorMessage(
         apiErr.data?.error ||
           apiErr.error ||
-          'Gagal mencatat tiket servis walk-in. Periksa kembali kelengkapan data.',
+          'Gagal mencatat tiket servis. Periksa kembali kelengkapan data.',
       );
     }
   }
 
   return (
     <div className={`container page-content ${styles.container}`}>
-      <header className={styles.heading}>
+      <header className={`${styles.heading} ${pageStyles.pageHeading}`}>
         <div>
-          <span className="eyebrow">Penerimaan Unit</span>
-          <h1>Catat Tiket Servis Walk-in</h1>
-          <p>Terima unit perangkat yang dibawa langsung oleh pelanggan ke tempat servis.</p>
+          <span className="eyebrow">Tiket Servis</span>
+          <h1>Buat Tiket Servis</h1>
+          <p>Catat perangkat yang dibawa langsung oleh pelanggan ke tempat servis.</p>
         </div>
       </header>
 
       {errorMessage && <InlineNotice>{errorMessage}</InlineNotice>}
 
-      <form className={styles.ticketCard} onSubmit={handleSubmit} noValidate>
-        <h2>1. Identitas Pelanggan</h2>
+      <form className={`${styles.ticketCard} ${pageStyles.newTicketForm}`} onSubmit={handleSubmit} noValidate>
+        <h2 className={pageStyles.sectionTitle}><span>1</span>Identitas Pelanggan</h2>
         <CustomerPicker
           businessId={businessId}
           selectedCustomerId={selectedCustomer?.id}
+          selectedCustomer={selectedCustomer}
           onSelectCustomer={setSelectedCustomer}
         />
 
-        <hr style={{ border: 'none', borderTop: '1px solid var(--border)', marginBlock: 8 }} />
+        <h2 className={pageStyles.sectionTitle}><span>2</span>Data Perangkat</h2>
 
-        <h2>2. Data Perangkat & Fisik</h2>
-
-        <div
-          className="row"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: 16,
-          }}
-        >
-          <label htmlFor="intake-category">Jenis perangkat<select id="intake-category" required value={category} onChange={(e) => setCategory(e.target.value)}><option value="">Pilih jenis perangkat</option>{deviceTypes.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-          <label htmlFor="intake-brand">Merek<select id="intake-brand" value={brand} onChange={(e) => setBrand(e.target.value)}><option value="">Pilih merek</option>{deviceBrands.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+        <div className={`${styles.row} ${pageStyles.formGrid}`}>
+          <label className={pageStyles.selectField} htmlFor="intake-category">Jenis perangkat *<select className={pageStyles.select} id="intake-category" required value={category} onChange={(e) => setCategory(e.target.value)}><option value="">Pilih jenis perangkat</option>{deviceTypes.map((value) => <option key={value} value={value}>{value}</option>)}<option value={otherOption}>Perangkat Lain</option></select></label>
+          {category === otherOption && <TextInput label="Nama perangkat *" required maxLength={50} placeholder="Tulis jenis perangkat" value={customCategory} onChange={(e) => setCustomCategory(e.target.value)} />}
+          <label className={pageStyles.selectField} htmlFor="intake-brand">Merek *<select className={pageStyles.select} id="intake-brand" required value={brand} onChange={(e) => setBrand(e.target.value)}><option value="">Pilih merek</option>{deviceBrands.map((value) => <option key={value} value={value}>{value}</option>)}<option value={otherOption}>Merek Lain</option></select></label>
+          {brand === otherOption && <TextInput label="Nama merek *" required maxLength={50} placeholder="Tulis nama merek" value={customBrand} onChange={(e) => setCustomBrand(e.target.value)} />}
           <TextInput
             label="Tipe / Model"
             placeholder="Contoh: ThinkPad T480"
-            required
             value={model}
             onChange={(e) => setModel(e.target.value)}
           />
         </div>
 
-        <div
-          className="row"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: 16,
-          }}
-        >
-          <TextInput
-            label="Nomor Seri / SN"
-            placeholder="Nomor seri perangkat"
-            value={serialNumber}
-            onChange={(e) => setSerialNumber(e.target.value)}
-          />
+        <div className={`${styles.row} ${pageStyles.formGrid}`}>
           <TextInput
             label="Kondisi Fisik Saat Diterima"
             placeholder="Contoh: Bodi lecet, baut hilang, layar utuh"
@@ -200,8 +187,8 @@ export default function OwnerNewTicketPage() {
           value={accessories}
           onChange={(e) => setAccessories(e.target.value)}
         />
-        <label htmlFor="intake-photo">Foto kondisi perangkat saat diterima (opsional)
-          <input id="intake-photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => {
+        <label className={pageStyles.fileField} htmlFor="intake-photo">Foto kondisi perangkat saat diterima (opsional)
+          <input className={pageStyles.fileInput} id="intake-photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => {
             const file = event.target.files?.[0] || null;
             setIntakePhoto(file && file.size <= 5 * 1024 * 1024 ? file : null);
             if (file && (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type) || file.size > 5 * 1024 * 1024)) setErrorMessage('Pilih foto JPEG, PNG, WebP, atau GIF dengan ukuran maksimal 5 MiB.');
@@ -210,30 +197,23 @@ export default function OwnerNewTicketPage() {
           <small>JPG, PNG, WebP, atau GIF. Maksimal 5 MiB.</small>
         </label>
 
-        <hr style={{ border: 'none', borderTop: '1px solid var(--border)', marginBlock: 8 }} />
+        <h2 className={pageStyles.sectionTitle}><span>3</span>Keluhan & Penugasan</h2>
 
-        <h2>3. Keluhan & Penugasan</h2>
+        <label className={pageStyles.selectField} htmlFor="intake-complaint">Keluhan / masalah *</label>
+        <textarea className={pageStyles.textarea} id="intake-complaint" required minLength={3} maxLength={1000} rows={4} placeholder="Jelaskan masalah perangkat yang disampaikan pelanggan" value={complaint} onChange={(e) => setComplaint(e.target.value)} />
 
-        <TextInput
-          label="Keluhan Kerusakan dari Pelanggan"
-          placeholder="Jelaskan kendala kerusakan yang disampaikan oleh pelanggan..."
-          required
-          value={complaint}
-          onChange={(e) => setComplaint(e.target.value)}
-        />
-
-        <div
-          className="row"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: 16,
-          }}
-        >
-          <div>
+        <div className={`${styles.row} ${pageStyles.formGrid}`}>
+          <div className={pageStyles.selectField}>
+            <label htmlFor="intake-difficulty">Tingkat kesulitan awal</label>
+            <select id="intake-difficulty" value={intakeDifficultyLevel} onChange={(e) => setIntakeDifficultyLevel(e.target.value)} className={pageStyles.select}>
+              <option value="">Belum ditentukan</option>
+              {Object.entries(difficultyLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+            <small>Teknisi dapat menyesuaikannya setelah diagnosis.</small>
+          </div>
+          <div className={pageStyles.selectField}>
             <label
               htmlFor="owner-service-select"
-              style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: 4 }}
             >
               Layanan yang Dipilih (Opsional)
             </label>
@@ -241,14 +221,7 @@ export default function OwnerNewTicketPage() {
               id="owner-service-select"
               value={requestedServiceId}
               onChange={(e) => setRequestedServiceId(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border)',
-                background: 'var(--card)',
-                color: 'var(--navy-950)',
-              }}
+              className={pageStyles.select}
             >
               <option value="">-- Tanpa Paket Layanan Khusus --</option>
               {services.map((s) => (
@@ -259,10 +232,9 @@ export default function OwnerNewTicketPage() {
             </select>
           </div>
 
-          <div>
+          <div className={pageStyles.selectField}>
             <label
               htmlFor="owner-tech-select"
-              style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: 4 }}
             >
               Tugaskan Langsung ke Teknisi (Opsional)
             </label>
@@ -270,14 +242,7 @@ export default function OwnerNewTicketPage() {
               id="owner-tech-select"
               value={assignedTechnicianId}
               onChange={(e) => setAssignedTechnicianId(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border)',
-                background: 'var(--card)',
-                color: 'var(--navy-950)',
-              }}
+              className={pageStyles.select}
             >
               <option value="">-- Belum Ditugaskan (Antrean Umum) --</option>
               {technicians.map((t) => (
@@ -289,11 +254,11 @@ export default function OwnerNewTicketPage() {
           </div>
         </div>
 
-        <div className="actions" style={{ marginTop: 16 }}>
-          <Button type="submit" pending={isSubmitting || isUploading || isAttaching}>
+        <div className={`actions ${pageStyles.formActions}`}>
+          <Button className={pageStyles.submitButton} type="submit" pending={isSubmitting || isUploading || isAttaching}>
             Simpan Tiket Masuk
           </Button>
-          <ButtonLink to="/owner/tickets" variant="ghost">
+          <ButtonLink className={pageStyles.cancelButton} to="/owner/tickets" variant="ghost">
             Batal
           </ButtonLink>
         </div>

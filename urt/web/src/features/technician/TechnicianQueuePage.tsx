@@ -68,6 +68,7 @@ export default function TechnicianQueuePage() {
           detail="Pekerjaan dalam penugasan"
           icon="ticket"
           tone="blue"
+          compactMobile
         />
         <SummaryCard
           label="Menunggu Persetujuan"
@@ -75,6 +76,7 @@ export default function TechnicianQueuePage() {
           detail="Estimasi menunggu pelanggan"
           icon="clock"
           tone="orange"
+          compactMobile
         />
         <SummaryCard
           label="Servis Selesai"
@@ -82,6 +84,7 @@ export default function TechnicianQueuePage() {
           detail="Pekerjaan telah selesai"
           icon="check"
           tone="green"
+          compactMobile
         />
       </section>
 

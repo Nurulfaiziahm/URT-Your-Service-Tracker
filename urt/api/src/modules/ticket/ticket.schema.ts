@@ -34,6 +34,7 @@ export const createTicketSchema = z.object({
       customerId: z.string().trim().optional(),
       requestedServiceId: z.string().trim().optional(),
       assignedTechnicianId: z.string().trim().optional(),
+      intakeDifficultyLevel: z.enum(['low', 'medium', 'high', 'complex']).optional(),
       device: deviceSchema,
       complaint: z.string().trim().min(3, 'Complaint is required').max(1000, 'Max 1000 characters'),
       intakeMethod: z.enum(['walk_in', 'online']).optional(),

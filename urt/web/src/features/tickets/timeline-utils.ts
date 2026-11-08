@@ -37,7 +37,13 @@ export function timelineNoteLabel(note: string) {
   return note;
 }
 
-export function currentStatusNote(status: TicketStatus, timeline: { status?: TicketStatus; note?: string }[] = []) {
+export function currentStatusNote(
+  status: TicketStatus,
+  timeline: { status?: TicketStatus; note?: string; action?: string }[] = [],
+) {
+  if (status === 'completed' && timeline.some((event) => event.action === 'estimate_rejected')) {
+    return 'Estimasi servis ditolak. Perangkat sudah dirakit kembali dan siap diambil.';
+  }
   const currentEvent = [...timeline].reverse().find((event) => event.status === status && event.note?.trim());
   return currentEvent?.note ? timelineNoteLabel(currentEvent.note) : customerStatusNotes[status];
 }

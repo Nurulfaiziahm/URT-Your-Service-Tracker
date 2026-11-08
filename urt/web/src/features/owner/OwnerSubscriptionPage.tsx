@@ -23,6 +23,10 @@ const paymentLabels = {
   failed: 'Gagal',
   expired: 'Kedaluwarsa',
 };
+
+function formatPackageName(name: string) {
+  return name.replace(/\s*\(Hemat\s+\d+%\)/i, '');
+}
 export default function OwnerSubscriptionPage() {
   const businessId = useAppSelector(selectSelectedBusinessId) || '';
   const location = useLocation();
@@ -88,22 +92,25 @@ export default function OwnerSubscriptionPage() {
       {error && <InlineNotice type="error">{error}</InlineNotice>}
       {!choosing && (
         <>
-          <div className="reference-stats reference-stats-three">
+          <div className={`reference-stats reference-stats-three ${styles.subscriptionStats}`}>
             <SummaryCard
               label="Paket Saat Ini"
-              value={subscription.planName || 'Belum Berlangganan'}
+              value={formatPackageName(subscription.planName || 'Belum Berlangganan')}
               icon="wallet"
+              compact
             />
             <SummaryCard
               label="Sisa Masa Aktif"
               value={`${subscription.daysRemaining} Hari`}
               icon="clock"
               tone={subscription.status === 'active' ? 'green' : 'orange'}
+              compact
             />
             <SummaryCard
               label="Teknisi Terdaftar"
               value={`${subscription.occupiedTechnicianSeats} / ${subscription.package?.maxTechnicians ?? '∞'}`}
               icon="people"
+              compact
             />
           </div>
           <section className="reference-panel">
@@ -130,7 +137,7 @@ export default function OwnerSubscriptionPage() {
               </div>
             </dl>
             {subscription.pendingPayment && (
-              <div className="reference-callout">
+              <div className={`reference-callout ${styles.pendingPaymentCallout}`}>
                 <p>Ada pembayaran yang menunggu penyelesaian.</p>
                 <ButtonLink
                   to={`/owner/subscription/payments/${subscription.pendingPayment.id}`}
@@ -165,7 +172,7 @@ export default function OwnerSubscriptionPage() {
                       <tr key={p.id}>
                         <td>{p.reference}</td>
                         <td>{new Date(p.createdAt).toLocaleDateString('id-ID')}</td>
-                        <td>{p.package.name}</td>
+                        <td>{formatPackageName(p.package.name)}</td>
                         <td>{formatRupiah(p.amount)}</td>
                         <td>
                           <StatusBadge label={paymentLabels[p.status]} tone={p.status === 'paid' ? 'success' : p.status === 'failed' || p.status === 'expired' ? 'danger' : 'warning'} />

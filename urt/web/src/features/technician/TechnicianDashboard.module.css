@@ -567,6 +567,8 @@
   background: #ffffff;
 }
 
+.mobileUrgentList { display: none; }
+
 .urgentTable {
   width: 100%;
   min-width: 760px;
@@ -659,7 +661,8 @@
 
 @media (max-width: 768px) {
   .statsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
   }
 }
 
@@ -678,4 +681,16 @@
     flex-direction: column;
     gap: 12px;
   }
+
+  .tableWrapper { display: none; }
+  .mobileUrgentList { display: grid; gap: 10px; }
+  .mobileUrgentCard { display: grid; gap: 10px; min-width: 0; padding: 12px; border: 1px solid #e2e8f0; border-radius: 13px; background: linear-gradient(150deg, #fff 0%, #f8fbff 100%); box-shadow: 0 3px 10px rgb(15 23 42 / 4%); }
+  .mobileUrgentHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding-bottom: 9px; border-bottom: 1px solid #edf1f6; }
+  .mobileUrgentDetails { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px 12px; margin: 0; }
+  .mobileUrgentDetails > div { display: grid; gap: 3px; min-width: 0; }
+  .mobileUrgentDetails dt { color: #64748b; font-size: 0.64rem; font-weight: 650; }
+  .mobileUrgentDetails dd { margin: 0; color: #17233b; font-size: 0.76rem; line-height: 1.35; overflow-wrap: anywhere; }
+  .mobileUrgentComplaint { grid-column: 1 / -1; }
+  .mobileUrgentCard .btnActionDetail { justify-content: center; }
+  .mobileUrgentEmpty { margin: 0; padding: 14px; border: 1px dashed #cbd5e1; border-radius: 12px; background: #fff; color: #64748b; font-size: 0.8rem; text-align: center; }
 }

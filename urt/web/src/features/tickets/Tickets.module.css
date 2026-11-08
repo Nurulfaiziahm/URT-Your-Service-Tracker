@@ -155,6 +155,32 @@
   font-size: 0.9rem;
 }
 
+.attachmentDeleteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #b91c1c;
+  background: #fff7f7;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.attachmentDeleteButton:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.attachmentDeleteButton:disabled { opacity: 0.55; cursor: not-allowed; }
+.attachmentDeleteButton svg { width: 16px; height: 16px; }
+
 /* Tables & Lists */
 .tableWrapper {
   overflow-x: auto;
@@ -164,6 +190,8 @@
   border-radius: var(--radius-md);
   background: var(--card);
 }
+
+.mobileTicketList { display: none; }
 
 .table {
   width: 100%;
@@ -410,6 +438,39 @@
 }
 
 @media (max-width: 640px) {
+  .attachmentDeleteButton { width: 36px; min-width: 36px; height: 36px; padding: 0; }
+  .attachmentDeleteButton span { display: none; }
+  .desktopTicketTable { display: none; }
+  .mobileTicketList { display: grid; gap: 10px; min-width: 0; }
+  .mobileTicketCard {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    background: linear-gradient(150deg, #fff 0%, #f8fbff 100%);
+    box-shadow: 0 3px 10px rgb(15 23 42 / 4%);
+  }
+  .mobileTicketHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    padding-bottom: 9px;
+    border-bottom: 1px solid #edf1f6;
+  }
+  .mobileTicketCode { min-width: 0; color: #1d4ed8; font: 700 0.76rem/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+  .mobileTicketHeader > :last-child { flex: 0 0 auto; }
+  .mobileTicketDetails { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px 12px; margin: 0; }
+  .mobileTicketDetails > div { display: grid; gap: 3px; min-width: 0; align-content: start; }
+  .mobileTicketDetails dt { color: #64748b; font-size: 0.64rem; font-weight: 650; }
+  .mobileTicketDetails dd { margin: 0; color: #17233b; font-size: 0.76rem; line-height: 1.35; overflow-wrap: anywhere; }
+  .mobileTicketComplaint { grid-column: 1 / -1; }
+  .mobileTicketAction { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 6px 10px; border: 1px solid #dbeafe; border-radius: 8px; background: #eff6ff; color: #1d4ed8; font-size: 0.72rem; font-weight: 650; text-decoration: none; }
+  .mobileTicketEmpty { margin: 0; padding: 14px; border: 1px dashed #cbd5e1; border-radius: 12px; color: #64748b; background: #fff; font-size: 0.8rem; text-align: center; }
+
   .tableWrapper.customerHistoryWrapper {
     overflow: visible;
     border: 0;

@@ -62,7 +62,10 @@ export const techniciansApi = baseApi.injectEndpoints({
       invalidatesTags: ['Technicians', 'Reports'],
     }),
 
-    deleteTechnician: builder.mutation<void, { businessId: string; technicianId: string }>({
+    deleteTechnician: builder.mutation<
+      ApiResponse<{ outcome: 'deactivated' | 'deleted' }>,
+      { businessId: string; technicianId: string }
+    >({
       query: ({ businessId, technicianId }) => ({
         url: `/businesses/${encodeURIComponent(businessId)}/technicians/${encodeURIComponent(technicianId)}`,
         method: 'DELETE',

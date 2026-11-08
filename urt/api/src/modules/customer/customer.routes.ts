@@ -3,19 +3,20 @@ import {
   createCustomer,
   getCustomers,
   getCustomerById,
+  updateCustomer,
   deleteCustomer,
   sendCustomerInvitation,
   acceptCustomerInvitation,
 } from './customer.controller.js';
 import { validate } from '../../middleware/validation.js';
 import { protect } from '../../middleware/auth.guard.js';
-import { AppError } from '../../middleware/error-handler.js';
 import {
   requireBusinessAccess,
   attachBusinessContext,
 } from '../business/business.access.js';
 import {
   createCustomerSchema,
+  updateCustomerSchema,
   customerQuerySchema,
   acceptCustomerInvitationSchema,
 } from './customer.schema.js';
@@ -52,11 +53,12 @@ customerRouter.get(
   getCustomerById,
 );
 
-// The owner directory is read-only; unlinked fictitious contacts may be removed.
+// Owners can update contact details in their business directory.
 customerRouter.put(
   '/:customerId',
   requireBusinessAccess('owner'),
-  () => { throw new AppError('Data pelanggan hanya dapat dilihat pada portal pemilik.', 403, 'CUSTOMER_READ_ONLY'); },
+  validate(updateCustomerSchema),
+  updateCustomer,
 );
 customerRouter.delete('/:customerId', requireBusinessAccess('owner'), deleteCustomer);
 

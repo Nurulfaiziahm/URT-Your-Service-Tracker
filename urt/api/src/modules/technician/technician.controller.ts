@@ -28,8 +28,17 @@ export const resendTechnicianInvitation = asyncHandler(async (req: Request, res:
 });
 
 export const deleteTechnician = asyncHandler(async (req: Request, res: Response) => {
-  await TechnicianService.deleteTechnician(req.params.businessId, req.params.technicianId);
-  ResponseHandler.noContent(res);
+  const result = await TechnicianService.deleteTechnician(
+    req.params.businessId,
+    req.params.technicianId,
+  );
+  ResponseHandler.success(
+    res,
+    result,
+    result.outcome === 'deactivated'
+      ? 'Technician was removed from the active team; service history was preserved.'
+      : 'Technician deleted successfully.',
+  );
 });
 
 export const getTechnicians = asyncHandler(async (req: Request, res: Response) => {

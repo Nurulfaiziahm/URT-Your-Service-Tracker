@@ -1,7 +1,7 @@
 import { SummaryCard } from '../../components/ui/SummaryCard';
 import { Pagination } from '../../components/navigation/Pagination';
 import { useGetOwnerDashboardQuery } from '../dashboard/dashboardApi';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router';
 import { useAppSelector } from '../../redux/hooks';
 import { selectSelectedBusinessId } from '../business/businessSlice';
@@ -14,6 +14,7 @@ import { TextInput } from '../../components/ui/TextInput';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { PageLoader, EmptyState, InlineNotice } from '../../components/feedback/Feedback';
 import styles from '../tickets/Tickets.module.css';
+import pageStyles from './OwnerTicketsPage.module.css';
 
 export default function OwnerTicketsPage() {
   const businessId = useAppSelector(selectSelectedBusinessId);
@@ -24,6 +25,17 @@ export default function OwnerTicketsPage() {
   const statusFilter = (searchParams.get('status') as TicketStatus) || '';
 
   const [searchInput, setSearchInput] = useState(search);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches,
+  );
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 640px)');
+    const updateViewport = () => setIsMobile(mobileQuery.matches);
+    updateViewport();
+    mobileQuery.addEventListener('change', updateViewport);
+    return () => mobileQuery.removeEventListener('change', updateViewport);
+  }, []);
 
   const { data, isLoading, isError } = useGetTicketsQuery(
     {
@@ -31,6 +43,7 @@ export default function OwnerTicketsPage() {
       params: {
         q: search || undefined,
         page: Math.max(1, Number(searchParams.get('page')) || 1),
+        limit: isMobile ? 5 : 20,
         customerId: searchParams.get('customerId') || undefined,
         technicianId: searchParams.get('technicianId') || undefined,
         status: statusFilter || undefined,
@@ -75,53 +88,52 @@ export default function OwnerTicketsPage() {
 
   return (
     <div className={`container page-content ${styles.container}`}>
-      <header className={styles.heading}>
+      <header className={`${styles.heading} ${pageStyles.heading}`}>
         <div>
           <span className="eyebrow">Operasional Servis</span>
           <h1>Daftar Tiket Servis</h1>
           <p>Pantau semua tiket perbaikan perangkat yang masuk ke tempat servis Anda.</p>
         </div>
-        <ButtonLink to="/owner/tickets/new">+ Catat Tiket Walk-in</ButtonLink>
+        <ButtonLink to="/owner/tickets/new">+ Buat Tiket Servis</ButtonLink>
       </header>
 
-      <div className="reference-stats">
-        <SummaryCard label="Tiket Aktif" value={stats?.activeTickets ?? '—'} icon="ticket" />
+      <div className={`reference-stats ${pageStyles.ticketStats}`}>
+        <SummaryCard label="Tiket Aktif" value={stats?.activeTickets ?? '—'} icon="ticket" compactMobile />
         <SummaryCard
           label="Menunggu Persetujuan"
           value={stats?.awaitingApproval ?? '—'}
           icon="clock"
           tone="orange"
+          compactMobile
         />
-        <SummaryCard label="Dalam Perbaikan" value={stats?.inRepair ?? '—'} icon="tool" />
+        <SummaryCard label="Dalam Perbaikan" value={stats?.inRepair ?? '—'} icon="tool" compactMobile />
         <SummaryCard
-          label="Siap Diambil"
+          label="Servis Selesai"
           value={stats?.readyForPickup ?? '—'}
           icon="check"
           tone="green"
+          compactMobile
         />
       </div>
       {isError && <InlineNotice>Daftar tiket gagal dimuat. Silakan coba lagi.</InlineNotice>}
       {state?.notice && <InlineNotice type="success">{state.notice}</InlineNotice>}
-      <div className={styles.filters}>
-        <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: 8, flex: 1 }}>
-          <TextInput
-            label="Cari Tiket"
-            placeholder="Cari kode tiket, nama pelanggan, atau keluhan..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-          <Button type="submit" style={{ alignSelf: 'end' }}>
+      <div className={`${styles.filters} ${pageStyles.filters}`}>
+        <form onSubmit={handleSearchSubmit} className={pageStyles.searchForm}>
+          <div className={pageStyles.searchInput}>
+            <TextInput
+              label="Cari tiket"
+              placeholder="Kode, pelanggan, atau keluhan"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </div>
+          <Button type="submit" size="small" className={pageStyles.searchButton}>
             Cari
           </Button>
         </form>
 
-        <div>
-          <label
-            htmlFor="filter-status"
-            style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 4 }}
-          >
-            Filter Status
-          </label>
+        <div className={pageStyles.statusFilter}>
+          <label htmlFor="filter-status" className={pageStyles.statusLabel}>Filter Status</label>
           <select
             id="filter-status"
             className={styles.filterSelect}
@@ -153,8 +165,9 @@ export default function OwnerTicketsPage() {
           }
         />
       ) : (
-        <ResponsiveTable className={styles.tableWrapper} rowHeading="Tiket">
-          <table className={styles.table}>
+        <>
+          <ResponsiveTable className={`${styles.tableWrapper} ${pageStyles.desktopTickets}`} rowHeading="Tiket">
+            <table className={styles.table}>
             <thead>
               <tr style={{ background: 'var(--canvas)', borderBottom: '1px solid var(--border)' }}>
                 <th style={{ padding: '12px 16px' }}>Kode Tiket</th>
@@ -180,7 +193,7 @@ export default function OwnerTicketsPage() {
                     {new Date(t.createdAt).toLocaleDateString('id-ID')}
                   </td>
                   <td style={{ padding: '12px 16px' }}>
-                    <strong>{t.customer?.name || 'Walk-in'}</strong>
+                    <strong>{t.customer?.name || 'Pelanggan langsung'}</strong>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
                     {t.device.category} • {t.device.model}
@@ -195,7 +208,10 @@ export default function OwnerTicketsPage() {
                     )}
                   </td>
                   <td style={{ padding: '12px 16px' }}>
-                    <TicketStatusBadge status={t.status} />
+                    <TicketStatusBadge
+                      status={t.status}
+                      rejectedFlow={t.timeline.some((event) => event.action === 'estimate_rejected')}
+                    />
                   </td>
                   <td style={{ padding: '12px 16px' }}>
                     <ButtonLink
@@ -210,17 +226,76 @@ export default function OwnerTicketsPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
-        </ResponsiveTable>
+            </table>
+          </ResponsiveTable>
+          <div className={pageStyles.ticketCards} aria-label="Daftar tiket servis">
+            {tickets.map((ticket) => (
+              <article className={pageStyles.ticketCard} key={ticket.id}>
+                <header className={pageStyles.ticketCardHeader}>
+                  <Link to={`/owner/tickets/${ticket.id}`} className={pageStyles.ticketCode}>
+                    {ticket.ticketCode}
+                  </Link>
+                  <TicketStatusBadge
+                    status={ticket.status}
+                    rejectedFlow={ticket.timeline.some((event) => event.action === 'estimate_rejected')}
+                  />
+                </header>
+                <dl className={pageStyles.ticketDetails}>
+                  <div><dt>Pelanggan</dt><dd>{ticket.customer?.name || 'Pelanggan langsung'}</dd></div>
+                  <div><dt>Perangkat</dt><dd>{ticket.device.category} · {ticket.device.model}</dd></div>
+                  <div><dt>Tanggal masuk</dt><dd>{new Date(ticket.createdAt).toLocaleDateString('id-ID')}</dd></div>
+                  <div><dt>Teknisi</dt><dd>{ticket.technician?.name || 'Belum ditugaskan'}</dd></div>
+                </dl>
+                <ButtonLink to={`/owner/tickets/${ticket.id}`} variant="secondary" size="small" className={pageStyles.detailButton}>
+                  Lihat detail
+                </ButtonLink>
+              </article>
+            ))}
+          </div>
+        </>
       )}
-      <Pagination
-        pagination={data?.pagination}
-        onPageChange={(page) => {
-          const next = new URLSearchParams(searchParams);
-          next.set('page', String(page));
-          setSearchParams(next);
-        }}
-      />
+      <div className={pageStyles.desktopPagination}>
+        <Pagination
+          pagination={data?.pagination}
+          onPageChange={(page) => {
+            const next = new URLSearchParams(searchParams);
+            next.set('page', String(page));
+            setSearchParams(next);
+          }}
+        />
+      </div>
+      {isMobile && data?.pagination && (
+        <nav className={pageStyles.mobilePagination} aria-label="Halaman daftar tiket">
+          <span>
+            Halaman {data.pagination.page} dari {data.pagination.totalPages} · {data.pagination.total} tiket
+          </span>
+          <div>
+            <Button
+              size="small"
+              variant="secondary"
+              disabled={data.pagination.page <= 1}
+              onClick={() => {
+                const next = new URLSearchParams(searchParams);
+                next.set('page', String(data.pagination.page - 1));
+                setSearchParams(next);
+              }}
+            >
+              Kembali
+            </Button>
+            <Button
+              size="small"
+              disabled={data.pagination.page >= data.pagination.totalPages}
+              onClick={() => {
+                const next = new URLSearchParams(searchParams);
+                next.set('page', String(data.pagination.page + 1));
+                setSearchParams(next);
+              }}
+            >
+              Berikutnya
+            </Button>
+          </div>
+        </nav>
+      )}
     </div>
   );
 }

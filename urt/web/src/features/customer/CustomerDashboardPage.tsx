@@ -38,7 +38,7 @@ function TrackedTicketPanel({ ticket }: { ticket: PublicTrackingResult }) {
           <div className={styles.summaryMeta}>
             <div className={styles.summaryHeader}>
               <span className={styles.ticketCode}>{ticket.ticketCode}</span>
-              <TicketStatusBadge status={ticket.status} />
+              <TicketStatusBadge status={ticket.status} rejectedFlow={ticket.timeline.some((event) => event.action === 'estimate_rejected')} />
             </div>
             <h2 className={styles.deviceName}>{deviceTitle}</h2>
             <p className={styles.complaintText}><strong>Pemilik perangkat:</strong> {ticket.customer.name}</p>
@@ -281,6 +281,7 @@ export default function CustomerDashboardPage() {
           label="Servis Aktif"
           value={displayStats.activeTickets}
           detail={displayPublicStats ? 'Tiket yang sedang dilacak' : 'Perangkat dalam penanganan'}
+          compactMobile
         />
         <SummaryCard
           label="Servis Selesai"
@@ -288,6 +289,7 @@ export default function CustomerDashboardPage() {
           detail={displayPublicStats ? 'Status tiket yang sedang dilacak' : 'Riwayat perbaikan Anda'}
           tone="green"
           icon="check"
+          compactMobile
         />
         <SummaryCard
           label="Menunggu Persetujuan"
@@ -295,6 +297,7 @@ export default function CustomerDashboardPage() {
           detail={displayPublicStats ? 'Tiket yang sedang dilacak' : 'Estimasi membutuhkan keputusan'}
           tone="orange"
           icon="clock"
+          compactMobile
         />
       </section>
 
@@ -309,7 +312,7 @@ export default function CustomerDashboardPage() {
               <div className={styles.summaryMeta}>
                 <div className={styles.summaryHeader}>
                   <span className={styles.ticketCode}>{ticket.ticketCode}</span>
-                  <TicketStatusBadge status={ticket.status} />
+                  <TicketStatusBadge status={ticket.status} rejectedFlow={ticket.timeline.some((event) => event.action === 'estimate_rejected')} />
                 </div>
                 <h2 className={styles.deviceName}>{[ticket.device.brand, ticket.device.model].filter(Boolean).join(' ') || ticket.device.category}</h2>
                 <p className={styles.complaintText}><strong>Pelanggan:</strong> {ticket.customer?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim()}</p>

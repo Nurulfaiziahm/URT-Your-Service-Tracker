@@ -19,7 +19,11 @@ export function CustomerWhatsAppUpdate({ ticket }: { ticket: ServiceTicket }) {
   );
   const id = useId();
   const [draft, setDraft] = useState<string | null>(null);
-  const generated = customerServiceUpdate(ticket, ticketStatuses[ticket.status].label, `${user?.firstName || ''} ${user?.lastName || ''}`.trim(), portalUrl, approval?.data.approvalUrl);
+  const rejectedFlow = ticket.timeline.some((event) => event.action === 'estimate_rejected');
+  const statusLabel = ticket.status === 'completed' && rejectedFlow
+    ? ticketStatuses.rejected.label
+    : ticketStatuses[ticket.status].label;
+  const generated = customerServiceUpdate(ticket, statusLabel, `${user?.firstName || ''} ${user?.lastName || ''}`.trim(), portalUrl, approval?.data.approvalUrl);
   const message = draft ?? generated;
   const link = whatsappMessageLink(ticket.customer?.phone, message);
   if (!['awaiting_approval', 'completed'].includes(ticket.status)) return null;

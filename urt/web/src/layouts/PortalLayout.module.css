@@ -435,6 +435,9 @@
   .layout[data-role='technician'] .content {
     padding: 20px 16px 24px;
   }
+  .layout[data-role='customer'] .content {
+    padding: 16px 12px 20px;
+  }
 }
 
 /* Owner shell follows the original owner portal. */

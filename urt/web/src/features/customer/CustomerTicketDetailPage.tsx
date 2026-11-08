@@ -95,7 +95,10 @@ export default function CustomerTicketDetailPage() {
           <span className="eyebrow">Status Perbaikan</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
             <span className={styles.ticketCode}>{ticket.ticketCode}</span>
-            <TicketStatusBadge status={ticket.status} />
+            <TicketStatusBadge
+              status={ticket.status}
+              rejectedFlow={ticket.timeline.some((event) => event.action === 'estimate_rejected')}
+            />
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -205,13 +208,27 @@ export default function CustomerTicketDetailPage() {
                   <Icon name="check" width={28} height={28} />
                 </span>
                 <div>
-                  <strong style={{ color: '#166534', fontSize: '1.05rem' }}>
-                    Perbaikan Selesai & Perangkat Siap Diambil!
-                  </strong>
-                  <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: '#14532d' }}>
-                    Perangkat Anda telah lolos uji kendali mutu teknisi dan siap diambil di toko.
-                    Mohon siapkan kode tiket servis ini saat serah terima.
-                  </p>
+                  {ticket.timeline.some((event) => event.action === 'estimate_rejected') ? (
+                    <>
+                      <strong style={{ color: '#166534', fontSize: '1.05rem' }}>
+                        Servis Ditolak & Perangkat Siap Diambil
+                      </strong>
+                      <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: '#14532d' }}>
+                        Estimasi servis ditolak. Perangkat sudah dirakit kembali dan siap diambil.
+                        Mohon siapkan kode tiket servis ini saat serah terima.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <strong style={{ color: '#166534', fontSize: '1.05rem' }}>
+                        Servis Selesai & Perangkat Siap Diambil!
+                      </strong>
+                      <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: '#14532d' }}>
+                        Perangkat Anda telah lolos uji kendali mutu teknisi dan siap diambil di toko.
+                        Mohon siapkan kode tiket servis ini saat serah terima.
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

@@ -95,6 +95,7 @@ export interface SerializedTicket {
     condition?: string;
   };
   complaint: string;
+  intakeDifficultyLevel?: 'low' | 'medium' | 'high' | 'complex';
   intakeMethod: 'walk_in' | 'online';
   status: TicketStatus;
   revision: number;
@@ -345,6 +346,7 @@ export const serializeTicket = (
       condition: ticket.device.condition,
     },
     complaint: ticket.complaint,
+    intakeDifficultyLevel: isCustomer ? undefined : ticket.intakeDifficultyLevel,
     intakeMethod: ticket.intakeMethod,
     status: ticket.status,
     revision: ticket.revision,

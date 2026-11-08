@@ -11,6 +11,7 @@ const paths = {
   print: 'M6 9V3h12v6M6 18H3V9h18v9h-3M6 14h12v7H6Zm11-2h1',
   file: 'M14 2H4v20h16V8Zm0 0v6h6M8 13h8M8 17h6',
   image: 'M3 3h18v18H3Zm0 14 5-5 4 4 3-3 6 6M8 7h.01',
+  trash: 'M3 6h18M8 6V4h8v2m3 0-1 15H6L5 6m4 4v7m6-7v7',
   qr: 'M3 3h7v7H3zM5.5 5.5h2v2h-2zM14 3h7v7h-7zM16.5 5.5h2v2h-2zM3 14h7v7H3zM5.5 16.5h2v2h-2zM14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM18 18h3v3h-3z',
   home: 'M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z',
   ticket: 'M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4Zm12 0v3m0 3v2m0 3v3',

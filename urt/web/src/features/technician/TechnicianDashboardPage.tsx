@@ -88,6 +88,7 @@ export default function TechnicianDashboardPage() {
           detail="Pekerjaan yang ditugaskan"
           icon="ticket"
           tone="blue"
+          compactMobile
         />
         <SummaryCard
           label="Menunggu Persetujuan"
@@ -95,6 +96,7 @@ export default function TechnicianDashboardPage() {
           detail="Estimasi menunggu pelanggan"
           icon="clock"
           tone="orange"
+          compactMobile
         />
         <SummaryCard
           label="Servis Selesai"
@@ -102,6 +104,7 @@ export default function TechnicianDashboardPage() {
           detail="Pekerjaan telah selesai"
           icon="check"
           tone="green"
+          compactMobile
         />
       </section>
 
@@ -371,6 +374,23 @@ export default function TechnicianDashboardPage() {
               )}
             </tbody>
           </table>
+        </div>
+        <div className={styles.mobileUrgentList} aria-label="Daftar servis mendesak">
+          {urgentItems.length ? urgentItems.map((item) => (
+            <article className={styles.mobileUrgentCard} key={item.id}>
+              <header className={styles.mobileUrgentHeader}>
+                <Link to={`/technician/tickets/${item.id}`} className={styles.tableTicketLink}>{item.ticketCode}</Link>
+                <span className={styles.statusPillLate}><span className={styles.statusDotRed} />Terlambat</span>
+              </header>
+              <dl className={styles.mobileUrgentDetails}>
+                <div><dt>Perangkat</dt><dd>{item.device.brand} {item.device.model}</dd></div>
+                <div><dt>Pelanggan</dt><dd>{item.customer?.name || '—'}</dd></div>
+                <div className={styles.mobileUrgentComplaint}><dt>Keluhan</dt><dd>{item.complaint}</dd></div>
+                <div><dt>Tanggal masuk</dt><dd>{new Date(item.createdAt).toLocaleDateString('id-ID')}</dd></div>
+              </dl>
+              <Link to={`/technician/tickets/${item.id}`} className={styles.btnActionDetail}>Lihat detail</Link>
+            </article>
+          )) : <p className={styles.mobileUrgentEmpty}>Belum ada antrean servis mendesak.</p>}
         </div>
       </section>
     </div>

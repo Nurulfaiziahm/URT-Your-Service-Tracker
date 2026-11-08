@@ -206,7 +206,7 @@ export default function AccountProfilePage() {
           </Link>
         </div>
         <Link to={homePath} className={styles.navHome}>
-          &larr; Kembali ke Beranda
+          Kembali ke Beranda
         </Link>
       </nav>
 

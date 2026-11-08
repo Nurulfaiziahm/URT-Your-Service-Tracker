@@ -76,6 +76,7 @@ export const errorMessages: Record<string, string> = {
   SUBSCRIPTION_REQUIRED: 'Langganan belum aktif atau sudah berakhir. Pemilik perlu mengaktifkan paket terlebih dahulu.',
   TECHNICIAN_EXISTS: 'Teknisi dengan email ini sudah aktif di tempat servis Anda.',
   TECHNICIAN_HAS_ACTIVE_TICKETS: 'Teknisi masih memiliki tiket aktif. Alihkan penugasan sebelum menonaktifkannya.',
+  TECHNICIAN_NOT_PENDING: 'Hanya undangan teknisi yang belum diterima yang dapat dihapus permanen.',
   TECHNICIAN_LIMIT_REACHED: 'Batas teknisi paket telah tercapai, termasuk undangan yang belum kedaluwarsa. Kurangi jumlah teknisi atau pilih paket lain.',
   TICKET_CHANGED: 'Tiket telah diperbarui oleh pengguna lain. Muat ulang sebelum melanjutkan.',
   TICKET_NOT_COMPLETED: 'Selesaikan perbaikan terlebih dahulu sebelum melakukan tindakan ini.',

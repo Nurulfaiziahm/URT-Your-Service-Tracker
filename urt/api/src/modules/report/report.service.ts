@@ -514,6 +514,8 @@ export class ReportService {
       completedTicketsInPeriod,
       incomingTicketsCount,
       statusCountsAgg,
+      weeklyReceivedAgg,
+      weeklyCompletedAgg,
       technicians,
       unpaidInvoices,
       issuedInPeriodAgg,
@@ -529,19 +531,57 @@ export class ReportService {
         businessId: businessObjectId,
         createdAt: { $gte: startDate, $lte: endDate },
       }),
-      // 3. Status distribution across all business tickets
+      // 3. Current active ticket stages
       ServiceTicket.aggregate([
-        { $match: { deletedAt: { $exists: false }, businessId: businessObjectId } },
+        {
+          $match: {
+            deletedAt: { $exists: false },
+            businessId: businessObjectId,
+            status: { $nin: ['completed', 'cancelled'] },
+          },
+        },
         { $group: { _id: '$status', count: { $sum: 1 } } },
       ]),
-      // 4. Active technicians
+      // 4. Weekly ticket activity in the selected period
+      ServiceTicket.aggregate([
+        {
+          $match: {
+            deletedAt: { $exists: false },
+            businessId: businessObjectId,
+            createdAt: { $gte: startDate, $lte: endDate },
+          },
+        },
+        {
+          $group: {
+            _id: { $dateTrunc: { date: '$createdAt', unit: 'week', timezone, startOfWeek: 'monday' } },
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+      ServiceTicket.aggregate([
+        {
+          $match: {
+            deletedAt: { $exists: false },
+            businessId: businessObjectId,
+            status: 'completed',
+            readyAt: { $gte: startDate, $lte: endDate },
+          },
+        },
+        {
+          $group: {
+            _id: { $dateTrunc: { date: '$readyAt', unit: 'week', timezone, startOfWeek: 'monday' } },
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+      // 5. Active technicians
       Technician.find({ businessId: businessObjectId, status: 'active' }),
-      // 5. Unpaid invoices balance
+      // 6. Unpaid invoices balance
       ServiceInvoice.find({
         businessId: businessObjectId,
         status: { $in: ['issued', 'partially_paid'] },
       }),
-      // 6. Invoices issued in period
+      // 7. Invoices issued in period
       ServiceInvoice.aggregate([
         {
           $match: {
@@ -683,6 +723,42 @@ export class ReportService {
 
     const unpaidInvoicesBalance = unpaidInvoices.reduce((acc, inv) => acc + inv.balance, 0);
 
+    const localDay = (date: Date) => {
+      const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+        timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit',
+      }).formatToParts(date).map(({ type, value }) => [type, value]));
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    };
+    const weekStart = (date: Date) => {
+      const [year, month, day] = localDay(date).split('-').map(Number);
+      const localDate = new Date(Date.UTC(year, month - 1, day));
+      localDate.setUTCDate(localDate.getUTCDate() - ((localDate.getUTCDay() + 6) % 7));
+      return localDate;
+    };
+    const receivedByWeek = new Map<string, number>(weeklyReceivedAgg.map((item) => [localDay(item._id), item.count]));
+    const completedByWeek = new Map<string, number>(weeklyCompletedAgg.map((item) => [localDay(item._id), item.count]));
+    const weeklyVolume = [];
+    const startDay = localDay(startDate);
+    const endDay = localDay(endDate);
+    const endDayDate = new Date(`${endDay}T00:00:00Z`);
+    for (let cursor = weekStart(startDate); cursor <= endDayDate; cursor.setUTCDate(cursor.getUTCDate() + 7)) {
+      const key = cursor.toISOString().slice(0, 10);
+      const weekEnd = new Date(cursor);
+      weekEnd.setUTCDate(weekEnd.getUTCDate() + 6);
+      const weekEndDay = weekEnd.toISOString().slice(0, 10);
+      const displayStart = key < startDay ? startDay : key;
+      const displayEnd = weekEndDay > endDay ? endDay : weekEndDay;
+      const labelDate = (date: string) => new Intl.DateTimeFormat('id-ID', {
+        day: 'numeric', month: 'short', timeZone: 'UTC',
+      }).format(new Date(`${date}T00:00:00Z`));
+      weeklyVolume.push({
+        week: key,
+        label: `${labelDate(displayStart)}–${labelDate(displayEnd)}`,
+        ticketsReceived: receivedByWeek.get(key) || 0,
+        ticketsCompleted: completedByWeek.get(key) || 0,
+      });
+    }
+
     return {
       period: {
         startDate,
@@ -698,6 +774,7 @@ export class ReportService {
       volume: {
         ticketsCompleted: completedTicketsInPeriod.length,
         ticketsReceived: incomingTicketsCount,
+        byWeek: weeklyVolume,
       },
       sla: {
         eligibleTickets: eligibleSlaTickets.length,

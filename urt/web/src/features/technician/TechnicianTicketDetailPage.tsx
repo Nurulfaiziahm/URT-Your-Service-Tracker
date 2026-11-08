@@ -58,7 +58,10 @@ export default function TechnicianTicketDetailPage() {
           <span className="eyebrow">Pengerjaan Teknisi</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
             <span className={styles.ticketCode}>{ticket.ticketCode}</span>
-            <TicketStatusBadge status={ticket.status} />
+            <TicketStatusBadge
+              status={ticket.status}
+              rejectedFlow={ticket.timeline.some((event) => event.action === 'estimate_rejected')}
+            />
           </div>
         </div>
         <ButtonLink to="/technician/queue" variant="secondary">

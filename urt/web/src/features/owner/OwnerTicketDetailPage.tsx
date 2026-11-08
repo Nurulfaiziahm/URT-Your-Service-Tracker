@@ -1,4 +1,3 @@
-import { Icon } from '../../components/ui/Icon';
 import { Modal } from '../../components/ui/Modal';
 import { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
@@ -25,6 +24,7 @@ import { Button, ButtonLink } from '../../components/ui/Button';
 import { PageLoader, EmptyState, InlineNotice } from '../../components/feedback/Feedback';
 import type { ApiErrorBody } from '../../lib/api.types';
 import styles from '../tickets/Tickets.module.css';
+import pageStyles from './OwnerTicketDetailPage.module.css';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 export default function OwnerTicketDetailPage() {
@@ -167,19 +167,22 @@ export default function OwnerTicketDetailPage() {
       : undefined);
 
   return (
-    <div className={`container page-content ${styles.container}`}>
-      <header className={styles.heading}>
-        <div>
+    <div className={`container page-content ${styles.container} ${pageStyles.ownerDetail}`}>
+      <header className={`${styles.heading} ${pageStyles.detailHeading}`}>
+        <div className={pageStyles.headingMain}>
           <span className="eyebrow">Detail Tiket Servis</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
             <span className={styles.ticketCode}>{ticket.ticketCode}</span>
-            <TicketStatusBadge status={ticket.status} />
+            <TicketStatusBadge
+              status={ticket.status}
+              rejectedFlow={ticket.timeline.some((event) => event.action === 'estimate_rejected')}
+            />
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className={pageStyles.headingActions}>
           {ticket.allowedActions.includes('delete_ticket') && <Button type="button" variant="danger" onClick={() => setShowDeleteDialog(true)}>Hapus Tiket Anonim</Button>}
           <Button type="button" variant="secondary" onClick={() => setShowPrintReceipt(true)}>
-            <Icon name="print" /> Cetak Tanda Terima
+            Cetak Tanda Terima
           </Button>
           <ButtonLink to={`/tracking/${encodeURIComponent(ticket.ticketCode)}`} variant="secondary">
             Lihat Lacak Publik
@@ -224,11 +227,11 @@ export default function OwnerTicketDetailPage() {
       )}
 
       {/* Stepper */}
-      <div className={styles.ticketCard}>
+      <div className={`${styles.ticketCard} ${pageStyles.stepperCard}`}>
         <ServiceStepper status={ticket.status} rejectedFlow={ticket.timeline?.some((event) => event.action === 'estimate_rejected')} />
       </div>
 
-      <div className="reference-columns">
+      <div className={`reference-columns ${pageStyles.detailsGrid}`}>
         <div className="reference-stack">
           {/* Device Info */}
           <div className={styles.ticketCard}>
@@ -428,7 +431,7 @@ export default function OwnerTicketDetailPage() {
               <div style={{ display: 'grid', gap: 6, fontSize: '0.92rem' }}>
                 <div>
                   <span style={{ color: 'var(--slate-500)' }}>Nama: </span>
-                  <strong>{ticket.customer?.name || 'Walk-in Customer'}</strong>
+                  <strong>{ticket.customer?.name || 'Pelanggan langsung'}</strong>
                 </div>
                 <div>
                   <span style={{ color: 'var(--slate-500)' }}>Telepon: </span>
@@ -441,7 +444,7 @@ export default function OwnerTicketDetailPage() {
                 <div>
                   <span style={{ color: 'var(--slate-500)' }}>Metode Penerimaan: </span>
                   <strong>
-                    {ticket.intakeMethod === 'online' ? 'Pengajuan Online' : 'Walk-in Toko'}
+                    {ticket.intakeMethod === 'online' ? 'Pengajuan Online' : 'Datang langsung ke toko'}
                   </strong>
                 </div>
               </div>

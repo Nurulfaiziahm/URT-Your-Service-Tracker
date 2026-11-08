@@ -28,4 +28,16 @@
 .ticket { font-size: clamp(1.4rem, 6vw, 2rem); font-weight: 800; padding: 20px 12px; background: #eff6ff; color: var(--blue); border-radius: 12px; overflow-wrap: anywhere; }
 .optional { padding-top: 24px; border-top: 1px solid var(--border); display: grid; gap: 14px; }
 .optional .actions, .success .actions { justify-content: center; }
-@media (max-width: 520px) { .row { grid-template-columns: 1fr; } .steps li { flex-direction: column; text-align: center; font-size: .75rem; } .steps { gap: 6px; } .actions > * { flex: 1; } .card { border-radius: 14px; } }
+@media (max-width: 520px) {
+  .page { padding: 12px 0 24px; }
+  .heading { margin-bottom: 16px; }
+  .row { grid-template-columns: 1fr; }
+  .steps li { flex-direction: column; text-align: center; font-size: .75rem; }
+  .steps { gap: 6px; padding-bottom: 18px; margin-bottom: 18px; }
+  .form { gap: 18px; }
+  .actions > * { flex: 1; }
+  .card { padding: 16px; border-radius: 14px; }
+  .summary { gap: 14px; padding: 16px; }
+  .optional { padding-top: 16px; gap: 10px; }
+  .ticket { padding: 16px 10px; }
+}

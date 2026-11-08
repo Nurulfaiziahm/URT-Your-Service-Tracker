@@ -382,7 +382,10 @@ export default function TrackingPage() {
                     </span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
                       <span className={ticketStyles.ticketCode}>{trackingResult.ticketCode}</span>
-                      <TicketStatusBadge status={trackingResult.status} />
+                      <TicketStatusBadge
+                        status={trackingResult.status}
+                        rejectedFlow={trackingResult.timeline.some((event) => event.action === 'estimate_rejected')}
+                      />
                     </div>
                   </div>
                   <Button
@@ -404,6 +407,7 @@ export default function TrackingPage() {
                 <ServiceStepper
                   status={trackingResult.status}
                   statusNote={currentStatusNote(trackingResult.status, trackingResult.timeline)}
+                  rejectedFlow={trackingResult.timeline.some((event) => event.action === 'estimate_rejected')}
                 />
 
                 {/* Device and Complaint */}
@@ -554,10 +558,15 @@ export default function TrackingPage() {
                       color: '#166534',
                     }}
                   >
-                    <strong>Perangkat Siap Diambil!</strong>
+                    <strong>
+                      {trackingResult.timeline.some((event) => event.action === 'estimate_rejected')
+                        ? 'Servis Ditolak & Perangkat Siap Diambil'
+                        : 'Servis Selesai & Perangkat Siap Diambil!'}
+                    </strong>
                     <p style={{ margin: '4px 0 0', fontSize: '0.88rem' }}>
-                      Perbaikan telah selesai dan lolos uji kendali mutu. Silakan datang ke tempat
-                      servis dengan membawa tanda terima unit.
+                      {trackingResult.timeline.some((event) => event.action === 'estimate_rejected')
+                        ? 'Estimasi servis ditolak. Perangkat sudah dirakit kembali dan siap diambil di tempat servis.'
+                        : 'Perbaikan telah selesai dan lolos uji kendali mutu. Silakan datang ke tempat servis dengan membawa tanda terima unit.'}
                     </p>
                   </div>
                 )}

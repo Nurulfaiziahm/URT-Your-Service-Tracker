@@ -1,0 +1,67 @@
+.ownerDetail {
+  gap: 18px;
+}
+
+.detailHeading {
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.headingMain {
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.headingMain > div {
+  flex-wrap: wrap;
+  row-gap: 8px !important;
+}
+
+.headingActions {
+  display: flex;
+  flex: 1 1 600px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.headingActions > * {
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.stepperCard {
+  padding: 20px 24px;
+}
+
+.detailsGrid {
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.9fr);
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .detailHeading {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .headingActions {
+    flex: 0 1 auto;
+    justify-content: flex-start;
+  }
+
+  .detailsGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .ownerDetail { gap: 14px; }
+  .headingActions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .headingActions > * { justify-content: center; white-space: normal; text-align: center; }
+  .stepperCard { padding: 14px 10px; }
+  .detailsGrid { gap: 14px; }
+}

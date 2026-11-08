@@ -454,6 +454,7 @@ export class TicketService {
         condition: input.device.condition,
       },
       complaint: input.complaint,
+      intakeDifficultyLevel: input.intakeDifficultyLevel,
       intakeMethod: isOwner ? input.intakeMethod || 'walk_in' : 'online',
       status: startingStatus,
       revision: 1,

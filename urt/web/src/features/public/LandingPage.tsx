@@ -142,19 +142,15 @@ export default function LandingPage() {
               </li>
               <li>
                 <a
-                  className={
-                    activeSection === 'alur-kerja' ? 'site-nav__link is-active' : 'site-nav__link'
-                  }
-                  href="#alur-kerja"
+                  className={activeSection === 'lacak-servis' ? 'site-nav__link is-active' : 'site-nav__link'}
+                  href="#lacak-servis"
                 >
-                  Alur Kerja
+                  Lacak Servis
                 </a>
               </li>
               <li>
                 <a
-                  className={
-                    activeSection === 'peran' ? 'site-nav__link is-active' : 'site-nav__link'
-                  }
+                  className={activeSection === 'peran' ? 'site-nav__link is-active' : 'site-nav__link'}
                   href="#peran"
                 >
                   Tiga Peran
@@ -162,22 +158,18 @@ export default function LandingPage() {
               </li>
               <li>
                 <a
-                  className={
-                    activeSection === 'layanan' ? 'site-nav__link is-active' : 'site-nav__link'
-                  }
-                  href="#layanan"
+                  className={activeSection === 'alur-kerja' ? 'site-nav__link is-active' : 'site-nav__link'}
+                  href="#alur-kerja"
                 >
-                  Fitur
+                  Alur Kerja
                 </a>
               </li>
               <li>
                 <a
-                  className={
-                    activeSection === 'lacak-servis' ? 'site-nav__link is-active' : 'site-nav__link'
-                  }
-                  href="#lacak-servis"
+                  className={activeSection === 'layanan' ? 'site-nav__link is-active' : 'site-nav__link'}
+                  href="#layanan"
                 >
-                  Lacak Servis
+                  Fitur
                 </a>
               </li>
               <li>
@@ -522,7 +514,7 @@ export default function LandingPage() {
             </div>
             <div
               className={persona === 'owner' ? 'persona-panel is-active' : 'persona-panel'}
-              hidden={persona !== 'owner'}
+              hidden={false}
               id="panel-owner"
               role="tabpanel"
               aria-labelledby="tab-owner"
@@ -559,8 +551,8 @@ export default function LandingPage() {
                     </ul>
                   </div>
                   <div className="persona-layout__action">
-                    <a href="#harga" className="btn btn--secondary">
-                      Lihat Paket Langganan
+                    <a href="/demo/owner/beranda-owner.html" className="btn btn--primary">
+                      Jelajahi Portal Owner
                     </a>
                   </div>
                 </div>
@@ -577,34 +569,34 @@ export default function LandingPage() {
                           <span className="mini-metrics__num">24 Unit</span>
                         </div>
                         <div className="mini-metrics__item">
-                          <span className="mini-metrics__title">Menunggu ACC</span>
-                          <span className="mini-metrics__num">6 Unit</span>
+                          <span className="mini-metrics__title">Pelanggan</span>
+                          <span className="mini-metrics__num">48 Orang</span>
                         </div>
                         <div className="mini-metrics__item">
-                          <span className="mini-metrics__title">Selesai Hari Ini</span>
-                          <span className="mini-metrics__num">8 Unit</span>
+                          <span className="mini-metrics__title">Teknisi Aktif</span>
+                          <span className="mini-metrics__num">3 Orang</span>
                         </div>
                       </div>
                       <div className="ui-box">
-                        <h4 className="ui-box__title"> Beban Kerja Teknisi Hari Ini </h4>
+                        <h4 className="ui-box__title">Tiket Terbaru</h4>
                         <div className="technician-load">
                           <div className="technician-load__row">
-                            <span className="technician-load__name">Andi Saputra</span>
-                            <span className="technician-load__stat">8 Unit (Optimal)</span>
+                            <span className="technician-load__name">#URT-1024 · MacBook Pro</span>
+                            <span className="technician-load__stat">Diagnosis</span>
                           </div>
                           <div className="progress-bar">
                             <div className="progress-bar__fill" style={{ width: '80%' }}></div>
                           </div>
                           <div className="technician-load__row">
-                            <span className="technician-load__name">Budi Santoso</span>
-                            <span className="technician-load__stat">6 Unit (Sedang)</span>
+                            <span className="technician-load__name">#URT-1023 · iPhone 13</span>
+                            <span className="technician-load__stat">Pengerjaan</span>
                           </div>
                           <div className="progress-bar">
                             <div className="progress-bar__fill" style={{ width: '60%' }}></div>
                           </div>
                           <div className="technician-load__row">
-                            <span className="technician-load__name">Rizky Pratama</span>
-                            <span className="technician-load__stat">5 Unit (Sedang)</span>
+                            <span className="technician-load__name">#URT-1022 · Laptop Asus</span>
+                            <span className="technician-load__stat">Menunggu Diagnosis</span>
                           </div>
                           <div className="progress-bar">
                             <div className="progress-bar__fill" style={{ width: '50%' }}></div>
@@ -618,7 +610,7 @@ export default function LandingPage() {
             </div>
             <div
               className={persona === 'technician' ? 'persona-panel is-active' : 'persona-panel'}
-              hidden={persona !== 'technician'}
+              hidden={false}
               id="panel-technician"
               role="tabpanel"
               aria-labelledby="tab-technician"
@@ -676,40 +668,33 @@ export default function LandingPage() {
                 <div className="persona-layout__visual">
                   <div className="ui-mockup">
                     <div className="ui-mockup__header">
-                      <span className="ui-mockup__title">Kartu Kerja Teknisi: #URT-1024</span>
-                      <StatusBadge label="Menunggu Approval" tone="warning" />
+                      <span className="ui-mockup__title">Dashboard Teknisi · #URT-1024</span>
+                      <StatusBadge label="Menunggu Diagnosis" tone="warning" />
                     </div>
                     <div className="ui-mockup__body">
                       <div className="ticket-detail-grid">
                         <div>
-                          <span className="ui-label">Perangkat &amp; Pelanggan</span>
-                          <p className="ui-value">MacBook Pro 13" (Ahmad Fauzi)</p>
+                          <span className="ui-label">Tiket Ditugaskan</span>
+                          <p className="ui-value">MacBook Pro 13" · Ahmad Fauzi</p>
                         </div>
                         <div>
                           <span className="ui-label">Keluhan Masuk</span>
-                          <p className="ui-value"> Mati total setelah terkena tumpahan air </p>
+                          <p className="ui-value">Perangkat mati setelah terkena air</p>
                         </div>
                       </div>
                       <div className="diagnosis-card">
-                        <div className="diagnosis-card__title"> Hasil Diagnosis Teknisi: </div>
+                        <div className="diagnosis-card__title">Langkah Berikutnya</div>
                         <p className="diagnosis-card__body">
                           {' '}
-                          Korsleting pada IC Power rail 3.3V dan korosi pada konektor baterai.
-                          Diperlukan re-soldering komponen daya serta pembersihan ultrasonik
-                          board.{' '}
+                          Periksa unit, catat hasil diagnosis, lalu kirim estimasi biaya untuk
+                          keputusan pelanggan.{' '}
                         </p>
                         <div className="estimate-tag">
                           <span>
-                            Estimasi Total: <strong>Rp 850.000</strong>
+                            Aksi: <strong>Mulai Diagnosis</strong>
                           </span>
                           <span className="text-muted">(Suku Cadang + Jasa)</span>
                         </div>
-                      </div>
-                      <div className="action-footer">
-                        <button type="button" className="btn btn--secondary btn--sm" disabled>
-                          {' '}
-                          Tunggu Konfirmasi Pelanggan{' '}
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -718,7 +703,7 @@ export default function LandingPage() {
             </div>
             <div
               className={persona === 'customer' ? 'persona-panel is-active' : 'persona-panel'}
-              hidden={persona !== 'customer'}
+              hidden={false}
               id="panel-customer"
               role="tabpanel"
               aria-labelledby="tab-customer"
@@ -770,9 +755,9 @@ export default function LandingPage() {
                       <div className="tracking-device-card">
                         <div>
                           <strong>MacBook Pro 13" Space Gray</strong>
-                          <div className="text-muted">Serial: C02DW0**MD6R</div>
+                          <div className="text-muted">Nomor tiket: URT-1024</div>
                         </div>
-                        <span className="tag tag--blue">Est. Siap: Hari ini, 16:00</span>
+                        <span className="tag tag--blue">Status servis terkini</span>
                       </div>
                       <ServiceStepper status="repairing" />
                     </div>
@@ -1275,6 +1260,16 @@ export default function LandingPage() {
           </div>
         </section>
       </main>
+      <button
+        className="back-to-top"
+        type="button"
+        aria-label="Kembali ke atas"
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m5 11 7-7 7 7M12 4v16" />
+        </svg>
+      </button>
       <footer className="site-footer">
         <div className="container site-footer__container">
           <div className="site-footer__brand-col">
@@ -1318,25 +1313,29 @@ export default function LandingPage() {
           </nav>
           <div className="site-footer__col">
             <h3 className="site-footer__heading">Hubungi Kami</h3>
-            <ul className="site-footer__links">
+            <ul className="site-footer__links site-footer__contact-links">
               <li>
-                <a href="mailto:urtyourservicetracker@gmail.com">
-                  urtyourservicetracker@gmail.com
+                <a href="mailto:urtyourservicetracker@gmail.com" aria-label="Email URT" title="Email URT">
+                  <svg className="site-footer__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 6.75A1.75 1.75 0 0 1 4.75 5h14.5A1.75 1.75 0 0 1 21 6.75v10.5A1.75 1.75 0 0 1 19.25 19H4.75A1.75 1.75 0 0 1 3 17.25V6.75Zm1.7.03 6.75 5.17a.9.9 0 0 0 1.1 0l6.75-5.17a.25.25 0 0 0-.15-.08H4.85a.25.25 0 0 0-.15.08Zm14.6 1.9-5.84 4.47a2.6 2.6 0 0 1-3.12 0L4.5 8.68v8.57c0 .14.11.25.25.25h14.5a.25.25 0 0 0 .25-.25V8.68Z" />
+                  </svg>
+                  <span>urtyourservicetracker@gmail.com</span>
                 </a>
               </li>
               <li>
-                <a href="https://web.whatsapp.com" target="_blank" rel="noopener noreferrer">
-                  WhatsApp Support
+                <a href="https://web.whatsapp.com" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Support" title="WhatsApp Support">
+                  <svg className="site-footer__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2.5a9.35 9.35 0 0 0-8.04 14.12L2.7 21.5l5.02-1.22A9.5 9.5 0 1 0 12 2.5Zm0 16.9a7.5 7.5 0 0 1-3.83-1.05l-.3-.18-2.98.72.75-2.9-.2-.31A7.5 7.5 0 1 1 12 19.4Zm4.12-5.62c-.23-.12-1.36-.67-1.57-.75-.21-.08-.36-.12-.52.12-.15.23-.6.75-.74.9-.14.16-.27.18-.5.06-.23-.11-.97-.36-1.84-1.13-.68-.6-1.14-1.35-1.27-1.58-.13-.23-.01-.36.1-.47.1-.1.23-.27.35-.4.12-.14.15-.24.23-.39.08-.15.04-.29-.02-.4-.06-.12-.52-1.25-.72-1.71-.19-.45-.39-.39-.52-.4h-.45c-.16 0-.4.06-.61.29-.21.23-.8.78-.8 1.9 0 1.13.82 2.22.93 2.37.12.15 1.62 2.47 3.93 3.46.55.24.97.38 1.3.49.55.17 1.05.15 1.45.09.44-.07 1.36-.56 1.55-1.1.2-.55.2-1.02.14-1.11-.06-.1-.21-.16-.44-.28Z" />
+                  </svg>
+                  <span>WhatsApp Support</span>
                 </a>
               </li>
               <li>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
-                  YouTube Tutorial
-                </a>
-              </li>
-              <li>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                  LinkedIn Official
+                <a href="https://youtu.be/vJSAYUxIn7g" target="_blank" rel="noopener noreferrer" aria-label="YouTube Tutorial" title="YouTube Tutorial">
+                  <svg className="site-footer__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.57 12 3.57 12 3.57s-7.55 0-9.4.51A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.51 9.4.51 9.4.51s7.55 0 9.4-.51a3 3 0 0 0 2.1-2.12A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM9.55 15.6V8.4L15.8 12l-6.25 3.6Z" />
+                  </svg>
+                  <span>YouTube Tutorial</span>
                 </a>
               </li>
             </ul>

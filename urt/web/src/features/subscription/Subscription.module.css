@@ -89,6 +89,16 @@
   padding: 14px 16px;
   border-bottom: 1px solid #e2e8f0;
 }
+.pendingPaymentCallout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+}
+.subscriptionStats { gap: 16px; }
+.pendingPaymentCallout p { margin: 0; }
+.pendingPaymentCallout a { flex: 0 0 auto; }
 @media (max-width: 720px) {
   .plans {
     grid-template-columns: 1fr;
@@ -98,5 +108,10 @@
   }
   .total {
     flex-wrap: wrap;
+  }
+  .pendingPaymentCallout {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
   }
 }

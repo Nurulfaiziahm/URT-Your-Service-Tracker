@@ -1,0 +1,215 @@
+.picker {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.picker > div:last-child > div:first-child {
+  align-items: flex-end;
+  gap: 10px !important;
+}
+
+.picker > div:last-child > div:first-child > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.picker > div:last-child > div:first-child > button {
+  flex: 0 0 auto;
+  height: 42px;
+  white-space: nowrap;
+}
+
+.picker [style*='max-height: 180px'] {
+  max-height: 156px !important;
+  border-color: #dbe3ef !important;
+  border-radius: 10px !important;
+  background: #fff;
+}
+
+.picker [style*='max-height: 180px'] > div {
+  min-height: 40px;
+  align-items: center;
+  padding: 8px 12px !important;
+  border-color: #edf1f6 !important;
+  color: #1e293b;
+  font-size: 13px;
+  transition: background-color 120ms ease;
+}
+
+.picker [style*='max-height: 180px'] > div:hover {
+  background: #f8fafc;
+}
+
+.picker [style*='max-height: 180px'] > div:last-child {
+  border-bottom: 0 !important;
+}
+
+.customerRowSelect {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  grid-template-columns: minmax(140px, 1fr) minmax(140px, 0.8fr) minmax(220px, 1.2fr);
+  align-items: center;
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.customerRowSelect:hover .customerName {
+  color: #1d4ed8;
+}
+
+.customerPhone,
+.customerEmail {
+  overflow: hidden;
+  color: var(--slate-500);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customerEmail {
+  text-align: center;
+}
+
+.customerAction,
+.customerEditAction {
+  min-height: 30px !important;
+  padding: 4px 10px !important;
+  border-radius: 7px !important;
+  font-size: 0.76rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+}
+
+.customerAction {
+  color: #2563eb !important;
+}
+
+.customerAction:hover:not(:disabled) {
+  background: #eff6ff !important;
+}
+
+.customerEditAction {
+  color: #64748b !important;
+}
+
+.customerEditAction:hover:not(:disabled) {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+}
+
+.picker [style*='max-height: 180px'] > div > span:last-child {
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.editModal {
+  display: grid;
+  gap: 20px;
+  padding: 28px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.editHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8edf4;
+}
+
+.editEyebrow {
+  color: #2563eb;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.editHeader h2 {
+  margin: 5px 0 0;
+  color: #111827;
+  font-size: 1.25rem;
+}
+
+.editHeader p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.closeButton {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  background: #fff;
+  color: #64748b;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.editFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.editActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #e8edf4;
+}
+
+@media (max-width: 640px) {
+  .customerRowSelect {
+    grid-template-columns: minmax(90px, 1fr) minmax(100px, 1fr);
+    gap: 4px 10px;
+  }
+
+  .customerEmail {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .editModal {
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .editFields {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .picker > div:last-child > div:first-child {
+    flex-wrap: wrap;
+  }
+
+  .picker > div:last-child > div:first-child > :first-child {
+    flex-basis: 100%;
+  }
+
+  .picker > div:last-child > div:first-child > button {
+    width: 100%;
+  }
+}

@@ -31,6 +31,12 @@ export interface ReportOverviewData {
   volume: {
     ticketsCompleted: number;
     ticketsReceived: number;
+    byWeek: {
+      week: string;
+      label: string;
+      ticketsReceived: number;
+      ticketsCompleted: number;
+    }[];
   };
   sla: {
     eligibleTickets: number;

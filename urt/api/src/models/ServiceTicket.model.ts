@@ -132,6 +132,7 @@ export interface IServiceTicket extends Document {
   requestedServiceId?: mongoose.Types.ObjectId;
   device: IDeviceSnapshot;
   complaint: string;
+  intakeDifficultyLevel?: 'low' | 'medium' | 'high' | 'complex';
   intakeMethod: IntakeMethod;
   status: TicketStatus;
   revision: number;
@@ -558,6 +559,7 @@ const serviceTicketSchema = new Schema<IServiceTicket>(
       trim: true,
       maxlength: [1000, 'Complaint description cannot exceed 1000 characters'],
     },
+    intakeDifficultyLevel: { type: String, enum: ['low', 'medium', 'high', 'complex'], default: undefined },
     intakeMethod: {
       type: String,
       enum: ['walk_in', 'online'],

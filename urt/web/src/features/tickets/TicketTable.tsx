@@ -20,8 +20,9 @@ export function TicketTable({
 }) {
   const path = role === 'customer' ? `${customerBasePath}/services` : `/${role}/tickets`;
   return (
-    <ResponsiveTable role={history && role === 'customer' ? 'region' : undefined} className={[styles.tableWrapper, history && role === 'customer' ? styles.customerHistoryWrapper : ''].filter(Boolean).join(' ')} aria-label={history && role === 'customer' ? 'Riwayat servis' : undefined} tabIndex={history && role === 'customer' ? 0 : undefined} rowHeading={tickets.length ? 'Tiket' : undefined}>
-      <table data-mobile-card-layout={history && role === 'customer' ? 'true' : undefined} className={[styles.table, history ? styles.centeredTable : '', history && role === 'customer' ? styles.customerHistoryTable : ''].filter(Boolean).join(' ')}>
+    <>
+      <ResponsiveTable role={history && role === 'customer' ? 'region' : undefined} className={[styles.tableWrapper, styles.desktopTicketTable, history && role === 'customer' ? styles.customerHistoryWrapper : ''].filter(Boolean).join(' ')} aria-label={history && role === 'customer' ? 'Riwayat servis' : undefined} tabIndex={history && role === 'customer' ? 0 : undefined} rowHeading={tickets.length ? 'Tiket' : undefined}>
+      <table className={[styles.table, history ? styles.centeredTable : '', history && role === 'customer' ? styles.customerHistoryTable : ''].filter(Boolean).join(' ')}>
         <thead>
           <tr>
             <th>{history ? 'Nomor Tiket & Perangkat' : 'Nomor Tiket'}</th>
@@ -71,7 +72,10 @@ export function TicketTable({
                   </td>
                 )}
                 <td>
-                  <TicketStatusBadge status={ticket.status} />
+                  <TicketStatusBadge
+                    status={ticket.status}
+                    rejectedFlow={ticket.timeline.some((event) => event.action === 'estimate_rejected')}
+                  />
                 </td>
                 {role === 'technician' && !history && <td><DeadlineBadge ticket={ticket} /></td>}
                 {role !== 'owner' && (
@@ -90,6 +94,34 @@ export function TicketTable({
           )}
         </tbody>
       </table>
-    </ResponsiveTable>
+      </ResponsiveTable>
+      <div className={styles.mobileTicketList} aria-label={history ? 'Riwayat servis' : 'Daftar tiket'}>
+        {tickets.length ? tickets.map((ticket) => (
+          <article className={styles.mobileTicketCard} key={ticket.id}>
+            <header className={styles.mobileTicketHeader}>
+              <Link to={`${path}/${ticket.id}`} className={styles.mobileTicketCode}>{ticket.ticketCode}</Link>
+              <TicketStatusBadge
+                status={ticket.status}
+                rejectedFlow={ticket.timeline.some((event) => event.action === 'estimate_rejected')}
+              />
+            </header>
+            <dl className={styles.mobileTicketDetails}>
+              <div><dt>Perangkat</dt><dd>{ticket.device.brand} {ticket.device.model}</dd></div>
+              {role === 'customer' ? (
+                <div><dt>{history ? 'Jenis servis' : 'Layanan'}</dt><dd>{ticket.service?.name || ticket.device.category}</dd></div>
+              ) : (
+                <div><dt>Pelanggan</dt><dd>{ticket.customer?.name || '—'}</dd></div>
+              )}
+              {role === 'owner' && <div><dt>Teknisi</dt><dd>{ticket.technician?.name || 'Belum ditugaskan'}</dd></div>}
+              {(role !== 'owner' || history) && <div><dt>Tanggal masuk</dt><dd>{new Date(ticket.createdAt).toLocaleDateString('id-ID')}</dd></div>}
+              {history && <div><dt>Total biaya</dt><dd>{ticket.approvedEstimate ? formatRupiah(ticket.approvedEstimate.totalAmount) : '—'}</dd></div>}
+              {role !== 'customer' && !history && <div className={styles.mobileTicketComplaint}><dt>Keluhan</dt><dd>{ticket.complaint}</dd></div>}
+              {role === 'technician' && !history && <div><dt>Prioritas & tenggat</dt><dd><DeadlineBadge ticket={ticket} /></dd></div>}
+            </dl>
+            <Link to={`${path}/${ticket.id}`} className={styles.mobileTicketAction}>Lihat detail</Link>
+          </article>
+        )) : <p className={styles.mobileTicketEmpty}>Belum ada tiket servis.</p>}
+      </div>
+    </>
   );
 }

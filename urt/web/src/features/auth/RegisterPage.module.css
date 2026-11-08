@@ -641,6 +641,18 @@
     padding: 0;
   }
 
+  .onboarding-page .onboarding-form-row > div > label {
+    min-height: 0;
+  }
+
+  .onboarding-page .onboarding-form-row {
+    gap: 8px;
+  }
+
+  .onboarding-page .onboarding-form-card {
+    gap: 10px;
+  }
+
   .onboarding-page .register-main {
     background: transparent;
   }
@@ -713,7 +725,11 @@
   }
 
   .form-group {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
+  }
+
+  .field-error:empty {
+    display: none;
   }
 
   .form-control {

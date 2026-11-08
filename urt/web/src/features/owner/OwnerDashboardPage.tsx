@@ -62,10 +62,10 @@ export default function OwnerDashboardPage() {
       <OwnerOnboardingChecklist data={data.data} />
 
       <section className={styles.stats} aria-label="Ringkasan operasional">
-        <SummaryCard label="Tiket Aktif" value={stats.activeTickets} detail="Tiket servis berjalan" />
-        <SummaryCard label="Pelanggan" value={stats.totalCustomers} detail="Pelanggan terdaftar" icon="people" tone="green" />
-        <SummaryCard label="Teknisi Aktif" value={stats.activeTechnicians} detail="Tim teknisi tempat servis" icon="team" tone="orange" />
-        <SummaryCard label="Langganan" value={isActive ? `${subscription.daysRemaining} hari` : '—'} detail={isActive ? `${subscription.planName} aktif` : 'Belum ada langganan aktif'} icon="shield" />
+        <SummaryCard label="Tiket Aktif" value={stats.activeTickets} detail="Tiket servis berjalan" compactMobile />
+        <SummaryCard label="Pelanggan" value={stats.totalCustomers} detail="Pelanggan terdaftar" icon="people" tone="green" compactMobile />
+        <SummaryCard label="Teknisi Aktif" value={stats.activeTechnicians} detail="Tim teknisi tempat servis" icon="team" tone="orange" compactMobile />
+        <SummaryCard label="Langganan" value={isActive ? `${subscription.daysRemaining} hari` : '—'} detail={isActive ? `${subscription.planName} aktif` : 'Belum ada langganan aktif'} icon="shield" compactMobile />
       </section>
 
       <section className={styles.grid}>

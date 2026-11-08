@@ -103,6 +103,7 @@ export interface ServiceTicket {
   };
   device: DeviceInfo;
   complaint: string;
+  intakeDifficultyLevel?: 'low' | 'medium' | 'high' | 'complex';
   intakeMethod: 'walk_in' | 'online';
   status: TicketStatus;
   revision: number;
@@ -164,6 +165,7 @@ export interface CreateTicketInput {
   complaint: string;
   requestedServiceId?: string;
   assignedTechnicianId?: string;
+  intakeDifficultyLevel?: 'low' | 'medium' | 'high' | 'complex';
   intakeMethod?: 'walk_in' | 'online';
 }
 

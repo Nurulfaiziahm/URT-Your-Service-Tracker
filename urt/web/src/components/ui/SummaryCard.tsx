@@ -8,15 +8,19 @@ export function SummaryCard({
   detail,
   icon = 'ticket',
   tone = 'blue',
+  compact = false,
+  compactMobile = false,
 }: {
   label: string;
   value: ReactNode;
   detail?: ReactNode;
   icon?: IconName;
   tone?: 'blue' | 'green' | 'orange';
+  compact?: boolean;
+  compactMobile?: boolean;
 }) {
   return (
-    <article className={styles.card} data-tone={tone}>
+    <article className={`${styles.card} ${compact ? styles.compact : ''} ${compactMobile ? styles.compactMobile : ''}`} data-tone={tone}>
       <div className={styles.head}>
         <span>{label}</span>
         <span className={styles.icon}>

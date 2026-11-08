@@ -442,11 +442,16 @@
 }
 
 @media (max-width: 640px) {
+  :global([data-dashboard='customer']) { gap: 16px; }
+
   .summaryCard,
   .journeyCard {
-    padding: 16px;
-    gap: 14px;
+    padding: 14px;
+    gap: 12px;
   }
+
+  .activeServiceGrid,
+  .trackedServiceLayout { gap: 12px; }
 
   .infoRow {
     grid-template-columns: 1fr;
