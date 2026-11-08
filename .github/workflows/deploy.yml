@@ -7,35 +7,40 @@ on:
           paths:
                - "urt/api/**"
                - ".github/workflows/deploy.yml"
+     workflow_dispatch:
+
+# Never run two deploys at the same time on the VPS
+concurrency:
+     group: deploy-api
+     cancel-in-progress: false
 
 jobs:
      deploy:
-          runs-on: ubuntu-latest
+          # Runs directly on the VPS via the self-hosted GitHub Actions runner
+          runs-on: [self-hosted, linux]
+          timeout-minutes: 30
+
+          env:
+               REPO_DIR: /var/www/URT-Your-Service-Tracker
+               APP_DIR: /var/www/URT-Your-Service-Tracker/urt/api
 
           steps:
-               - name: Deploy to VPS and build
-                 uses: appleboy/ssh-action@v1.0.3
-                 with:
-                      host: ${{ secrets.VPS_HOST }}
-                      username: ${{ secrets.VPS_USER }}
-                      key: ${{ secrets.VPS_SSH_KEY }}
-                      script_stop: true
-                      command_timeout: 30m
-                      script: |
-                           set -e
+               - name: Pull latest code
+                 working-directory: ${{ env.REPO_DIR }}
+                 run: |
+                      set -e
+                      git fetch origin main
+                      git reset --hard origin/main
 
-                           REPO_DIR="/var/www/URT-Your-Service-Tracker"
-                           APP_DIR="$REPO_DIR/urt/api"
+               - name: Build and restart API (.env is already in the directory)
+                 working-directory: ${{ env.APP_DIR }}
+                 run: |
+                      set -e
+                      docker compose down
+                      docker compose up -d --build
 
-                           # pull latest code
-                           cd "$REPO_DIR"
-                           git fetch
-                           git reset --hard origin/main
-
-                           cd "$APP_DIR"
-                           docker compose down
-                           docker compose up -d --build
-
-
-                           docker image prune -f
-                           docker builder prune -f
+               - name: Cleanup old Docker images
+                 if: always()
+                 run: |
+                      docker image prune -f
+                      docker builder prune -f
