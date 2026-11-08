@@ -48,7 +48,7 @@ export default function OwnerNewTicketPage() {
   const [complaint, setComplaint] = useState('');
   const [requestedServiceId, setRequestedServiceId] = useState('');
   const [assignedTechnicianId, setAssignedTechnicianId] = useState('');
-  const [intakeDifficultyLevel, setIntakeDifficultyLevel] = useState('');
+  const [intakeDifficultyLevel, setIntakeDifficultyLevel] = useState<'' | 'low' | 'medium' | 'high' | 'complex'>('');
   const [intakePhoto, setIntakePhoto] = useState<File | null>(null);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -205,7 +205,7 @@ export default function OwnerNewTicketPage() {
         <div className={`${styles.row} ${pageStyles.formGrid}`}>
           <div className={pageStyles.selectField}>
             <label htmlFor="intake-difficulty">Tingkat kesulitan awal</label>
-            <select id="intake-difficulty" value={intakeDifficultyLevel} onChange={(e) => setIntakeDifficultyLevel(e.target.value)} className={pageStyles.select}>
+            <select id="intake-difficulty" value={intakeDifficultyLevel} onChange={(e) => setIntakeDifficultyLevel(e.target.value as typeof intakeDifficultyLevel)} className={pageStyles.select}>
               <option value="">Belum ditentukan</option>
               {Object.entries(difficultyLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>

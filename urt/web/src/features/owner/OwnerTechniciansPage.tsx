@@ -15,6 +15,7 @@ import { TextInput } from '../../components/ui/TextInput';
 import { Button } from '../../components/ui/Button';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
 import { InlineNotice, PageLoader, EmptyState } from '../../components/feedback/Feedback';
+import type { Technician } from '../technicians/types';
 import styles from '../business/Business.module.css';
 
 export default function OwnerTechniciansPage() {

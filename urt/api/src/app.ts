@@ -34,7 +34,7 @@ app.set('trust proxy', config.trustProxy);
  * Middleware Setup
  */
 app.use(morgan('dev'));
-app.use(helmet()); // Security headers
+app.use(helmet({})); // Security headers
 app.use('/api/v1/auth', (_req, res, next) => {
   res.setHeader('Cache-Control', 'no-store');
   next();

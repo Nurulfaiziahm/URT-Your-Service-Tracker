@@ -32,12 +32,10 @@ jobs:
                            git fetch
                            git reset --hard origin/main
 
-                           # Build Docker image on VPS (.env is already in the directory)
                            cd "$APP_DIR"
-
+                           docker compose down
                            docker compose up -d --build
 
 
-                           # Cleanup dangling images
                            docker image prune -f
                            docker builder prune -f

@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: urt-web
+    runtime: static
+    rootDir: urt/web
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - urt/web/**
+        - render.yaml
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: VITE_API_BASE_URL
+        value: https://urt-api.alritesoft.com/api/v1
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false
+    routes:
+      # SPA fallback so BrowserRouter deep links (e.g. /owner/dashboard) work on refresh
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
